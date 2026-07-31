@@ -111,42 +111,13 @@ False`), not a separate source or a duplicate table. `matches.csv` is the
 complete, authoritative table (played and unplayed); `fixtures.csv` exists
 purely as a convenience view of what's still upcoming/unplayed.
 
-## Data dictionary (core tables)
+## Data dictionary and how to query the data
 
-- **`competitions.csv`** — one row per competition (season × category ×
-  phase), e.g. "PREFERENTE BENJAMÍN F-7". Key: `competition_id`.
-- **`groups.csv`** — one row per group within a competition, e.g. "Grupo 12".
-  Key: `group_id`.
-- **`teams.csv`** — one row per canonical `team_id`. `club_name_raw` +
-  `squad_suffix` are split out of the raw name (e.g. `"C.F. MADRID RIO 'A'"`
-  → club `"C.F. MADRID RIO"`, suffix `"A"`) — **a club can field multiple
-  teams** (`'A'`, `'B'`, ...) across different groups/levels; join through
-  `club_name_raw` to see all of a club's teams.
-- **`team_group_membership.csv`** — which `team_id` played in which
-  `group_id`/`competition_id` this season.
-- **`matches.csv`** — one row per fixture/result. `match_id` (site's
-  `codacta`) is the canonical key when present; a bye/unassigned opponent
-  (`codigo_equipo_*="-1"`) yields `home_team_id`/`away_team_id = null`, not a
-  fabricated id. `home_score`/`away_score` are `null` together for unplayed
-  matches, never partially null.
-- **`standings.csv`** — one row per team per group, including
-  `sanction_points` (`puntos_sancion`) when present.
-- **`scorers.csv`** — top scorers per group (name, team, goals) — this is an
-  aggregate leaderboard, **not** a full per-match player log (that requires
-  the `enrich_acta.py` lineup enrichment below).
-- **`manifest_groups.csv`** / **`manifest_pages.csv`** / **`manifest_endpoints.csv`**
-  — discovery/page/endpoint manifests documenting what was found and fetched.
-- **`crawl_log.csv`** — every HTTP request attempted this run (status,
-  retries, success, raw path saved).
-- **`data_quality_report.csv`** — automated anomaly findings (see
-  `rffm_scraper/quality_checks.py`): duplicate match/team ids, empty team
-  names, inconsistent scores, standings missing keys, team-count mismatches
-  between matches and standings, jornada coverage gaps, groups with
-  calendario but no standings (or vice versa), finished matches missing a
-  `match_id`.
-
-See `CLAUDE.md` for the full table relationship map (including the
-enrichment tables) and analytics join recipes.
+Full column-by-column schema for every table (core + enrichment), table
+relationships, and ready-to-run pandas join recipes (including a worked
+"results between two clubs" example) live in **`CLAUDE.md`** — kept as the
+single source of truth for the data model on purpose, see that file's "Why
+one file" section for why it isn't duplicated here too.
 
 ## What's collected successfully vs. limited
 
