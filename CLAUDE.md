@@ -222,6 +222,54 @@ it's easy to revise. `goal_type_raw` (`tipo_gol`) has **no** analogous
 breakdown anywhere on the site and stays undecoded/opaque — don't assume it
 mirrors the card mapping.
 
+## Promotion/relegation (ascensos y descensos) — official, not inferred
+
+RFFM publishes a season-specific **"Bases de Ascensos y Descensos"** PDF
+(approved by the Comisión Delegada, typically each July before the season
+starts) that governs how teams move between divisions
+(`competition`/`competition_id` level, e.g. División de Honor → 1ª División
+Autonómica → Preferente → Primera). It is **not** derivable from
+`standings.csv` alone.
+
+Full transcript + archived source PDF for **2025-2026**:
+`docs/regulations/2025-2026/bases_ascensos_descensos_f7_f5.md` (the PDF
+itself is scanned images — OCR'd via `pdftoppm` + `tesseract -l spa`, see
+that file for the extraction method and the raw OCR text alongside it).
+
+Headline points (season 2025-2026, BENJAMÍN/PREBENJAMÍN, Fútbol-7 — see the
+doc above for full detail and Prebenjamín's two-phase season structure,
+which is why `SEGUNDA FASE`/`SUBGRUPO ... A`/`SUBGRUPO ... B` rows exist in
+`competitions.csv`/`groups.csv`):
+
+- Promotion/relegation is decided by **final table position** (top-2 /
+  bottom-4, division-dependent) — no playoff for these two categories in
+  2025-2026 (playoffs only apply to Infantil Femenino in this document).
+- Table position is **necessary but not sufficient** to know who actually
+  moved: a club's filial/dependent status can block a promotion (next
+  eligible team gets it instead), same-club A/B teams competing for one
+  slot are resolved by points-per-game coefficient (not raw points, since
+  groups can play different match counts) with letter-swapping if "B"
+  outranks "A", and "supernumerary" groups relegate one extra team to
+  rebalance division sizes.
+- The **"Torneo de Campeones"** competitions in our data
+  (`phase_label = "playoff"` / `"playoff FASE FINAL"`) are a separate
+  end-of-season champions' cup among group winners — the ascensos/descensos
+  document never mentions them, so treat them as **unrelated** to which
+  division a team plays in next season (inference from the document's
+  silence, not a confirmed fact).
+- To confirm an actual division change for a team, **diff
+  `team_id` → `competition_id`/`group_id` in `team_group_membership.csv`
+  across two consecutive seasons** — don't infer it from one season's
+  `standings.csv` position.
+- **Rules are re-published every season and do change** (e.g. Prebenjamín's
+  entire ascenso/descenso system is being abolished for 2026-2027 in favor
+  of self-registration, per RFFM's own announcement). When a future session
+  adds another season's data, fetch and read **that season's own** Bases de
+  Ascensos y Descensos PDF from
+  `https://www.rffm.es/federacion-rffm/documentacion-y-circulares/bases-de-competicion`
+  rather than assuming the 2025-2026 rules above still hold — save it under
+  `docs/regulations/<season>/` following the same structure.
+
 ## Known gaps / do not re-derive speculatively
 
 - **Nullable-int-as-float CSV formatting** (see `matches.csv` notes above)
