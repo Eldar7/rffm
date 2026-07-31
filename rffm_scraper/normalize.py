@@ -110,6 +110,27 @@ def to_float_or_none(value) -> float | None:
         return None
 
 
+def to_bool_or_none(value) -> bool | None:
+    """Coerce RFFM's '1'/'0' (occasionally 'true'/'false') string flags to bool."""
+    if value is None:
+        return None
+    s = str(value).strip()
+    if s == "":
+        return None
+    if s in ("1", "true", "True", "TRUE"):
+        return True
+    if s in ("0", "false", "False", "FALSE"):
+        return False
+    return None
+
+
+def team_id_or_none(raw_id: str | None) -> str | None:
+    """RFFM uses '' or '-1' as sentinels for a bye/unassigned/unknown team."""
+    if raw_id in (None, "", "-1"):
+        return None
+    return raw_id
+
+
 _PLAYOFF_PHASE_RE = re.compile(
     r"\b(\d+ª?\s*FASE|FASE\s*FINAL|SEGUNDA\s*FASE|TERCERA\s*FASE)\b"
 )

@@ -34,6 +34,7 @@ site:
     # `enrichment` below) and only happens if explicitly enabled.
     acta_partido: "/acta-partido"
     fichaequipo: "/fichaequipo"
+    fichajugador: "/fichajugador"
 
 network:
   user_agent: "Mozilla/5.0 (compatible; RFFM-DataCollector/1.0; contact: research use)"
@@ -58,8 +59,28 @@ target:
 
 enrichment:
   fetch_scorers: true            # /competicion/goleadores - allowed by robots.txt
-  fetch_acta_partido: false      # disallowed by robots.txt - opt-in only
+  fetch_acta_partido: true       # disallowed by robots.txt - explicit opt-in, run via enrich_acta.py
   fetch_fichaequipo: false       # disallowed by robots.txt - opt-in only
+  fetch_fichajugador: false      # disallowed by robots.txt - opt-in only, run via enrich_players.py
+  # Settings for the enrich_acta.py stage (match lineups/goals/cards/staff/
+  # officials, from /acta-partido/<match_id>). Off by default; explicitly
+  # opted into for a PREBENJAMIN pilot before widening to other categories.
+  acta_partido:
+    scope_category: "PREBENJAMIN"
+    skip_byes: true
+    skip_unplayed: true
+    progress_report_every: 25
+    rate_limit_seconds: 1.25     # more conservative than the 0.75s base pages use
+    force_refetch: false
+  # Settings for the enrich_players.py stage (player profiles/season stats/
+  # competition participation, from /fichajugador/<player_id>). Targets are
+  # the player_ids discovered by the acta_partido stage above, so this
+  # should be run after it.
+  fichajugador:
+    scope_category: "PREBENJAMIN"
+    progress_report_every: 25
+    rate_limit_seconds: 1.25
+    force_refetch: false
 
 paths:
   output_dir: "output"
