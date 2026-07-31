@@ -16,6 +16,7 @@ from rffm_scraper.normalize import (
     parse_date_to_iso,
     parse_matchday_label,
     parse_team_name,
+    team_id_or_none,
     to_int_or_none,
 )
 
@@ -40,12 +41,6 @@ class GroupContext:
     phase_label: str
 
 
-def _team_id_or_none(raw_id: str | None) -> str | None:
-    if raw_id in (None, "", "-1"):
-        return None
-    return raw_id
-
-
 def parse_matches(
     calendar_json: dict[str, Any], ctx: GroupContext, source_url: str
 ) -> list[dict]:
@@ -54,8 +49,8 @@ def parse_matches(
     for round_ in calendar_json.get("rounds", []):
         matchday, matchday_label = parse_matchday_label(round_.get("jornada"))
         for game in round_.get("equipos", []):
-            home_id = _team_id_or_none(game.get("codigo_equipo_local"))
-            away_id = _team_id_or_none(game.get("codigo_equipo_visitante"))
+            home_id = team_id_or_none(game.get("codigo_equipo_local"))
+            away_id = team_id_or_none(game.get("codigo_equipo_visitante"))
             home_score = to_int_or_none(game.get("goles_casa"))
             away_score = to_int_or_none(game.get("goles_visitante"))
             fecha = (game.get("fecha") or "").strip()
@@ -138,7 +133,7 @@ def parse_standings(
                 group=ctx.group,
                 group_id=ctx.group_id,
                 team=entry.get("nombre", ""),
-                team_id=_team_id_or_none(entry.get("codequipo")),
+                team_id=team_id_or_none(entry.get("codequipo")),
                 position=to_int_or_none(entry.get("posicion")),
                 played=to_int_or_none(entry.get("jugados")),
                 wins=to_int_or_none(entry.get("ganados")),
@@ -167,7 +162,7 @@ def parse_scorers(
                 season=ctx.season,
                 competition_id=ctx.competition_id,
                 group_id=ctx.group_id,
-                team_id=_team_id_or_none(entry.get("codigo_equipo")),
+                team_id=team_id_or_none(entry.get("codigo_equipo")),
                 player_name=entry.get("jugador", ""),
                 goals=to_int_or_none(entry.get("goles")),
                 source_url=source_url,

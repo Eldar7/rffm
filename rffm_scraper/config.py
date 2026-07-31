@@ -23,6 +23,7 @@ class Pages:
     goleadores: str
     acta_partido: str
     fichaequipo: str
+    fichajugador: str
 
 
 @dataclass
@@ -48,10 +49,31 @@ class TargetConfig:
 
 
 @dataclass
+class ActaPartidoConfig:
+    scope_category: str
+    skip_byes: bool = True
+    skip_unplayed: bool = True
+    progress_report_every: int = 25
+    rate_limit_seconds: float = 1.25
+    force_refetch: bool = False
+
+
+@dataclass
+class FichajugadorConfig:
+    scope_category: str
+    progress_report_every: int = 25
+    rate_limit_seconds: float = 1.25
+    force_refetch: bool = False
+
+
+@dataclass
 class EnrichmentConfig:
     fetch_scorers: bool
     fetch_acta_partido: bool
     fetch_fichaequipo: bool
+    fetch_fichajugador: bool
+    acta_partido: ActaPartidoConfig
+    fichajugador: FichajugadorConfig
 
 
 @dataclass
@@ -91,7 +113,14 @@ def load_settings(config_path: str | pathlib.Path = "config.yaml") -> Settings:
         season_label=raw["target"]["season_label"],
         category_priority=raw["target"]["category_priority"],
     )
-    enrichment = EnrichmentConfig(**raw["enrichment"])
+    raw_enrichment = dict(raw["enrichment"])
+    acta_raw = raw_enrichment.pop("acta_partido", {})
+    fichajugador_raw = raw_enrichment.pop("fichajugador", {})
+    enrichment = EnrichmentConfig(
+        **raw_enrichment,
+        acta_partido=ActaPartidoConfig(**acta_raw),
+        fichajugador=FichajugadorConfig(**fichajugador_raw),
+    )
     output_dir = pathlib.Path(raw["paths"]["output_dir"])
 
     return Settings(

@@ -41,6 +41,7 @@ from rffm_scraper.parsers import (
     teams_from_matches_and_standings,
 )
 from rffm_scraper.quality_checks import run_quality_checks
+from rffm_scraper.row_io import atomic_write_text, validate_rows, write_csv
 
 logger = logging.getLogger("rffm_scraper.pipeline")
 
@@ -50,21 +51,9 @@ def _now_iso() -> str:
 
 
 def _save_raw(settings: Settings, category_base: str, season_label: str, page_kind: str, group_id: str, content: str) -> str:
-    directory = settings.raw_dir / category_base.lower() / season_label / page_kind
-    directory.mkdir(parents=True, exist_ok=True)
-    path = directory / f"{group_id}.html"
-    path.write_text(content, encoding="utf-8")
+    path = settings.raw_dir / category_base.lower() / season_label / page_kind / f"{group_id}.html"
+    atomic_write_text(path, content)
     return str(path)
-
-
-def _validate_rows(model_cls, rows: list[dict], label: str) -> list[dict]:
-    validated = []
-    for row in rows:
-        try:
-            validated.append(model_cls(**row).model_dump())
-        except Exception as exc:  # pydantic ValidationError or similar
-            logger.warning("Dropping invalid %s row: %s (row=%s)", label, exc, row)
-    return validated
 
 
 ENDPOINT_DOCS = [
@@ -113,15 +102,24 @@ ENDPOINT_DOCS = [
     ),
     dict(
         name="acta_partido_page", method="GET", path="/acta-partido/<match_id>",
-        required_params="", optional_params="",
-        notes="Match report enrichment (goal scorers/minutes, venue, referee-adjacent fields). "
-              "robots.txt: Disallow /acta-partido/ - fetched only if enrichment.fetch_acta_partido=true.",
+        required_params="", optional_params="temporada,competicion,grupo",
+        notes="Match report enrichment: lineups, goals, cards, coaches/delegates, referees. "
+              "robots.txt: Disallow /acta-partido/ - fetched only if enrichment.fetch_acta_partido=true, "
+              "via enrich_acta.py (separate from the core crawl).",
     ),
     dict(
         name="fichaequipo_page", method="GET", path="/fichaequipo/<team_id>",
         required_params="", optional_params="",
         notes="Team metadata enrichment (club contact info, kit colours). "
               "robots.txt: Disallow /fichaequipo/ - fetched only if enrichment.fetch_fichaequipo=true.",
+    ),
+    dict(
+        name="fichajugador_page", method="GET", path="/fichajugador/<player_id>",
+        required_params="", optional_params="temporada",
+        notes="Player profile enrichment: birth year, season stats, competition participation. "
+              "Bare URL (no temporada) silently defaults to the current season. "
+              "robots.txt: Disallow /fichajugador/ - fetched only if enrichment.fetch_fichajugador=true, "
+              "via enrich_players.py (separate from the core crawl).",
     ),
 ]
 
@@ -145,16 +143,16 @@ def run_pipeline(settings: Settings) -> dict:
             all_matches, all_standings, all_scorers, teams_acc, membership_acc,
         )
 
-    matches_df = pd.DataFrame(_validate_rows(Match, all_matches, "match"))
-    standings_df = pd.DataFrame(_validate_rows(Standing, all_standings, "standing"))
-    scorers_df = pd.DataFrame(_validate_rows(Scorer, all_scorers, "scorer"))
-    teams_df = pd.DataFrame(_validate_rows(Team, list(teams_acc.values()), "team"))
+    matches_df = pd.DataFrame(validate_rows(Match, all_matches, "match"))
+    standings_df = pd.DataFrame(validate_rows(Standing, all_standings, "standing"))
+    scorers_df = pd.DataFrame(validate_rows(Scorer, all_scorers, "scorer"))
+    teams_df = pd.DataFrame(validate_rows(Team, list(teams_acc.values()), "team"))
     membership_df = pd.DataFrame(
-        _validate_rows(TeamGroupMembership, list(membership_acc.values()), "team_group_membership")
+        validate_rows(TeamGroupMembership, list(membership_acc.values()), "team_group_membership")
     )
-    competitions_df = pd.DataFrame(_validate_rows(Competition, list(competitions.values()), "competition"))
-    groups_df = pd.DataFrame(_validate_rows(Group, groups_rows, "group"))
-    manifest_groups_df = pd.DataFrame(_validate_rows(ManifestGroup, manifest_group_rows, "manifest_group"))
+    competitions_df = pd.DataFrame(validate_rows(Competition, list(competitions.values()), "competition"))
+    groups_df = pd.DataFrame(validate_rows(Group, groups_rows, "group"))
+    manifest_groups_df = pd.DataFrame(validate_rows(ManifestGroup, manifest_group_rows, "manifest_group"))
 
     fixtures_df = matches_df[~matches_df["is_finished"]].copy() if not matches_df.empty else matches_df
 
@@ -163,27 +161,27 @@ def run_pipeline(settings: Settings) -> dict:
 
     seasons_df = pd.DataFrame(discovery.seasons_raw)
     game_types_df = pd.DataFrame(discovery.game_types_raw)
-    endpoints_df = pd.DataFrame(_validate_rows(ManifestEndpoint, ENDPOINT_DOCS, "manifest_endpoint"))
+    endpoints_df = pd.DataFrame(validate_rows(ManifestEndpoint, ENDPOINT_DOCS, "manifest_endpoint"))
     crawl_log_df = pd.DataFrame(
-        _validate_rows(CrawlLogEntry, [dataclasses.asdict(e) for e in client.crawl_log], "crawl_log")
+        validate_rows(CrawlLogEntry, [dataclasses.asdict(e) for e in client.crawl_log], "crawl_log")
     )
 
     processed = settings.processed_dir
     processed.mkdir(parents=True, exist_ok=True)
-    _write_csv(seasons_df, processed / "seasons.csv")
-    _write_csv(game_types_df, processed / "game_types.csv")
-    _write_csv(competitions_df, processed / "competitions.csv")
-    _write_csv(groups_df, processed / "groups.csv")
-    _write_csv(teams_df, processed / "teams.csv")
-    _write_csv(membership_df, processed / "team_group_membership.csv")
-    _write_csv(matches_df, processed / "matches.csv")
-    _write_csv(fixtures_df, processed / "fixtures.csv")
-    _write_csv(standings_df, processed / "standings.csv")
-    _write_csv(scorers_df, processed / "scorers.csv")
-    _write_csv(manifest_groups_df, processed / "manifest_groups.csv")
-    _write_csv(endpoints_df, processed / "manifest_endpoints.csv")
-    _write_csv(crawl_log_df, processed / "crawl_log.csv")
-    _write_csv(quality_df, processed / "data_quality_report.csv")
+    write_csv(seasons_df, processed / "seasons.csv")
+    write_csv(game_types_df, processed / "game_types.csv")
+    write_csv(competitions_df, processed / "competitions.csv")
+    write_csv(groups_df, processed / "groups.csv")
+    write_csv(teams_df, processed / "teams.csv")
+    write_csv(membership_df, processed / "team_group_membership.csv")
+    write_csv(matches_df, processed / "matches.csv")
+    write_csv(fixtures_df, processed / "fixtures.csv")
+    write_csv(standings_df, processed / "standings.csv")
+    write_csv(scorers_df, processed / "scorers.csv")
+    write_csv(manifest_groups_df, processed / "manifest_groups.csv")
+    write_csv(endpoints_df, processed / "manifest_endpoints.csv")
+    write_csv(crawl_log_df, processed / "crawl_log.csv")
+    write_csv(quality_df, processed / "data_quality_report.csv")
     _write_page_manifest(settings, manifest_group_rows, processed / "manifest_pages.csv")
 
     summary = dict(
@@ -198,11 +196,6 @@ def run_pipeline(settings: Settings) -> dict:
     )
     logger.info("Pipeline summary: %s", summary)
     return summary
-
-
-def _write_csv(df: pd.DataFrame, path: pathlib.Path) -> None:
-    df.to_csv(path, index=False)
-    logger.info("Wrote %s (%d rows)", path, len(df))
 
 
 def _write_page_manifest(settings: Settings, manifest_group_rows: list[dict], path: pathlib.Path) -> None:

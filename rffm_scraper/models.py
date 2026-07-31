@@ -132,6 +132,114 @@ class Scorer(Row):
     scraped_at: str
 
 
+class MatchLineupEntry(Row):
+    match_id: str
+    team_id: str
+    player_id: str
+    player_name_raw: str
+    jersey_number: Optional[int]
+    is_starter: Optional[bool]
+    is_substitute: Optional[bool]
+    is_captain: Optional[bool]
+    is_goalkeeper: Optional[bool]
+    position_raw: Optional[str]
+    position_abbr_raw: Optional[str]
+    sex_raw: Optional[str]
+    source_url: str
+    scraped_at: str
+
+
+class MatchGoalEvent(Row):
+    match_id: str
+    team_id: str
+    player_id: Optional[str]
+    player_name_raw: str
+    minute: Optional[int]
+    minute_raw: Optional[str]
+    goal_type_raw: Optional[str]
+    source_url: str
+    scraped_at: str
+
+
+class MatchCardEvent(Row):
+    match_id: str
+    team_id: str
+    player_id: Optional[str]
+    player_name_raw: str
+    minute: Optional[int]
+    minute_raw: Optional[str]
+    card_type_raw: Optional[str]
+    card_type_label: Optional[str]
+    is_second_yellow: Optional[bool]
+    source_url: str
+    scraped_at: str
+
+
+class MatchStaff(Row):
+    match_id: str
+    team_id: str
+    role_kind: str
+    role_raw: str
+    person_id: Optional[str]
+    person_name: str
+    source_url: str
+    scraped_at: str
+
+
+class MatchOfficial(Row):
+    match_id: str
+    official_kind: str
+    official_id: Optional[str]
+    official_name: str
+    role_raw: str
+    source_url: str
+    scraped_at: str
+
+
+class Player(Row):
+    player_id: str
+    player_name: str
+    birth_year: Optional[int]
+    source_url: str
+    scraped_at: str
+
+
+class PlayerSeasonStats(Row):
+    player_id: str
+    season: str
+    season_id: str
+    called_up: Optional[int]
+    starter_appearances: Optional[int]
+    substitute_appearances: Optional[int]
+    matches_played: Optional[int]
+    goals_total: Optional[int]
+    goals_per_match: Optional[float]
+    yellow_cards: Optional[int]
+    red_cards: Optional[int]
+    second_yellow_cards: Optional[int]
+    is_goalkeeper: Optional[bool]
+    jersey_number: Optional[int]
+    source_url: str
+    scraped_at: str
+
+
+class PlayerCompetitionParticipation(Row):
+    player_id: str
+    season: str
+    season_id: str
+    competition_id: str
+    competition: str
+    group_id: str
+    group: str
+    team_id: str
+    team: str
+    club_name_raw: Optional[str]
+    team_position: Optional[int]
+    team_points: Optional[int]
+    source_url: str
+    scraped_at: str
+
+
 class ManifestGroup(Row):
     season_id: str
     game_type_id: str

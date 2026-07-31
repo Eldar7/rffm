@@ -120,11 +120,19 @@ def fetch_goleadores(
     )
 
 
-def fetch_acta_partido(client: RffmClient, settings: Settings, match_id: str) -> PageFetchResult:
+def fetch_acta_partido(
+    client: RffmClient, settings: Settings, *, season_id: str, competicion: str,
+    grupo: str, match_id: str,
+) -> PageFetchResult:
     """Enrichment only. robots.txt disallows /acta-partido/ - only call this
-    when settings.enrichment.fetch_acta_partido is explicitly enabled."""
+    when settings.enrichment.fetch_acta_partido is explicitly enabled.
+
+    URL confirmed by live sampling: /acta-partido/<match_id>?temporada=&competicion=&grupo=
+    (no tipojuego, unlike the three group-level page fetchers above).
+    """
+    params = {"temporada": season_id, "competicion": competicion, "grupo": grupo}
     return fetch_page(
-        client, settings, f"{settings.site.pages.acta_partido}/{match_id}", {},
+        client, settings, f"{settings.site.pages.acta_partido}/{match_id}", params,
         entity_type="match_acta", entity_id=match_id,
     )
 
@@ -135,4 +143,21 @@ def fetch_fichaequipo(client: RffmClient, settings: Settings, team_id: str) -> P
     return fetch_page(
         client, settings, f"{settings.site.pages.fichaequipo}/{team_id}", {},
         entity_type="team_ficha", entity_id=team_id,
+    )
+
+
+def fetch_fichajugador(
+    client: RffmClient, settings: Settings, *, season_id: str, player_id: str,
+) -> PageFetchResult:
+    """Enrichment only. robots.txt disallows /fichajugador/ - only call this
+    when settings.enrichment.fetch_fichajugador is explicitly enabled.
+
+    URL confirmed by live sampling: /fichajugador/<player_id>?temporada=<season_id>.
+    The bare URL (no query param) silently defaults to the *current* season,
+    so temporada is always passed explicitly.
+    """
+    params = {"temporada": season_id}
+    return fetch_page(
+        client, settings, f"{settings.site.pages.fichajugador}/{player_id}", params,
+        entity_type="player_ficha", entity_id=player_id,
     )
