@@ -93,6 +93,28 @@ explicitly requested.
 
 ## Enrichment tables (opt-in — see README for how/when these get populated)
 
+**Current coverage (check before querying, this narrows as pilots widen):**
+`match_lineups.csv` / `match_goals.csv` / `match_cards.csv` / `match_staff.csv`
+/ `match_officials.csv` are populated for **`PREBENJAMÍN` only** — the full
+2025-2026 season, all 7,618 finished matches (172,684 lineup rows, 52,545
+goals, 204 cards, 26,059 staff rows, 10,453 officials). `BENJAMIN` has **zero**
+rows in these five tables right now (`enrich_acta.py`'s
+`enrichment.acta_partido.scope_category` in `config.yaml` is set to
+`"PREBENJAMIN"` as a deliberate pilot before widening — see README's
+"What's collected successfully vs. limited"). **Filter/join queries against
+these five tables will silently return nothing for BENJAMIN** — that's
+expected scope, not a data bug; don't re-investigate it as one, and don't
+answer a BENJAMÍN player/lineup/card/goal question from these tables without
+telling the user the coverage gap.
+
+`players.csv`, `player_season_stats.csv`, and `player_competition_participation.csv`
+(the `enrich_players.py` outputs) **do not exist on disk yet** as of this data
+pull — `enrichment.fetch_fichajugador` is enabled in `config.yaml` but the
+stage hasn't been run. Check the file exists (e.g. `ls output/processed/rffm/`)
+before reading it; a missing-file error here means "not run yet", not a
+broken path. Player identity/season-stat questions currently can't be
+answered — say so rather than guessing from `match_lineups.csv` name strings.
+
 - **`match_lineups.csv`** — per-match, per-player. FK `match_id` →
   `matches.csv`, FK `player_id` → `players.csv`. Columns: `match_id,
   team_id, player_id, player_name_raw, jersey_number, is_starter,
@@ -226,6 +248,17 @@ mirrors the card mapping.
 
 - **Nullable-int-as-float CSV formatting** (see `matches.csv` notes above)
   — a known, not-yet-fixed pandas serialization quirk, not a data problem.
+- **`match_goals.csv` row count doesn't always sum to the official score.**
+  Verified by cross-checking every finished PREBENJAMÍN match: 86/7,618
+  (1.1%) have `goal_rows != home_score + away_score`. 68 of those are the
+  documented walkover/forfeit gap (score is 3-0/0-3 and the site has no acta
+  to scrape — same root cause as `acta_lineup_coverage_gap` in
+  `acta_data_quality_report.csv`, just not all individually flagged there).
+  The remaining **14 are genuine mismatches on played matches** (e.g.
+  match_id `5460032`/`5460036`: score 10-0 but 17 goal rows recorded;
+  `5511313`: score 1-12 but only 1 goal row) — cause unconfirmed, don't
+  silently trust `match_goals.csv` as the tally for a specific match without
+  reconciling against `matches.csv`'s `home_score`/`away_score` first.
 - Match substitutions: not modeled — zero populated examples were found in
   the BENJAMÍN/PREBENJAMÍN age bracket to validate a schema against. Raw
   acta HTML is archived per match, so this is revisitable once older
