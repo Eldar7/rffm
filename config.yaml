@@ -61,7 +61,7 @@ enrichment:
   fetch_scorers: true            # /competicion/goleadores - allowed by robots.txt
   fetch_acta_partido: true       # disallowed by robots.txt - explicit opt-in, run via enrich_acta.py
   fetch_fichaequipo: false       # disallowed by robots.txt - opt-in only
-  fetch_fichajugador: false      # disallowed by robots.txt - opt-in only, run via enrich_players.py
+  fetch_fichajugador: true       # disallowed by robots.txt - explicit opt-in, run via enrich_players.py
   # Settings for the enrich_acta.py stage (match lineups/goals/cards/staff/
   # officials, from /acta-partido/<match_id>). Off by default; explicitly
   # opted into for a PREBENJAMIN pilot before widening to other categories.
