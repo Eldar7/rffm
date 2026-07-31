@@ -1,0 +1,104 @@
+"""Typed configuration loaded from config.yaml."""
+from __future__ import annotations
+
+import pathlib
+from dataclasses import dataclass, field
+
+import yaml
+
+
+@dataclass
+class ApiEndpoints:
+    seasons: str
+    game_types: str
+    competitions: str
+    groups: str
+    results: str
+
+
+@dataclass
+class Pages:
+    calendario: str
+    clasificaciones: str
+    goleadores: str
+    acta_partido: str
+    fichaequipo: str
+
+
+@dataclass
+class SiteConfig:
+    base_url: str
+    api: ApiEndpoints
+    pages: Pages
+
+
+@dataclass
+class NetworkConfig:
+    user_agent: str
+    request_timeout_seconds: float
+    rate_limit_seconds: float
+    max_retries: int
+    retry_backoff_seconds: float
+
+
+@dataclass
+class TargetConfig:
+    season_label: str
+    category_priority: list[str] = field(default_factory=list)
+
+
+@dataclass
+class EnrichmentConfig:
+    fetch_scorers: bool
+    fetch_acta_partido: bool
+    fetch_fichaequipo: bool
+
+
+@dataclass
+class Settings:
+    site: SiteConfig
+    network: NetworkConfig
+    target: TargetConfig
+    enrichment: EnrichmentConfig
+    output_dir: pathlib.Path
+    config_path: pathlib.Path
+
+    @property
+    def raw_dir(self) -> pathlib.Path:
+        return self.output_dir / "raw" / "rffm"
+
+    @property
+    def processed_dir(self) -> pathlib.Path:
+        return self.output_dir / "processed" / "rffm"
+
+    @property
+    def discovery_dir(self) -> pathlib.Path:
+        return self.raw_dir / "discovery"
+
+
+def load_settings(config_path: str | pathlib.Path = "config.yaml") -> Settings:
+    config_path = pathlib.Path(config_path)
+    with open(config_path, "r", encoding="utf-8") as f:
+        raw = yaml.safe_load(f)
+
+    site = SiteConfig(
+        base_url=raw["site"]["base_url"],
+        api=ApiEndpoints(**raw["site"]["api"]),
+        pages=Pages(**raw["site"]["pages"]),
+    )
+    network = NetworkConfig(**raw["network"])
+    target = TargetConfig(
+        season_label=raw["target"]["season_label"],
+        category_priority=raw["target"]["category_priority"],
+    )
+    enrichment = EnrichmentConfig(**raw["enrichment"])
+    output_dir = pathlib.Path(raw["paths"]["output_dir"])
+
+    return Settings(
+        site=site,
+        network=network,
+        target=target,
+        enrichment=enrichment,
+        output_dir=output_dir,
+        config_path=config_path,
+    )

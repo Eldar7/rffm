@@ -1,0 +1,65 @@
+# RFFM scraper configuration.
+#
+# This file is the single place where URL patterns, target scope
+# (season + categories), and network/parsing policy live. Nothing about
+# site structure is hardcoded in code beyond what is described here plus
+# the discovery step (discovery.py), which derives competitions/groups
+# from the site's own /api/competitions and /api/groups endpoints rather
+# than a hardcoded list.
+
+site:
+  base_url: "https://www.rffm.es"
+  # Hidden JSON endpoints found via reverse-engineering the Next.js client
+  # bundle (see README "Discovered endpoints"). These are the primary,
+  # preferred data source for discovery.
+  api:
+    seasons: "/api/seasons"
+    game_types: "/api/game-types"
+    competitions: "/api/competitions"   # params: temporada, tipojuego
+    groups: "/api/groups"               # params: competicion
+    results: "/api/results"             # params: idGroup, round (single-round only; NOT used - see calendario page instead)
+  # Server-rendered pages. Each embeds a `__NEXT_DATA__` JSON blob with the
+  # full page state - we parse that JSON rather than scraping visible HTML
+  # text, which is far more robust to markup/CSS changes.
+  # IMPORTANT: the calendario page returns ALL jornadas for the group in a
+  # single request regardless of the `jornada` query param, so it is used
+  # as the single source for the whole season's fixtures+results per group.
+  pages:
+    calendario: "/competicion/calendario"
+    clasificaciones: "/competicion/clasificaciones"
+    goleadores: "/competicion/goleadores"
+    # Enrichment-only pages. robots.txt explicitly disallows crawling these
+    # three path prefixes (Disallow: /fichaequipo/ /fichajugador/
+    # /acta-partido/), so fetching them is OFF by default (see
+    # `enrichment` below) and only happens if explicitly enabled.
+    acta_partido: "/acta-partido"
+    fichaequipo: "/fichaequipo"
+
+network:
+  user_agent: "Mozilla/5.0 (compatible; RFFM-DataCollector/1.0; contact: research use)"
+  request_timeout_seconds: 20
+  rate_limit_seconds: 0.75       # minimum delay between requests to be polite
+  max_retries: 4
+  retry_backoff_seconds: 2.0
+
+target:
+  season_label: "2025-2026"      # resolved against /api/seasons -> cod_temporada
+  # Base categories in scope for this MVP. Matching is accent/case
+  # insensitive and substring-based against the site's `NombreCategoria`
+  # field. Order matters: PREBENJAMIN must be checked before BENJAMIN
+  # because "BENJAMIN" is a substring of "PREBENJAMIN".
+  category_priority:
+    - PREBENJAMIN
+    - BENJAMIN
+  # Game types are NOT hardcoded to Futbol-7: discovery iterates over all
+  # game types returned by /api/game-types and keeps whichever ones
+  # actually contain BENJAMIN/PREBENJAMIN competitions for the target
+  # season (empirically this is Futbol-7 and Futbol Sala).
+
+enrichment:
+  fetch_scorers: true            # /competicion/goleadores - allowed by robots.txt
+  fetch_acta_partido: false      # disallowed by robots.txt - opt-in only
+  fetch_fichaequipo: false       # disallowed by robots.txt - opt-in only
+
+paths:
+  output_dir: "output"
