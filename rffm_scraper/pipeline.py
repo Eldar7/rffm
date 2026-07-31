@@ -1,0 +1,359 @@
+"""Orchestrates discovery -> fetch -> parse -> normalize -> quality-check -> write.
+
+Restartability: raw pages are saved to deterministic per-group paths
+(overwritten on re-run, never appended), and processed CSVs are rebuilt
+from scratch each run from whatever raw+live data was fetched. A single
+group's fetch/parse failure is logged (crawl_log + missing manifest flags)
+and does not stop the rest of the run - partial success is expected and
+handled downstream by the quality report, not by crashing.
+"""
+from __future__ import annotations
+
+import dataclasses
+import logging
+import pathlib
+from datetime import datetime, timezone
+
+import pandas as pd
+
+from rffm_scraper.config import Settings
+from rffm_scraper.discovery import DiscoveredGroup, run_discovery
+from rffm_scraper.fetchers import fetch_calendario, fetch_clasificaciones, fetch_goleadores
+from rffm_scraper.http_client import RffmClient
+from rffm_scraper.models import (
+    Competition,
+    CrawlLogEntry,
+    Group,
+    ManifestEndpoint,
+    ManifestGroup,
+    Match,
+    Standing,
+    Scorer,
+    Team,
+    TeamGroupMembership,
+)
+from rffm_scraper.parsers import (
+    GroupContext,
+    parse_matches,
+    parse_scorers,
+    parse_standings,
+    team_group_memberships,
+    teams_from_matches_and_standings,
+)
+from rffm_scraper.quality_checks import run_quality_checks
+
+logger = logging.getLogger("rffm_scraper.pipeline")
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _save_raw(settings: Settings, category_base: str, season_label: str, page_kind: str, group_id: str, content: str) -> str:
+    directory = settings.raw_dir / category_base.lower() / season_label / page_kind
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"{group_id}.html"
+    path.write_text(content, encoding="utf-8")
+    return str(path)
+
+
+def _validate_rows(model_cls, rows: list[dict], label: str) -> list[dict]:
+    validated = []
+    for row in rows:
+        try:
+            validated.append(model_cls(**row).model_dump())
+        except Exception as exc:  # pydantic ValidationError or similar
+            logger.warning("Dropping invalid %s row: %s (row=%s)", label, exc, row)
+    return validated
+
+
+ENDPOINT_DOCS = [
+    dict(
+        name="seasons", method="GET", path="/api/seasons",
+        required_params="", optional_params="delegacion",
+        notes="List of all seasons with cod_temporada/nombre/fecha_inicio/fecha_fin.",
+    ),
+    dict(
+        name="game_types", method="GET", path="/api/game-types",
+        required_params="", optional_params="delegacion",
+        notes="List of game types (Futbol-11/Futbol-7/Futsal/Futbol-5/Futbol-Playa).",
+    ),
+    dict(
+        name="competitions", method="GET", path="/api/competitions",
+        required_params="temporada,tipojuego", optional_params="delegacion",
+        notes="Competitions for a season+game type, with NombreCategoria used for category filtering.",
+    ),
+    dict(
+        name="groups", method="GET", path="/api/groups",
+        required_params="competicion", optional_params="delegacion",
+        notes="Groups within a competition, incl. total_jornadas/total_equipos/clasificacion_goleadores flags.",
+    ),
+    dict(
+        name="results (not used)", method="GET", path="/api/results",
+        required_params="idGroup,round", optional_params="delegacion",
+        notes="Returns a SINGLE round's matches - would require iterating jornada 1..N per group. "
+              "The calendario page below is used instead since it returns the whole season in one request.",
+    ),
+    dict(
+        name="calendario_page", method="GET", path="/competicion/calendario",
+        required_params="temporada,competicion,grupo,jornada,tipojuego",
+        optional_params="",
+        notes="Server-rendered page; __NEXT_DATA__.props.pageProps.calendar.rounds contains ALL jornadas "
+              "for the group regardless of the jornada query value. Primary source for matches/fixtures.",
+    ),
+    dict(
+        name="clasificaciones_page", method="GET", path="/competicion/clasificaciones",
+        required_params="temporada,competicion,grupo,tipojuego", optional_params="",
+        notes="__NEXT_DATA__.props.pageProps.standings.clasificacion - standings incl. puntos_sancion.",
+    ),
+    dict(
+        name="goleadores_page", method="GET", path="/competicion/goleadores",
+        required_params="temporada,competicion,grupo,tipojuego", optional_params="",
+        notes="__NEXT_DATA__.props.pageProps.scorers.goles - top scorers list.",
+    ),
+    dict(
+        name="acta_partido_page", method="GET", path="/acta-partido/<match_id>",
+        required_params="", optional_params="",
+        notes="Match report enrichment (goal scorers/minutes, venue, referee-adjacent fields). "
+              "robots.txt: Disallow /acta-partido/ - fetched only if enrichment.fetch_acta_partido=true.",
+    ),
+    dict(
+        name="fichaequipo_page", method="GET", path="/fichaequipo/<team_id>",
+        required_params="", optional_params="",
+        notes="Team metadata enrichment (club contact info, kit colours). "
+              "robots.txt: Disallow /fichaequipo/ - fetched only if enrichment.fetch_fichaequipo=true.",
+    ),
+]
+
+
+def run_pipeline(settings: Settings) -> dict:
+    client = RffmClient(settings)
+    discovery = run_discovery(client, settings)
+
+    competitions: dict[str, dict] = {}
+    groups_rows: list[dict] = []
+    manifest_group_rows: list[dict] = []
+    all_matches: list[dict] = []
+    all_standings: list[dict] = []
+    all_scorers: list[dict] = []
+    teams_acc: dict[str, dict] = {}
+    membership_acc: dict[tuple[str, str], dict] = {}
+
+    for g in discovery.groups:
+        _process_group(
+            client, settings, g, competitions, groups_rows, manifest_group_rows,
+            all_matches, all_standings, all_scorers, teams_acc, membership_acc,
+        )
+
+    matches_df = pd.DataFrame(_validate_rows(Match, all_matches, "match"))
+    standings_df = pd.DataFrame(_validate_rows(Standing, all_standings, "standing"))
+    scorers_df = pd.DataFrame(_validate_rows(Scorer, all_scorers, "scorer"))
+    teams_df = pd.DataFrame(_validate_rows(Team, list(teams_acc.values()), "team"))
+    membership_df = pd.DataFrame(
+        _validate_rows(TeamGroupMembership, list(membership_acc.values()), "team_group_membership")
+    )
+    competitions_df = pd.DataFrame(_validate_rows(Competition, list(competitions.values()), "competition"))
+    groups_df = pd.DataFrame(_validate_rows(Group, groups_rows, "group"))
+    manifest_groups_df = pd.DataFrame(_validate_rows(ManifestGroup, manifest_group_rows, "manifest_group"))
+
+    fixtures_df = matches_df[~matches_df["is_finished"]].copy() if not matches_df.empty else matches_df
+
+    quality_issues = run_quality_checks(matches_df, standings_df, teams_df, manifest_groups_df)
+    quality_df = pd.DataFrame(quality_issues)
+
+    seasons_df = pd.DataFrame(discovery.seasons_raw)
+    game_types_df = pd.DataFrame(discovery.game_types_raw)
+    endpoints_df = pd.DataFrame(_validate_rows(ManifestEndpoint, ENDPOINT_DOCS, "manifest_endpoint"))
+    crawl_log_df = pd.DataFrame(
+        _validate_rows(CrawlLogEntry, [dataclasses.asdict(e) for e in client.crawl_log], "crawl_log")
+    )
+
+    processed = settings.processed_dir
+    processed.mkdir(parents=True, exist_ok=True)
+    _write_csv(seasons_df, processed / "seasons.csv")
+    _write_csv(game_types_df, processed / "game_types.csv")
+    _write_csv(competitions_df, processed / "competitions.csv")
+    _write_csv(groups_df, processed / "groups.csv")
+    _write_csv(teams_df, processed / "teams.csv")
+    _write_csv(membership_df, processed / "team_group_membership.csv")
+    _write_csv(matches_df, processed / "matches.csv")
+    _write_csv(fixtures_df, processed / "fixtures.csv")
+    _write_csv(standings_df, processed / "standings.csv")
+    _write_csv(scorers_df, processed / "scorers.csv")
+    _write_csv(manifest_groups_df, processed / "manifest_groups.csv")
+    _write_csv(endpoints_df, processed / "manifest_endpoints.csv")
+    _write_csv(crawl_log_df, processed / "crawl_log.csv")
+    _write_csv(quality_df, processed / "data_quality_report.csv")
+    _write_page_manifest(settings, manifest_group_rows, processed / "manifest_pages.csv")
+
+    summary = dict(
+        groups_discovered=len(discovery.groups),
+        competitions=len(competitions),
+        matches=len(matches_df),
+        standings=len(standings_df),
+        scorers=len(scorers_df),
+        teams=len(teams_df),
+        quality_issues=len(quality_df),
+        crawl_requests=len(crawl_log_df),
+    )
+    logger.info("Pipeline summary: %s", summary)
+    return summary
+
+
+def _write_csv(df: pd.DataFrame, path: pathlib.Path) -> None:
+    df.to_csv(path, index=False)
+    logger.info("Wrote %s (%d rows)", path, len(df))
+
+
+def _write_page_manifest(settings: Settings, manifest_group_rows: list[dict], path: pathlib.Path) -> None:
+    rows = []
+    for row in manifest_group_rows:
+        for kind, flag in (
+            ("calendario", "has_calendario"),
+            ("clasificaciones", "has_clasificaciones"),
+            ("goleadores", "has_goleadores"),
+        ):
+            if not row[flag]:
+                continue
+            rows.append(
+                dict(
+                    page_kind=kind,
+                    group_id=row["group_id"],
+                    competition_id=row["competition_id"],
+                    season_id=row["season_id"],
+                    game_type_id=row["game_type_id"],
+                    url=(
+                        f"{settings.site.base_url}{getattr(settings.site.pages, kind)}"
+                        f"?temporada={row['season_id']}&competicion={row['competition_id']}"
+                        f"&grupo={row['group_id']}&tipojuego={row['game_type_id']}"
+                    ),
+                    raw_saved_path=str(
+                        settings.raw_dir / row["category_base"].lower() / settings.target.season_label / kind
+                        / f"{row['group_id']}.html"
+                    ),
+                )
+            )
+    pd.DataFrame(rows).to_csv(path, index=False)
+    logger.info("Wrote %s (%d rows)", path, len(rows))
+
+
+def _process_group(
+    client: RffmClient,
+    settings: Settings,
+    g: DiscoveredGroup,
+    competitions: dict[str, dict],
+    groups_rows: list[dict],
+    manifest_group_rows: list[dict],
+    all_matches: list[dict],
+    all_standings: list[dict],
+    all_scorers: list[dict],
+    teams_acc: dict[str, dict],
+    membership_acc: dict[tuple[str, str], dict],
+) -> None:
+    scraped_at = _now_iso()
+    ctx = GroupContext(
+        season=g.season_label,
+        season_id=g.season_id,
+        category=g.category_base,
+        competition=g.competition_label_raw,
+        competition_id=g.competition_id,
+        group=g.group_label_raw,
+        group_id=g.group_id,
+        game_type=g.game_type_label,
+        game_type_id=g.game_type_id,
+        phase_label=g.phase_label,
+    )
+
+    if g.competition_id not in competitions:
+        competitions[g.competition_id] = dict(
+            season=g.season_label,
+            season_id=g.season_id,
+            category_base=g.category_base,
+            category_label_raw=g.category_label_raw,
+            competition=g.competition_label_raw,
+            competition_id=g.competition_id,
+            phase_label=g.phase_label,
+            game_type=g.game_type_label,
+            game_type_id=g.game_type_id,
+            source_url=(
+                f"{settings.site.base_url}{settings.site.api.competitions}"
+                f"?temporada={g.season_id}&tipojuego={g.game_type_id}"
+            ),
+            scraped_at=scraped_at,
+        )
+
+    groups_rows.append(
+        dict(
+            season=g.season_label,
+            season_id=g.season_id,
+            category=g.category_base,
+            competition=g.competition_label_raw,
+            competition_id=g.competition_id,
+            group=g.group_label_raw,
+            group_id=g.group_id,
+            group_label_raw=g.group_label_raw,
+            subgroup_label=None,
+            source_url=f"{settings.site.base_url}{settings.site.api.groups}?competicion={g.competition_id}",
+            scraped_at=scraped_at,
+        )
+    )
+
+    cal = fetch_calendario(
+        client, settings, season_id=g.season_id, competicion=g.competition_id,
+        grupo=g.group_id, game_type_id=g.game_type_id, entity_id=g.group_id,
+    )
+    clas = fetch_clasificaciones(
+        client, settings, season_id=g.season_id, competicion=g.competition_id,
+        grupo=g.group_id, game_type_id=g.game_type_id, entity_id=g.group_id,
+    )
+    gol = None
+    if settings.enrichment.fetch_scorers and g.clasificacion_goleadores:
+        gol = fetch_goleadores(
+            client, settings, season_id=g.season_id, competicion=g.competition_id,
+            grupo=g.group_id, game_type_id=g.game_type_id, entity_id=g.group_id,
+        )
+
+    group_matches: list[dict] = []
+    group_standings: list[dict] = []
+    group_scorers: list[dict] = []
+
+    if cal.ok and cal.raw_html:
+        _save_raw(settings, g.category_base, g.season_label, "calendario", g.group_id, cal.raw_html)
+        calendar_json = (cal.page_props or {}).get("calendar")
+        if calendar_json:
+            group_matches = parse_matches(calendar_json, ctx, cal.url)
+            all_matches.extend(group_matches)
+
+    if clas.ok and clas.raw_html:
+        _save_raw(settings, g.category_base, g.season_label, "clasificaciones", g.group_id, clas.raw_html)
+        standings_json = (clas.page_props or {}).get("standings")
+        if standings_json:
+            group_standings = parse_standings(standings_json, ctx, clas.url)
+            all_standings.extend(group_standings)
+
+    if gol is not None and gol.ok and gol.raw_html:
+        _save_raw(settings, g.category_base, g.season_label, "goleadores", g.group_id, gol.raw_html)
+        scorers_json = (gol.page_props or {}).get("scorers")
+        if scorers_json:
+            group_scorers = parse_scorers(scorers_json, ctx, gol.url)
+            all_scorers.extend(group_scorers)
+
+    teams_acc.update(teams_from_matches_and_standings(group_matches, group_standings))
+    for key, row in team_group_memberships(group_matches, group_standings, ctx, cal.url).items():
+        membership_acc[(g.group_id, key)] = row
+
+    manifest_group_rows.append(
+        dict(
+            season_id=g.season_id,
+            game_type_id=g.game_type_id,
+            competition_id=g.competition_id,
+            group_id=g.group_id,
+            category_base=g.category_base,
+            category_label_raw=g.category_label_raw,
+            competition_label_raw=g.competition_label_raw,
+            group_label_raw=g.group_label_raw,
+            has_calendario=bool(group_matches) or (cal.ok and cal.page_props is not None),
+            has_clasificaciones=bool(group_standings) or (clas.ok and clas.page_props is not None),
+            has_goleadores=bool(group_scorers) or (gol is not None and gol.ok and gol.page_props is not None),
+        )
+    )
