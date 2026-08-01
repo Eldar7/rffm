@@ -41,7 +41,7 @@ from rffm_scraper.parsers import (
     teams_from_matches_and_standings,
 )
 from rffm_scraper.quality_checks import run_quality_checks
-from rffm_scraper.row_io import atomic_write_text, validate_rows, write_csv
+from rffm_scraper.row_io import atomic_write_text, upsert_coverage_manifest, validate_rows, write_csv
 
 logger = logging.getLogger("rffm_scraper.pipeline")
 
@@ -125,6 +125,7 @@ ENDPOINT_DOCS = [
 
 
 def run_pipeline(settings: Settings) -> dict:
+    started_at = _now_iso()
     client = RffmClient(settings)
     discovery = run_discovery(client, settings)
 
@@ -183,6 +184,22 @@ def run_pipeline(settings: Settings) -> dict:
     write_csv(crawl_log_df, processed / "crawl_log.csv")
     write_csv(quality_df, processed / "data_quality_report.csv")
     _write_page_manifest(settings, manifest_group_rows, processed / "manifest_pages.csv")
+
+    # Core stage always completes in one run (it's fast, ~20 min/season) -
+    # unlike the batched acta_partido/fichajugador stages, this is the one
+    # and only coverage_manifest write for this stage per run. Not
+    # category-scoped (category_base="ALL") since discovery covers every
+    # matching category in a single pass, not one CLI invocation per
+    # category the way the enrichment stages are.
+    failed_groups = sum(1 for row in manifest_group_rows if not row["has_calendario"])
+    season_id = discovery.groups[0].season_id if discovery.groups else ""
+    upsert_coverage_manifest(
+        settings.processed_root, season=settings.target.season_label, season_id=season_id,
+        category_base="ALL", stage="core",
+        status="complete" if failed_groups == 0 else "complete_with_failures",
+        targets_total=len(discovery.groups), targets_completed=len(manifest_group_rows),
+        targets_failed=failed_groups, started_at=started_at, completed_at=_now_iso(),
+    )
 
     summary = dict(
         groups_discovered=len(discovery.groups),
