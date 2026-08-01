@@ -1,0 +1,97 @@
+name: RFFM crawl
+
+# Manually-dispatched crawl job for any stage. Deliberately dispatch-only for
+# now (no `schedule:` trigger yet) - add a cron once this has been watched
+# run cleanly a few times. See README.md "Running via GitHub Actions" and
+# CLAUDE.md "Is this season/category/stage done?" for the resumability model
+# this relies on: every stage is safe to re-dispatch at any time, including
+# after this job's own timeout cuts it off mid-run - it always resumes from
+# whatever output/processed/rffm/<season>/*.csv + coverage_manifest.csv are
+# already committed, never from local/runner state.
+
+on:
+  workflow_dispatch:
+    inputs:
+      season_label:
+        description: "Season to crawl, e.g. 2025-2026 (must already exist in /api/seasons on the site)"
+        required: true
+        default: "2025-2026"
+      stage:
+        description: "Which pipeline stage to run"
+        required: true
+        type: choice
+        options:
+          - core
+          - acta_partido
+          - fichajugador
+        default: core
+      scope_category:
+        description: "Category scope for acta_partido/fichajugador (ignored for core, which covers every configured category in one pass)"
+        required: false
+        default: "PREBENJAMIN"
+
+permissions:
+  contents: write
+
+concurrency:
+  # One crawl at a time per (season, stage) - prevents two dispatches from
+  # racing to flush batches into the same season directory.
+  group: rffm-crawl-${{ github.event.inputs.season_label }}-${{ github.event.inputs.stage }}
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    # Bounded well under GitHub's 6h hosted-runner ceiling. If a season's
+    # full target list can't be finished in one job, the batched/atomic
+    # flush design (row_io.append_or_write_csv, coverage_manifest.csv)
+    # means this just stops cleanly mid-batch - re-dispatch to continue.
+    timeout-minutes: 300
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set target season in config.yaml
+        run: |
+          python3 - <<'EOF'
+          import yaml
+
+          with open("config.yaml") as f:
+              cfg = yaml.safe_load(f)
+          cfg["target"]["season_label"] = "${{ inputs.season_label }}"
+          with open("config.yaml", "w") as f:
+              yaml.safe_dump(cfg, f, sort_keys=False, allow_unicode=True)
+          EOF
+
+      - name: Run core crawl
+        if: inputs.stage == 'core'
+        run: python3 main.py --log-level INFO
+
+      - name: Run acta-partido enrichment
+        if: inputs.stage == 'acta_partido'
+        run: python3 enrich_acta.py --scope "${{ inputs.scope_category }}" --log-level INFO
+
+      - name: Run fichajugador enrichment
+        if: inputs.stage == 'fichajugador'
+        run: python3 enrich_players.py --scope "${{ inputs.scope_category }}" --log-level INFO
+
+      - name: Commit and push updated processed data
+        run: |
+          git config user.name "rffm-crawl-bot"
+          git config user.email "actions@github.com"
+          git add output/processed
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }}"
+            git push
+          fi

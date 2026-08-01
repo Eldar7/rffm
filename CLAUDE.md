@@ -9,14 +9,52 @@ see "Why one file" at the bottom.
 
 ## Scope
 
-Season **2025-2026** only, categories **BENJAMÍN** and **PREBENJAMÍN**
+Categories **BENJAMÍN** and **PREBENJAMÍN**
 (`category`/`category_base` column value `"BENJAMIN"`/`"PREBENJAMIN"`),
 across every game type the federation runs under those categories (Futbol-7
-and Futsal, as discovered — not hardcoded to one).
+and Futsal, as discovered — not hardcoded to one). Multiple **seasons** —
+starting with 2025-2026, more added over time as separate crawls; always
+check `coverage_manifest.csv` (below) for which season/category/stage
+combinations actually have data before assuming a season is covered.
 
-All tables live in `output/processed/rffm/*.csv`. Answer questions by
-running a pandas script (via Bash), not by eyeballing CSV rows — see
-"How to answer a query" below.
+All tables live in `output/processed/rffm/<season>/*.csv` — one directory
+per season, e.g. `output/processed/rffm/2025-2026/matches.csv`. This is a
+**per-season partition**, not a duplicate/overlapping copy: re-running the
+crawler for a new season writes to its own new directory and never touches
+another season's files. The lone exception is `coverage_manifest.csv`
+itself, which lives one level up at `output/processed/rffm/coverage_manifest.csv`
+(see "Is this season done" below) since its whole purpose is to be the one
+cross-season index. Answer questions by running a pandas script (via Bash),
+not by eyeballing CSV rows — see "How to answer a query" below.
+
+## Is this season/category/stage done? — `coverage_manifest.csv`
+
+Before trusting a season's numbers (especially for the enrichment stages,
+which can take hours and run across multiple crawl sessions), check
+`output/processed/rffm/coverage_manifest.csv` — one row per
+`(season, category_base, stage)`, upserted after every batch of the crawl,
+so it's always an accurate, git-tracked, timestamped answer to "is this
+done":
+
+- `stage` is `core` (competitions/groups/teams/matches/standings/scorers —
+  not category-scoped per run, so `category_base="ALL"`), `acta_partido`
+  (match lineups/goals/cards/staff/officials), or `fichajugador` (player
+  profiles/season stats/participation).
+- `status` is `complete` (every target for that key has a successful fetch),
+  `complete_with_failures` (the crawl ran to exhaustion but some targets
+  never got a successful fetch — see `targets_failed` and the matching
+  `*_data_quality_report.csv`/`*_crawl_log.csv` for which ones), or
+  `partial` (the crawl hasn't finished yet — could be mid-run right now, or
+  was interrupted; `last_updated_at` tells you how stale that is).
+- `targets_total`/`targets_completed`/`targets_failed` plus
+  `started_at`/`last_updated_at`/`completed_at` give the coarse numbers and
+  timing directly, without loading the full per-row crawl logs.
+
+```python
+import pandas as pd
+coverage = pd.read_csv("output/processed/rffm/coverage_manifest.csv")
+print(coverage[coverage["season"] == "2025-2026"])
+```
 
 ## Why pandas, not SQL
 
@@ -169,13 +207,13 @@ explicitly requested.
 | Did a player move teams/clubs | `match_lineups`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe below) |
 | Match report detail (lineup, staff, ref) | `match_lineups`, `match_staff`, `match_officials` | `match_id` |
 
-**Worked example — "give me all results between two clubs":**
+**Worked example — "give me all results between two clubs" (season 2025-2026):**
 
 ```python
 import pandas as pd
 
-teams = pd.read_csv("output/processed/rffm/teams.csv", dtype=str)
-matches = pd.read_csv("output/processed/rffm/matches.csv", dtype=str)
+teams = pd.read_csv("output/processed/rffm/2025-2026/teams.csv", dtype=str)
+matches = pd.read_csv("output/processed/rffm/2025-2026/matches.csv", dtype=str)
 
 club_a, club_b = "ARAVACA C.F. - CEIBA", "C.D. UNION DE ARAVACA"
 ids_a = teams.loc[teams["club_name_raw"] == club_a, "team_id"]
@@ -192,6 +230,20 @@ h2h["away_score"] = pd.to_numeric(h2h["away_score"], errors="coerce")
 
 h2h = h2h.sort_values("match_date")
 print(h2h[["match_date", "home_team", "away_team", "home_score", "away_score", "competition", "group"]])
+```
+
+**Querying across multiple seasons:** read each season's file and
+`pd.concat()` at analysis time — same rule as the crawl-log families below,
+never merge the season-partitioned files together on disk.
+
+```python
+import glob
+import pandas as pd
+
+matches_all_seasons = pd.concat(
+    (pd.read_csv(p, dtype=str) for p in sorted(glob.glob("output/processed/rffm/*/matches.csv"))),
+    ignore_index=True,
+)
 ```
 
 **Recipe — "did player X move between teams/clubs?"** (no materialized
@@ -248,7 +300,16 @@ on purpose: the core files are fully rebuilt from scratch on every `main.py`
 run, so an appending enrichment stage on top of them would get silently
 wiped by the next unrelated core rerun. Want a unified view across all
 crawl logs? `pd.concat()` them at analysis time — don't merge the files on
-disk.
+disk. (Each of these lives inside its season's directory alongside that
+season's other tables — `crawl_log.csv` is per-season too, not global.)
+
+Unlike the core `crawl_log.csv` (rebuilt from scratch every `main.py` run),
+`acta_crawl_log.csv` and `fichajugador_crawl_log.csv` are **appended to
+incrementally** across a season's enrichment crawl (batched, atomic
+flushes — see `coverage_manifest.csv` above) and also double as the
+resumability marker the crawler itself uses: an `entity_id` with
+`success == True` there means that target is done and won't be re-fetched
+on a later run, even in a completely fresh environment.
 
 ## Why one file
 

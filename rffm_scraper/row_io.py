@@ -29,8 +29,117 @@ def validate_rows(model_cls, rows: list[dict], label: str) -> list[dict]:
 
 
 def write_csv(df: pd.DataFrame, path: pathlib.Path) -> None:
-    df.to_csv(path, index=False)
+    """Atomic: writes via a temp file + os.replace, matching
+    atomic_write_text below, so a process killed mid-write never leaves a
+    truncated/corrupt CSV at the final path."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    df.to_csv(tmp_path, index=False)
+    os.replace(tmp_path, path)
     logger.info("Wrote %s (%d rows)", path, len(df))
+
+
+def append_or_write_csv(new_rows_df: pd.DataFrame, path: pathlib.Path) -> None:
+    """Batch-flush primitive for resumable pipelines: merges new_rows_df into
+    whatever is already at path (if anything) and atomically rewrites the
+    whole file via write_csv above.
+
+    Deliberately read-concat-replace rather than a true file append: a
+    process killed mid true-append can leave a torn last line that breaks
+    parsing of the *entire* file, while read-concat-atomic-replace can never
+    leave a torn file. The reread cost is paid once per batch (whatever
+    csv_flush_every is set to), not once per row, so it stays cheap.
+    """
+    if path.exists():
+        existing_df = pd.read_csv(path, dtype=str, keep_default_na=True)
+        combined = pd.concat([existing_df, new_rows_df], ignore_index=True)
+    else:
+        combined = new_rows_df
+    write_csv(combined, path)
+
+
+def already_done_ids(crawl_log_path: pathlib.Path, entity_type: str | None = None) -> set[str]:
+    """Resumability source of truth for the batched enrichment pipelines:
+    the set of entity_ids with at least one *successful* fetch already
+    recorded in a {stage}_crawl_log.csv (empty set if that file doesn't
+    exist yet, e.g. first run for this season).
+
+    Deliberately keyed off the crawl log rather than presence in the
+    primary output table (match_lineups.csv / players.csv): a legitimately
+    processed target can produce zero child rows (e.g. a match with no
+    reported lineup on the site - a known, separately-flagged anomaly in
+    acta_quality_checks.py), which would be indistinguishable from "never
+    attempted" if presence-in-primary-table were the marker instead. This
+    also gives automatic retry-on-resume for free - a target that failed
+    has no success==True row, so it's simply absent from this set and gets
+    retried on the next run, no separate retry queue needed.
+    """
+    if not crawl_log_path.exists():
+        return set()
+    df = pd.read_csv(crawl_log_path, dtype=str, keep_default_na=True)
+    mask = df["success"] == "True"
+    if entity_type is not None:
+        mask &= df["entity_type"] == entity_type
+    return set(df.loc[mask, "entity_id"].dropna())
+
+
+_COVERAGE_MANIFEST_COLUMNS = [
+    "season", "season_id", "category_base", "stage", "status",
+    "targets_total", "targets_completed", "targets_failed",
+    "started_at", "last_updated_at", "completed_at", "notes",
+]
+
+
+def upsert_coverage_manifest(
+    processed_root: pathlib.Path,
+    *,
+    season: str,
+    season_id: str,
+    category_base: str,
+    stage: str,
+    status: str,
+    targets_total: int,
+    targets_completed: int,
+    targets_failed: int,
+    started_at: str,
+    completed_at: str | None = None,
+    notes: str = "",
+) -> None:
+    """Upsert one row (keyed by season+category_base+stage) into the
+    cross-season output/processed/rffm/coverage_manifest.csv - the single,
+    git-tracked place to check "is season X / category Y / stage Z done"
+    without loading the full per-row crawl logs. Called after every batch
+    flush in the enrichment pipelines (so a hard-killed process leaves an
+    accurate `partial` row - the last successful write to this file *is*
+    the truth, no separate interruption-detection needed) and once at the
+    end of the core pipeline run.
+    """
+    path = processed_root / "coverage_manifest.csv"
+    if path.exists():
+        df = pd.read_csv(path, dtype=str, keep_default_na=True)
+    else:
+        df = pd.DataFrame(columns=_COVERAGE_MANIFEST_COLUMNS)
+
+    key = (df["season"] == season) & (df["category_base"] == category_base) & (df["stage"] == stage)
+    df = df[~key]
+
+    row = dict(
+        season=season,
+        season_id=season_id,
+        category_base=category_base,
+        stage=stage,
+        status=status,
+        targets_total=targets_total,
+        targets_completed=targets_completed,
+        targets_failed=targets_failed,
+        started_at=started_at,
+        last_updated_at=_now_iso(),
+        completed_at=completed_at or "",
+        notes=notes,
+    )
+    df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    df = df.sort_values(["season", "stage", "category_base"]).reset_index(drop=True)
+    write_csv(df, path)
 
 
 def atomic_write_text(path: pathlib.Path, content: str) -> None:

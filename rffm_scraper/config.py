@@ -54,6 +54,7 @@ class ActaPartidoConfig:
     skip_byes: bool = True
     skip_unplayed: bool = True
     progress_report_every: int = 25
+    csv_flush_every: int = 200
     rate_limit_seconds: float = 1.25
     force_refetch: bool = False
 
@@ -62,6 +63,7 @@ class ActaPartidoConfig:
 class FichajugadorConfig:
     scope_category: str
     progress_report_every: int = 25
+    csv_flush_every: int = 200
     rate_limit_seconds: float = 1.25
     force_refetch: bool = False
 
@@ -90,8 +92,14 @@ class Settings:
         return self.output_dir / "raw" / "rffm"
 
     @property
-    def processed_dir(self) -> pathlib.Path:
+    def processed_root(self) -> pathlib.Path:
+        """Cross-season root: home for coverage_manifest.csv, parent of every <season>/ dir."""
         return self.output_dir / "processed" / "rffm"
+
+    @property
+    def processed_dir(self) -> pathlib.Path:
+        """Season-partitioned output dir, e.g. output/processed/rffm/2025-2026/."""
+        return self.processed_root / self.target.season_label
 
     @property
     def discovery_dir(self) -> pathlib.Path:
