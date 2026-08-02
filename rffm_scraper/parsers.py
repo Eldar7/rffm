@@ -17,6 +17,7 @@ from rffm_scraper.normalize import (
     parse_matchday_label,
     parse_team_name,
     team_id_or_none,
+    to_float_or_none,
     to_int_or_none,
 )
 
@@ -100,6 +101,7 @@ def parse_matches(
                     match_time=hora or None,
                     match_datetime_raw=match_datetime_raw,
                     venue=(game.get("campo") or "").strip() or None,
+                    venue_id=team_id_or_none(game.get("codigo_campo")),
                     status=status,
                     is_finished=is_finished,
                     is_scheduled=is_scheduled,
@@ -240,3 +242,28 @@ def team_group_memberships(
     for s in standing_rows:
         _add(s["team_id"], s["team"])
     return members
+
+
+def parse_venue(field_json: dict[str, Any], venue_id: str, source_url: str) -> dict:
+    """/campo/<id> page's `field` object -> one venues.csv row.
+
+    latitude/longitude come straight from the source (not geocoded), so
+    google_maps_url is exact when both are present.
+    """
+    lat = to_float_or_none(field_json.get("latitud"))
+    lon = to_float_or_none(field_json.get("longitud"))
+    return dict(
+        venue_id=venue_id,
+        venue_name=field_json.get("nombre_campo", ""),
+        address=(field_json.get("direccion") or "").strip() or None,
+        locality=(field_json.get("localidad") or "").strip() or None,
+        province=(field_json.get("provincia") or "").strip() or None,
+        postal_code=(field_json.get("codigo_postal") or "").strip() or None,
+        latitude=lat,
+        longitude=lon,
+        google_maps_url=f"https://www.google.com/maps?q={lat},{lon}" if lat is not None and lon is not None else None,
+        field_type_raw=(field_json.get("tipo_campo") or "").strip() or None,
+        surface_raw=(field_json.get("superficie_juego") or "").strip() or None,
+        source_url=source_url,
+        scraped_at=_now_iso(),
+    )

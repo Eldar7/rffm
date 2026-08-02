@@ -21,6 +21,7 @@ class Pages:
     calendario: str
     clasificaciones: str
     goleadores: str
+    campo: str
     acta_partido: str
     fichaequipo: str
     fichajugador: str
@@ -69,6 +70,15 @@ class FichajugadorConfig:
 
 
 @dataclass
+class ClubsConfig:
+    scope_category: str
+    progress_report_every: int = 25
+    csv_flush_every: int = 100
+    rate_limit_seconds: float = 1.25
+    force_refetch: bool = False
+
+
+@dataclass
 class EnrichmentConfig:
     fetch_scorers: bool
     fetch_acta_partido: bool
@@ -76,6 +86,7 @@ class EnrichmentConfig:
     fetch_fichajugador: bool
     acta_partido: ActaPartidoConfig
     fichajugador: FichajugadorConfig
+    clubs: ClubsConfig
 
 
 @dataclass
@@ -124,10 +135,12 @@ def load_settings(config_path: str | pathlib.Path = "config.yaml") -> Settings:
     raw_enrichment = dict(raw["enrichment"])
     acta_raw = raw_enrichment.pop("acta_partido", {})
     fichajugador_raw = raw_enrichment.pop("fichajugador", {})
+    clubs_raw = raw_enrichment.pop("clubs", {})
     enrichment = EnrichmentConfig(
         **raw_enrichment,
         acta_partido=ActaPartidoConfig(**acta_raw),
         fichajugador=FichajugadorConfig(**fichajugador_raw),
+        clubs=ClubsConfig(**clubs_raw),
     )
     output_dir = pathlib.Path(raw["paths"]["output_dir"])
 

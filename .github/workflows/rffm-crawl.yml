@@ -24,9 +24,10 @@ on:
           - core
           - acta_partido
           - fichajugador
+          - clubs
         default: core
       scope_category:
-        description: "Category scope for acta_partido/fichajugador (ignored for core, which covers every configured category in one pass)"
+        description: "Category scope for acta_partido/fichajugador/clubs (ignored for core, which covers every configured category in one pass)"
         required: false
         default: "PREBENJAMIN"
 
@@ -83,6 +84,10 @@ jobs:
       - name: Run fichajugador enrichment
         if: inputs.stage == 'fichajugador'
         run: python3 enrich_players.py --scope "${{ inputs.scope_category }}" --log-level INFO
+
+      - name: Run clubs enrichment
+        if: inputs.stage == 'clubs'
+        run: python3 enrich_clubs.py --scope "${{ inputs.scope_category }}" --log-level INFO
 
       - name: Commit and push updated processed data
         if: always()
