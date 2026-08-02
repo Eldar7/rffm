@@ -12,12 +12,24 @@ this file only tells you which table to look at, not its columns.
 
 ## Scope
 
-Categories **BENJAMÍN** and **PREBENJAMÍN**
-(`category`/`category_base` column value `"BENJAMIN"`/`"PREBENJAMIN"`),
-across every game type the federation runs under those categories (Futbol-7
-and Futsal, as discovered — not hardcoded to one). Multiple **seasons** —
-starting with 2025-2026, more added over time as separate crawls; always
-check `coverage_manifest.csv` (below) for which season/category/stage
+**BENJAMÍN**/**PREBENJAMÍN** was this project's initial development target,
+**not** a permanent restriction — the crawler can discover and collect
+every age/division category the federation runs (ALEVÍN, CADETE, INFANTIL,
+JUVENIL, AFICIONADO, SENIOR, VETERANOS, UNIVERSITARIO, ...; see
+`DATA_DICTIONARY.md`'s "Category taxonomy"), across every game type
+(Futbol-7, Futbol-11, Futsal, as discovered — not hardcoded to one). A
+given season's core crawl may or may not have used `--all-categories`
+though — **don't assume scope from this file**; check that season's own
+`groups.csv`/`competitions.csv` `category`/`category_base` values (or
+`coverage_manifest.csv`'s `category_base` rows) for what it actually
+covers. `clubs.csv`/`venues.csv` are never category-scoped (a club/venue
+isn't an age-bracket concept) — they cover whatever categories that
+season's core crawl found. `acta_partido`/`fichajugador` enrichment
+*is* still category-scoped (`scope_category`) and is not necessarily run
+for every category present in a season's core data — check
+`coverage_manifest.csv`. Multiple **seasons** — starting with 2025-2026,
+more added over time as separate crawls; always check
+`coverage_manifest.csv` (below) for which season/category/stage
 combinations actually have data before assuming a season is covered.
 
 All tables live in `output/processed/rffm/<season>/*.csv` — one directory

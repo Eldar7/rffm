@@ -7,8 +7,11 @@ informed opt-in (checked again here as a second guard). Reads targets from
 output/processed/rffm/{teams,team_group_membership,groups,matches}.csv,
 produced by `python main.py` - run that first.
 
+Not category-scoped (unlike enrich_acta.py/enrich_players.py) - a club is
+not an age-bracket concept, see club_pipeline.py's module docstring.
+
 Usage:
-    python enrich_clubs.py [--config config.yaml] [--scope PREBENJAMIN]
+    python enrich_clubs.py [--config config.yaml]
                             [--force-refetch] [--log-level INFO]
 """
 from __future__ import annotations
@@ -24,7 +27,6 @@ from rffm_scraper.config import load_settings
 def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="RFFM clubs enrichment (identity/address, one team per club)")
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
-    parser.add_argument("--scope", default=None, help="Category to enrich (defaults to config's clubs.scope_category)")
     parser.add_argument("--force-refetch", action="store_true", help="Ignore cached raw HTML and refetch every club")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return parser.parse_args(argv)
@@ -47,7 +49,7 @@ def main(argv=None) -> int:
         )
         return 1
 
-    summary = run_club_enrichment(settings, scope_category=args.scope, force_refetch=args.force_refetch or None)
+    summary = run_club_enrichment(settings, force_refetch=args.force_refetch or None)
     print("\n=== clubs enrichment summary ===")
     for k, v in summary.items():
         print(f"{k}: {v}")

@@ -26,11 +26,14 @@ requirement:
    cards/staff/officials. Reads `matches.csv`. Category-scoped, rate-limited,
    can take hours.
 3. `enrich_clubs.py` → `rffm_scraper/club_pipeline.py` — club identity/
-   correspondence address. Reads `teams.csv`/`team_group_membership.csv`/
-   `groups.csv` (for category) + `matches.csv` (for `season_id`).
-   Category-scoped. One representative team per club, so the target count
-   is roughly `teams.csv`'s row count divided by teams-per-club, not one
-   request per team - a few hundred requests, not thousands.
+   correspondence address. Reads `teams.csv` (+ `matches.csv` for
+   `season_id`). **Not** category-scoped, unlike the other two enrichment
+   stages - a club is not an age-bracket concept, the same club routinely
+   fields both a BENJAMIN and a PREBENJAMIN team, so every unique
+   `club_name_raw` in `teams.csv` is a target regardless of category. One
+   representative team per club, so the target count is roughly
+   `teams.csv`'s row count divided by teams-per-club, not one request per
+   team - a few hundred requests, not thousands.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups.csv` (needs
    step 2 done first for the categories it targets). Same order of
@@ -39,8 +42,8 @@ requirement:
 `config.yaml`'s `target.season_label` picks the season (not CLI-overridable
 — see the workflow walkthrough below for why that matters);
 `enrichment.acta_partido.scope_category` / `enrichment.fichajugador.scope_category`
-/ `enrichment.clubs.scope_category` pick the category, overridable per-run
-via each entrypoint's `--scope` flag.
+pick the category, overridable per-run via each entrypoint's `--scope`
+flag. `enrich_clubs.py` has no `--scope` - see point 3 above.
 
 ## Storage layout
 
@@ -125,10 +128,13 @@ dispatch `acta_partido` with `scope_category=<category>`, re-dispatching the
 same inputs until `coverage_manifest.csv` shows
 `complete`/`complete_with_failures` for that row → dispatch `fichajugador`
 the same way. `clubs` only needs `core` done first and can be dispatched any
-time after it (independently of `acta_partido`/`fichajugador`), same
-re-dispatch-until-complete pattern. Widening an already-`core`'d season to a
-new category: skip straight to `acta_partido`/`fichajugador`/`clubs` with
-the new `scope_category`.
+time after it (independently of `acta_partido`/`fichajugador`, and only
+once per season - it covers every category in one pass, `scope_category` is
+ignored), same re-dispatch-until-complete pattern for resuming an
+interrupted run. Widening an already-`core`'d season to a new category:
+skip straight to `acta_partido`/`fichajugador` with the new
+`scope_category` (`clubs` needs no re-dispatch - it was never
+category-scoped to begin with).
 
 **Checking progress:**
 - Live, while a job runs: Actions tab → the running job → expand the crawl

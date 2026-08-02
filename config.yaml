@@ -93,10 +93,10 @@ enrichment:
   # /fichaequipo/<team_id>). Targets are ONE representative team_id per
   # unique club_name_raw already in teams.csv (codigo_club is the same for
   # every team of a club - confirmed by live sampling - so there is no need
-  # to fetch every team of a multi-team club), restricted to teams playing
-  # in scope_category this season.
+  # to fetch every team of a multi-team club). NOT category-scoped - a club
+  # is not an age-bracket concept, so every club_name_raw in teams.csv is a
+  # target regardless of which categories that season's core crawl covered.
   clubs:
-    scope_category: "PREBENJAMIN"
     progress_report_every: 25
     csv_flush_every: 100
     rate_limit_seconds: 1.25

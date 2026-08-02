@@ -119,13 +119,18 @@ per competition) — not duplicated onto `groups`/`matches`/`standings`,
 which already carry ~118k+ rows/season; join on `competition_id` if you
 need them there.
 
-**Scope note:** this project's committed dataset (per `CLAUDE.md`) only
-ever *enriches* (acta_partido/fichajugador) BENJAMIN/PREBENJAMIN. A core
+**Scope note:** BENJAMÍN/PREBENJAMÍN was this project's initial development
+target, not a permanent restriction (see `CLAUDE.md`'s "Scope"). A core
 crawl (`--all-categories` / GitHub Actions `all_categories: true` input,
-`stage: core` only) can discover every category the federation runs — this
-taxonomy exists so that data is usable, not to imply the other ages are
-enriched too. Check `coverage_manifest.csv` for what's actually
-enriched vs. core-only.
+`stage: core` only) discovers every category the federation runs — season
+2025-2026's committed core data is one such all-categories crawl (11
+`category_base` values, not just the original two). `clubs.csv` is never
+category-scoped either way (a club isn't an age-bracket concept - see
+`club_pipeline.py`), so it covers whatever categories that season's core
+data has. `acta_partido`/`fichajugador` remain category-scoped
+(`scope_category`) and are **not** run against every category by default -
+check `coverage_manifest.csv` for which `(season, category_base, stage)`
+combinations are actually enriched vs. core-only.
 
 ### Age group (`category_base`)
 

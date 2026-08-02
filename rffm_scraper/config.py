@@ -77,7 +77,6 @@ class FichajugadorConfig:
 
 @dataclass
 class ClubsConfig:
-    scope_category: str
     progress_report_every: int = 25
     csv_flush_every: int = 100
     rate_limit_seconds: float = 1.25

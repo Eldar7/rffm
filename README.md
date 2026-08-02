@@ -1,10 +1,16 @@
-# RFFM data collector — BENJAMÍN / PREBENJAMÍN, multi-season
+# RFFM data collector — multi-category, multi-season
 
 Production-minded scraper for the Real Federación de Fútbol de Madrid (RFFM)
 website (`https://www.rffm.es`). Covers competitions, groups, teams,
-fixtures/results, standings, and top scorers for the **BENJAMÍN** and
-**PREBENJAMÍN** base categories, discovered dynamically (not hardcoded)
-across every game type the federation runs (Fútbol-7, Fútbol Sala, ...).
+fixtures/results, standings, and top scorers, discovered dynamically (not
+hardcoded) across every game type the federation runs (Fútbol-7, Fútbol-11,
+Fútbol Sala, ...). **BENJAMÍN**/**PREBENJAMÍN** was this project's initial
+development target, not a permanent restriction: `config.yaml`'s
+`target.category_priority` still defaults to those two for a plain crawl,
+but `main.py --all-categories` (or the GitHub Actions workflow's
+`all_categories` input) discovers and collects every age/division category
+the federation runs in one pass — see `DATA_DICTIONARY.md`'s "Category
+taxonomy". `clubs.csv`/`venues.csv` are never category-scoped regardless.
 Built to run repeatedly across **many seasons** (change `target.season_label`
 in `config.yaml`, nothing else) without one season's crawl ever overwriting
 another's — see "Storage layout" below.
@@ -72,6 +78,13 @@ file" section).
 Empirically for 2025-2026 this surfaces BENJAMÍN/PREBENJAMÍN competitions
 under **both Futbol-7 and Futsal (Fútbol Sala)** — not just Futbol-7 — which
 is exactly why game type isn't hardcoded.
+
+With `--all-categories` (or the GitHub Actions workflow's `all_categories`
+input), step 3's category matching is skipped entirely - every competition
+in every game type is kept, with `category_base` classified via
+`normalize.classify_age_category` against a fixed age vocabulary instead of
+`category_priority` (see `DATA_DICTIONARY.md`'s "Category taxonomy" for the
+full facet breakdown: age/gender/division/format).
 
 Discovery output is saved as a timestamped JSON manifest under
 `output/raw/rffm/discovery/manifest_<season_id>_<timestamp>.json`.
@@ -162,9 +175,11 @@ lives in exactly one of these.
   site (1,272 HTTP requests, 33 quality-report findings — see
   `output/processed/rffm/2025-2026/data_quality_report.csv`).
 - ⚠️ Fallback/limited by design: acta-partido/fichaequipo/fichajugador
-  enrichment is disabled by default (robots.txt), and even when enabled is
-  intentionally scoped to a category pilot before widening (see
-  `enrich_acta.py --scope`).
+  enrichment is disabled by default (robots.txt). acta_partido/fichajugador
+  are additionally category-scoped (`--scope`), typically piloted on one
+  category before widening; `enrich_clubs.py` is **not** category-scoped
+  (see "Entities collected" above) - one run covers every club regardless
+  of category.
 - ⚠️ Not modeled: match substitutions (zero populated examples found in the
   BENJAMÍN age bracket — nothing to validate a schema against yet),
   `otras_tarjetas`, full multi-season player career history (player
