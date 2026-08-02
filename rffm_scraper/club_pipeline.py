@@ -218,6 +218,18 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
     quality_issues = run_club_quality_checks(clubs_df, target_team_ids)
     write_csv(pd.DataFrame(quality_issues), processed / "clubs_data_quality_report.csv")
 
+    # teams.csv's club_name_raw (this project's own parsing of the team-name
+    # suffix) is sometimes finer-grained than RFFM's real club_id - a
+    # multi-campus chain (e.g. "GREDOS SAN DIEGO-GUADARRAMA" vs
+    # "GREDOS SAN DIEGO-VALLECAS") or inconsistent punctuation
+    # ("C.D.B. BASE" vs "C.D.B BASE") can yield more than one target for the
+    # same real club_id - _check_redundant_club_targets above already
+    # logged that. club_id is clubs.csv's documented PK, so the shipped
+    # table is deduped on it here (keep the first-fetched row) regardless.
+    if not clubs_df.empty and clubs_df["club_id"].duplicated().any():
+        clubs_df = clubs_df.drop_duplicates(subset="club_id", keep="first").reset_index(drop=True)
+        write_csv(clubs_df, processed / "clubs.csv")
+
     summary = dict(
         scope_category=scope_category,
         targets=len(target_team_ids),

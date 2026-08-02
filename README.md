@@ -157,11 +157,17 @@ lives in exactly one of these.
 ## What's collected successfully vs. limited (2025-2026 pilot)
 
 - ✅ Full 2025-2026 BENJAMÍN/PREBENJAMÍN coverage across Futbol-7 **and**
-  Futsal: 408 groups, 43 competitions, 25,410 matches, 3,167 standings rows,
-  26,003 scorer rows, 2,144 teams, in one ~20-minute run against the live
-  site (1,272 HTTP requests, 33 quality-report findings — see
+  Futsal: 408 groups, 43 competitions, 25,410 matches, 361 venues (356 with
+  full address+coordinates), 3,167 standings rows, 26,003 scorer rows, 2,144
+  teams, in one ~24-minute run against the live site (1,633 HTTP requests,
+  33 quality-report findings — see
   `output/processed/rffm/2025-2026/data_quality_report.csv`).
-- ⚠️ Fallback/limited by design: acta-partido/fichaequipo/fichajugador
+- ✅ `clubs.csv` PREBENJAMIN pilot: 323 unique clubs (`complete_with_failures`
+  — 3 of 343 representative team_ids never returned a usable fichaequipo
+  profile; 8 club_ids were reached by more than one target team and deduped
+  to their first-fetched row — see `clubs_data_quality_report.csv`).
+  BENJAMIN not yet dispatched for this stage.
+- ⚠️ Fallback/limited by design: acta-partido/fichaequipo(clubs)/fichajugador
   enrichment is disabled by default (robots.txt), and even when enabled is
   intentionally scoped to a category pilot before widening (see
   `enrich_acta.py --scope`).

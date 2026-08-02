@@ -159,6 +159,17 @@ requested.
   club delegate, not public club data. Columns: `club_id, club_name_raw,
   portal_web, crest_url, correspondence_address, locality, province,
   postal_code, representative_team_id, source_url, scraped_at`.
+  **`teams.csv`'s `club_name_raw` can be finer-grained than RFFM's real
+  `club_id`** — a multi-campus chain (e.g. `"GREDOS SAN DIEGO-GUADARRAMA"`
+  vs `"GREDOS SAN DIEGO-VALLECAS"`, 11 campuses in the 2025-2026 PREBENJAMIN
+  data) or inconsistent punctuation (`"C.D.B. BASE"` vs `"C.D.B BASE"`) can
+  resolve to the same `club_id` under one campus-agnostic `nombre_club` on
+  the fichaequipo page. `enrich_clubs.py` fetches one representative team
+  per unique `teams.club_name_raw` (so it does make redundant requests for
+  these cases) but dedupes the shipped `clubs.csv` on `club_id` at the end,
+  keeping the first-fetched row — see `clubs_data_quality_report.csv`'s
+  `redundant_club_target` entries for which `club_id`s this happened to and
+  which `representative_team_id`s collided.
 
 ## Worked example — "give me all results between two clubs" (season 2025-2026)
 

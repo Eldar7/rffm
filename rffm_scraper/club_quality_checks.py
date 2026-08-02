@@ -26,9 +26,12 @@ def _issue(check_name, severity, entity_type, entity_id, details, group_id=None,
 
 
 def run_club_quality_checks(clubs_df: pd.DataFrame, target_team_ids: list) -> list[dict]:
+    """clubs_df here is the PRE-dedup read (one row per fetch target, before
+    club_pipeline.py's final club_id dedup) so _check_redundant_club_targets
+    can see every duplicate before it's collapsed away."""
     issues: list[dict] = []
     issues += _check_coverage(clubs_df, target_team_ids)
-    issues += _check_duplicate_club_ids(clubs_df)
+    issues += _check_redundant_club_targets(clubs_df)
 
     logger.info("Club quality checks found %d issue(s)", len(issues))
     return issues
@@ -49,21 +52,28 @@ def _check_coverage(clubs_df: pd.DataFrame, target_team_ids: list) -> list[dict]
     return issues
 
 
-def _check_duplicate_club_ids(clubs_df: pd.DataFrame) -> list[dict]:
-    """Two different club_name_raw values resolving to the same codigo_club
-    would mean the site's own name string for a club isn't stable across
-    teams - worth flagging since CLAUDE.md's routing table assumes
-    club_name_raw is a reliable club-level filter key."""
+def _check_redundant_club_targets(clubs_df: pd.DataFrame) -> list[dict]:
+    """teams.csv's club_name_raw (this project's parsing of the team-name
+    suffix) is sometimes finer-grained than RFFM's real club_id - e.g. a
+    multi-campus chain registered as one club_id but with per-campus team
+    names ("GREDOS SAN DIEGO-GUADARRAMA" vs "GREDOS SAN DIEGO-VALLECAS"), or
+    inconsistent punctuation ("C.D.B. BASE" vs "C.D.B BASE") - so more than
+    one representative team can get fetched for the same real club.
+    Informational: club_pipeline.py dedups the shipped clubs.csv on club_id
+    afterwards, so this doesn't reach the final table - logged here so the
+    redundant HTTP requests (and which club_name_raw variants collided) are
+    still visible."""
     issues = []
     if clubs_df.empty:
         return issues
-    dupes = clubs_df.groupby("club_id")["club_name_raw"].nunique()
+    dupes = clubs_df.groupby("club_id").size()
     for club_id, n in dupes[dupes > 1].items():
-        names = clubs_df.loc[clubs_df["club_id"] == club_id, "club_name_raw"].unique().tolist()
+        reps = clubs_df.loc[clubs_df["club_id"] == club_id, "representative_team_id"].tolist()
         issues.append(
             _issue(
-                "club_id_name_mismatch", "warning", "club", club_id,
-                f"club_id maps to {n} different club_name_raw values: {names}",
+                "redundant_club_target", "info", "club", club_id,
+                f"{n} different target teams resolved to the same club_id - representative_team_ids {reps}; "
+                "deduped in the shipped clubs.csv, kept the first-fetched row",
             )
         )
     return issues

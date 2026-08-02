@@ -179,5 +179,9 @@ the int64/dtype merge failure) before they touched anything committed:
 ## Current state
 
 Check `coverage_manifest.csv` for the live picture. As of this writing,
-season 2025-2026: `core` complete (both categories); `acta_partido` and
-`fichajugador` complete for PREBENJAMIN only — BENJAMIN not started.
+season 2025-2026: `core` complete (both categories, incl. `venues.csv`);
+`acta_partido` and `fichajugador` complete for PREBENJAMIN only; `clubs`
+`complete_with_failures` for PREBENJAMIN (323 unique clubs from 343 targets
+- 3 fetch failures, 8 redundant same-club_id targets deduped away, see
+`clubs_data_quality_report.csv`). BENJAMIN not started for any of the three
+opt-in stages.

@@ -1,0 +1,12 @@
+check_name,severity,entity_type,entity_id,group_id,competition_id,details
+club_coverage_gap,warning,team,-25890290,,,"team was selected as a club's representative but no fichaequipo profile was fetched (fetch failure, empty page, or missing codigo_club)"
+club_coverage_gap,warning,team,-25906869,,,"team was selected as a club's representative but no fichaequipo profile was fetched (fetch failure, empty page, or missing codigo_club)"
+club_coverage_gap,warning,team,13551112,,,"team was selected as a club's representative but no fichaequipo profile was fetched (fetch failure, empty page, or missing codigo_club)"
+redundant_club_target,info,club,1032661,,,"2 different target teams resolved to the same club_id - representative_team_ids ['2278892', '21422060']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,10664183,,,"2 different target teams resolved to the same club_id - representative_team_ids ['10664123', '13561627']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,1120,,,"2 different target teams resolved to the same club_id - representative_team_ids ['770560', '16284916']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,3333,,,"2 different target teams resolved to the same club_id - representative_team_ids ['2728658', '10176814']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,3666,,,"2 different target teams resolved to the same club_id - representative_team_ids ['334355', '24025831']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,4112,,,"11 different target teams resolved to the same club_id - representative_team_ids ['24235531', '1035743', '24024551', '2730078', '24024526', '1031763', '17138243', '17138241', '24024518', '3365535', '24024478']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,849146,,,"2 different target teams resolved to the same club_id - representative_team_ids ['849148', '20513208']; deduped in the shipped clubs.csv, kept the first-fetched row"
+redundant_club_target,info,club,857503,,,"2 different target teams resolved to the same club_id - representative_team_ids ['857836', '11243763']; deduped in the shipped clubs.csv, kept the first-fetched row"
