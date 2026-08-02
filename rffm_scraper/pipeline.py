@@ -12,6 +12,10 @@ from __future__ import annotations
 import dataclasses
 import logging
 import pathlib
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -46,6 +50,19 @@ from rffm_scraper.quality_checks import run_quality_checks
 from rffm_scraper.row_io import atomic_write_text, upsert_coverage_manifest, validate_rows, write_csv
 
 logger = logging.getLogger("rffm_scraper.pipeline")
+
+
+@dataclass
+class GroupResult:
+    competition: dict
+    group: dict
+    manifest_group: dict
+    matches: list[dict]
+    standings: list[dict]
+    scorers: list[dict]
+    teams: dict[str, dict]
+    memberships: dict[tuple[str, str], dict]
+    crawl_log: list[CrawlLogEntry]
 
 
 def _now_iso() -> str:
@@ -133,10 +150,27 @@ ENDPOINT_DOCS = [
 ]
 
 
-def run_pipeline(settings: Settings) -> dict:
+def run_pipeline(
+    settings: Settings,
+    *,
+    workers: int = 1,
+    limit_groups: int | None = None,
+    progress_report_every: int = 25,
+) -> dict:
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    if limit_groups is not None and limit_groups < 1:
+        raise ValueError("limit_groups must be at least 1")
+
     started_at = _now_iso()
     client = RffmClient(settings)
-    discovery = run_discovery(client, settings)
+    discovery = run_discovery(client, settings, workers=workers)
+    target_groups = discovery.groups[:limit_groups] if limit_groups else discovery.groups
+    if limit_groups:
+        logger.warning(
+            "Core crawl is limited to %d/%d groups; coverage will be recorded as partial.",
+            len(target_groups), len(discovery.groups),
+        )
 
     competitions: dict[str, dict] = {}
     groups_rows: list[dict] = []
@@ -147,14 +181,25 @@ def run_pipeline(settings: Settings) -> dict:
     teams_acc: dict[str, dict] = {}
     membership_acc: dict[tuple[str, str], dict] = {}
 
-    for g in discovery.groups:
-        _process_group(
-            client, settings, g, competitions, groups_rows, manifest_group_rows,
-            all_matches, all_standings, all_scorers, teams_acc, membership_acc,
-        )
+    group_results = _fetch_groups(
+        client, settings, target_groups, workers=workers, progress_report_every=progress_report_every,
+    )
+    for result in group_results:
+        competitions.setdefault(result.competition["competition_id"], result.competition)
+        groups_rows.append(result.group)
+        manifest_group_rows.append(result.manifest_group)
+        all_matches.extend(result.matches)
+        all_standings.extend(result.standings)
+        all_scorers.extend(result.scorers)
+        teams_acc.update(result.teams)
+        membership_acc.update(result.memberships)
+        if workers > 1:
+            client.crawl_log.extend(result.crawl_log)
 
     matches_df = pd.DataFrame(validate_rows(Match, all_matches, "match"))
-    venues_df = _fetch_venues(client, settings, matches_df)
+    venues_df = _fetch_venues(
+        client, settings, matches_df, workers=workers, progress_report_every=progress_report_every,
+    )
     standings_df = pd.DataFrame(validate_rows(Standing, all_standings, "standing"))
     scorers_df = pd.DataFrame(validate_rows(Scorer, all_scorers, "scorer"))
     teams_df = pd.DataFrame(validate_rows(Team, list(teams_acc.values()), "team"))
@@ -207,13 +252,15 @@ def run_pipeline(settings: Settings) -> dict:
     upsert_coverage_manifest(
         settings.processed_root, season=settings.target.season_label, season_id=season_id,
         category_base="ALL", stage="core",
-        status="complete" if failed_groups == 0 else "complete_with_failures",
+        status=("partial" if limit_groups else "complete" if failed_groups == 0 else "complete_with_failures"),
         targets_total=len(discovery.groups), targets_completed=len(manifest_group_rows),
         targets_failed=failed_groups, started_at=started_at, completed_at=_now_iso(),
     )
 
     summary = dict(
         groups_discovered=len(discovery.groups),
+        groups_processed=len(target_groups),
+        workers=workers,
         competitions=len(competitions),
         matches=len(matches_df),
         venues=len(venues_df),
@@ -227,7 +274,14 @@ def run_pipeline(settings: Settings) -> dict:
     return summary
 
 
-def _fetch_venues(client: RffmClient, settings: Settings, matches_df: pd.DataFrame) -> pd.DataFrame:
+def _fetch_venues(
+    client: RffmClient,
+    settings: Settings,
+    matches_df: pd.DataFrame,
+    *,
+    workers: int,
+    progress_report_every: int,
+) -> pd.DataFrame:
     """One /campo/<id> fetch per unique venue_id seen in this run's
     matches.csv. Not robots.txt-gated, so this runs unconditionally as part
     of the core crawl rather than a separate opt-in enrichment stage - see
@@ -236,18 +290,90 @@ def _fetch_venues(client: RffmClient, settings: Settings, matches_df: pd.DataFra
         return pd.DataFrame(columns=list(Venue.model_fields))
 
     venue_ids = sorted(matches_df["venue_id"].dropna().unique().tolist())
+    started = time.monotonic()
     rows: list[dict] = []
-    for venue_id in venue_ids:
-        result = fetch_campo(client, settings, venue_id)
-        if not result.ok or not result.page_props:
-            continue
-        field_json = result.page_props.get("field")
-        if not field_json:
-            continue
-        rows.append(parse_venue(field_json, venue_id, result.url))
 
+    def fetch_one(venue_id: str, venue_client: RffmClient) -> tuple[dict | None, list[CrawlLogEntry]]:
+        log_start = len(venue_client.crawl_log)
+        result = fetch_campo(venue_client, settings, venue_id)
+        row = None
+        if result.ok and result.page_props:
+            field_json = result.page_props.get("field")
+            if field_json:
+                row = parse_venue(field_json, venue_id, result.url)
+        return row, venue_client.crawl_log[log_start:]
+
+    if workers == 1:
+        for completed, venue_id in enumerate(venue_ids, start=1):
+            row, _ = fetch_one(venue_id, client)
+            if row:
+                rows.append(row)
+            _log_progress("venues", completed, len(venue_ids), started, progress_report_every)
+    else:
+        local = threading.local()
+
+        def fetch_in_worker(venue_id: str) -> tuple[dict | None, list[CrawlLogEntry]]:
+            if not hasattr(local, "client"):
+                local.client = RffmClient(settings, run_id=client.run_id)
+            return fetch_one(venue_id, local.client)
+
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-venue") as executor:
+            futures = [executor.submit(fetch_in_worker, venue_id) for venue_id in venue_ids]
+            for completed, future in enumerate(as_completed(futures), start=1):
+                row, logs = future.result()
+                if row:
+                    rows.append(row)
+                client.crawl_log.extend(logs)
+                _log_progress("venues", completed, len(venue_ids), started, progress_report_every)
+
+    rows.sort(key=lambda row: row["venue_id"])
     logger.info("Fetched %d/%d venues", len(rows), len(venue_ids))
     return pd.DataFrame(validate_rows(Venue, rows, "venue"))
+
+
+def _log_progress(stage: str, completed: int, total: int, started: float, every: int) -> None:
+    if completed % every != 0 and completed != total:
+        return
+    elapsed = time.monotonic() - started
+    rate = completed / elapsed if elapsed else 0
+    logger.info("%s progress: %d/%d (%.2f groups/s, elapsed %.1fs)", stage, completed, total, rate, elapsed)
+
+
+def _fetch_groups(
+    client: RffmClient,
+    settings: Settings,
+    groups: list[DiscoveredGroup],
+    *,
+    workers: int,
+    progress_report_every: int,
+) -> list[GroupResult]:
+    started = time.monotonic()
+    if workers == 1:
+        results = []
+        for completed, group in enumerate(groups, start=1):
+            results.append(_process_group(client, settings, group))
+            _log_progress("core", completed, len(groups), started, progress_report_every)
+        return results
+
+    local = threading.local()
+
+    def fetch_in_worker(index: int, group: DiscoveredGroup) -> tuple[int, GroupResult]:
+        if not hasattr(local, "client"):
+            local.client = RffmClient(settings, run_id=client.run_id)
+        worker_client: RffmClient = local.client
+        log_start = len(worker_client.crawl_log)
+        result = _process_group(worker_client, settings, group)
+        result.crawl_log = worker_client.crawl_log[log_start:]
+        return index, result
+
+    ordered: list[GroupResult | None] = [None] * len(groups)
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-core") as executor:
+        futures = [executor.submit(fetch_in_worker, index, group) for index, group in enumerate(groups)]
+        for completed, future in enumerate(as_completed(futures), start=1):
+            index, result = future.result()
+            ordered[index] = result
+            _log_progress("core", completed, len(groups), started, progress_report_every)
+    return [result for result in ordered if result is not None]
 
 
 def _write_page_manifest(settings: Settings, manifest_group_rows: list[dict], path: pathlib.Path) -> None:
@@ -286,15 +412,8 @@ def _process_group(
     client: RffmClient,
     settings: Settings,
     g: DiscoveredGroup,
-    competitions: dict[str, dict],
-    groups_rows: list[dict],
-    manifest_group_rows: list[dict],
-    all_matches: list[dict],
-    all_standings: list[dict],
-    all_scorers: list[dict],
-    teams_acc: dict[str, dict],
-    membership_acc: dict[tuple[str, str], dict],
-) -> None:
+) -> GroupResult:
+    log_start = len(client.crawl_log)
     scraped_at = _now_iso()
     ctx = GroupContext(
         season=g.season_label,
@@ -309,40 +428,36 @@ def _process_group(
         phase_label=g.phase_label,
     )
 
-    if g.competition_id not in competitions:
-        competitions[g.competition_id] = dict(
-            season=g.season_label,
-            season_id=g.season_id,
-            category_base=g.category_base,
-            category_label_raw=g.category_label_raw,
-            is_femenino=g.is_femenino,
-            division_level=g.division_level,
-            competition=g.competition_label_raw,
-            competition_id=g.competition_id,
-            phase_label=g.phase_label,
-            game_type=g.game_type_label,
-            game_type_id=g.game_type_id,
-            source_url=(
-                f"{settings.site.base_url}{settings.site.api.competitions}"
-                f"?temporada={g.season_id}&tipojuego={g.game_type_id}"
-            ),
-            scraped_at=scraped_at,
-        )
-
-    groups_rows.append(
-        dict(
-            season=g.season_label,
-            season_id=g.season_id,
-            category=g.category_base,
-            competition=g.competition_label_raw,
-            competition_id=g.competition_id,
-            group=g.group_label_raw,
-            group_id=g.group_id,
-            group_label_raw=g.group_label_raw,
-            subgroup_label=None,
-            source_url=f"{settings.site.base_url}{settings.site.api.groups}?competicion={g.competition_id}",
-            scraped_at=scraped_at,
-        )
+    competition = dict(
+        season=g.season_label,
+        season_id=g.season_id,
+        category_base=g.category_base,
+        category_label_raw=g.category_label_raw,
+        is_femenino=g.is_femenino,
+        division_level=g.division_level,
+        competition=g.competition_label_raw,
+        competition_id=g.competition_id,
+        phase_label=g.phase_label,
+        game_type=g.game_type_label,
+        game_type_id=g.game_type_id,
+        source_url=(
+            f"{settings.site.base_url}{settings.site.api.competitions}"
+            f"?temporada={g.season_id}&tipojuego={g.game_type_id}"
+        ),
+        scraped_at=scraped_at,
+    )
+    group = dict(
+        season=g.season_label,
+        season_id=g.season_id,
+        category=g.category_base,
+        competition=g.competition_label_raw,
+        competition_id=g.competition_id,
+        group=g.group_label_raw,
+        group_id=g.group_id,
+        group_label_raw=g.group_label_raw,
+        subgroup_label=None,
+        source_url=f"{settings.site.base_url}{settings.site.api.groups}?competicion={g.competition_id}",
+        scraped_at=scraped_at,
     )
 
     cal = fetch_calendario(
@@ -369,40 +484,46 @@ def _process_group(
         calendar_json = (cal.page_props or {}).get("calendar")
         if calendar_json:
             group_matches = parse_matches(calendar_json, ctx, cal.url)
-            all_matches.extend(group_matches)
 
     if clas.ok and clas.raw_html:
         _save_raw(settings, g.category_base, g.season_label, "clasificaciones", g.group_id, clas.raw_html)
         standings_json = (clas.page_props or {}).get("standings")
         if standings_json:
             group_standings = parse_standings(standings_json, ctx, clas.url)
-            all_standings.extend(group_standings)
 
     if gol is not None and gol.ok and gol.raw_html:
         _save_raw(settings, g.category_base, g.season_label, "goleadores", g.group_id, gol.raw_html)
         scorers_json = (gol.page_props or {}).get("scorers")
         if scorers_json:
             group_scorers = parse_scorers(scorers_json, ctx, gol.url)
-            all_scorers.extend(group_scorers)
 
-    teams_acc.update(teams_from_matches_and_standings(group_matches, group_standings))
-    for key, row in team_group_memberships(group_matches, group_standings, ctx, cal.url).items():
-        membership_acc[(g.group_id, key)] = row
-
-    manifest_group_rows.append(
-        dict(
-            season_id=g.season_id,
-            game_type_id=g.game_type_id,
-            competition_id=g.competition_id,
-            group_id=g.group_id,
-            category_base=g.category_base,
-            category_label_raw=g.category_label_raw,
-            is_femenino=g.is_femenino,
-            division_level=g.division_level,
-            competition_label_raw=g.competition_label_raw,
-            group_label_raw=g.group_label_raw,
-            has_calendario=bool(group_matches) or (cal.ok and cal.page_props is not None),
-            has_clasificaciones=bool(group_standings) or (clas.ok and clas.page_props is not None),
-            has_goleadores=bool(group_scorers) or (gol is not None and gol.ok and gol.page_props is not None),
-        )
+    memberships = {
+        (g.group_id, key): row
+        for key, row in team_group_memberships(group_matches, group_standings, ctx, cal.url).items()
+    }
+    manifest_group = dict(
+        season_id=g.season_id,
+        game_type_id=g.game_type_id,
+        competition_id=g.competition_id,
+        group_id=g.group_id,
+        category_base=g.category_base,
+        category_label_raw=g.category_label_raw,
+        is_femenino=g.is_femenino,
+        division_level=g.division_level,
+        competition_label_raw=g.competition_label_raw,
+        group_label_raw=g.group_label_raw,
+        has_calendario=bool(group_matches) or (cal.ok and cal.page_props is not None),
+        has_clasificaciones=bool(group_standings) or (clas.ok and clas.page_props is not None),
+        has_goleadores=bool(group_scorers) or (gol is not None and gol.ok and gol.page_props is not None),
+    )
+    return GroupResult(
+        competition=competition,
+        group=group,
+        manifest_group=manifest_group,
+        matches=group_matches,
+        standings=group_standings,
+        scorers=group_scorers,
+        teams=teams_from_matches_and_standings(group_matches, group_standings),
+        memberships=memberships,
+        crawl_log=client.crawl_log[log_start:],
     )
