@@ -11,6 +11,7 @@ import json
 import logging
 import os
 import pathlib
+import subprocess
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
@@ -159,6 +160,39 @@ def upsert_coverage_manifest(
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     df = df.sort_values(["season", "stage", "category_base"]).reset_index(drop=True)
     write_csv(df, path)
+
+
+def git_push_progress(branch: str, message: str) -> bool:
+    """Mid-run checkpoint push for the batched enrichment pipelines
+    (acta_pipeline.py, player_pipeline.py), called every few batch flushes
+    when GIT_PUSH_BRANCH-style periodic pushing is enabled (see those
+    modules for the call site).
+
+    Unlike the GitHub Actions workflow's single end-of-run commit - which,
+    if it's the ONLY place progress is ever pushed, means a run cancelled by
+    the job timeout can lose its entire multi-hour output in one go, since
+    nothing survives on the ephemeral runner past the job ending - this
+    pushes straight to a branch created fresh for this one run
+    (rffm-crawl.yml creates it before invoking the crawl), so nothing else
+    is ever pushing to it concurrently: no fetch/rebase dance needed here,
+    just add+commit+push.
+
+    Never raises: a failed checkpoint here (network blip, whatever) must not
+    abort an hours-long crawl over a push that can simply be retried by the
+    next periodic checkpoint or the workflow's own final commit.
+    """
+    try:
+        subprocess.run(["git", "add", "output/processed"], check=True)
+        staged = subprocess.run(["git", "diff", "--cached", "--quiet"])
+        if staged.returncode == 0:
+            return True  # nothing new since the last checkpoint
+        subprocess.run(["git", "commit", "-m", message], check=True)
+        subprocess.run(["git", "push", "origin", f"HEAD:{branch}"], check=True)
+        logger.info("Pushed mid-run checkpoint to %s", branch)
+        return True
+    except subprocess.CalledProcessError as exc:
+        logger.warning("Mid-run checkpoint push to %s failed (crawl continues): %s", branch, exc)
+        return False
 
 
 def atomic_write_text(path: pathlib.Path, content: str) -> None:
