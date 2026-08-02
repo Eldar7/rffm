@@ -58,6 +58,25 @@ def append_or_write_csv(new_rows_df: pd.DataFrame, path: pathlib.Path) -> None:
     write_csv(combined, path)
 
 
+def downgrade_crawl_log_if_no_content(entry: dict, *, content_ok: bool) -> dict:
+    """RffmClient.get()'s crawl-log entry reflects HTTP-level success only (a
+    200 response) - it is recorded before the caller ever looks at the page's
+    embedded content object. already_done_ids() below treats success==True
+    as "fully processed, never retry", so an HTTP-200-but-unparseable-page
+    (missing/broken __NEXT_DATA__, or a page with no usable business object)
+    would otherwise be marked done forever with no automatic retry - the
+    fetch "succeeded" but nothing was actually extracted. Downgrade success
+    to False in that case so the target is correctly retried on the next
+    run. No-op when content_ok is True or the entry was already a failure.
+    """
+    if entry["success"] and not content_ok:
+        entry = dict(entry)
+        entry["success"] = False
+        suffix = "fetched OK (HTTP) but no usable content object in page (missing/unparseable __NEXT_DATA__ or empty page)"
+        entry["message"] = f"{entry['message']}; {suffix}" if entry["message"] else suffix
+    return entry
+
+
 def already_done_ids(crawl_log_path: pathlib.Path, entity_type: str | None = None) -> set[str]:
     """Resumability source of truth for the batched enrichment pipelines:
     the set of entity_ids with at least one *successful* fetch already
