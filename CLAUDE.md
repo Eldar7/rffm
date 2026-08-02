@@ -57,7 +57,8 @@ Core (always collected):
 - `groups.csv` (`group_id`) — group within a competition
 - `teams.csv` (`team_id`) — **a club is not a team**, see `DATA_DICTIONARY.md`
 - `team_group_membership.csv` — team ↔ group/competition, this season
-- `matches.csv` (`match_id`) — one row per fixture/result (`fixtures.csv` = unplayed-only view)
+- `matches.csv` (`match_id`) — one row per fixture/result (`fixtures.csv` = unplayed-only view); `venue_id` FK → `venues.csv`
+- `venues.csv` (`venue_id`) — one row per playing field: address + exact lat/lon + Google Maps link. Not robots.txt-gated, always collected.
 - `standings.csv` — one row per team per group
 - `scorers.csv` — aggregate top-scorer leaderboard per group
 - `manifest_groups.csv` / `manifest_pages.csv` / `manifest_endpoints.csv` — discovery/fetch manifests
@@ -72,6 +73,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 - `players.csv` (`player_id`) — stable player identity (name, birth year)
 - `player_season_stats.csv` — site-reported season aggregates per player
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
+- `clubs.csv` (`club_id`, `enrich_clubs.py`) — one row per club: real RFFM club id, website, correspondence address (**not** a stadium address — see `DATA_DICTIONARY.md`)
 
 ## How to answer a query
 
@@ -98,6 +100,8 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 | League table / standings | `standings` | `group_id` (+ `team_id` for one team) |
 | Top scorers in a group | `scorers` | `group_id` |
 | A team's fixture list | `matches` | `home_team_id`/`away_team_id` |
+| Where does a team/club play (address, map link) | `teams`, `matches`, `venues` | `club_name_raw` → `team_id` → `matches.venue_id` → `venues` |
+| A club's identity/website/correspondence address | `clubs` | `club_name_raw` (join to `teams` if starting from a `team_id`) — opt-in table, check `coverage_manifest.csv` first |
 | A player's appearances/goals/cards | `match_lineups`, `match_goals`, `match_cards`, `matches` | `player_id` → `match_id` → `matches` for date/context |
 | Did a player move teams/clubs | `match_lineups`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |
 | Match report detail (lineup, staff, ref) | `match_lineups`, `match_staff`, `match_officials` | `match_id` |

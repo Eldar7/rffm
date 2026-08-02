@@ -24,8 +24,11 @@ Output:
 
 Optional enrichment stages (see "robots.txt and enrichment" below) each have
 their own entrypoint and are off by default: `enrich_acta.py` (match
-lineups/goals/cards/staff/officials) and `enrich_players.py` (player
-profiles/season stats).
+lineups/goals/cards/staff/officials), `enrich_players.py` (player
+profiles/season stats), and `enrich_clubs.py` (club identity/correspondence
+address). Venue/field data (`venues.csv`) is **not** a separate opt-in stage
+- it's part of the core `main.py` crawl, since `/campo/` is not in
+robots.txt's `Disallow` list.
 
 ## Storage layout
 
@@ -80,6 +83,7 @@ Discovery output is saved as a timestamped JSON manifest under
 | Calendario (fixtures+results) | `/competicion/calendario?temporada=&competicion=&grupo=&jornada=&tipojuego=` | **Returns every jornada for the group in one request**, regardless of the `jornada` value — used as the single source for the whole season's matches per group. `jornada=1` is always passed since the param is required by the route but ignored by the response. |
 | Clasificaciones (standings) | `/competicion/clasificaciones?temporada=&competicion=&grupo=&tipojuego=` | |
 | Goleadores (top scorers) | `/competicion/goleadores?temporada=&competicion=&grupo=&tipojuego=` | Only fetched when the group's `clasificacion_goleadores` flag is `"1"`. |
+| Campo (venue/field profile) | `/campo/<venue_id>` | **Not** robots.txt-disallowed - part of the core crawl, one request per unique `codigo_campo` seen in this run's calendario data. Address + exact lat/lon → `venues.csv`. |
 | Acta de partido (match report) | `/acta-partido/<match_id>?temporada=&competicion=&grupo=` | Enrichment only, **off by default** — see robots.txt note below. |
 | Ficha de equipo (team profile) | `/fichaequipo/<team_id>` | Enrichment only, **off by default** — see robots.txt note below. |
 | Ficha de jugador (player profile) | `/fichajugador/<player_id>?temporada=` | Enrichment only, **off by default** — see robots.txt note below. |
@@ -108,22 +112,30 @@ Disallow: /fichaequipo/
 Disallow: /fichajugador/
 Disallow: /acta-partido/
 ```
-The core MVP (calendario/clasificaciones/goleadores + the `/api/*` discovery
-endpoints) does **not** touch any disallowed path. The three enrichment
-sources above are implemented but **off by default**
-(`enrichment.fetch_acta_partido` / `enrichment.fetch_fichaequipo` in
-`config.yaml`), requiring an explicit, informed opt-in per run — this is a
-deliberate policy choice, not a limitation to work around.
+`/campo/` is **not** in this list. The core MVP (calendario/clasificaciones/
+goleadores + `/campo/` + the `/api/*` discovery endpoints) does **not**
+touch any disallowed path. The three still-disallowed enrichment sources
+above are implemented but **off by default**
+(`enrichment.fetch_acta_partido` / `enrichment.fetch_fichaequipo` /
+`enrichment.fetch_fichajugador` in `config.yaml`), requiring an explicit,
+informed opt-in per run — this is a deliberate policy choice, not a
+limitation to work around. Note `fetch_fichaequipo` now gates the
+`enrich_clubs.py` stage (club identity), not a `fichaequipo`-per-team crawl
+- see "Entities collected" below.
 
 ## Entities collected
 
 - **Core (always collected):** seasons, game types, competitions, groups,
   teams, team-group membership, matches (fixtures+results, one table — see
-  below), standings, top scorers.
+  below), venues (playing fields: address, exact lat/lon, Google Maps link),
+  standings, top scorers.
 - **Enrichment (opt-in, `enrich_acta.py`):** match lineups, goals, cards,
   team staff (coaches/delegates), match officials (referees/field delegate).
 - **Enrichment (opt-in, `enrich_players.py`):** player profiles, per-season
   player stats, per-player competition participation.
+- **Enrichment (opt-in, `enrich_clubs.py`):** club identity (real RFFM
+  `club_id`), website, correspondence address - one representative team per
+  club, not every team (see `DATA_DICTIONARY.md` for why one is enough).
 
 ### matches.csv vs fixtures.csv
 
@@ -165,9 +177,10 @@ lives in exactly one of these.
 config.yaml            # URL patterns, target season/categories, network policy
 OPERATIONS.md           # how to run/extend the crawl + GitHub Actions + resumability internals
 DATA_DICTIONARY.md      # full schema: every table/column, join recipes, worked examples
-main.py                # core crawl: discovery + calendario/clasificaciones/goleadores → CSVs
+main.py                # core crawl: discovery + calendario/clasificaciones/goleadores/campo → CSVs
 enrich_acta.py          # opt-in: match lineups/goals/cards/staff/officials
 enrich_players.py       # opt-in: player profiles/season stats
+enrich_clubs.py         # opt-in: club identity/correspondence address
 .github/workflows/
   rffm-crawl.yml          # manually-dispatched crawl job (any stage), commits+pushes on success
 rffm_scraper/
@@ -175,16 +188,18 @@ rffm_scraper/
   http_client.py         # retry/backoff/rate-limit/crawl-log HTTP client
   discovery.py            # Stage A: /api/* discovery of competitions/groups
   fetchers.py              # Stage B: page fetchers (__NEXT_DATA__ extraction)
-  parsers.py                # Stage C: page JSON → row dicts (matches/standings/scorers)
+  parsers.py                # Stage C: page JSON → row dicts (matches/standings/scorers/venues)
   acta_parsers.py             # match report JSON → lineups/goals/cards/staff/officials
   fichajugador_parsers.py       # player profile JSON → player/season-stats/participation
+  club_parsers.py                # fichaequipo JSON → club identity/address
   normalize.py                   # category matching, dates, team-name/suffix parsing
   models.py                       # pydantic row schemas (one per CSV)
   row_io.py                        # shared CSV validation/writing/atomic-write/coverage-manifest/resumability helpers
-  pipeline.py                       # core orchestration
+  pipeline.py                       # core orchestration (incl. venue fetch)
   acta_pipeline.py                   # match-report enrichment orchestration (batched, resumable)
   player_pipeline.py                   # player-profile enrichment orchestration (batched, resumable)
-  quality_checks.py / acta_quality_checks.py / player_quality_checks.py
+  club_pipeline.py                      # club enrichment orchestration (batched, resumable)
+  quality_checks.py / acta_quality_checks.py / player_quality_checks.py / club_quality_checks.py
 
 output/processed/rffm/
   coverage_manifest.csv  # cross-season index: is season × category × stage done?
