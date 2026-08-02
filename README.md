@@ -135,11 +135,12 @@ purely as a convenience view of what's still upcoming/unplayed.
 
 ## Data dictionary and how to query the data
 
-Full column-by-column schema for every table (core + enrichment), table
-relationships, and ready-to-run pandas join recipes (including a worked
-"results between two clubs" example) live in **`CLAUDE.md`** — kept as the
-single source of truth for the data model on purpose, see that file's "Why
-one file" section for why it isn't duplicated here too.
+`CLAUDE.md` routes an analytics question to the right table (kept short —
+it's auto-loaded into every session in this repo); **`DATA_DICTIONARY.md`**
+has the full column-by-column schema, table relationships, and ready-to-run
+pandas join recipes (including a worked "results between two clubs"
+example). See `CLAUDE.md`'s "Why one file" section for why each concern
+lives in exactly one of these.
 
 ## What's collected successfully vs. limited (2025-2026 pilot)
 
@@ -163,6 +164,7 @@ one file" section for why it isn't duplicated here too.
 ```
 config.yaml            # URL patterns, target season/categories, network policy
 OPERATIONS.md           # how to run/extend the crawl + GitHub Actions + resumability internals
+DATA_DICTIONARY.md      # full schema: every table/column, join recipes, worked examples
 main.py                # core crawl: discovery + calendario/clasificaciones/goleadores → CSVs
 enrich_acta.py          # opt-in: match lineups/goals/cards/staff/officials
 enrich_players.py       # opt-in: player profiles/season stats
