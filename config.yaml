@@ -28,6 +28,12 @@ site:
     calendario: "/competicion/calendario"
     clasificaciones: "/competicion/clasificaciones"
     goleadores: "/competicion/goleadores"
+    # Venue/field profile page. NOT in robots.txt's Disallow list (only
+    # fichaequipo/fichajugador/acta-partido are), so this is fetched as
+    # part of the core crawl, not gated behind `enrichment`. codigo_campo
+    # (the <id> here) comes from the calendario page's per-match "campo"
+    # object - see matches.csv's venue_id column.
+    campo: "/campo"
     # Enrichment-only pages. robots.txt explicitly disallows crawling these
     # three path prefixes (Disallow: /fichaequipo/ /fichajugador/
     # /acta-partido/), so fetching them is OFF by default (see
@@ -60,7 +66,7 @@ target:
 enrichment:
   fetch_scorers: true            # /competicion/goleadores - allowed by robots.txt
   fetch_acta_partido: true       # disallowed by robots.txt - explicit opt-in, run via enrich_acta.py
-  fetch_fichaequipo: false       # disallowed by robots.txt - opt-in only
+  fetch_fichaequipo: true        # disallowed by robots.txt - explicit opt-in, run via enrich_clubs.py
   fetch_fichajugador: true       # disallowed by robots.txt - explicit opt-in, run via enrich_players.py
   # Settings for the enrich_acta.py stage (match lineups/goals/cards/staff/
   # officials, from /acta-partido/<match_id>). Off by default; explicitly
@@ -81,6 +87,18 @@ enrichment:
     scope_category: "PREBENJAMIN"
     progress_report_every: 25
     csv_flush_every: 200
+    rate_limit_seconds: 1.25
+    force_refetch: false
+  # Settings for the enrich_clubs.py stage (club identity/address, from
+  # /fichaequipo/<team_id>). Targets are ONE representative team_id per
+  # unique club_name_raw already in teams.csv (codigo_club is the same for
+  # every team of a club - confirmed by live sampling - so there is no need
+  # to fetch every team of a multi-team club), restricted to teams playing
+  # in scope_category this season.
+  clubs:
+    scope_category: "PREBENJAMIN"
+    progress_report_every: 25
+    csv_flush_every: 100
     rate_limit_seconds: 1.25
     force_refetch: false
 

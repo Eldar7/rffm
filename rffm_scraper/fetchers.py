@@ -120,6 +120,16 @@ def fetch_goleadores(
     )
 
 
+def fetch_campo(client: RffmClient, settings: Settings, venue_id: str) -> PageFetchResult:
+    """Venue/field profile page. NOT robots.txt-disallowed (unlike the three
+    fetchers below) - part of the core crawl, no enrichment opt-in needed.
+    """
+    return fetch_page(
+        client, settings, f"{settings.site.pages.campo}/{venue_id}", {},
+        entity_type="venue_campo", entity_id=venue_id,
+    )
+
+
 def fetch_acta_partido(
     client: RffmClient, settings: Settings, *, season_id: str, competicion: str,
     grupo: str, match_id: str,

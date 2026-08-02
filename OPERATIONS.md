@@ -12,15 +12,26 @@ worth restating so they don't get silently broken.
 
 ## Dependency order
 
-Three entrypoints, must run in this order per season (each reads the
-previous stage's committed output as its target list):
+Four entrypoints. `enrich_clubs.py` only depends on step 1 (not on
+`enrich_acta.py`), so it can run any time after `main.py` - it's listed
+third here only because it's the newer addition, not because of an ordering
+requirement:
 
 1. `main.py` → `rffm_scraper/pipeline.py` — competitions/groups/teams/
-   matches/standings/scorers. Not category-scoped. ~20 min/season.
+   matches/venues/standings/scorers. Not category-scoped. ~20 min/season.
+   Venues (`venues.csv`, one row per unique `codigo_campo` seen in this
+   run's matches) are fetched here too, not a separate stage - `/campo/`
+   isn't robots.txt-gated.
 2. `enrich_acta.py` → `rffm_scraper/acta_pipeline.py` — match lineups/goals/
    cards/staff/officials. Reads `matches.csv`. Category-scoped, rate-limited,
    can take hours.
-3. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
+3. `enrich_clubs.py` → `rffm_scraper/club_pipeline.py` — club identity/
+   correspondence address. Reads `teams.csv`/`team_group_membership.csv`/
+   `groups.csv` (for category) + `matches.csv` (for `season_id`).
+   Category-scoped. One representative team per club, so the target count
+   is roughly `teams.csv`'s row count divided by teams-per-club, not one
+   request per team - a few hundred requests, not thousands.
+4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups.csv` (needs
    step 2 done first for the categories it targets). Same order of
    magnitude as step 2.
@@ -28,7 +39,8 @@ previous stage's committed output as its target list):
 `config.yaml`'s `target.season_label` picks the season (not CLI-overridable
 — see the workflow walkthrough below for why that matters);
 `enrichment.acta_partido.scope_category` / `enrichment.fichajugador.scope_category`
-pick the category, overridable per-run via each entrypoint's `--scope` flag.
+/ `enrichment.clubs.scope_category` pick the category, overridable per-run
+via each entrypoint's `--scope` flag.
 
 ## Storage layout
 
@@ -88,7 +100,7 @@ here (see "Checking progress" below).
 - **Trigger**: `workflow_dispatch` only (no `schedule:` cron yet —
   deliberate, add one once this has run cleanly a few times).
 - **Inputs**: `season_label` (free text, must exist in the site's
-  `/api/seasons`), `stage` (`core`/`acta_partido`/`fichajugador`),
+  `/api/seasons`), `stage` (`core`/`acta_partido`/`fichajugador`/`clubs`),
   `scope_category` (free text, ignored for `core`).
 - `permissions: contents: write` for the final push via the default
   `GITHUB_TOKEN` — no extra secrets.
@@ -108,12 +120,15 @@ here (see "Checking progress" below).
 
 ## Running a stage — recipe
 
-New season: dispatch `core` once → dispatch `acta_partido` with
-`scope_category=<category>`, re-dispatching the same inputs until
-`coverage_manifest.csv` shows `complete`/`complete_with_failures` for that
-row → dispatch `fichajugador` the same way. Widening an already-`core`'d
-season to a new category: skip straight to `acta_partido`/`fichajugador`
-with the new `scope_category`.
+New season: dispatch `core` once (this also produces `venues.csv`) →
+dispatch `acta_partido` with `scope_category=<category>`, re-dispatching the
+same inputs until `coverage_manifest.csv` shows
+`complete`/`complete_with_failures` for that row → dispatch `fichajugador`
+the same way. `clubs` only needs `core` done first and can be dispatched any
+time after it (independently of `acta_partido`/`fichajugador`), same
+re-dispatch-until-complete pattern. Widening an already-`core`'d season to a
+new category: skip straight to `acta_partido`/`fichajugador`/`clubs` with
+the new `scope_category`.
 
 **Checking progress:**
 - Live, while a job runs: Actions tab → the running job → expand the crawl

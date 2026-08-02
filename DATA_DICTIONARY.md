@@ -67,8 +67,20 @@ requested.
   group, group_id, game_type, game_type_id, phase_label, matchday,
   matchday_label, match_id, home_team, home_team_id, away_team,
   away_team_id, home_score, away_score, match_date, match_time,
-  match_datetime_raw, venue, status, is_finished, is_scheduled,
-  result_text_raw, source_url, source_type, scraped_at`.
+  match_datetime_raw, venue, venue_id, status, is_finished, is_scheduled,
+  result_text_raw, source_url, source_type, scraped_at`. `venue` is the
+  site's raw venue name string (e.g. `"COTORRUELO 1-A(HA)"`); `venue_id` is
+  the numeric field id (site's `codigo_campo`) — FK to `venues.csv`, `null`
+  for unscheduled matches with no assigned venue yet.
+- **`venues.csv`** (`venue_id` PK) — one row per distinct playing field
+  (`/campo/<venue_id>`, allowed by `robots.txt` — fetched as part of the
+  core crawl, one request per unique `venue_id` seen in this run's
+  `matches.csv`, not gated behind `enrichment`). Has exact
+  `latitude`/`longitude` from the site (not geocoded), so
+  `google_maps_url` is precise, not a name-based guess. Columns: `venue_id,
+  venue_name, address, locality, province, postal_code, latitude,
+  longitude, google_maps_url, field_type_raw, surface_raw, source_url,
+  scraped_at`.
 - **`standings.csv`** — one row per team per group. Includes
   `sanction_points`. Columns: `season, season_id, category, competition,
   competition_id, group, group_id, team, team_id, position, played, wins,
@@ -239,6 +251,24 @@ re-crawl of enrichment data needed.
   `player_id, season, season_id, competition_id, competition, group_id,
   group, team_id, team, club_name_raw, team_position, team_points,
   source_url, scraped_at`.
+- **`clubs.csv`** (`club_id` PK, `enrich_clubs.py`) — one row per unique
+  club (`club_name_raw` in `teams.csv`), from `/fichaequipo/<team_id>`.
+  `club_id` is the site's own `codigo_club` — confirmed identical across
+  every team of the same club by live sampling, so it is the real RFFM
+  club identity, **not** a surrogate this project invented; join
+  `teams.csv` to `clubs.csv` on `club_name_raw` (there is no `club_id`
+  column in `teams.csv` itself). `representative_team_id` records which one
+  team's fichaequipo page the row was actually fetched from — only one team
+  per club is fetched (codigo_club/address don't vary by team), not every
+  team. **`correspondence_address`/`locality`/`province`/`postal_code` are
+  a correspondence address (where official club mail goes), not a stadium
+  address** — RFFM does not publish a per-club venue; for playing fields,
+  join `matches.csv`'s `venue_id` to `venues.csv` instead (see worked
+  example below). Deliberately excludes the source page's
+  `telefonos`/`email_correspondencia`/`fax` — personal contact info of a
+  club delegate, not public club data. Columns: `club_id, club_name_raw,
+  portal_web, crest_url, correspondence_address, locality, province,
+  postal_code, representative_team_id, source_url, scraped_at`.
 
 ## Worked example — "give me all results between two clubs" (season 2025-2026)
 
@@ -294,6 +324,38 @@ one risks being wrong):
      in `match_lineups.csv` may just reflect which of their two teams
      played that week, not a move.
 
+## Worked example — a club's playing fields + Google Maps links (season 2025-2026)
+
+Two separate address concepts, joined through two different keys — do not
+conflate them:
+
+```python
+import pandas as pd
+
+teams = pd.read_csv("output/processed/rffm/2025-2026/teams.csv", dtype=str)
+matches = pd.read_csv("output/processed/rffm/2025-2026/matches.csv", dtype=str)
+venues = pd.read_csv("output/processed/rffm/2025-2026/venues.csv", dtype=str)
+clubs = pd.read_csv("output/processed/rffm/2025-2026/clubs.csv", dtype=str)  # requires enrich_clubs.py to have run
+
+club_name = "GETAFE C.F. S.A.D."
+
+# Correspondence address (club_name_raw -> clubs.csv, no stadium guarantee)
+print(clubs.loc[clubs["club_name_raw"] == club_name])
+
+# Actual playing fields this club's teams host matches at, with precise
+# lat/lon-derived Google Maps links (club_name_raw -> teams.csv -> team_id
+# -> matches.csv home rows -> venue_id -> venues.csv)
+team_ids = teams.loc[teams["club_name_raw"] == club_name, "team_id"]
+home_venue_ids = matches.loc[matches["home_team_id"].isin(team_ids), "venue_id"].dropna().unique()
+print(venues[venues["venue_id"].isin(home_venue_ids)][["venue_name", "address", "google_maps_url"]])
+```
+
+`clubs.csv` is opt-in (`enrich_clubs.py`, robots.txt-disallowed page) — check
+`coverage_manifest.csv` (`stage == "clubs"`) before assuming it covers the
+club you need. `venues.csv` is always present (core crawl) but only
+contains venues that appear in *this run's* `matches.csv` — a club whose
+teams haven't played yet this season may have no `venue_id` rows at all.
+
 ## Card-type code mapping (inferred, not officially documented)
 
 `/fichajugador/` explicitly labels its card breakdown
@@ -324,19 +386,23 @@ mirrors the card mapping.
   per-player history back to 2020-2021 (`listado_temporadas`) if a future
   session wants multi-season career tracking.
 
-## Two intentionally separate crawl_log/quality-report families
+## Three intentionally separate crawl_log/quality-report families
 
-`acta_crawl_log.csv`/`acta_data_quality_report.csv` and
-`fichajugador_crawl_log.csv`/`fichajugador_data_quality_report.csv` are kept
-**separate** from the core pipeline's `crawl_log.csv`/`data_quality_report.csv`,
-on purpose: the core files are fully rebuilt from scratch on every `main.py`
+`acta_crawl_log.csv`/`acta_data_quality_report.csv`,
+`fichajugador_crawl_log.csv`/`fichajugador_data_quality_report.csv`, and
+`clubs_crawl_log.csv`/`clubs_data_quality_report.csv` are kept **separate**
+from the core pipeline's `crawl_log.csv`/`data_quality_report.csv`, on
+purpose: the core files are fully rebuilt from scratch on every `main.py`
 run, so an appending enrichment stage on top of them would get silently
 wiped by the next unrelated core rerun. Want a unified view across all
 crawl logs? `pd.concat()` them at analysis time — don't merge the files on
 disk. (Each of these lives inside its season's directory alongside that
-season's other tables — `crawl_log.csv` is per-season too, not global.)
+season's other tables — `crawl_log.csv` is per-season too, not global.) Note
+`venues.csv`'s own fetches (`/campo/<id>`) log into core's `crawl_log.csv`,
+not a fourth family — that stage isn't robots.txt-gated, so it runs inside
+`main.py` itself rather than as a separate enrichment entrypoint.
 
-Unlike core's `crawl_log.csv` (rebuilt from scratch every run), the two
+Unlike core's `crawl_log.csv` (rebuilt from scratch every run), the three
 enrichment crawl logs grow incrementally across a season's crawl and also
 double as the crawler's own resumability marker — mechanics and why in
 `OPERATIONS.md`, not relevant to querying the data itself.

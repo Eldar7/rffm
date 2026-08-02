@@ -18,7 +18,7 @@ import pandas as pd
 
 from rffm_scraper.config import Settings
 from rffm_scraper.discovery import DiscoveredGroup, run_discovery
-from rffm_scraper.fetchers import fetch_calendario, fetch_clasificaciones, fetch_goleadores
+from rffm_scraper.fetchers import fetch_calendario, fetch_campo, fetch_clasificaciones, fetch_goleadores
 from rffm_scraper.http_client import RffmClient
 from rffm_scraper.models import (
     Competition,
@@ -31,12 +31,14 @@ from rffm_scraper.models import (
     Scorer,
     Team,
     TeamGroupMembership,
+    Venue,
 )
 from rffm_scraper.parsers import (
     GroupContext,
     parse_matches,
     parse_scorers,
     parse_standings,
+    parse_venue,
     team_group_memberships,
     teams_from_matches_and_standings,
 )
@@ -101,6 +103,13 @@ ENDPOINT_DOCS = [
         notes="__NEXT_DATA__.props.pageProps.scorers.goles - top scorers list.",
     ),
     dict(
+        name="campo_page", method="GET", path="/campo/<venue_id>",
+        required_params="", optional_params="",
+        notes="Venue/field profile: address, locality, province, postal code, latitude/longitude. "
+              "NOT in robots.txt's Disallow list, so fetched as part of the core crawl for every "
+              "unique venue_id (matches.csv's codigo_campo) seen in this run - see venues.csv.",
+    ),
+    dict(
         name="acta_partido_page", method="GET", path="/acta-partido/<match_id>",
         required_params="", optional_params="temporada,competicion,grupo",
         notes="Match report enrichment: lineups, goals, cards, coaches/delegates, referees. "
@@ -145,6 +154,7 @@ def run_pipeline(settings: Settings) -> dict:
         )
 
     matches_df = pd.DataFrame(validate_rows(Match, all_matches, "match"))
+    venues_df = _fetch_venues(client, settings, matches_df)
     standings_df = pd.DataFrame(validate_rows(Standing, all_standings, "standing"))
     scorers_df = pd.DataFrame(validate_rows(Scorer, all_scorers, "scorer"))
     teams_df = pd.DataFrame(validate_rows(Team, list(teams_acc.values()), "team"))
@@ -177,6 +187,7 @@ def run_pipeline(settings: Settings) -> dict:
     write_csv(membership_df, processed / "team_group_membership.csv")
     write_csv(matches_df, processed / "matches.csv")
     write_csv(fixtures_df, processed / "fixtures.csv")
+    write_csv(venues_df, processed / "venues.csv")
     write_csv(standings_df, processed / "standings.csv")
     write_csv(scorers_df, processed / "scorers.csv")
     write_csv(manifest_groups_df, processed / "manifest_groups.csv")
@@ -205,6 +216,7 @@ def run_pipeline(settings: Settings) -> dict:
         groups_discovered=len(discovery.groups),
         competitions=len(competitions),
         matches=len(matches_df),
+        venues=len(venues_df),
         standings=len(standings_df),
         scorers=len(scorers_df),
         teams=len(teams_df),
@@ -213,6 +225,29 @@ def run_pipeline(settings: Settings) -> dict:
     )
     logger.info("Pipeline summary: %s", summary)
     return summary
+
+
+def _fetch_venues(client: RffmClient, settings: Settings, matches_df: pd.DataFrame) -> pd.DataFrame:
+    """One /campo/<id> fetch per unique venue_id seen in this run's
+    matches.csv. Not robots.txt-gated, so this runs unconditionally as part
+    of the core crawl rather than a separate opt-in enrichment stage - see
+    fetch_campo's docstring."""
+    if matches_df.empty or "venue_id" not in matches_df.columns:
+        return pd.DataFrame(columns=list(Venue.model_fields))
+
+    venue_ids = sorted(matches_df["venue_id"].dropna().unique().tolist())
+    rows: list[dict] = []
+    for venue_id in venue_ids:
+        result = fetch_campo(client, settings, venue_id)
+        if not result.ok or not result.page_props:
+            continue
+        field_json = result.page_props.get("field")
+        if not field_json:
+            continue
+        rows.append(parse_venue(field_json, venue_id, result.url))
+
+    logger.info("Fetched %d/%d venues", len(rows), len(venue_ids))
+    return pd.DataFrame(validate_rows(Venue, rows, "venue"))
 
 
 def _write_page_manifest(settings: Settings, manifest_group_rows: list[dict], path: pathlib.Path) -> None:

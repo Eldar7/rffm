@@ -55,6 +55,20 @@ class Team(Row):
     scraped_at: str
 
 
+class Club(Row):
+    club_id: str
+    club_name_raw: str
+    portal_web: Optional[str]
+    crest_url: Optional[str]
+    correspondence_address: Optional[str]
+    locality: Optional[str]
+    province: Optional[str]
+    postal_code: Optional[str]
+    representative_team_id: str
+    source_url: str
+    scraped_at: str
+
+
 class TeamGroupMembership(Row):
     season: str
     season_id: str
@@ -90,12 +104,29 @@ class Match(Row):
     match_time: Optional[str]
     match_datetime_raw: Optional[str]
     venue: Optional[str]
+    venue_id: Optional[str]
     status: str
     is_finished: bool
     is_scheduled: bool
     result_text_raw: Optional[str]
     source_url: str
     source_type: str
+    scraped_at: str
+
+
+class Venue(Row):
+    venue_id: str
+    venue_name: str
+    address: Optional[str]
+    locality: Optional[str]
+    province: Optional[str]
+    postal_code: Optional[str]
+    latitude: Optional[float]
+    longitude: Optional[float]
+    google_maps_url: Optional[str]
+    field_type_raw: Optional[str]
+    surface_raw: Optional[str]
+    source_url: str
     scraped_at: str
 
 
