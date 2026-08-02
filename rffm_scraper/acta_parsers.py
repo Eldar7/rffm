@@ -33,6 +33,28 @@ CARD_TYPE_LABELS = {
 _ABSENT_NAME_SENTINELS = {"", "NO PRESENTA"}
 
 
+def _dedupe_exact(rows: list[dict], label: str) -> list[dict]:
+    """Drop exact-duplicate event rows (same match/team/player/minute/type/...),
+    ignoring scraped_at. Seen in the wild: RFFM's own acta-partido JSON
+    occasionally lists the identical goal or card entry twice for what is
+    the same real-world event. There's no site-provided event id to tell a
+    genuine repeat apart from a data glitch, so full-field equality is the
+    only signal available - safe as a dedup key since two distinct events
+    (e.g. two different goals in the same minute) would differ in at least
+    one other field.
+    """
+    seen: set[tuple] = set()
+    deduped = []
+    for row in rows:
+        key = tuple((k, v) for k, v in row.items() if k != "scraped_at")
+        if key in seen:
+            logger.warning("Dropping exact-duplicate %s row: %s", label, row)
+            continue
+        seen.add(key)
+        deduped.append(row)
+    return deduped
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -148,7 +170,7 @@ def _parse_goals(game, *, match_id, home_team_id, away_team_id, source_url, scra
                     scraped_at=scraped_at,
                 )
             )
-    return rows
+    return _dedupe_exact(rows, "goal")
 
 
 def _parse_cards(game, *, match_id, home_team_id, away_team_id, source_url, scraped_at) -> list[dict]:
@@ -175,7 +197,7 @@ def _parse_cards(game, *, match_id, home_team_id, away_team_id, source_url, scra
                     scraped_at=scraped_at,
                 )
             )
-    return rows
+    return _dedupe_exact(rows, "card")
 
 
 def _add_staff_row(rows, *, match_id, team_id, role_kind, name, person_id, source_url, scraped_at):

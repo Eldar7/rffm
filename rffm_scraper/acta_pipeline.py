@@ -75,6 +75,7 @@ from rffm_scraper.row_io import (
     already_done_ids,
     append_or_write_csv,
     atomic_write_text,
+    downgrade_crawl_log_if_no_content,
     upsert_coverage_manifest,
     validate_rows,
     write_csv,
@@ -259,7 +260,10 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
                 atomic_write_text(raw_path, result.raw_html)
                 game = (result.page_props or {}).get("game")
                 progress.record_fetch(time.monotonic() - fetch_started)
-            pending_crawl_log_rows.append(dataclasses.asdict(client.crawl_log[-1]))
+            log_entry = downgrade_crawl_log_if_no_content(
+                dataclasses.asdict(client.crawl_log[-1]), content_ok=game is not None,
+            )
+            pending_crawl_log_rows.append(log_entry)
         elif cache_hit:
             # A cache hit never touches the network client, so it never
             # produces a crawl_log entry on its own - synthesize one so this
