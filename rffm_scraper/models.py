@@ -312,6 +312,7 @@ class CrawlLogEntry(Row):
     parser_type: str
     raw_saved_path: str
     message: str
+    elapsed_seconds: Optional[float] = None
 
 
 class ManifestEndpoint(Row):
