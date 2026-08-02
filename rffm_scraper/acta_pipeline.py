@@ -136,6 +136,49 @@ def _raw_path(settings: Settings, category: str, season_label: str, match_id: st
     return settings.raw_dir / category.lower() / season_label / "acta" / f"{match_id}.html"
 
 
+def _guard_against_silent_empty_scope(
+    settings: Settings, *, season_label: str, scope_category: str, stage: str,
+) -> None:
+    """Refuse to proceed if _load_targets found 0 matches for scope_category
+    but coverage_manifest.csv already shows this exact (season, scope,
+    stage) had a nonzero target count before.
+
+    Without this, a 0-target run falls through run_acta_enrichment's normal
+    completion logic ("missing = set() - done_ids = set()" -> status
+    "complete") and upsert_coverage_manifest overwrites the last-known-good
+    progress row with a false "complete, 0/0" - indistinguishable from a
+    legitimately empty scope. This has a real trigger: matches.csv's
+    `category` column is denormalized from discovery's category_base (see
+    pipeline.py), so any change to how category_base is computed (e.g. a
+    core crawl re-run under different taxonomy rules) can silently empty
+    out what `category == scope_category` matches, with no error anywhere
+    in between. See DATA_DICTIONARY.md's "Category taxonomy" section for
+    the incident that motivated this guard.
+    """
+    manifest_path = settings.processed_root / "coverage_manifest.csv"
+    if not manifest_path.exists():
+        return
+    existing = pd.read_csv(manifest_path, dtype=str, keep_default_na=True)
+    prior = existing[
+        (existing["season"] == season_label)
+        & (existing["category_base"] == scope_category)
+        & (existing["stage"] == stage)
+    ]
+    if prior.empty:
+        return
+    prior_targets_total = int(prior.iloc[-1]["targets_total"] or 0)
+    if prior_targets_total > 0:
+        raise RuntimeError(
+            f"{stage}: matches.csv has 0 rows with category={scope_category!r}, but "
+            f"coverage_manifest.csv already shows {prior_targets_total} targets for "
+            f"(season={season_label!r}, category_base={scope_category!r}, stage={stage!r}) from a "
+            f"previous run. Refusing to overwrite that with a false 'complete, 0/0' row. This "
+            f"usually means matches.csv's category taxonomy changed upstream (e.g. a core "
+            f"all-categories re-run) and scope_category no longer matches anything in it - check "
+            f"DATA_DICTIONARY.md's 'Category taxonomy' section and re-run core if so."
+        )
+
+
 def _progress_path(settings: Settings, season_label: str, scope_category: str):
     return settings.discovery_dir / f"acta_progress_{season_label}_{scope_category.lower()}.json"
 
@@ -208,6 +251,11 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
 
     processed = settings.processed_dir
     processed.mkdir(parents=True, exist_ok=True)
+
+    if not target_match_ids:
+        _guard_against_silent_empty_scope(
+            settings, season_label=season_label, scope_category=scope_category, stage="acta_partido",
+        )
 
     # Resumability source of truth: the UNION of (a) crawl-log successes and
     # (b) match_ids already present in match_lineups.csv. (a) alone catches

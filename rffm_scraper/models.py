@@ -20,6 +20,8 @@ class Competition(Row):
     season_id: str
     category_base: str
     category_label_raw: str
+    is_femenino: bool
+    division_level: str
     competition: str
     competition_id: str
     phase_label: str
@@ -247,6 +249,8 @@ class ManifestGroup(Row):
     group_id: str
     category_base: str
     category_label_raw: str
+    is_femenino: bool
+    division_level: str
     competition_label_raw: str
     group_label_raw: str
     has_calendario: bool
