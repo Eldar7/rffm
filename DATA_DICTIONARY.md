@@ -93,8 +93,9 @@ requested.
 - **`manifest_groups.csv` / `manifest_pages.csv` / `manifest_endpoints.csv`**
   — discovery/page/endpoint manifests (what was found and fetched).
 - **`crawl_log.csv`** / **`data_quality_report.csv`** — every HTTP request
-  this run and automated anomaly findings (see "Two intentionally separate
-  crawl-log families" below for why there are several of each).
+  this run (including `elapsed_seconds`, the end-to-end client duration) and
+  automated anomaly findings (see "Two intentionally separate crawl-log
+  families" below for why there are several of each).
 
 ## Category taxonomy
 

@@ -42,6 +42,7 @@ class CrawlLogEntry:
     parser_type: str
     raw_saved_path: str
     message: str
+    elapsed_seconds: float | None = None
 
 
 def _is_retryable_http_error(exc: BaseException) -> bool:
@@ -102,6 +103,7 @@ class RffmClient:
         parser_type: str,
         raw_saved_path: str = "",
         message: str = "",
+        elapsed_seconds: float | None = None,
     ) -> None:
         entry = CrawlLogEntry(
             run_id=self.run_id,
@@ -116,6 +118,7 @@ class RffmClient:
             parser_type=parser_type,
             raw_saved_path=raw_saved_path,
             message=message,
+            elapsed_seconds=elapsed_seconds,
         )
         self.crawl_log.append(entry)
 
@@ -156,6 +159,7 @@ class RffmClient:
 
         Never raises - a single broken page must not abort the whole crawl.
         """
+        started = time.monotonic()
         try:
             resp = self._request_with_retry(url, params)
             self._log(
@@ -167,6 +171,7 @@ class RffmClient:
                 success=True,
                 retry_count=0,
                 parser_type=parser_type,
+                elapsed_seconds=time.monotonic() - started,
             )
             return resp
         except requests.exceptions.HTTPError as exc:
@@ -182,6 +187,7 @@ class RffmClient:
                 retry_count=self.settings.network.max_retries,
                 parser_type=parser_type,
                 message=str(exc),
+                elapsed_seconds=time.monotonic() - started,
             )
             return None
         except requests.exceptions.RequestException as exc:
@@ -196,6 +202,7 @@ class RffmClient:
                 retry_count=self.settings.network.max_retries,
                 parser_type=parser_type,
                 message=str(exc),
+                elapsed_seconds=time.monotonic() - started,
             )
             return None
 
