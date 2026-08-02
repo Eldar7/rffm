@@ -4,10 +4,16 @@ One representative team_id per unique club_name_raw is fetched, not every
 team - codigo_club (and the correspondence-address fields) are confirmed
 identical across every team of the same club by live sampling, so fetching
 a second/third team of an already-covered club would just re-fetch the same
-club data for no new information. Targets are restricted to teams playing
-in scope_category this season (team_group_membership.csv joined to
-groups.csv for the category), read from output the core crawl (main.py)
-already produced - run that first.
+club data for no new information.
+
+Deliberately NOT category-scoped (unlike acta_partido/fichajugador): a club
+is not an age-bracket concept - the same club routinely fields both a
+BENJAMIN and a PREBENJAMIN team, so filtering targets to one category would
+silently drop clubs whose only team happens to sit in the other category.
+Targets are every unique club_name_raw in teams.csv, whatever categories
+that season's core crawl covered - same "not category-scoped" treatment as
+`core` itself (see pipeline.py) and venues. Read from output the core crawl
+(main.py) already produced - run that first.
 
 Same resumability/progress/batched-flush/coverage-manifest design as
 acta_pipeline.py/player_pipeline.py - see acta_pipeline.py's module
@@ -48,28 +54,18 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _load_target_teams(settings: Settings, scope_category: str) -> pd.DataFrame:
-    processed = settings.processed_dir
-    teams_df = pd.read_csv(processed / "teams.csv", dtype=str, keep_default_na=True)
-    membership_df = pd.read_csv(processed / "team_group_membership.csv", dtype=str, keep_default_na=True)
-    groups_df = pd.read_csv(processed / "groups.csv", dtype=str, keep_default_na=True)
-
-    group_category = groups_df.set_index("group_id")["category"]
-    in_scope_team_ids = set(
-        membership_df.loc[membership_df["group_id"].map(group_category) == scope_category, "team_id"]
-    )
-
-    scoped = teams_df[teams_df["team_id"].isin(in_scope_team_ids)]
-    representatives = scoped.drop_duplicates(subset="club_name_raw", keep="first")
+def _load_target_teams(settings: Settings) -> pd.DataFrame:
+    teams_df = pd.read_csv(settings.processed_dir / "teams.csv", dtype=str, keep_default_na=True)
+    representatives = teams_df.drop_duplicates(subset="club_name_raw", keep="first")
     return representatives[["team_id", "club_name_raw"]].reset_index(drop=True)
 
 
-def _raw_path(settings: Settings, category: str, season_label: str, team_id: str):
-    return settings.raw_dir / category.lower() / season_label / "fichaequipo" / f"{team_id}.html"
+def _raw_path(settings: Settings, season_label: str, team_id: str):
+    return settings.raw_dir / season_label / "fichaequipo" / f"{team_id}.html"
 
 
-def _progress_path(settings: Settings, season_label: str, scope_category: str):
-    return settings.discovery_dir / f"clubs_progress_{season_label}_{scope_category.lower()}.json"
+def _progress_path(settings: Settings, season_label: str):
+    return settings.discovery_dir / f"clubs_progress_{season_label}.json"
 
 
 def _reread_table(processed, filename: str) -> pd.DataFrame:
@@ -90,7 +86,7 @@ def _flush_batch(processed, rows: list[dict], crawl_log_rows: list[dict]) -> Non
         crawl_log_rows.clear()
 
 
-def run_club_enrichment(settings: Settings, scope_category: str | None = None, force_refetch: bool | None = None) -> dict:
+def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -> dict:
     if not settings.enrichment.fetch_fichaequipo:
         raise RuntimeError(
             "enrichment.fetch_fichaequipo is false in config - refusing to crawl "
@@ -98,7 +94,6 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
         )
 
     cfg = settings.enrichment.clubs
-    scope_category = scope_category or cfg.scope_category
     force_refetch = cfg.force_refetch if force_refetch is None else force_refetch
     season_label = settings.target.season_label
 
@@ -108,7 +103,7 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
     )
     client = RffmClient(club_settings)
 
-    targets = _load_target_teams(settings, scope_category)
+    targets = _load_target_teams(settings)
     target_team_ids: list[str] = targets["team_id"].tolist()
 
     processed = settings.processed_dir
@@ -126,16 +121,16 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
         done_ids |= set(
             pd.read_csv(clubs_path, usecols=["representative_team_id"], dtype=str)["representative_team_id"].dropna()
         )
-    already_done_this_scope = done_ids & set(target_team_ids)
+    already_done = done_ids & set(target_team_ids)
     remaining = [tid for tid in target_team_ids if tid not in done_ids]
 
     logger.info(
-        "clubs enrichment: %d targets total, %d already done, %d remaining (scope=%s)",
-        len(target_team_ids), len(already_done_this_scope), len(remaining), scope_category,
+        "clubs enrichment: %d targets total, %d already done, %d remaining",
+        len(target_team_ids), len(already_done), len(remaining),
     )
 
-    progress = Progress(_progress_path(settings, season_label, scope_category), scope_category, len(target_team_ids))
-    progress.completed = len(already_done_this_scope)
+    progress = Progress(_progress_path(settings, season_label), season_label, len(target_team_ids))
+    progress.completed = len(already_done)
     progress.write()
 
     started_at = _now_iso()
@@ -143,7 +138,7 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
     pending_crawl_log_rows: list[dict] = []
 
     for i, team_id in enumerate(remaining, start=1):
-        raw_path = _raw_path(settings, scope_category, season_label, team_id)
+        raw_path = _raw_path(settings, season_label, team_id)
         source_url = f"{settings.site.base_url}{settings.site.pages.fichaequipo}/{team_id}"
 
         team_json = None
@@ -197,7 +192,7 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
             progress.write()
             upsert_coverage_manifest(
                 settings.processed_root, season=season_label, season_id=season_id,
-                category_base=scope_category, stage="clubs", status="partial",
+                category_base="ALL", stage="clubs", status="partial",
                 targets_total=len(target_team_ids), targets_completed=progress.completed,
                 targets_failed=progress.failed, started_at=started_at,
             )
@@ -209,7 +204,7 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
     final_status = "complete" if not missing else "complete_with_failures"
     upsert_coverage_manifest(
         settings.processed_root, season=season_label, season_id=season_id,
-        category_base=scope_category, stage="clubs", status=final_status,
+        category_base="ALL", stage="clubs", status=final_status,
         targets_total=len(target_team_ids), targets_completed=progress.completed,
         targets_failed=len(missing), started_at=started_at, completed_at=_now_iso(),
     )
@@ -227,9 +222,8 @@ def run_club_enrichment(settings: Settings, scope_category: str | None = None, f
         write_csv(clubs_df, processed / "clubs.csv")
 
     summary = dict(
-        scope_category=scope_category,
         targets=len(target_team_ids),
-        already_done_before_this_run=len(already_done_this_scope),
+        already_done_before_this_run=len(already_done),
         processed_this_run=len(remaining),
         completed=progress.completed,
         freshly_fetched_ok=progress.freshly_fetched_ok,
