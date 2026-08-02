@@ -23,7 +23,13 @@ from datetime import datetime, timezone
 
 from rffm_scraper.config import Settings
 from rffm_scraper.http_client import RffmClient
-from rffm_scraper.normalize import match_category_base, phase_label_from_competition_name
+from rffm_scraper.normalize import (
+    classify_age_category,
+    classify_division_level,
+    is_femenino_label,
+    match_category_base,
+    phase_label_from_competition_name,
+)
 
 logger = logging.getLogger("rffm_scraper.discovery")
 
@@ -38,6 +44,8 @@ class DiscoveredGroup:
     competition_label_raw: str
     category_base: str
     category_label_raw: str
+    is_femenino: bool
+    division_level: str
     phase_label: str
     group_id: str
     group_label_raw: str
@@ -105,14 +113,26 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
 
         for comp in matching:
             competition_id = comp["codigo"]
+            raw_category_label = comp.get("NombreCategoria", "")
             if settings.target.crawl_all_categories:
-                # No priority list to match against - every competition's
-                # own raw label is its category_base as-is.
-                category_base = comp.get("NombreCategoria", "").strip() or None
+                # No config-supplied priority list to match against - use
+                # the fixed age vocabulary instead (see normalize.py), which
+                # covers every age RFFM runs, not just this project's
+                # BENJAMIN/PREBENJAMIN scope. Falls through to "OTHER"
+                # rather than the raw label itself, so BENJAMIN/PREBENJAMIN
+                # (and every other age) stay consolidated buckets here too -
+                # see DATA_DICTIONARY.md's "Category taxonomy" section for
+                # why a previous version of this (raw label passthrough)
+                # was a regression: it silently broke acta_partido's
+                # `category == scope_category` filter for BENJAMIN/
+                # PREBENJAMIN by fragmenting them across a dozen raw labels.
+                category_base = classify_age_category(raw_category_label)
             else:
                 category_base = match_category_base(
-                    comp.get("NombreCategoria", ""), settings.target.category_priority
+                    raw_category_label, settings.target.category_priority
                 )
+            division_level = classify_division_level(raw_category_label)
+            is_fem = is_femenino_label(raw_category_label)
             phase_label = phase_label_from_competition_name(comp.get("nombre", ""))
 
             group_list = client.get_json(
@@ -132,7 +152,9 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
                         competition_id=competition_id,
                         competition_label_raw=comp.get("nombre", ""),
                         category_base=category_base or "",
-                        category_label_raw=comp.get("NombreCategoria", ""),
+                        category_label_raw=raw_category_label,
+                        is_femenino=is_fem,
+                        division_level=division_level,
                         phase_label=phase_label,
                         group_id=grp["codigo"],
                         group_label_raw=grp.get("nombre", ""),

@@ -36,6 +36,87 @@ def match_category_base(raw_label: str, category_priority: list[str]) -> str | N
     return None
 
 
+# Age-group vocabulary for crawl_all_categories mode, where there's no
+# config-driven category_priority to match against (see match_category_base
+# above, used instead in the normal 2-category scope). Ordered most-specific
+# first, same substring-containment reasoning: PREBENJAMIN before BENJAMIN,
+# etc. (token, canonical category_base value) - the token is what's searched
+# for in the normalized label; the canonical value is what gets stored, which
+# only differs from the token for the two Spanish grammatical-gender stems
+# (UNIVERSITARI matches both UNIVERSITARIO/UNIVERSITARIA). Derived from the
+# 93 categories observed in the RFFM's 2025-2026 season - see
+# DATA_DICTIONARY.md's "Category taxonomy" section for the full derivation
+# and known edge cases (e.g. adult federation leagues with no explicit age
+# word, which correctly fall through to OTHER below rather than being
+# guessed at).
+AGE_CATEGORY_VOCABULARY: list[tuple[str, str]] = [
+    ("PREBENJAMIN", "PREBENJAMIN"),
+    ("BENJAMIN", "BENJAMIN"),
+    ("ALEV", "ALEVIN"),  # stem, not "ALEVIN" - RFFM abbreviates as "ALEV-F7"/"ALEV.F-7" in some labels
+    ("INFANTIL", "INFANTIL"),
+    ("CADETE", "CADETE"),
+    ("JUVENIL", "JUVENIL"),
+    ("VETERANOS", "VETERANOS"),
+    ("UNIVERSITARI", "UNIVERSITARIO"),
+    ("AFICIONADO", "AFICIONADO"),
+    ("SENIOR", "SENIOR"),
+]
+
+# Same idea, for the division/level facet - also ordered most-specific
+# first (e.g. "PRIMERA DIVISION AUTONOMICA" before plain "PRIMERA", which it
+# would otherwise match as a substring). See DATA_DICTIONARY.md - this facet
+# is the messiest of the four (age/format/gender/division) since RFFM's
+# naming isn't fully orthogonal; unmatched labels fall through to OTHER
+# rather than being force-fit into the nearest-looking bucket.
+DIVISION_LEVEL_VOCABULARY: list[tuple[str, str]] = [
+    ("PRIMERA DIVISION AUTONOMICA", "PRIMERA DIVISION AUTONOMICA"),
+    ("DIVISION DE HONOR", "DIVISION DE HONOR"),
+    ("PREFERENTE", "PREFERENTE"),
+    ("SEGUNDA DIVISION B", "SEGUNDA DIVISION B"),
+    ("TERCERA FEDERACION", "TERCERA FEDERACION"),
+    ("PRIMERA", "PRIMERA"),
+    ("SEGUNDA", "SEGUNDA"),
+    ("TERCERA", "TERCERA"),
+    ("SUPERLIGA", "SUPERLIGA"),
+    ("LIGA NACIONAL", "LIGA NACIONAL"),
+    ("FASE ZONAL", "FASE ZONAL"),
+    ("CAMPEONATO UNIVERSITARI", "CAMPEONATO UNIVERSITARIO"),
+    ("LIGA UNIVERSITARI", "LIGA UNIVERSITARIA"),
+]
+
+
+def classify_age_category(raw_label: str) -> str:
+    """crawl_all_categories counterpart to match_category_base: classify
+    against the fixed AGE_CATEGORY_VOCABULARY above instead of a
+    config-supplied list. Returns 'OTHER' rather than None for no match,
+    since there's no caller-side "not in scope, skip it" filtering step to
+    feed None into here (every competition is kept in all-categories mode)."""
+    normalized = normalize_label(raw_label)
+    for token, canonical in AGE_CATEGORY_VOCABULARY:
+        if token in normalized:
+            return canonical
+    return "OTHER"
+
+
+def classify_division_level(raw_label: str) -> str:
+    """Best-effort division/level facet - see DIVISION_LEVEL_VOCABULARY."""
+    normalized = normalize_label(raw_label)
+    for token, canonical in DIVISION_LEVEL_VOCABULARY:
+        if token in normalized:
+            return canonical
+    return "OTHER"
+
+
+def is_femenino_label(raw_label: str) -> bool:
+    """Whether raw_label carries an explicit women's-category marker.
+
+    RFFM does not consistently mark the converse (see DATA_DICTIONARY.md) -
+    a False here means "no explicit marker found", not "confirmed men's/
+    mixed competition".
+    """
+    return "FEMENIN" in normalize_label(raw_label)
+
+
 _DATE_RE = re.compile(r"^(\d{2})[-/](\d{2})[-/](\d{4})$")
 
 

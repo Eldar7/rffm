@@ -24,9 +24,12 @@ requested.
   season × category × phase, e.g. "PREFERENTE BENJAMÍN F-7". `phase_label`
   distinguishes regular season from playoff stages ("T. CAMPEONES...",
   "SEGUNDA FASE...") that the site models as *separate* competitions under
-  the same category. Columns: `season, season_id, category_base,
-  category_label_raw, competition, competition_id, phase_label, game_type,
-  game_type_id, source_url, scraped_at`.
+  the same category. `category_base`/`is_femenino`/`division_level` are
+  parsed facets of `category_label_raw` — see "Category taxonomy" below
+  before filtering by any of the three. Columns: `season, season_id,
+  category_base, category_label_raw, is_femenino, division_level,
+  competition, competition_id, phase_label, game_type, game_type_id,
+  source_url, scraped_at`.
 - **`groups.csv`** (`group_id` PK) — belongs to a `competition_id`. Columns:
   `season, season_id, category, competition, competition_id, group,
   group_id, group_label_raw, subgroup_label, source_url, scraped_at`.
@@ -80,6 +83,113 @@ requested.
 - **`crawl_log.csv`** / **`data_quality_report.csv`** — every HTTP request
   this run and automated anomaly findings (see "Two intentionally separate
   crawl-log families" below for why there are several of each).
+
+## Category taxonomy
+
+RFFM's own category naming (`NombreCategoria`, preserved verbatim as
+`category_label_raw`) packs four independent facets into one free-text
+string, e.g. `"PRIMERA DIVISIÓN AUTONÓMICA BENJAMÍN F7"` = division
+*Primera División Autonómica* + age *Benjamín* + format *Futbol-7* (+ no
+explicit gender marker). Never filter or group by `category_label_raw`
+directly — parse (or, for the two already-derived columns below, just
+read) the facet you actually want:
+
+| Facet | Column | Source |
+|---|---|---|
+| Age group | `competitions.category_base` (also denormalized as `category` in `groups`/`matches`/`standings`/`scorers`) | parsed from `category_label_raw` |
+| Game format | `competitions.game_type` / `game_type_id` | **not** parsed from the label — comes from a separate `/api/game-types` field, authoritative. The label sometimes *also* carries a redundant format suffix ("F-7"/"F7"/"SALA") but only when it differs from the division's default format, so don't parse it from there. |
+| Gender | `competitions.is_femenino` | parsed from `category_label_raw` |
+| Division / level | `competitions.division_level` | parsed from `category_label_raw` |
+
+`is_femenino`/`division_level` live **only on `competitions.csv`** (one row
+per competition) — not duplicated onto `groups`/`matches`/`standings`,
+which already carry ~118k+ rows/season; join on `competition_id` if you
+need them there.
+
+**Scope note:** this project's committed dataset (per `CLAUDE.md`) only
+ever *enriches* (acta_partido/fichajugador) BENJAMIN/PREBENJAMIN. A core
+crawl (`--all-categories` / GitHub Actions `all_categories: true` input,
+`stage: core` only) can discover every category the federation runs — this
+taxonomy exists so that data is usable, not to imply the other ages are
+enriched too. Check `coverage_manifest.csv` for what's actually
+enriched vs. core-only.
+
+### Age group (`category_base`)
+
+Matched via `rffm_scraper.normalize.classify_age_category` against a fixed
+vocabulary (`AGE_CATEGORY_VOCABULARY`), substring-matched most-specific
+first (`PREBENJAMIN` before `BENJAMIN`, since the former contains the
+latter): `PREBENJAMIN, BENJAMIN, ALEVIN, INFANTIL, CADETE, JUVENIL,
+VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER` — this is
+never guessed at (see below for which real labels land there and why).
+
+Note: RFFM sometimes abbreviates "ALEVIN" as "ALEV" (e.g.
+`"DIVISION DE HONOR ALEV-F7"`) — the vocabulary matches on the `ALEV` stem
+for this reason, not the full word.
+
+This is the same substring-matching approach `match_category_base()` uses
+for this project's configured `target.category_priority` (currently just
+`[PREBENJAMIN, BENJAMIN]`, used for the normal 2-category scoped crawl) —
+`classify_age_category` is its `--all-categories` counterpart, fixed
+instead of config-driven, covering every age RFFM runs.
+
+**Important — this is why `category_base` must stay a consolidated bucket,
+not a raw-label passthrough:** `enrich_acta.py --scope BENJAMIN` filters
+`matches.csv` with `df["category"] == scope_category` — an exact string
+match. An earlier version of the `--all-categories` code path used
+`category_label_raw` directly as `category_base`, which fragmented
+BENJAMIN across 8 different raw labels (`"PRIMERA BENJAMIN F7"`,
+`"DIVISIÓN DE HONOR BENJAMÍN F7"`, ...) and PREBENJAMIN across 4 more — so
+the literal string `"BENJAMIN"` stopped existing anywhere in `matches.csv`,
+and any acta_partido re-run for that scope would have silently found 0
+targets. Worse: `acta_pipeline.py`'s completion logic treats 0 remaining
+targets as `status="complete"`, so a 0-target run would have overwritten a
+correct progress row with a false `complete, 0/0` — masking the breakage
+rather than erroring. There's now a guard against this specific failure
+mode in `acta_pipeline.py` (`_guard_against_silent_empty_scope` — raises
+instead of upserting a false-complete row when a previously-nonzero
+scope suddenly resolves to 0 targets), but the real fix is this: always
+classify into a fixed vocabulary, never pass the raw label through.
+
+### Gender (`is_femenino`)
+
+`True` iff `category_label_raw` contains "FEMENIN" (covers both
+"FEMENINO"/"FEMENINA"). **RFFM does not consistently mark the converse** —
+only one category this season (`"CAMPEONATO UNIVERSITARIO MASCULINO"`)
+carries an explicit men's marker. `is_femenino=False` means "no explicit
+women's marker found", **not** "confirmed men's/mixed" — don't report it
+as the latter.
+
+### Division / level (`division_level`)
+
+The messiest facet — RFFM's division naming isn't fully orthogonal to age
+the way BENJAMIN/PREBENJAMIN's is. Matched via
+`rffm_scraper.normalize.classify_division_level`, most-specific first:
+`PRIMERA DIVISION AUTONOMICA, DIVISION DE HONOR, PREFERENTE, SEGUNDA
+DIVISION B, TERCERA FEDERACION, PRIMERA, SEGUNDA, TERCERA, SUPERLIGA, LIGA
+NACIONAL, FASE ZONAL, CAMPEONATO UNIVERSITARIO, LIGA UNIVERSITARIA`. No
+match → `OTHER` (e.g. bare `"PREBENJAMIN"` or `"BENJAMIN SALA"` with no
+explicit tier — a real, common case, not a parsing gap).
+
+### Known `OTHER` cases (2025-2026, both facets) — genuine ambiguity, not bugs
+
+A handful of RFFM's 93 2025-2026 categories carry no age word at all —
+mostly senior/adult federation-tier leagues (`TERCERA FEDERACION`, `SEGUNDA
+DIVISIÓN B DE FÚTBOL SALA`, `TERCERA DIVISIÓN DE FÚTBOL SALA`) or leisure
+formats (`FUTBOL ANDANDO F-7` — walking football, `DEBUTANTE`, `FASE ZONAL
+7`/`FASE ZONAL SALA` — a zonal qualifying phase, age unclear) or
+gender-only labels missing an age word entirely (`PREFERENTE FEMENINO
+SALA`, `PREFERENTE FUTBOL FEMENINO`, `PRIMERA FUTBOL FEMENINO`, `PRIMERA
+DIVISION AUTONOMICA FEMENINO SALA`, `PRIMERA DIVISIÓN AUTONÓMICA
+FEMENINO`). These land in `age_category=OTHER` deliberately rather than
+being guessed at (e.g. assuming the federation-tier ones are "SENIOR") —
+if you need them classified, verify against the site rather than assuming
+the vocabulary's silence means "not adult."
+
+If a future season's labels don't fit this vocabulary well (new wording,
+new abbreviations), it's a pure function of `category_label_raw` (always
+preserved) — fix `normalize.py`'s vocabulary and re-run **core only**, no
+re-crawl of enrichment data needed.
 
 ## Enrichment tables (opt-in — see README.md for why opt-in/robots.txt, OPERATIONS.md for how/when a run populates these)
 
