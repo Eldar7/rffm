@@ -19,6 +19,8 @@ from __future__ import annotations
 import dataclasses
 import json
 import logging
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 from rffm_scraper.config import Settings
@@ -74,7 +76,7 @@ def _resolve_season_id(seasons_raw: list[dict], season_label: str) -> str:
     )
 
 
-def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
+def run_discovery(client: RffmClient, settings: Settings, *, workers: int = 1) -> DiscoveryResult:
     api = settings.site.api
 
     seasons_raw = client.get_json(api.seasons, stage="discovery", entity_type="seasons") or []
@@ -83,7 +85,7 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
     season_id = _resolve_season_id(seasons_raw, settings.target.season_label)
     logger.info("Resolved season %s -> cod_temporada=%s", settings.target.season_label, season_id)
 
-    groups: list[DiscoveredGroup] = []
+    competition_tasks: list[tuple[dict, str, str, str, str, bool, str]] = []
 
     for gt in game_types_raw:
         game_type_id = gt["codigo_tipo_juego"]
@@ -112,7 +114,6 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
         )
 
         for comp in matching:
-            competition_id = comp["codigo"]
             raw_category_label = comp.get("NombreCategoria", "")
             if settings.target.crawl_all_categories:
                 # No config-supplied priority list to match against - use
@@ -135,35 +136,70 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
             is_fem = is_femenino_label(raw_category_label)
             phase_label = phase_label_from_competition_name(comp.get("nombre", ""))
 
-            group_list = client.get_json(
-                api.groups,
-                params={"competicion": competition_id},
-                stage="discovery",
-                entity_type="groups",
-                entity_id=competition_id,
+            competition_tasks.append(
+                (comp, game_type_id, game_type_label, category_base or "", raw_category_label, is_fem, division_level)
             )
-            for grp in group_list or []:
-                groups.append(
-                    DiscoveredGroup(
-                        season_id=season_id,
-                        season_label=settings.target.season_label,
-                        game_type_id=game_type_id,
-                        game_type_label=game_type_label,
-                        competition_id=competition_id,
-                        competition_label_raw=comp.get("nombre", ""),
-                        category_base=category_base or "",
-                        category_label_raw=raw_category_label,
-                        is_femenino=is_fem,
-                        division_level=division_level,
-                        phase_label=phase_label,
-                        group_id=grp["codigo"],
-                        group_label_raw=grp.get("nombre", ""),
-                        total_jornadas=_safe_int(grp.get("total_jornadas")),
-                        total_equipos=_safe_int(grp.get("total_equipos")),
-                        clasificacion_goleadores=grp.get("clasificacion_goleadores") == "1",
-                        ver_clasificacion=grp.get("ver_clasificacion") == "1",
-                    )
-                )
+
+    def fetch_competition_groups(
+        index: int, task: tuple[dict, str, str, str, str, bool, str], task_client: RffmClient,
+    ) -> tuple[int, list[DiscoveredGroup], list]:
+        comp, game_type_id, game_type_label, category_base, raw_category_label, is_fem, division_level = task
+        competition_id = comp["codigo"]
+        log_start = len(task_client.crawl_log)
+        group_list = task_client.get_json(
+            api.groups,
+            params={"competicion": competition_id},
+            stage="discovery",
+            entity_type="groups",
+            entity_id=competition_id,
+        )
+        discovered = [
+            DiscoveredGroup(
+                season_id=season_id,
+                season_label=settings.target.season_label,
+                game_type_id=game_type_id,
+                game_type_label=game_type_label,
+                competition_id=competition_id,
+                competition_label_raw=comp.get("nombre", ""),
+                category_base=category_base,
+                category_label_raw=raw_category_label,
+                is_femenino=is_fem,
+                division_level=division_level,
+                phase_label=phase_label_from_competition_name(comp.get("nombre", "")),
+                group_id=grp["codigo"],
+                group_label_raw=grp.get("nombre", ""),
+                total_jornadas=_safe_int(grp.get("total_jornadas")),
+                total_equipos=_safe_int(grp.get("total_equipos")),
+                clasificacion_goleadores=grp.get("clasificacion_goleadores") == "1",
+                ver_clasificacion=grp.get("ver_clasificacion") == "1",
+            )
+            for grp in (group_list or [])
+        ]
+        return index, discovered, task_client.crawl_log[log_start:]
+
+    grouped: list[list[DiscoveredGroup] | None] = [None] * len(competition_tasks)
+    if workers == 1:
+        for index, task in enumerate(competition_tasks):
+            _, discovered, _ = fetch_competition_groups(index, task, client)
+            grouped[index] = discovered
+    else:
+        local = threading.local()
+
+        def fetch_in_worker(index: int, task: tuple[dict, str, str, str, str, bool, str]):
+            if not hasattr(local, "client"):
+                local.client = RffmClient(settings, run_id=client.run_id)
+            return fetch_competition_groups(index, task, local.client)
+
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-discovery") as executor:
+            futures = [executor.submit(fetch_in_worker, index, task) for index, task in enumerate(competition_tasks)]
+            for completed, future in enumerate(as_completed(futures), start=1):
+                index, discovered, logs = future.result()
+                grouped[index] = discovered
+                client.crawl_log.extend(logs)
+                if completed % 25 == 0 or completed == len(competition_tasks):
+                    logger.info("discovery groups progress: %d/%d competitions", completed, len(competition_tasks))
+
+    groups = [group for discovered in grouped if discovered for group in discovered]
 
     result = DiscoveryResult(
         season_id=season_id,
