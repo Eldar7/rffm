@@ -138,6 +138,55 @@ the new `scope_category`.
 - After a job ends: `coverage_manifest.csv`, updated only by that job's
   flushes/final commit.
 
+## Experimental local parallel core crawl
+
+`main.py` is sequential by default (`--workers 1`) and the GitHub Actions
+workflow deliberately keeps that default. For an isolated local benchmark or
+a deliberately approved high-throughput run, core accepts these overrides:
+
+```powershell
+python main.py `
+  --season 2024-2025 `
+  --output-dir C:\temp\rffm-2024-2025-test `
+  --all-categories `
+  --workers 12 `
+  --limit-groups 60 `
+  --progress-report-every 10 `
+  --log-level INFO
+```
+
+- `--season` changes only the in-memory target season; it does not rewrite
+  `config.yaml`.
+- `--output-dir` is required in practice for a limited or experimental run so
+  it cannot replace a season's tracked output.
+- `--limit-groups` processes the first `N` discovered groups and records the
+  resulting core row in `coverage_manifest.csv` as `partial`. It is a test
+  facility, not a resumable full-core mode.
+- `--workers` parallelizes three independent stages: `/api/groups` discovery,
+  group pages, and `/campo/<venue_id>` pages. Each worker owns its own HTTP
+  session and rate limiter; worker results are collected centrally in stable
+  discovery order before CSVs are built, avoiding concurrent CSV writes.
+- `--progress-report-every` emits a heartbeat with completed targets, rate,
+  and elapsed time. This fixes the previous core behaviour where logs could
+  be silent until the final CSV writes.
+
+### Throughput guardrails
+
+The configured `network.rate_limit_seconds` applies **per worker** in this
+experimental mode. Increasing workers therefore increases aggregate request
+rate; it is not merely a local CPU setting. Start with a limited isolated run,
+inspect `crawl_log.csv` for non-200 responses, and do not start a full run if
+there are `429`, timeouts, or server errors.
+
+A 12-worker all-category test for 2024-2025 on 2026-08-02 completed discovery
+of 223 competitions / 1,201 groups in about 19 seconds, then processed an
+isolated 60-group sample in about 51 seconds and its 347 venues in about 42
+seconds. All 757 requests returned HTTP 200 and output keys had no duplicates.
+The measured group rate was about 1.17 groups/second, so 12 workers did **not**
+demonstrate a five-minute full-season crawl; it suggests roughly 17 minutes
+for the group phase before discovery, venue fetches, parsing, and writes.
+Treat five minutes as an unproven target, not an operating promise.
+
 ## GitHub Actions limits that apply here
 
 - **Minutes**: only metered on private repos (public repos: unlimited on
