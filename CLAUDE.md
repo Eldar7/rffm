@@ -2,8 +2,11 @@
 
 This file is for a *future session* answering analytics questions against
 the collected RFFM data — not for someone implementing the scraper (see
-`README.md` for that: URL patterns, endpoints, how the data was collected).
-This is the **single source of truth for the data model** — there is no
+`README.md`: URL patterns, endpoints, how the data was collected) and not
+for someone running/extending the crawl pipelines or the GitHub Actions
+workflow (see `OPERATIONS.md`: resumability internals, `coverage_manifest.csv`
+mechanics, how to dispatch a crawl, how to test a pipeline change safely).
+This file is the **single source of truth for the data model** — there is no
 separate data-dictionary file; keeping one instead of several is deliberate,
 see "Why one file" at the bottom.
 
@@ -32,23 +35,11 @@ not by eyeballing CSV rows — see "How to answer a query" below.
 Before trusting a season's numbers (especially for the enrichment stages,
 which can take hours and run across multiple crawl sessions), check
 `output/processed/rffm/coverage_manifest.csv` — one row per
-`(season, category_base, stage)`, upserted after every batch of the crawl,
-so it's always an accurate, git-tracked, timestamped answer to "is this
-done":
-
-- `stage` is `core` (competitions/groups/teams/matches/standings/scorers —
-  not category-scoped per run, so `category_base="ALL"`), `acta_partido`
-  (match lineups/goals/cards/staff/officials), or `fichajugador` (player
-  profiles/season stats/participation).
-- `status` is `complete` (every target for that key has a successful fetch),
-  `complete_with_failures` (the crawl ran to exhaustion but some targets
-  never got a successful fetch — see `targets_failed` and the matching
-  `*_data_quality_report.csv`/`*_crawl_log.csv` for which ones), or
-  `partial` (the crawl hasn't finished yet — could be mid-run right now, or
-  was interrupted; `last_updated_at` tells you how stale that is).
-- `targets_total`/`targets_completed`/`targets_failed` plus
-  `started_at`/`last_updated_at`/`completed_at` give the coarse numbers and
-  timing directly, without loading the full per-row crawl logs.
+`(season, category_base, stage)`. `status` is `complete`, `complete_with_failures`
+(some targets never got a successful fetch — see `targets_failed`, and the
+matching `*_data_quality_report.csv`/`*_crawl_log.csv` for which ones), or
+`partial` (still running or was interrupted — `last_updated_at` tells you
+how stale). Full column list and how/when this file gets written: `OPERATIONS.md`.
 
 ```python
 import pandas as pd
@@ -129,7 +120,7 @@ explicitly requested.
   this run and automated anomaly findings (see "Two intentionally separate
   crawl-log families" below for why there are several of each).
 
-## Enrichment tables (opt-in — see README for how/when these get populated)
+## Enrichment tables (opt-in — see README.md for why opt-in/robots.txt, `OPERATIONS.md` for how/when a run populates these)
 
 - **`match_lineups.csv`** — per-match, per-player. FK `match_id` →
   `matches.csv`, FK `player_id` → `players.csv`. Columns: `match_id,
@@ -303,20 +294,30 @@ crawl logs? `pd.concat()` them at analysis time — don't merge the files on
 disk. (Each of these lives inside its season's directory alongside that
 season's other tables — `crawl_log.csv` is per-season too, not global.)
 
-Unlike the core `crawl_log.csv` (rebuilt from scratch every `main.py` run),
-`acta_crawl_log.csv` and `fichajugador_crawl_log.csv` are **appended to
-incrementally** across a season's enrichment crawl (batched, atomic
-flushes — see `coverage_manifest.csv` above) and also double as the
-resumability marker the crawler itself uses: an `entity_id` with
-`success == True` there means that target is done and won't be re-fetched
-on a later run, even in a completely fresh environment.
+Unlike core's `crawl_log.csv` (rebuilt from scratch every run), the two
+enrichment crawl logs grow incrementally across a season's crawl and also
+double as the crawler's own resumability marker — mechanics and why in
+`OPERATIONS.md`, not relevant to querying the data itself.
 
-## Why one file
+## Why one file (per concern)
 
 This project briefly had three overlapping docs (`README.md`'s data
 dictionary, this file, and a separate `DATA_DICTIONARY.md`) describing the
 same schema — they drifted out of sync with the actual code within the same
 day (wrong `card_type_label`/`role_kind` example values, a raw-vs-cleaned
-team-name mismatch). `CLAUDE.md` is now the only place the schema is
-described in full; `README.md` covers how the scraper itself works and
-links here instead of duplicating columns.
+team-name mismatch). Lesson applied project-wide, not just to the schema:
+each concern gets exactly one file that owns it, and the others link to it
+instead of re-describing it.
+
+- **`README.md`** — first read: what this project is, how the scraper
+  works, URL patterns/endpoints, storage layout.
+- **`CLAUDE.md`** (this file) — the data model: every table, every column,
+  join recipes, for answering analytics questions.
+- **`OPERATIONS.md`** — running/extending the crawl: the GitHub Actions
+  workflow, the resumability/batching design, `coverage_manifest.csv`
+  mechanics, how to test a pipeline change safely.
+
+If you're about to add a paragraph explaining *how the crawler works* to
+this file, or a paragraph explaining *what a column means* to `OPERATIONS.md`,
+that's the signal it belongs in the other file instead — link to it, don't
+copy it.
