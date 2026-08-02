@@ -187,6 +187,51 @@ demonstrate a five-minute full-season crawl; it suggests roughly 17 minutes
 for the group phase before discovery, venue fetches, parsing, and writes.
 Treat five minutes as an unproven target, not an operating promise.
 
+### Full local run: 2024-2025 core, 24 workers (2026-08-03)
+
+Following up on the 12-worker sample above, a **full, non-sample** core crawl
+of 2024-2025 (both categories) was run manually on a local machine —
+**not through the GitHub Actions workflow**, which still defaults to
+`--workers 1` (see above). This was a one-off, deliberately-approved run to
+get real season data and a real throughput number, not a pipeline-safety
+test — it wrote directly to the tracked `output/processed/rffm/2024-2025/`
+(no `--output-dir` override), unlike the "testing pipeline changes safely"
+recipe below, which always uses a scratch dir.
+
+Command:
+
+```powershell
+python main.py --season 2024-2025 --all-categories --workers 24 --log-level INFO
+```
+
+Result: discovery (223 competitions / 1,201 groups) in ~13s, then all 1,201
+groups plus 689 venues in ~409s, for a wall time of about **7m22s**
+(00:37:59–00:45:21 UTC+2) end to end — comfortably under the 12-worker
+projection. 4,465 HTTP requests logged, 4,464 returned 200; one
+`group_goleadores` (scorers) page returned 500 and exhausted its retries
+(`data_quality_report.csv` / `crawl_log.csv` have the one row) — the run
+continued and finished normally, since a single-target failure doesn't
+abort the whole core stage. No 429s. `coverage_manifest.csv` records this
+row as `season=2024-2025, category_base=ALL, stage=core, status=complete,
+targets_completed=1201/1201, targets_failed=0`.
+
+Sustained group-processing throughput was about **1,201 groups / 359s ≈
+3.3 groups/second** — roughly 2.9× the 12-worker test's 1.17 groups/s from
+a ~2× worker increase, so 24 workers *did* help here, slightly better than
+linearly (plausible reasons: the 12-worker sample's 60 groups were an
+unusually heavy subset — 12,089 matches, 347 venues — not fixed per-request
+overhead amortizing better at 24). This is one run, not a swept benchmark;
+treat "24 is clearly better than 12" as supported for this one season, and
+48 workers as still untested and a higher risk of tripping RFFM's
+(unknown) rate limiting.
+
+This run was a manual/local exception, not a change to the default
+workflow. The GitHub Actions path (`--workers 1`, see above) remains the
+plan for any crawl meant to be reproducible and unattended going forward;
+raising its default worker count is a separate, not-yet-made decision that
+should follow the same "isolated test → inspect `crawl_log.csv` → then
+scale" pattern used here.
+
 ## GitHub Actions limits that apply here
 
 - **Minutes**: only metered on private repos (public repos: unlimited on
@@ -229,4 +274,6 @@ the int64/dtype merge failure) before they touched anything committed:
 
 Check `coverage_manifest.csv` for the live picture. As of this writing,
 season 2025-2026: `core` complete (both categories); `acta_partido` and
-`fichajugador` complete for PREBENJAMIN only — BENJAMIN not started.
+`fichajugador` complete for PREBENJAMIN only — BENJAMIN not started. Season
+2024-2025: `core` complete (both categories, via the manual 24-worker run
+above, not GitHub Actions); no enrichment stages started yet.
