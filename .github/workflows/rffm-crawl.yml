@@ -38,6 +38,11 @@ on:
         description: "Category scope for acta_partido/fichajugador (ignored for core, which covers every configured category in one pass)"
         required: false
         default: "PREBENJAMIN"
+      all_categories:
+        description: "core stage only: discover every category the federation runs this season (not just target.category_priority's BENJAMIN/PREBENJAMIN) - full core crawl across all ages/divisions. Ignored for acta_partido/fichajugador (use scope_category)."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -103,7 +108,12 @@ jobs:
 
       - name: Run core crawl
         if: inputs.stage == 'core'
-        run: python3 main.py --log-level INFO
+        run: |
+          if [ "${{ inputs.all_categories }}" = "true" ]; then
+            python3 main.py --all-categories --log-level INFO
+          else
+            python3 main.py --log-level INFO
+          fi
 
       - name: Run acta-partido enrichment
         if: inputs.stage == 'acta_partido'
@@ -146,11 +156,16 @@ jobs:
           # rewrite committed anyway, so just discard it before touching git.
           git checkout -- config.yaml
 
+          scope_desc="${{ inputs.scope_category }}"
+          if [ "${{ inputs.stage }}" = "core" ] && [ "${{ inputs.all_categories }}" = "true" ]; then
+            scope_desc="ALL"
+          fi
+
           git add output/processed
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }} (final)"
+            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${scope_desc} (final)"
           fi
 
           # Push whatever's here to this run's OWN branch first. Periodic
