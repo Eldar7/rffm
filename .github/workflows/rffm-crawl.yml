@@ -125,15 +125,26 @@ jobs:
           git config user.name "rffm-crawl-bot"
           git config user.email "actions@github.com"
 
-          # A job-timeout cancellation doesn't necessarily kill the crawler
-          # process instantly - it can linger as an orphan and keep writing
-          # to output/processed/*.csv after this step takes its git
-          # snapshot below, which then makes the commit/rebase see "you have
-          # unstaged changes" and aborts, discarding the run. Kill it first,
-          # unconditionally - by now either it finished on its own or it's
-          # exactly the kind of leftover process this is guarding against.
+          # Belt-and-braces: a job-timeout cancellation doesn't necessarily
+          # kill the crawler process instantly, so make sure nothing is
+          # still writing to output/processed/*.csv before the git snapshot
+          # below.
           pkill -9 -f "enrich_acta.py|enrich_players.py|main.py" 2>/dev/null || true
           sleep 2
+
+          # The real, confirmed cause of "cannot rebase: You have unstaged
+          # changes" wiping out a run's final push (twice): "Set target
+          # season in config.yaml" above round-trips the file through
+          # yaml.safe_load/safe_dump, which silently strips every comment
+          # and reformats quoting - so config.yaml sits modified-but-
+          # unstaged in the working tree for the rest of the job even when
+          # season_label didn't change. `git add output/processed` never
+          # stages it, nothing else commits it, and `git rebase` refuses to
+          # run with ANY dirty tracked file - not just ones touched by the
+          # rebase - so it fails at the very end regardless of whether the
+          # crawler process is still alive. We never want this transient
+          # rewrite committed anyway, so just discard it before touching git.
+          git checkout -- config.yaml
 
           git add output/processed
           if git diff --cached --quiet; then
