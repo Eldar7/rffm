@@ -46,6 +46,12 @@ class NetworkConfig:
 class TargetConfig:
     season_label: str
     category_priority: list[str] = field(default_factory=list)
+    # When true, discovery keeps every competition for every category the
+    # federation runs (not just ones matching category_priority) and uses
+    # the site's own raw NombreCategoria as category_base directly, with no
+    # substring consolidation - there's no "priority" concept once nothing
+    # is being filtered. See discovery.py.
+    crawl_all_categories: bool = False
 
 
 @dataclass
@@ -120,6 +126,7 @@ def load_settings(config_path: str | pathlib.Path = "config.yaml") -> Settings:
     target = TargetConfig(
         season_label=raw["target"]["season_label"],
         category_priority=raw["target"]["category_priority"],
+        crawl_all_categories=raw["target"].get("crawl_all_categories", False),
     )
     raw_enrichment = dict(raw["enrichment"])
     acta_raw = raw_enrichment.pop("acta_partido", {})

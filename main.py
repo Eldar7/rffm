@@ -17,6 +17,12 @@ from rffm_scraper.pipeline import run_pipeline
 def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="RFFM data collector (BENJAMIN/PREBENJAMIN 2025-2026 MVP)")
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
+    parser.add_argument(
+        "--all-categories", action="store_true",
+        help="Discover every category the federation runs this season, not just "
+             "config.yaml's target.category_priority - overrides config.yaml's "
+             "target.crawl_all_categories to true for this run.",
+    )
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return parser.parse_args(argv)
 
@@ -28,9 +34,12 @@ def main(argv=None) -> int:
         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
     )
     settings = load_settings(args.config)
+    if args.all_categories:
+        settings.target.crawl_all_categories = True
     logging.getLogger("rffm_scraper").info(
-        "Starting RFFM crawl: season=%s categories=%s",
+        "Starting RFFM crawl: season=%s categories=%s all_categories=%s",
         settings.target.season_label, settings.target.category_priority,
+        settings.target.crawl_all_categories,
     )
     summary = run_pipeline(settings)
     print("\n=== Run summary ===")

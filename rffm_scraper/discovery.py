@@ -91,10 +91,13 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
         if not competitions:
             continue
 
-        matching = [
-            c for c in competitions
-            if match_category_base(c.get("NombreCategoria", ""), settings.target.category_priority)
-        ]
+        if settings.target.crawl_all_categories:
+            matching = competitions
+        else:
+            matching = [
+                c for c in competitions
+                if match_category_base(c.get("NombreCategoria", ""), settings.target.category_priority)
+            ]
         logger.info(
             "game_type=%s (%s): %d competitions total, %d match target categories",
             game_type_id, game_type_label, len(competitions), len(matching),
@@ -102,9 +105,14 @@ def run_discovery(client: RffmClient, settings: Settings) -> DiscoveryResult:
 
         for comp in matching:
             competition_id = comp["codigo"]
-            category_base = match_category_base(
-                comp.get("NombreCategoria", ""), settings.target.category_priority
-            )
+            if settings.target.crawl_all_categories:
+                # No priority list to match against - every competition's
+                # own raw label is its category_base as-is.
+                category_base = comp.get("NombreCategoria", "").strip() or None
+            else:
+                category_base = match_category_base(
+                    comp.get("NombreCategoria", ""), settings.target.category_priority
+                )
             phase_label = phase_label_from_competition_name(comp.get("nombre", ""))
 
             group_list = client.get_json(
