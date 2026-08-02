@@ -92,7 +92,31 @@ jobs:
           git add output/processed
           if git diff --cached --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }}"
-            git push
+            exit 0
           fi
+          git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }}"
+
+          # This job's checkout is pinned to whatever ${{ github.ref_name }}
+          # was at dispatch time - a branch this long-running (up to 5h)
+          # almost always moves in the meantime (another dispatch, or a
+          # direct push). A bare `git push` would be rejected outright and
+          # silently strand this run's entire crawl output, since the
+          # runner is ephemeral and nothing survives a failed push. Rebase
+          # onto the latest remote tip and retry a few times to absorb an
+          # ordinary race; a real content conflict (same rows touched both
+          # ways) aborts loudly instead of guessing at a resolution.
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "${{ github.ref_name }}"
+            if ! git rebase "origin/${{ github.ref_name }}"; then
+              git rebase --abort
+              echo "::error::Rebase onto origin/${{ github.ref_name }} conflicted - crawl output NOT pushed. Resolve manually (the commit is only in this ephemeral runner and will be lost when the job ends)."
+              exit 1
+            fi
+            if git push origin "HEAD:${{ github.ref_name }}"; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+          echo "::error::Failed to push after retries - crawl output NOT pushed."
+          exit 1
