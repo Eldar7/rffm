@@ -32,27 +32,18 @@ CARD_TYPE_LABELS = {
 # absent rather than storing a person named "No presenta".
 _ABSENT_NAME_SENTINELS = {"", "NO PRESENTA"}
 
-
-def _dedupe_exact(rows: list[dict], label: str) -> list[dict]:
-    """Drop exact-duplicate event rows (same match/team/player/minute/type/...),
-    ignoring scraped_at. Seen in the wild: RFFM's own acta-partido JSON
-    occasionally lists the identical goal or card entry twice for what is
-    the same real-world event. There's no site-provided event id to tell a
-    genuine repeat apart from a data glitch, so full-field equality is the
-    only signal available - safe as a dedup key since two distinct events
-    (e.g. two different goals in the same minute) would differ in at least
-    one other field.
-    """
-    seen: set[tuple] = set()
-    deduped = []
-    for row in rows:
-        key = tuple((k, v) for k, v in row.items() if k != "scraped_at")
-        if key in seen:
-            logger.warning("Dropping exact-duplicate %s row: %s", label, row)
-            continue
-        seen.add(key)
-        deduped.append(row)
-    return deduped
+# NOTE: goals/cards are intentionally NOT deduplicated, even when two entries
+# in game["goles_equipo_*"]/["tarjetas_equipo_*"] are identical in every
+# field (same player/minute/type). A prior version of this module dropped
+# such "exact duplicates" - reverted after checking match 5334992 live: its
+# goles_equipo_local array lists the same player/minute goal twice, and
+# len(goles_equipo_local)==8 matches both game["goles_local"]=="8" AND the
+# independently-scraped calendario-page score in matches.csv (home_score=8).
+# Sampling other matches with a repeated entry showed the same pattern:
+# raw event count (duplicate included) matches the scored total; dropping
+# the "duplicate" undercounts by exactly one. So these are real, distinct
+# events RFFM's own system happens to record identically down to the
+# minute - not a scrape/data artifact - and must be kept as-is.
 
 
 def _now_iso() -> str:
@@ -170,7 +161,7 @@ def _parse_goals(game, *, match_id, home_team_id, away_team_id, source_url, scra
                     scraped_at=scraped_at,
                 )
             )
-    return _dedupe_exact(rows, "goal")
+    return rows
 
 
 def _parse_cards(game, *, match_id, home_team_id, away_team_id, source_url, scraped_at) -> list[dict]:
@@ -197,7 +188,7 @@ def _parse_cards(game, *, match_id, home_team_id, away_team_id, source_url, scra
                     scraped_at=scraped_at,
                 )
             )
-    return _dedupe_exact(rows, "card")
+    return rows
 
 
 def _add_staff_row(rows, *, match_id, team_id, role_kind, name, person_id, source_url, scraped_at):
