@@ -8,6 +8,15 @@ name: RFFM crawl
 # after this job's own timeout cuts it off mid-run - it always resumes from
 # whatever output/processed/rffm/<season>/*.csv + coverage_manifest.csv are
 # already committed, never from local/runner state.
+#
+# Every run works on its own branch (created below), pushed to periodically
+# during acta_partido/fichajugador (row_io.git_push_progress, every 5 batch
+# flushes) and folded into main at the end - so a timeout no longer risks
+# losing the whole run's output in one go, only whatever happened since the
+# last checkpoint. See git history on this file for why: an earlier version
+# committed once at the very end straight to main, and a single failure
+# there (git conflict, or a lingering crawler process still writing after
+# the "final" git snapshot) discarded an entire multi-hour run.
 
 on:
   workflow_dispatch:
@@ -52,6 +61,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create per-run branch
+        id: run_branch
+        # Every push during this run - the periodic mid-run checkpoints from
+        # acta_pipeline.py/player_pipeline.py (see row_io.git_push_progress)
+        # AND this workflow's own end-of-run commit - targets a branch
+        # created fresh right here, not `main` directly. Nothing else ever
+        # pushes to it, so those pushes never need to fetch/rebase against a
+        # moving target; only the final fold-into-main step (below) does.
+        # Named with the stage/scope/season and a UTC timestamp so a human
+        # can tell which dispatch produced it at a glance; branches are not
+        # deleted after merging, so this doubles as a per-run audit trail.
+        run: |
+          git config user.name "rffm-crawl-bot"
+          git config user.email "actions@github.com"
+          ts="$(date -u +%Y%m%dT%H%M%SZ)"
+          branch="crawl/${{ inputs.stage }}-${{ inputs.scope_category }}-${{ inputs.season_label }}-${ts}"
+          git checkout -b "$branch"
+          echo "Created and checked out $branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -78,45 +107,78 @@ jobs:
 
       - name: Run acta-partido enrichment
         if: inputs.stage == 'acta_partido'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: python3 enrich_acta.py --scope "${{ inputs.scope_category }}" --log-level INFO
 
       - name: Run fichajugador enrichment
         if: inputs.stage == 'fichajugador'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: python3 enrich_players.py --scope "${{ inputs.scope_category }}" --log-level INFO
 
       - name: Commit and push updated processed data
         if: always()
+        env:
+          RUN_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: |
           git config user.name "rffm-crawl-bot"
           git config user.email "actions@github.com"
+
+          # A job-timeout cancellation doesn't necessarily kill the crawler
+          # process instantly - it can linger as an orphan and keep writing
+          # to output/processed/*.csv after this step takes its git
+          # snapshot below, which then makes the commit/rebase see "you have
+          # unstaged changes" and aborts, discarding the run. Kill it first,
+          # unconditionally - by now either it finished on its own or it's
+          # exactly the kind of leftover process this is guarding against.
+          pkill -9 -f "enrich_acta.py|enrich_players.py|main.py" 2>/dev/null || true
+          sleep 2
+
           git add output/processed
           if git diff --cached --quiet; then
             echo "No changes to commit."
-            exit 0
+          else
+            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }} (final)"
           fi
-          git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${{ inputs.scope_category }}"
 
-          # This job's checkout is pinned to whatever ${{ github.ref_name }}
-          # was at dispatch time - a branch this long-running (up to 5h)
-          # almost always moves in the meantime (another dispatch, or a
-          # direct push). A bare `git push` would be rejected outright and
-          # silently strand this run's entire crawl output, since the
-          # runner is ephemeral and nothing survives a failed push. Rebase
-          # onto the latest remote tip and retry a few times to absorb an
-          # ordinary race; a real content conflict (same rows touched both
-          # ways) aborts loudly instead of guessing at a resolution.
+          # Push whatever's here to this run's OWN branch first. Periodic
+          # checkpoints during the run (if any) already pushed most of this
+          # same branch, so this is normally a small fast-forward; retried
+          # only to absorb a transient network blip, never a real conflict
+          # (nothing else writes to a run-dedicated branch).
+          pushed_branch=false
           for attempt in 1 2 3 4 5; do
-            git fetch origin "${{ github.ref_name }}"
-            if ! git rebase "origin/${{ github.ref_name }}"; then
+            if git push origin "HEAD:$RUN_BRANCH"; then
+              echo "Pushed $RUN_BRANCH on attempt $attempt."
+              pushed_branch=true
+              break
+            fi
+            sleep $((attempt * 5))
+          done
+          if [ "$pushed_branch" != "true" ]; then
+            echo "::error::Failed to push $RUN_BRANCH after retries - crawl output NOT pushed anywhere."
+            exit 1
+          fi
+
+          # Fold this run's branch into main. This DOES need fetch/rebase/
+          # retry, since main moves independently of any one run's branch
+          # (other stages/dispatches, or a direct push). If it can't be
+          # resolved automatically, the run's data is still safe on
+          # $RUN_BRANCH regardless - this step failing means "merge
+          # manually", never "data lost".
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            if ! git rebase origin/main; then
               git rebase --abort
-              echo "::error::Rebase onto origin/${{ github.ref_name }} conflicted - crawl output NOT pushed. Resolve manually (the commit is only in this ephemeral runner and will be lost when the job ends)."
+              echo "::error::Rebase of $RUN_BRANCH onto origin/main conflicted - NOT merged into main. Data is safe on branch $RUN_BRANCH; resolve and merge manually."
               exit 1
             fi
-            if git push origin "HEAD:${{ github.ref_name }}"; then
-              echo "Pushed on attempt $attempt."
+            if git push origin "HEAD:main"; then
+              echo "Merged $RUN_BRANCH into main on attempt $attempt."
               exit 0
             fi
             sleep $((attempt * 5))
           done
-          echo "::error::Failed to push after retries - crawl output NOT pushed."
+          echo "::error::Failed to merge $RUN_BRANCH into main after retries. Data is safe on that branch; merge manually."
           exit 1

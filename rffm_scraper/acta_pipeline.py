@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import os
 import time
 from datetime import datetime, timezone
 
@@ -76,12 +77,23 @@ from rffm_scraper.row_io import (
     append_or_write_csv,
     atomic_write_text,
     downgrade_crawl_log_if_no_content,
+    git_push_progress,
     upsert_coverage_manifest,
     validate_rows,
     write_csv,
 )
 
 logger = logging.getLogger("rffm_scraper.acta_pipeline")
+
+# When set (by rffm-crawl.yml, to a branch it created just for this run),
+# a mid-run checkpoint is pushed to that branch every _PUSH_EVERY_N_FLUSHES
+# batch flushes - see row_io.git_push_progress for why this exists (a
+# GitHub Actions job timeout can otherwise discard an entire multi-hour
+# run's output in one go, since nothing survives past the ephemeral runner
+# except what was actually pushed). Unset for local/non-CI runs, where
+# there is no dedicated per-run branch to push to and this is a no-op.
+_PUSH_BRANCH = os.environ.get("RFFM_GIT_PUSH_BRANCH")
+_PUSH_EVERY_N_FLUSHES = 5
 
 # (batch dict key, output filename, pydantic model, validate_rows label)
 _OUTPUT_TABLES = [
@@ -227,6 +239,7 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
     batches: dict[str, list[dict]] = {key: [] for key, _, _, _ in _OUTPUT_TABLES}
     pending_crawl_log_rows: list[dict] = []
     all_warnings: list[dict] = []
+    flush_count = 0
 
     for i, (_, row) in enumerate(remaining.iterrows(), start=1):
         match_id = row["match_id"]
@@ -312,11 +325,24 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
                 targets_total=len(target_match_ids), targets_completed=progress.completed,
                 targets_failed=progress.failed, started_at=started_at,
             )
+            flush_count += 1
+            if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
+                git_push_progress(
+                    _PUSH_BRANCH,
+                    f"rffm-crawl checkpoint: acta_partido {scope_category} "
+                    f"({progress.completed}/{progress.total_targets})",
+                )
 
     # Final flush - runs even if `remaining` was empty (everything already
     # done in a previous run/environment) or shorter than one full batch.
     _flush_batch(processed, batches, pending_crawl_log_rows)
     progress.write()
+    if _PUSH_BRANCH:
+        git_push_progress(
+            _PUSH_BRANCH,
+            f"rffm-crawl checkpoint: acta_partido {scope_category} "
+            f"({progress.completed}/{progress.total_targets}, final)",
+        )
 
     missing = set(target_match_ids) - done_ids
     final_status = "complete" if not missing else "complete_with_failures"

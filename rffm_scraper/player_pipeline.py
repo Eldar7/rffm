@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import os
 import time
 from datetime import datetime, timezone
 
@@ -39,12 +40,19 @@ from rffm_scraper.row_io import (
     append_or_write_csv,
     atomic_write_text,
     downgrade_crawl_log_if_no_content,
+    git_push_progress,
     upsert_coverage_manifest,
     validate_rows,
     write_csv,
 )
 
 logger = logging.getLogger("rffm_scraper.player_pipeline")
+
+# See acta_pipeline.py for why this exists - same GIT_PUSH_BRANCH-gated
+# mid-run checkpoint mechanism, same rationale (bound a GitHub Actions job
+# timeout's data loss to a few batches instead of the whole run).
+_PUSH_BRANCH = os.environ.get("RFFM_GIT_PUSH_BRANCH")
+_PUSH_EVERY_N_FLUSHES = 5
 
 # (batch dict key, output filename, pydantic model, validate_rows label)
 _OUTPUT_TABLES = [
@@ -167,6 +175,7 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     started_at = _now_iso()
     batches: dict[str, list[dict]] = {key: [] for key, _, _, _ in _OUTPUT_TABLES}
     pending_crawl_log_rows: list[dict] = []
+    flush_count = 0
 
     for i, player_id in enumerate(remaining, start=1):
         raw_path = _raw_path(settings, scope_category, season_label, player_id)
@@ -237,11 +246,24 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
                 targets_total=len(target_player_ids), targets_completed=progress.completed,
                 targets_failed=progress.failed, started_at=started_at,
             )
+            flush_count += 1
+            if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
+                git_push_progress(
+                    _PUSH_BRANCH,
+                    f"rffm-crawl checkpoint: fichajugador {scope_category} "
+                    f"({progress.completed}/{progress.total_targets})",
+                )
 
     # Final flush - runs even if `remaining` was empty (everything already
     # done in a previous run/environment) or shorter than one full batch.
     _flush_batch(processed, batches, pending_crawl_log_rows)
     progress.write()
+    if _PUSH_BRANCH:
+        git_push_progress(
+            _PUSH_BRANCH,
+            f"rffm-crawl checkpoint: fichajugador {scope_category} "
+            f"({progress.completed}/{progress.total_targets}, final)",
+        )
 
     missing = set(target_player_ids) - done_ids
     final_status = "complete" if not missing else "complete_with_failures"
