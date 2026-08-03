@@ -138,8 +138,38 @@ Matched via `rffm_scraper.normalize.classify_age_category` against a fixed
 vocabulary (`AGE_CATEGORY_VOCABULARY`), substring-matched most-specific
 first (`PREBENJAMIN` before `BENJAMIN`, since the former contains the
 latter): `PREBENJAMIN, BENJAMIN, ALEVIN, INFANTIL, CADETE, JUVENIL,
-VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER` — this is
-never guessed at (see below for which real labels land there and why).
+VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER`.
+
+Typical ages (RFEF standard — boundaries are approximate and can vary by
+competition or season):
+
+| `category_base` | Typical age | Birth years (2026–27) |
+|---|---|---|
+| `PREBENJAMIN` | 6–7 | 2019–2020 |
+| `BENJAMIN` | 8–9 | 2017–2018 |
+| `ALEVIN` | 10–11 | 2015–2016 |
+| `INFANTIL` | 12–13 | 2013–2014 |
+| `CADETE` | 14–15 | 2011–2012 |
+| `JUVENIL` | 16–18 | 2008–2010 |
+| `AFICIONADO` | 19+ (amateur) | ≤ 2007 |
+| `SENIOR` | 19+ (federated adult) | ≤ 2007 |
+| `UNIVERSITARIO` | student category | — |
+| `VETERANOS` | 35+\* | — |
+| `OTHER` | unclassified | — |
+
+`PREBENJAMIN` through `JUVENIL` form a continuous age progression.
+`AFICIONADO` and `SENIOR` are adult tiers, not a next step in that ladder.
+`UNIVERSITARIO` and `VETERANOS` are competition-specific categories — not
+part of the standard progression.
+
+\* VETERANOS minimum age varies by competition.
+
+The match is tried against `NombreCategoria` first; if that produces
+`OTHER`, the competition `nombre` field is tried as a fallback. This
+handles FASE ZONAL competitions, where `NombreCategoria` is the generic
+`"FASE ZONAL SALA"` / `"FASE ZONAL 7"` but `nombre` embeds the age group
+directly (e.g. `"FASE ZONAL 3 benjamin VALDEMORO FS"`). `OTHER` is only
+the final result when neither field contains any age-group token.
 
 Note: RFFM sometimes abbreviates "ALEVIN" as "ALEV" (e.g.
 `"DIVISION DE HONOR ALEV-F7"`) — the vocabulary matches on the `ALEV` stem
@@ -185,9 +215,12 @@ the way BENJAMIN/PREBENJAMIN's is. Matched via
 `rffm_scraper.normalize.classify_division_level`, most-specific first:
 `PRIMERA DIVISION AUTONOMICA, DIVISION DE HONOR, PREFERENTE, SEGUNDA
 DIVISION B, TERCERA FEDERACION, PRIMERA, SEGUNDA, TERCERA, SUPERLIGA, LIGA
-NACIONAL, FASE ZONAL, CAMPEONATO UNIVERSITARIO, LIGA UNIVERSITARIA`. No
-match → `OTHER` (e.g. bare `"PREBENJAMIN"` or `"BENJAMIN SALA"` with no
-explicit tier — a real, common case, not a parsing gap).
+NACIONAL, FASE ZONAL, CAMPEONATO UNIVERSITARIO, LIGA UNIVERSITARIA`. Match
+is tried against `NombreCategoria` first; if that produces `OTHER`, the
+competition `nombre` is tried as fallback (same pattern as `category_base`).
+No match in either → `OTHER` (e.g. bare `"BENJAMIN SALA"` with no explicit
+tier — a real, common case, not a parsing gap). **Tier ordering and full
+`OTHER` taxonomy: `DIVISIONS.md`.**
 
 ### Known `OTHER` cases (2025-2026, both facets) — genuine ambiguity, not bugs
 

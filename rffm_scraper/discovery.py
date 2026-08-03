@@ -127,12 +127,16 @@ def run_discovery(client: RffmClient, settings: Settings, *, workers: int = 1) -
                 # was a regression: it silently broke acta_partido's
                 # `category == scope_category` filter for BENJAMIN/
                 # PREBENJAMIN by fragmenting them across a dozen raw labels.
-                category_base = classify_age_category(raw_category_label)
+                category_base = classify_age_category(
+                    raw_category_label, fallback_label=comp.get("nombre", "")
+                )
             else:
                 category_base = match_category_base(
                     raw_category_label, settings.target.category_priority
                 )
-            division_level = classify_division_level(raw_category_label)
+            division_level = classify_division_level(
+                raw_category_label, fallback_label=comp.get("nombre", "")
+            )
             is_fem = is_femenino_label(raw_category_label)
             phase_label = phase_label_from_competition_name(comp.get("nombre", ""))
 
