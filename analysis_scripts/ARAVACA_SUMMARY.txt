@@ -1,0 +1,74 @@
+================================================================================
+ARAVACA DISTRICT - 3 STADIUMS COMPARISON (2025-2026 Season)
+================================================================================
+
+STADIUM 1: ARAVACA - ANTONIO SANFIZ (HA)
+ID: 201
+Location: CALLE DE LA FUENTE DEL REY 33, Madrid
+Format: Fútbol 11 (full-size soccer)
+Surface: Artificial grass
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Statistics:
+  • Total Matches: 325
+  • Unique Teams: 347
+  • Top clubs: Mostly ARAVACA C.F. - CEIBA (multiple teams, A-D levels)
+  • Age Groups: JUVENIL (34 matches), CADETE (30), INFANTIL (30)
+  • Main Focus: Youth 11-a-side across multiple age groups
+
+
+STADIUM 2: ARAVACA - NTRA. SRA. BUEN CAMINO (HA)
+ID: 212
+Location: GLORIETA RIO ZANCARA 1, Madrid
+Format: Fútbol 11 (full-size soccer)
+Surface: Artificial grass
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Statistics:
+  • Total Matches: 312
+  • Unique Teams: 225
+  • Top clubs: C.D. UNIÓN DE ARAVACA (multiple teams), A.D. CIRINGANILLOS
+  • Age Groups: INFANTIL (90 matches), CADETE (65), JUVENIL (30)
+  • Main Focus: Mostly youth 11-a-side, competitive age groups
+
+
+STADIUM 3: ARAVACA - STELLA MARIS COLLEGE (HA)
+ID: 25693593
+Location: CALLE VALDESQUI 16, Madrid
+Format: Fútbol 7 (7-a-side soccer)
+Surface: Artificial grass
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Statistics:
+  • Total Matches: 129
+  • Unique Teams: 17 (tightly focused)
+  • Top clubs: Equal distribution (22 matches each): Stella Maris, Pozuelo teams,
+    Aravaca teams, Cala Pozuelo, Ciringanillos
+  • Age Groups: Almost exclusively ALEVIN (U-9) Futbol-7 (125 matches)
+  • Main Focus: Youth development, small-sided game training
+
+
+================================================================================
+KEY INSIGHTS
+================================================================================
+
+Format Distribution:
+  • 2 stadiums: 11-a-side (traditional full-size, youth competitive)
+  • 1 stadium: 7-a-side (youth development/training)
+
+Activity Level:
+  • Stella Maris: 129 matches (concentrated, focused age group)
+  • Buen Camino: 312 matches (diverse age groups)
+  • Antonio Sanfiz: 325 matches (highest activity, very diverse)
+
+Club Overlap:
+  • ARAVACA C.F. (main player across all venues)
+  • C.D. UNIÓN DE ARAVACA (particularly in Buen Camino)
+  • Regional clubs (Ciringanillos, Pozuelo teams, Cala Pozuelo)
+
+Purpose:
+  • Stella Maris: Specialized U-9 training facility (7-a-side)
+  • Buen Camino: Competitive youth 11-a-side (U-10 to U-17)
+  • Antonio Sanfiz: High-volume competitive youth football hub
+
+================================================================================
+To Generate This Report:
+  python analysis_scripts/stadium_analyzer.py compare 201 212 25693593
+================================================================================
