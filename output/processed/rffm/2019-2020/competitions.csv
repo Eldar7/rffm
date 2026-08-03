@@ -1,0 +1,5 @@
+season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+2019-2020,15,BENJAMIN,PREFERENTE BENJAMIN F7,False,PREFERENTE,PREFERENTE BENJAMIN F7,10724090,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=15&tipojuego=2,2026-08-03T20:47:34.245847+00:00
+2019-2020,15,BENJAMIN,PRIMERA BENJAMIN F7,False,PRIMERA,PRIMERA BENJAMIN F7,10724127,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=15&tipojuego=2,2026-08-03T20:48:07.516999+00:00
+2019-2020,15,BENJAMIN,PRIMERA BENJAMIN F7,False,PRIMERA,PRIMERA BENJAMIN F7 - 2ª FASE - GRUPO 7º,12198752,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=15&tipojuego=2,2026-08-03T20:50:43.001176+00:00
+2019-2020,15,PREBENJAMIN,PREBENJAMIN SALA,False,OTHER,Prebenjamin - F.S.,18570195,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=15&tipojuego=3,2026-08-03T20:50:47.823620+00:00
