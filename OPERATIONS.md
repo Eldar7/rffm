@@ -279,7 +279,13 @@ the int64/dtype merge failure) before they touched anything committed:
 ## Current state
 
 Check `coverage_manifest.csv` for the live picture. As of this writing,
-season 2025-2026: `core` complete (both categories); `acta_partido` and
-`fichajugador` complete for PREBENJAMIN only — BENJAMIN not started. Season
-2024-2025: `core` complete (both categories, via the manual 24-worker run
-above, not GitHub Actions); no enrichment stages started yet.
+season 2025-2026: `core` complete via an `--all-categories` GitHub Actions
+dispatch (11 `category_base` values, not just BENJAMÍN/PREBENJAMÍN - see
+`DATA_DICTIONARY.md`'s "Category taxonomy"), including `venues.csv`;
+`acta_partido` and `fichajugador` complete for **both** BENJAMÍN and
+PREBENJAMÍN; `clubs` `complete_with_failures` (674 unique clubs from 1,146
+targets across every category, 326 genuine `codigo_club` gaps on RFFM's own
+pages - not fetch failures, see `clubs_data_quality_report.csv`). No other
+categories have acta_partido/fichajugador enrichment yet. Season 2024-2025:
+`core` complete (all categories, via the manual 24-worker run above, not
+GitHub Actions), including `venues.csv`; no enrichment stages started yet.
