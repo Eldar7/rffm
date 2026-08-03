@@ -66,6 +66,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history, not the default shallow (fetch-depth: 1) clone -
+          # the "Commit and push" step's final `git rebase origin/main`
+          # needs a real merge-base with origin/main to replay this run's
+          # commit(s) cleanly. A shallow clone has no shared ancestor to
+          # compute that from, so git treats every file as independently
+          # added on both sides ("CONFLICT (add/add)") the moment the
+          # checked-out ref has actually diverged from main by more than a
+          # fast-forward - silently discarding a run's output behind a
+          # "resolve manually" error instead of merging it.
+          fetch-depth: 0
 
       - name: Create per-run branch
         id: run_branch
