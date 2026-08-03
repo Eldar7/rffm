@@ -85,25 +85,43 @@ DIVISION_LEVEL_VOCABULARY: list[tuple[str, str]] = [
 ]
 
 
-def classify_age_category(raw_label: str) -> str:
+def classify_age_category(raw_label: str, fallback_label: str = "") -> str:
     """crawl_all_categories counterpart to match_category_base: classify
     against the fixed AGE_CATEGORY_VOCABULARY above instead of a
     config-supplied list. Returns 'OTHER' rather than None for no match,
     since there's no caller-side "not in scope, skip it" filtering step to
-    feed None into here (every competition is kept in all-categories mode)."""
+    feed None into here (every competition is kept in all-categories mode).
+
+    fallback_label is tried only when raw_label produces no match — pass the
+    competition nombre here, since FASE ZONAL labels embed the age group in
+    the competition name ("FASE ZONAL 3 benjamin VALDEMORO FS") but not in
+    NombreCategoria ("FASE ZONAL SALA")."""
     normalized = normalize_label(raw_label)
     for token, canonical in AGE_CATEGORY_VOCABULARY:
         if token in normalized:
             return canonical
+    if fallback_label:
+        normalized_fallback = normalize_label(fallback_label)
+        for token, canonical in AGE_CATEGORY_VOCABULARY:
+            if token in normalized_fallback:
+                return canonical
     return "OTHER"
 
 
-def classify_division_level(raw_label: str) -> str:
-    """Best-effort division/level facet - see DIVISION_LEVEL_VOCABULARY."""
+def classify_division_level(raw_label: str, fallback_label: str = "") -> str:
+    """Best-effort division/level facet - see DIVISION_LEVEL_VOCABULARY.
+
+    fallback_label is tried only when raw_label produces no match — pass the
+    competition nombre here (same pattern as classify_age_category)."""
     normalized = normalize_label(raw_label)
     for token, canonical in DIVISION_LEVEL_VOCABULARY:
         if token in normalized:
             return canonical
+    if fallback_label:
+        normalized_fallback = normalize_label(fallback_label)
+        for token, canonical in DIVISION_LEVEL_VOCABULARY:
+            if token in normalized_fallback:
+                return canonical
     return "OTHER"
 
 
