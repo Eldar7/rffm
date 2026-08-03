@@ -167,13 +167,25 @@ pandas join recipes (including a worked "results between two clubs"
 example). See `CLAUDE.md`'s "Why one file" section for why each concern
 lives in exactly one of these.
 
-## What's collected successfully vs. limited (2025-2026 pilot)
+## What's collected (current state)
 
-- ✅ Full 2025-2026 BENJAMÍN/PREBENJAMÍN coverage across Futbol-7 **and**
-  Futsal: 408 groups, 43 competitions, 25,410 matches, 3,167 standings rows,
-  26,003 scorer rows, 2,144 teams, in one ~20-minute run against the live
-  site (1,272 HTTP requests, 33 quality-report findings — see
-  `output/processed/rffm/2025-2026/data_quality_report.csv`).
+- ✅ **2025-2026, all categories**: 1,210 groups, 248 competitions, 118,078
+  matches, 708 venues, 10,521 standings rows, 113,966 scorer rows, 9,237
+  teams (`--all-categories` core crawl, ~66 min against the live site).
+  `acta_partido`/`fichajugador` enrichment is complete for **both**
+  BENJAMÍN and PREBENJAMÍN (23,351 matches / 37,290 players between them) -
+  still category-scoped by design, not yet dispatched for other categories.
+  `clubs.csv`: 674 unique clubs resolved from 1,146 target teams (not
+  category-scoped - covers every category present in this season's core
+  data); 326 targets never returned a usable `codigo_club` (real gaps on
+  RFFM's own fichaequipo pages, not fetch failures - every one of those 326
+  requests came back HTTP 200, see `clubs_crawl_log.csv`) and 93 targets
+  resolved to a `club_id` some other target had already covered (see
+  `clubs_data_quality_report.csv`'s `club_coverage_gap` /
+  `redundant_club_target` rows).
+- ✅ **2024-2025, all categories (core only)**: a second season, 1,201
+  groups, 223 competitions, 114,554 matches, 689 venues, 9,193 teams -
+  demonstrates the multi-season storage layout; no enrichment run yet.
 - ⚠️ Fallback/limited by design: acta-partido/fichaequipo/fichajugador
   enrichment is disabled by default (robots.txt). acta_partido/fichajugador
   are additionally category-scoped (`--scope`), typically piloted on one
@@ -181,8 +193,8 @@ lives in exactly one of these.
   (see "Entities collected" above) - one run covers every club regardless
   of category.
 - ⚠️ Not modeled: match substitutions (zero populated examples found in the
-  BENJAMÍN age bracket — nothing to validate a schema against yet),
-  `otras_tarjetas`, full multi-season player career history (player
+  BENJAMÍN/PREBENJAMÍN age brackets — nothing to validate a schema against
+  yet), `otras_tarjetas`, full multi-season player career history (player
   profiles are fetched for 2025-2026 only, though the site holds history
   back to 2020-2021 per player).
 
