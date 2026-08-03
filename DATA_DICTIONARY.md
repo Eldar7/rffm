@@ -140,6 +140,30 @@ first (`PREBENJAMIN` before `BENJAMIN`, since the former contains the
 latter): `PREBENJAMIN, BENJAMIN, ALEVIN, INFANTIL, CADETE, JUVENIL,
 VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER`.
 
+Typical ages (RFEF standard — boundaries are approximate and can vary by
+competition or season):
+
+| `category_base` | Typical age | Birth years (2026–27) |
+|---|---|---|
+| `PREBENJAMIN` | 6–7 | 2019–2020 |
+| `BENJAMIN` | 8–9 | 2017–2018 |
+| `ALEVIN` | 10–11 | 2015–2016 |
+| `INFANTIL` | 12–13 | 2013–2014 |
+| `CADETE` | 14–15 | 2011–2012 |
+| `JUVENIL` | 16–18 | 2008–2010 |
+| `AFICIONADO` | 19+ (amateur) | ≤ 2007 |
+| `SENIOR` | 19+ (federated adult) | ≤ 2007 |
+| `UNIVERSITARIO` | student category | — |
+| `VETERANOS` | 35+\* | — |
+| `OTHER` | unclassified | — |
+
+`PREBENJAMIN` through `JUVENIL` form a continuous age progression.
+`AFICIONADO` and `SENIOR` are adult tiers, not a next step in that ladder.
+`UNIVERSITARIO` and `VETERANOS` are competition-specific categories — not
+part of the standard progression.
+
+\* VETERANOS minimum age varies by competition.
+
 The match is tried against `NombreCategoria` first; if that produces
 `OTHER`, the competition `nombre` field is tried as a fallback. This
 handles FASE ZONAL competitions, where `NombreCategoria` is the generic

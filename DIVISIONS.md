@@ -7,24 +7,36 @@ comparisons (lower number = higher tier). `division_level` is parsed from
 `rffm_scraper.normalize.classify_division_level` — see `DATA_DICTIONARY.md`
 for the parsing mechanics.
 
+> **Important**
+>
+> `tier` is a scraper-defined prestige ranking, not an official RFFM
+> promotion/relegation hierarchy.
+>
+> Different age groups use different competition pyramids
+> (e.g. SUPERLIGA for Cadete/Infantil/Alevín, LIGA NACIONAL for Juvenil,
+> TERCERA FEDERACION for adult football). The tier values provide a
+> normalised ordering for analytical purposes only — comparing tiers
+> across age groups (e.g. BENJAMIN PRIMERA vs JUVENIL SEGUNDA) is
+> usually not meaningful.
+
 ## Tier table
 
-| tier | division_level | Notes |
-|------|---------------|-------|
-| 1 | `PRIMERA DIVISION AUTONOMICA` | Top regional tier. Spans AFICIONADO, ALEVIN, CADETE, INFANTIL, JUVENIL. |
-| 2 | `DIVISION DE HONOR` | Second tier for youth (ALEVIN–JUVENIL). Not used for adult categories. |
-| 3 | `SUPERLIGA` | Third tier for some youth formats (ALEVIN, CADETE, INFANTIL). |
-| 3 | `LIGA NACIONAL` | National league tier for JUVENIL specifically. Parallel to SUPERLIGA. |
-| 4 | `PREFERENTE` | Present across most age groups and adult categories. |
-| 5 | `SEGUNDA DIVISION B` | Adult/senior only (appears as SENIOR and sala formats). |
-| 5 | `TERCERA FEDERACION` | Adult federation tier (RFEF). Parallel to SEGUNDA DIVISION B. |
-| 6 | `PRIMERA` | Most common mid-tier across all ages. |
-| 7 | `SEGUNDA` | Below PRIMERA. Youth and SENIOR. |
-| 8 | `TERCERA` | Lowest named tier. Appears in adult sala. |
-| — | `FASE ZONAL` | Zonal qualifying phase — not a standing league tier, cross-zone playoff structure. Age group parsed from `nombre`. |
-| — | `CAMPEONATO UNIVERSITARIO` | University championship, separate pyramid (UNIVERSITARIO only). |
-| — | `LIGA UNIVERSITARIA` | University league, separate pyramid (UNIVERSITARIO only). |
-| — | `OTHER` | No division token in either `NombreCategoria` or `nombre`. Typical cases: bare age-only labels (`BENJAMIN SALA`, `ALEVIN FEMENINO SALA`, `PREBENJAMIN SALA`), special formats (`FUTBOL ANDANDO F-7`, `DEBUTANTE`), and copa/torneo competitions with no tier marker. |
+| tier | division_level | Applies to | Notes |
+|------|----------------|------------|-------|
+| 1 | `SUPERLIGA` | ALEVIN, INFANTIL, CADETE | Top youth competition level in observed RFFM structures. |
+| 1 | `LIGA NACIONAL` | JUVENIL | Highest observed regional youth level for Juvenil. |
+| 2 | `DIVISION DE HONOR` | ALEVIN, BENJAMIN, INFANTIL, CADETE, JUVENIL | Elite youth tier below SUPERLIGA where present. |
+| 3 | `PRIMERA DIVISION AUTONOMICA` | AFICIONADO, ALEVIN, BENJAMIN, INFANTIL, CADETE, JUVENIL, PREBENJAMIN | Highest common regional division. FEMENINO expected but not yet observed in crawled seasons. |
+| 4 | `PREFERENTE` | AFICIONADO, ALEVIN, BENJAMIN, CADETE, INFANTIL, JUVENIL, PREBENJAMIN, SENIOR | Regional level below Primera División Autonómica. Top of the pyramid for SENIOR Fútbol Sala (SEGUNDA DIVISION B is a parallel RFEF track, not a tier above it in the regional ladder). |
+| 5 | `SEGUNDA DIVISION B` | SENIOR | Legacy division token found in competition names. |
+| 5 | `TERCERA FEDERACION` | AFICIONADO, FEMENINO | Highest adult federation competition observed in RFFM datasets. Both appear as `category_base=OTHER` in crawled data — expected structurally but not yet confirmed via a clean `category_base`. |
+| 6 | `PRIMERA` | AFICIONADO, ALEVIN, BENJAMIN, CADETE, INFANTIL, JUVENIL, PREBENJAMIN, SENIOR | Bottom of the pyramid for BENJAMIN and PREBENJAMIN (no lower tier exists for them). Only tier observed for SENIOR Futbol-7. |
+| 7 | `SEGUNDA` | AFICIONADO, ALEVIN, CADETE, INFANTIL, JUVENIL, SENIOR | Bottom of the pyramid for most Futbol-11 youth categories. Not observed for BENJAMIN or PREBENJAMIN. |
+| 8 | `TERCERA` | SENIOR | Exclusively SENIOR Fútbol Sala in observed data. Bottom of the SENIOR sala pyramid. |
+| — | `FASE ZONAL` | youth categories | Competition phase rather than league tier — cross-zone playoff structure. |
+| — | `CAMPEONATO UNIVERSITARIO` | UNIVERSITARIO | Separate university competition structure. |
+| — | `LIGA UNIVERSITARIA` | UNIVERSITARIO | Separate university competition structure. |
+| — | `OTHER` | any | No recognised division token found. |
 
 ## Notes on using `tier`
 
@@ -32,14 +44,9 @@ for the parsing mechanics.
 from this table. To compare two competitions by level, join on
 `division_level` and map to `tier`.
 
-The tier ordering is **within-pyramid only** — it is meaningful when
-comparing two competitions of the same `category_base` and `game_type`.
-Comparing tiers across age groups (e.g. BENJAMIN PRIMERA vs JUVENIL
-SEGUNDA) is usually not meaningful.
-
-SUPERLIGA and LIGA NACIONAL share tier 3 because they appear at the same
-level in different category contexts; they are not strictly comparable to
-each other. Same for SEGUNDA DIVISION B and TERCERA FEDERACION at tier 5.
+SUPERLIGA and LIGA NACIONAL share tier 1 because they are the top level
+in their respective age-group pyramids, not because they are comparable
+to each other. Same for SEGUNDA DIVISION B and TERCERA FEDERACION at tier 5.
 
 FASE ZONAL, CAMPEONATO UNIVERSITARIO, and LIGA UNIVERSITARIA are outside
 the main pyramid and have no numeric tier.
@@ -56,3 +63,11 @@ If you need to filter out these unranked competitions, use:
 ```python
 df[df["division_level"] != "OTHER"]
 ```
+
+## Validation
+
+Run `analysis_scripts/validate_division_applies_to.py` to check which
+`(division_level, category_base)` combinations actually appear in the
+data and compare against the "Applies to" column above. The script also
+prints an inverted view — per-category pyramid in age order — so you can
+see the full tier ladder for each age group at a glance.
