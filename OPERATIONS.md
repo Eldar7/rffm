@@ -35,8 +35,8 @@ requirement:
    `teams.csv`'s row count divided by teams-per-club, not one request per
    team - a few hundred requests, not thousands.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
-   profiles/season stats/participation. Reads `match_lineups.csv` (needs
-   step 2 done first for the categories it targets). Same order of
+   profiles/season stats/participation. Reads `match_lineups/<category>.csv`
+   (needs step 2 done first for the categories it targets). Same order of
    magnitude as step 2.
 
 `config.yaml`'s `target.season_label` picks the season (not CLI-overridable
@@ -253,8 +253,9 @@ scale" pattern used here.
 - **Concurrent jobs**: 20 for Free/Pro on Linux — not a practical constraint
   given the `concurrency` group already serializes same-season-same-stage.
 - **Git blob size**: GitHub warns >50MB, blocks >100MB per file without Git
-  LFS. Largest table today (`match_lineups.csv`, ~26MB) has headroom;
-  re-check as more seasons/categories accumulate.
+  LFS. Acta enrichment tables are now split per-category
+  (`match_lineups/ALEVIN.csv` etc.) — largest file ~25MB; headroom is safe
+  even for the biggest category.
 
 ## Testing pipeline changes safely
 
@@ -266,7 +267,7 @@ the int64/dtype merge failure) before they touched anything committed:
    `paths.output_dir` at the scratch dir, shrink `csv_flush_every`/
    `progress_report_every` to force multiple batches on a tiny sample.
 2. Copy a handful of real rows (`dtype=str`) from real `matches.csv`/
-   `match_lineups.csv`, restricted to a small target set (~8 items).
+   `match_lineups/<category>.csv`, restricted to a small target set (~8 items).
 3. Copy the matching raw HTML cache files for that small set from the real
    `output/raw/rffm/...` tree — the run should be fully offline.
 4. Run the real entrypoint against the scratch config. Assert: no duplicate
