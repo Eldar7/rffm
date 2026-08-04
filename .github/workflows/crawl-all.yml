@@ -1,5 +1,5 @@
 name: RFFM crawl-all (orchestrator)
-run-name: "crawl-all: ${{ inputs.dry_run && 'dry-run' || 'live' }}"
+run-name: "crawl-all: ${{ inputs.hint_label || (inputs.dry_run && 'dry-run' || 'live') }}"
 
 # Self-chaining orchestrator: runs one crawl step at a time by calling
 # rffm-crawl.yml via workflow_call (job-level, synchronous), then
@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      hint_label:
+        description: "Human-readable label for the run (set by chain job, e.g. 'acta_partido 2025-2026 / ALEVIN')"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -100,6 +105,30 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compute hint label for next run
+        id: hint
+        run: |
+          pip install pandas --quiet
+          output=$(python .github/scripts/next_crawl_step.py || true)
+          if [ -n "$output" ]; then
+            IFS='|' read -r season stage scope all_cat _done _total <<< "$output"
+            scope_display="${scope:-ALL}"
+            if [ "$stage" = "core" ] || [ "$stage" = "clubs" ]; then
+              scope_display="ALL"
+            fi
+            echo "label=${stage} ${season} / ${scope_display}" >> "$GITHUB_OUTPUT"
+          else
+            echo "label=done" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Dispatch next crawl-all run
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -108,7 +137,8 @@ jobs:
             if gh workflow run crawl-all.yml \
               --repo "$GITHUB_REPOSITORY" \
               --ref "$GITHUB_REF_NAME" \
-              --field dry_run=false; then
+              --field dry_run=false \
+              --field "hint_label=${{ steps.hint.outputs.label }}"; then
               echo "Dispatched next crawl-all run (attempt $attempt)."
               exit 0
             fi
