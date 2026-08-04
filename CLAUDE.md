@@ -8,7 +8,10 @@ the data was collected), **not** for running/extending the crawl pipelines
 or GitHub Actions (see `OPERATIONS.md`), and **not** the full schema (see
 `DATA_DICTIONARY.md` — exact columns, quirks, worked examples, join
 recipes). **Before writing any actual query, read `DATA_DICTIONARY.md`** —
-this file only tells you which table to look at, not its columns.
+this file only tells you which table to look at, not its columns. If a
+result looks wrong (unexpected NaNs, suspicious duplicates, counts that
+seem off), check `DATA_FINDINGS.md` before assuming a bug — it records
+known data quirks discovered through real queries.
 
 ## Scope
 
@@ -145,6 +148,10 @@ file per concern, and every other file links instead of re-describing.
 - **`OPERATIONS.md`** — running/extending the crawl: the GitHub Actions
   workflow, the resumability/batching design, `coverage_manifest.csv`
   mechanics, how to test a pipeline change safely.
+- **`DATA_FINDINGS.md`** — empirical observations: expected "anomalies",
+  join traps, patterns that look like bugs but aren't, and genuine quality
+  issues discovered through real queries. Add entries here instead of
+  re-investigating the same surprises.
 
 If you're about to add a column description to this file, or a paragraph
 explaining *how the crawler works* to `DATA_DICTIONARY.md`, or *what a
