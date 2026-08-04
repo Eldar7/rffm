@@ -244,34 +244,43 @@ re-crawl of enrichment data needed.
 
 ## Enrichment tables (opt-in — see README.md for why opt-in/robots.txt, OPERATIONS.md for how/when a run populates these)
 
-- **`match_lineups.csv`** — per-match, per-player. FK `match_id` →
+- **`match_lineups/<category>.csv`** — per-match, per-player, one file per
+  `scope_category` (e.g. `match_lineups/ALEVIN.csv`). FK `match_id` →
   `matches.csv`, FK `player_id` → `players.csv`. Columns: `match_id,
-  team_id, player_id, player_name_raw, jersey_number, is_starter,
-  is_substitute, is_captain, is_goalkeeper, position_raw,
-  position_abbr_raw, sex_raw, source_url, scraped_at`.
-- **`match_goals.csv`** — one row per goal event. `goal_type_raw` (site's
-  `tipo_gol`, values `"100"/"101"/"102"` observed) is kept **opaque** —
-  no confirmed decoding exists (unlike cards, below). Columns: `match_id,
-  team_id, player_id, player_name_raw, minute, minute_raw, goal_type_raw,
-  source_url, scraped_at`.
-- **`match_cards.csv`** — one row per card. `card_type_raw` is the site's
-  raw `codigo_tipo_amonestacion` code; `card_type_label` is a **derived,
-  inferred** decoding — `"100"→"amarilla"`, `"101"→"roja"`,
+  team_id, player_id, jersey_number, is_starter, is_substitute, is_captain,
+  is_goalkeeper, position_raw, position_abbr_raw, sex_raw`.
+  Dropped columns and how to recover them:
+  `player_name_raw` → join `players.csv` on `player_id`;
+  `source_url` → `f"https://www.rffm.es/acta-partido/{match_id}"`;
+  `scraped_at` → join `acta_crawl_log.csv` on `entity_id=match_id` where
+  `success=True`, take `timestamp`.
+- **`match_goals/<category>.csv`** — one row per goal event. `goal_type_raw`
+  (site's `tipo_gol`, values `"100"/"101"/"102"` observed) is kept
+  **opaque** — no confirmed decoding exists (unlike cards, below). Columns:
+  `match_id, team_id, player_id, minute, minute_raw, goal_type_raw`.
+  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+- **`match_cards/<category>.csv`** — one row per card. `card_type_raw` is
+  the site's raw `codigo_tipo_amonestacion` code; `card_type_label` is a
+  **derived, inferred** decoding — `"100"→"amarilla"`, `"101"→"roja"`,
   `"102"→"doble_amarilla"` (lowercase Spanish, matching the site's own
   wording, **not** English) — see "Card-type mapping" below for the
-  inference basis. `minute == 999` is a known sentinel (card issued when not
-  literally in play) — treat as anomalous, not a literal minute. Columns:
-  `match_id, team_id, player_id, player_name_raw, minute, minute_raw,
-  card_type_raw, card_type_label, is_second_yellow, source_url, scraped_at`.
-- **`match_staff.csv`** — coaches/delegates, always has a real `team_id`.
-  `role_kind` is one of exactly `"head_coach"`, `"assistant_coach"`,
-  `"team_delegate"`, `"other_staff"` (never plain `"coach"`/`"delegate"`).
-  Columns: `match_id, team_id, role_kind, role_raw, person_id, person_name,
-  source_url, scraped_at`.
-- **`match_officials.csv`** — referees/field delegate, **no `team_id`**
-  (neutral). `official_kind` is `"referee"` or `"field_delegate"`. Columns:
-  `match_id, official_kind, official_id, official_name, role_raw,
-  source_url, scraped_at`.
+  inference basis. `minute == 999` is a known sentinel (card issued when
+  not literally in play) — treat as anomalous, not a literal minute.
+  Columns: `match_id, team_id, player_id, minute, minute_raw,
+  card_type_raw, card_type_label, is_second_yellow`.
+  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+- **`match_staff/<category>.csv`** — coaches/delegates, always has a real
+  `team_id`. `role_kind` is one of exactly `"head_coach"`,
+  `"assistant_coach"`, `"team_delegate"`, `"other_staff"`. Columns:
+  `match_id, team_id, role_kind, role_raw, person_id, person_name`.
+  `person_name` is kept (no separate coaches table exists).
+  `source_url`, `scraped_at` dropped (see above).
+- **`match_officials/<category>.csv`** — referees/field delegate, **no
+  `team_id`** (neutral). `official_kind` is `"referee"` or
+  `"field_delegate"`. Columns: `match_id, official_kind, official_id,
+  official_name, role_raw`.
+  `official_name` is kept (no separate officials table exists).
+  `source_url`, `scraped_at` dropped (see above).
 - **`players.csv`** (`player_id` PK) — stable identity only:
   `player_id, player_name, birth_year` (birth year, **not** age, which goes
   stale every year), `source_url, scraped_at`.

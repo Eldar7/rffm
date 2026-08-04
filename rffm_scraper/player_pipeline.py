@@ -67,9 +67,14 @@ def _now_iso() -> str:
 
 
 def _load_target_player_ids(settings: Settings) -> list[str]:
-    path = settings.processed_dir / "match_lineups.csv"
-    df = pd.read_csv(path, dtype=str, keep_default_na=True)
-    return sorted(df["player_id"].dropna().unique().tolist())
+    lineups_dir = settings.processed_dir / "match_lineups"
+    frames = [
+        pd.read_csv(p, usecols=["player_id"], dtype=str)
+        for p in sorted(lineups_dir.glob("*.csv"))
+    ]
+    if not frames:
+        return []
+    return sorted(pd.concat(frames)["player_id"].dropna().unique().tolist())
 
 
 def _raw_path(settings: Settings, category: str, season_label: str, player_id: str):
@@ -277,7 +282,9 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     players_df = _reread_table(processed, "players.csv")
     season_stats_df = _reread_table(processed, "player_season_stats.csv")
     competitions_df = _reread_table(processed, "player_competition_participation.csv")
-    lineups_df = pd.read_csv(processed / "match_lineups.csv", dtype=str, keep_default_na=True)
+    lineups_dir = processed / "match_lineups"
+    lineups_frames = [pd.read_csv(p, dtype=str) for p in sorted(lineups_dir.glob("*.csv"))] if lineups_dir.exists() else []
+    lineups_df = pd.concat(lineups_frames) if lineups_frames else pd.DataFrame()
 
     quality_issues = run_player_quality_checks(players_df, season_stats_df, lineups_df, set(target_player_ids))
     write_csv(pd.DataFrame(quality_issues), processed / "fichajugador_data_quality_report.csv")

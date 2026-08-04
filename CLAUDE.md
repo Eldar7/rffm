@@ -77,11 +77,11 @@ Core (always collected):
 - `crawl_log.csv` / `data_quality_report.csv` — per-run HTTP log + anomaly findings
 
 Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/when populated):
-- `match_lineups.csv` — per-match, per-player lineup
-- `match_goals.csv` — one row per goal event
-- `match_cards.csv` — one row per card
-- `match_staff.csv` — coaches/delegates per match
-- `match_officials.csv` — referees/field delegate per match
+- `match_lineups/<category>.csv` — per-match, per-player lineup (one file per scope_category)
+- `match_goals/<category>.csv` — one row per goal event
+- `match_cards/<category>.csv` — one row per card
+- `match_staff/<category>.csv` — coaches/delegates per match
+- `match_officials/<category>.csv` — referees/field delegate per match
 - `players.csv` (`player_id`) — stable player identity (name, birth year)
 - `player_season_stats.csv` — site-reported season aggregates per player
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
@@ -114,9 +114,9 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 | A team's fixture list | `matches` | `home_team_id`/`away_team_id` |
 | Where does a team/club play (address, map link) | `teams`, `matches`, `venues` | `club_name_raw` → `team_id` → `matches.venue_id` → `venues` |
 | A club's identity/website/correspondence address | `clubs` | `club_name_raw` (join to `teams` if starting from a `team_id`) — opt-in table, check `coverage_manifest.csv` first |
-| A player's appearances/goals/cards | `match_lineups`, `match_goals`, `match_cards`, `matches` | `player_id` → `match_id` → `matches` for date/context |
-| Did a player move teams/clubs | `match_lineups`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |
-| Match report detail (lineup, staff, ref) | `match_lineups`, `match_staff`, `match_officials` | `match_id` |
+| A player's appearances/goals/cards | `match_lineups/*`, `match_goals/*`, `match_cards/*`, `matches` | `player_id` → `match_id` → `matches` for date/context; glob all category files |
+| Did a player move teams/clubs | `match_lineups/*`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |
+| Match report detail (lineup, staff, ref) | `match_lineups/*`, `match_staff/*`, `match_officials/*` | `match_id` |
 
 Worked examples (two-clubs head-to-head, cross-season concat, the
 player-transfer-detection recipe, card-type code mapping, known

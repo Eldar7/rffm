@@ -54,7 +54,7 @@ def _check_coverage(players_df: pd.DataFrame, target_player_ids: set) -> list[di
         issues.append(
             _issue(
                 "player_profile_coverage_gap", "warning", "player", player_id,
-                "player appears in match_lineups.csv but no fichajugador profile was fetched (fetch failure or empty page)",
+                "player appears in match_lineups/ but no fichajugador profile was fetched (fetch failure or empty page)",
             )
         )
     return issues
@@ -63,7 +63,7 @@ def _check_coverage(players_df: pd.DataFrame, target_player_ids: set) -> list[di
 def _check_jugados_reconciliation(season_stats_df: pd.DataFrame, lineups_df: pd.DataFrame) -> list[dict]:
     """Cross-validates the whole acta-partido pipeline: the site's own
     'Jugados' (matches_played) season stat should match how many
-    match_lineups.csv rows we actually collected for that player. A
+    match_lineups/ rows we actually collected for that player. A
     mismatch means our acta crawl missed some of that player's matches."""
     issues = []
     if season_stats_df.empty or lineups_df.empty:
@@ -80,7 +80,7 @@ def _check_jugados_reconciliation(season_stats_df: pd.DataFrame, lineups_df: pd.
                 _issue(
                     "jugados_reconciliation_mismatch", "warning", "player", player_id,
                     f"site-reported matches_played={int(site_count)} vs "
-                    f"{our_count} rows collected in match_lineups.csv - "
+                    f"{our_count} rows collected in match_lineups/ - "
                     "likely a gap in acta-partido coverage for this player",
                 )
             )
