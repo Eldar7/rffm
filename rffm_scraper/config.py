@@ -64,6 +64,7 @@ class ActaPartidoConfig:
     csv_flush_every: int = 200
     rate_limit_seconds: float = 1.25
     force_refetch: bool = False
+    workers: int = 8
 
 
 @dataclass
@@ -73,6 +74,7 @@ class FichajugadorConfig:
     csv_flush_every: int = 200
     rate_limit_seconds: float = 1.25
     force_refetch: bool = False
+    workers: int = 8
 
 
 @dataclass
@@ -81,6 +83,7 @@ class ClubsConfig:
     csv_flush_every: int = 100
     rate_limit_seconds: float = 1.25
     force_refetch: bool = False
+    workers: int = 8
 
 
 @dataclass

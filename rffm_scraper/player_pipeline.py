@@ -23,7 +23,9 @@ from __future__ import annotations
 import dataclasses
 import logging
 import os
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -129,7 +131,75 @@ def _flush_batch(processed, batches: dict[str, list[dict]], crawl_log_rows: list
             append_or_write_csv(log_df, processed / "fichajugador_crawl_log.csv")
 
 
-def run_player_enrichment(settings: Settings, scope_category: str | None = None, force_refetch: bool | None = None) -> dict:
+def _fetch_one_player(
+    player_id: str,
+    settings: Settings,
+    player_settings: Settings,
+    scope_category: str,
+    season_label: str,
+    season_id: str,
+    local: threading.local,
+    run_id: str,
+    force_refetch: bool,
+) -> tuple[str, dict, dict | None, float]:
+    """Fetch and parse one player profile. Runs in a worker thread.
+
+    Returns (player_id, log_entry_dict, parsed_or_None, fetch_seconds).
+    """
+    if not hasattr(local, "client"):
+        local.client = RffmClient(player_settings, run_id=run_id)
+    client = local.client
+
+    raw_path = _raw_path(settings, scope_category, season_label, player_id)
+    source_url = f"{settings.site.base_url}{settings.site.pages.fichajugador}/{player_id}?temporada={season_id}"
+
+    player_json = None
+    cache_hit = False
+    fetch_seconds = 0.0
+
+    if raw_path.exists() and not force_refetch:
+        cached_html = raw_path.read_text(encoding="utf-8")
+        page_props = extract_next_data(cached_html)
+        player_json = (page_props or {}).get("player")
+        if player_json is not None:
+            cache_hit = True
+        else:
+            logger.warning("Cached fichajugador file unparseable, will refetch: %s", raw_path)
+
+    if player_json is None:
+        fetch_started = time.monotonic()
+        result = fetch_fichajugador(client, player_settings, season_id=season_id, player_id=player_id)
+        if result.ok and result.raw_html:
+            atomic_write_text(raw_path, result.raw_html)
+            player_json = (result.page_props or {}).get("player")
+            fetch_seconds = time.monotonic() - fetch_started
+        log_entry = downgrade_crawl_log_if_no_content(
+            dataclasses.asdict(client.crawl_log[-1]), content_ok=player_json is not None,
+        )
+    elif cache_hit:
+        # Cache hits never touch the network client, so synthesize a
+        # crawl_log entry for cross-environment resumability.
+        log_entry = dict(
+            run_id=run_id, timestamp=_now_iso(), stage="fichajugador",
+            entity_type="player_ficha", entity_id=player_id, source_url=source_url,
+            http_status=None, success=True, retry_count=0,
+            parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
+            message="served_from_raw_cache",
+        )
+
+    parsed = None
+    if player_json is not None:
+        parsed = parse_player_profile(player_json, source_url=source_url)
+
+    return player_id, log_entry, parsed, fetch_seconds
+
+
+def run_player_enrichment(
+    settings: Settings,
+    scope_category: str | None = None,
+    force_refetch: bool | None = None,
+    workers: int | None = None,
+) -> dict:
     if not settings.enrichment.fetch_fichajugador:
         raise RuntimeError(
             "enrichment.fetch_fichajugador is false in config - refusing to crawl "
@@ -139,6 +209,7 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     cfg = settings.enrichment.fichajugador
     scope_category = scope_category or cfg.scope_category
     force_refetch = cfg.force_refetch if force_refetch is None else force_refetch
+    workers = cfg.workers if workers is None else workers
     season_label = settings.target.season_label
 
     player_settings = dataclasses.replace(
@@ -173,8 +244,10 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     remaining = [pid for pid in target_player_ids if pid not in done_ids]
 
     logger.info(
-        "fichajugador enrichment: %d targets total, %d already done, %d remaining (season=%s scope=%s)",
-        len(target_player_ids), len(already_done_this_scope), len(remaining), season_label, scope_category,
+        "fichajugador enrichment: %d targets total, %d already done, %d remaining "
+        "(season=%s scope=%s workers=%d)",
+        len(target_player_ids), len(already_done_this_scope), len(remaining),
+        season_label, scope_category, workers,
     )
 
     progress = Progress(_progress_path(settings, season_label, scope_category), scope_category, len(target_player_ids))
@@ -185,59 +258,29 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     batches: dict[str, list[dict]] = {key: [] for key, _, _, _ in _OUTPUT_TABLES}
     pending_crawl_log_rows: list[dict] = []
     flush_count = 0
+    items_since_flush = 0
 
-    for i, player_id in enumerate(remaining, start=1):
-        raw_path = _raw_path(settings, scope_category, season_label, player_id)
-        source_url = f"{settings.site.base_url}{settings.site.pages.fichajugador}/{player_id}?temporada={season_id}"
+    local = threading.local()
+    if workers == 1:
+        local.client = client
 
-        player_json = None
-        cache_hit = False
-        if raw_path.exists() and not force_refetch:
-            cached_html = raw_path.read_text(encoding="utf-8")
-            page_props = extract_next_data(cached_html)
-            player_json = (page_props or {}).get("player")
-            if player_json is not None:
-                progress.skipped_cached += 1
-                cache_hit = True
-            else:
-                logger.warning("Cached fichajugador file unparseable, will refetch: %s", raw_path)
-
-        if player_json is None:
-            fetch_started = time.monotonic()
-            result = fetch_fichajugador(client, player_settings, season_id=season_id, player_id=player_id)
-            if result.ok and result.raw_html:
-                atomic_write_text(raw_path, result.raw_html)
-                player_json = (result.page_props or {}).get("player")
-                progress.record_fetch(time.monotonic() - fetch_started)
-            log_entry = downgrade_crawl_log_if_no_content(
-                dataclasses.asdict(client.crawl_log[-1]), content_ok=player_json is not None,
-            )
-            pending_crawl_log_rows.append(log_entry)
-        elif cache_hit:
-            # Cache hits never touch the network client, so they never
-            # produce a crawl_log entry on their own - synthesize one so
-            # this player is correctly marked "done" for cross-environment
-            # resumability, not just this process's raw-HTML cache.
-            pending_crawl_log_rows.append(dict(
-                run_id=client.run_id, timestamp=_now_iso(), stage="fichajugador",
-                entity_type="player_ficha", entity_id=player_id, source_url=source_url,
-                http_status=None, success=True, retry_count=0,
-                parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
-                message="served_from_raw_cache",
-            ))
-
+    def _process_result(player_id: str, log_entry: dict, parsed: dict | None, fetch_seconds: float) -> None:
+        nonlocal items_since_flush, flush_count
+        pending_crawl_log_rows.append(log_entry)
         progress.completed += 1
         progress.last_item_processed = player_id
-
-        if player_json is None:
+        if parsed is None:
             progress.failed += 1
         else:
+            if fetch_seconds > 0:
+                progress.record_fetch(fetch_seconds)
+            else:
+                progress.skipped_cached += 1
             done_ids.add(player_id)
-            parsed = parse_player_profile(player_json, source_url=source_url)
             batches["players"].append(parsed["player"])
             batches["season_stats"].append(parsed["season_stats"])
             batches["competitions"].extend(parsed["competitions"])
-
+        items_since_flush += 1
         if progress.completed % cfg.progress_report_every == 0:
             progress.write()
             logger.info(
@@ -245,8 +288,7 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
                 progress.completed, progress.total_targets, progress.skipped_cached,
                 progress.freshly_fetched_ok, progress.failed,
             )
-
-        if i % cfg.csv_flush_every == 0:
+        if items_since_flush >= cfg.csv_flush_every:
             _flush_batch(processed, batches, pending_crawl_log_rows)
             progress.write()
             upsert_coverage_manifest(
@@ -255,6 +297,7 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
                 targets_total=len(target_player_ids), targets_completed=progress.completed,
                 targets_failed=progress.failed, started_at=started_at,
             )
+            items_since_flush = 0
             flush_count += 1
             if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
                 git_push_progress(
@@ -262,6 +305,25 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
                     f"rffm-crawl checkpoint: fichajugador {scope_category} "
                     f"({progress.completed}/{progress.total_targets})",
                 )
+
+    if workers == 1:
+        for player_id in remaining:
+            result = _fetch_one_player(
+                player_id, settings, player_settings, scope_category, season_label,
+                season_id, local, client.run_id, force_refetch,
+            )
+            _process_result(*result)
+    else:
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-player") as executor:
+            futures = {
+                executor.submit(
+                    _fetch_one_player, pid, settings, player_settings, scope_category,
+                    season_label, season_id, local, client.run_id, force_refetch,
+                ): pid
+                for pid in remaining
+            }
+            for future in as_completed(futures):
+                _process_result(*future.result())
 
     # Final flush - runs even if `remaining` was empty (everything already
     # done in a previous run/environment) or shorter than one full batch.

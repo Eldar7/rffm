@@ -26,6 +26,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--scope", default=None, help="Category to enrich (defaults to config's acta_partido.scope_category)")
     parser.add_argument("--force-refetch", action="store_true", help="Ignore cached raw HTML and refetch every match")
+    parser.add_argument("--workers", type=int, default=None, help="Parallel fetch threads (default: from config, 8)")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return parser.parse_args(argv)
 
@@ -47,7 +48,7 @@ def main(argv=None) -> int:
         )
         return 1
 
-    summary = run_acta_enrichment(settings, scope_category=args.scope, force_refetch=args.force_refetch or None)
+    summary = run_acta_enrichment(settings, scope_category=args.scope, force_refetch=args.force_refetch or None, workers=args.workers)
     print("\n=== acta-partido enrichment summary ===")
     for k, v in summary.items():
         print(f"{k}: {v}")

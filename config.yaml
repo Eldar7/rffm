@@ -79,6 +79,7 @@ enrichment:
     csv_flush_every: 200         # batch size for the resumable incremental CSV flush (see row_io.append_or_write_csv)
     rate_limit_seconds: 1.25     # more conservative than the 0.75s base pages use
     force_refetch: false
+    workers: 8                   # parallel fetch threads; each gets its own RffmClient + rate-limit bucket
   # Settings for the enrich_players.py stage (player profiles/season stats/
   # competition participation, from /fichajugador/<player_id>). Targets are
   # the player_ids discovered by the acta_partido stage above, so this
@@ -89,6 +90,7 @@ enrichment:
     csv_flush_every: 200
     rate_limit_seconds: 1.25
     force_refetch: false
+    workers: 8
   # Settings for the enrich_clubs.py stage (club identity/address, from
   # /fichaequipo/<team_id>). Targets are ONE representative team_id per
   # unique club_name_raw already in teams.csv (codigo_club is the same for
@@ -101,6 +103,7 @@ enrichment:
     csv_flush_every: 100
     rate_limit_seconds: 1.25
     force_refetch: false
+    workers: 8
 
 paths:
   output_dir: "output"

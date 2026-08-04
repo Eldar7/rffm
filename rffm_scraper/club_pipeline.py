@@ -26,7 +26,9 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -86,7 +88,68 @@ def _flush_batch(processed, rows: list[dict], crawl_log_rows: list[dict]) -> Non
         crawl_log_rows.clear()
 
 
-def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -> dict:
+def _fetch_one_club(
+    team_id: str,
+    settings: Settings,
+    club_settings: Settings,
+    season_label: str,
+    local: threading.local,
+    run_id: str,
+    force_refetch: bool,
+) -> tuple[str, dict, dict | None, float]:
+    """Fetch and parse one club profile. Runs in a worker thread.
+
+    Returns (team_id, log_entry_dict, club_row_or_None, fetch_seconds).
+    """
+    if not hasattr(local, "client"):
+        local.client = RffmClient(club_settings, run_id=run_id)
+    client = local.client
+
+    raw_path = _raw_path(settings, season_label, team_id)
+    source_url = f"{settings.site.base_url}{settings.site.pages.fichaequipo}/{team_id}"
+
+    team_json = None
+    cache_hit = False
+    fetch_seconds = 0.0
+
+    if raw_path.exists() and not force_refetch:
+        cached_html = raw_path.read_text(encoding="utf-8")
+        page_props = extract_next_data(cached_html)
+        team_json = (page_props or {}).get("team")
+        if team_json is not None:
+            cache_hit = True
+        else:
+            logger.warning("Cached fichaequipo file unparseable, will refetch: %s", raw_path)
+
+    if team_json is None:
+        fetch_started = time.monotonic()
+        result = fetch_fichaequipo(client, club_settings, team_id)
+        if result.ok and result.raw_html:
+            atomic_write_text(raw_path, result.raw_html)
+            team_json = (result.page_props or {}).get("team")
+            fetch_seconds = time.monotonic() - fetch_started
+        log_entry = dataclasses.asdict(client.crawl_log[-1])
+    elif cache_hit:
+        log_entry = dict(
+            run_id=run_id, timestamp=_now_iso(), stage="clubs",
+            entity_type="team_ficha", entity_id=team_id, source_url=source_url,
+            http_status=None, success=True, retry_count=0,
+            parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
+            message="served_from_raw_cache",
+        )
+
+    club_row = None
+    if team_json is not None and team_json.get("codigo_club"):
+        club_row = parse_club(team_json, representative_team_id=team_id, source_url=source_url)
+
+    return team_id, log_entry, club_row, fetch_seconds
+
+
+def run_club_enrichment(
+    settings: Settings,
+    force_refetch: bool | None = None,
+    workers: int | None = None,
+) -> dict:
     if not settings.enrichment.fetch_fichaequipo:
         raise RuntimeError(
             "enrichment.fetch_fichaequipo is false in config - refusing to crawl "
@@ -95,6 +158,7 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
 
     cfg = settings.enrichment.clubs
     force_refetch = cfg.force_refetch if force_refetch is None else force_refetch
+    workers = cfg.workers if workers is None else workers
     season_label = settings.target.season_label
 
     club_settings = dataclasses.replace(
@@ -125,8 +189,8 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
     remaining = [tid for tid in target_team_ids if tid not in done_ids]
 
     logger.info(
-        "clubs enrichment: %d targets total, %d already done, %d remaining (season=%s)",
-        len(target_team_ids), len(already_done), len(remaining), season_label,
+        "clubs enrichment: %d targets total, %d already done, %d remaining (season=%s workers=%d)",
+        len(target_team_ids), len(already_done), len(remaining), season_label, workers,
     )
 
     progress = Progress(_progress_path(settings, season_label), season_label, len(target_team_ids))
@@ -136,49 +200,27 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
     started_at = _now_iso()
     pending_rows: list[dict] = []
     pending_crawl_log_rows: list[dict] = []
+    items_since_flush = 0
 
-    for i, team_id in enumerate(remaining, start=1):
-        raw_path = _raw_path(settings, season_label, team_id)
-        source_url = f"{settings.site.base_url}{settings.site.pages.fichaequipo}/{team_id}"
+    local = threading.local()
+    if workers == 1:
+        local.client = client
 
-        team_json = None
-        cache_hit = False
-        if raw_path.exists() and not force_refetch:
-            cached_html = raw_path.read_text(encoding="utf-8")
-            page_props = extract_next_data(cached_html)
-            team_json = (page_props or {}).get("team")
-            if team_json is not None:
-                progress.skipped_cached += 1
-                cache_hit = True
-            else:
-                logger.warning("Cached fichaequipo file unparseable, will refetch: %s", raw_path)
-
-        if team_json is None:
-            fetch_started = time.monotonic()
-            result = fetch_fichaequipo(client, club_settings, team_id)
-            if result.ok and result.raw_html:
-                atomic_write_text(raw_path, result.raw_html)
-                team_json = (result.page_props or {}).get("team")
-                progress.record_fetch(time.monotonic() - fetch_started)
-            pending_crawl_log_rows.append(dataclasses.asdict(client.crawl_log[-1]))
-        elif cache_hit:
-            pending_crawl_log_rows.append(dict(
-                run_id=client.run_id, timestamp=_now_iso(), stage="clubs",
-                entity_type="team_ficha", entity_id=team_id, source_url=source_url,
-                http_status=None, success=True, retry_count=0,
-                parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
-                message="served_from_raw_cache",
-            ))
-
+    def _process_result(team_id: str, log_entry: dict, club_row: dict | None, fetch_seconds: float) -> None:
+        nonlocal items_since_flush
+        pending_crawl_log_rows.append(log_entry)
         progress.completed += 1
         progress.last_item_processed = team_id
-
-        if team_json is None or not team_json.get("codigo_club"):
+        if club_row is None:
             progress.failed += 1
         else:
+            if fetch_seconds > 0:
+                progress.record_fetch(fetch_seconds)
+            else:
+                progress.skipped_cached += 1
             done_ids.add(team_id)
-            pending_rows.append(parse_club(team_json, representative_team_id=team_id, source_url=source_url))
-
+            pending_rows.append(club_row)
+        items_since_flush += 1
         if progress.completed % cfg.progress_report_every == 0:
             progress.write()
             logger.info(
@@ -186,8 +228,7 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
                 progress.completed, progress.total_targets, progress.skipped_cached,
                 progress.freshly_fetched_ok, progress.failed,
             )
-
-        if i % cfg.csv_flush_every == 0:
+        if items_since_flush >= cfg.csv_flush_every:
             _flush_batch(processed, pending_rows, pending_crawl_log_rows)
             progress.write()
             upsert_coverage_manifest(
@@ -196,6 +237,25 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
                 targets_total=len(target_team_ids), targets_completed=progress.completed,
                 targets_failed=progress.failed, started_at=started_at,
             )
+            items_since_flush = 0
+
+    if workers == 1:
+        for team_id in remaining:
+            result = _fetch_one_club(
+                team_id, settings, club_settings, season_label, local, client.run_id, force_refetch,
+            )
+            _process_result(*result)
+    else:
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-club") as executor:
+            futures = {
+                executor.submit(
+                    _fetch_one_club, tid, settings, club_settings, season_label,
+                    local, client.run_id, force_refetch,
+                ): tid
+                for tid in remaining
+            }
+            for future in as_completed(futures):
+                _process_result(*future.result())
 
     _flush_batch(processed, pending_rows, pending_crawl_log_rows)
     progress.write()

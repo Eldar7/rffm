@@ -28,6 +28,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="RFFM clubs enrichment (identity/address, one team per club)")
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--force-refetch", action="store_true", help="Ignore cached raw HTML and refetch every club")
+    parser.add_argument("--workers", type=int, default=None, help="Parallel fetch threads (default: from config, 8)")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return parser.parse_args(argv)
 
@@ -49,7 +50,7 @@ def main(argv=None) -> int:
         )
         return 1
 
-    summary = run_club_enrichment(settings, force_refetch=args.force_refetch or None)
+    summary = run_club_enrichment(settings, force_refetch=args.force_refetch or None, workers=args.workers)
     print("\n=== clubs enrichment summary ===")
     for k, v in summary.items():
         print(f"{k}: {v}")

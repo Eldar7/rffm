@@ -53,7 +53,9 @@ from __future__ import annotations
 import dataclasses
 import logging
 import os
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -236,7 +238,84 @@ def _flush_batch(processed, scope_category: str, batches: dict[str, list[dict]],
             append_or_write_csv(log_df, processed / "acta_crawl_log.csv")
 
 
-def run_acta_enrichment(settings: Settings, scope_category: str | None = None, force_refetch: bool | None = None) -> dict:
+def _fetch_one_match(
+    row: pd.Series,
+    settings: Settings,
+    acta_settings: Settings,
+    local: threading.local,
+    run_id: str,
+    force_refetch: bool,
+) -> tuple[str, dict, dict | None, float]:
+    """Fetch and parse one acta match. Runs in a worker thread.
+
+    Returns (match_id, log_entry_dict, parsed_or_None, fetch_seconds).
+    parsed_or_None is None if the fetch/parse failed.
+    fetch_seconds is > 0 only for real network fetches (not cache hits).
+    """
+    if not hasattr(local, "client"):
+        local.client = RffmClient(acta_settings, run_id=run_id)
+    client = local.client
+
+    match_id = row["match_id"]
+    row_season_label = row["season"]
+    category = row["category"]
+    raw_path = _raw_path(settings, category, row_season_label, match_id)
+    source_url = f"{settings.site.base_url}{settings.site.pages.acta_partido}/{match_id}"
+
+    game = None
+    cache_hit = False
+    fetch_seconds = 0.0
+
+    if raw_path.exists() and not force_refetch:
+        cached_html = raw_path.read_text(encoding="utf-8")
+        page_props = extract_next_data(cached_html)
+        game = (page_props or {}).get("game")
+        if game is not None:
+            cache_hit = True
+        else:
+            logger.warning("Cached acta file unparseable, will refetch: %s", raw_path)
+
+    if game is None:
+        fetch_started = time.monotonic()
+        result = fetch_acta_partido(
+            client, acta_settings, season_id=row["season_id"], competicion=row["competition_id"],
+            grupo=row["group_id"], match_id=match_id,
+        )
+        if result.ok and result.raw_html:
+            atomic_write_text(raw_path, result.raw_html)
+            game = (result.page_props or {}).get("game")
+            fetch_seconds = time.monotonic() - fetch_started
+        log_entry = downgrade_crawl_log_if_no_content(
+            dataclasses.asdict(client.crawl_log[-1]), content_ok=game is not None,
+        )
+    elif cache_hit:
+        # A cache hit never touches the network client, so synthesize a
+        # crawl_log entry so this match is marked "done" for cross-environment
+        # resumability (layer 2), not just this process's raw-HTML cache.
+        log_entry = dict(
+            run_id=run_id, timestamp=_now_iso(), stage="acta_partido",
+            entity_type="match_acta", entity_id=match_id, source_url=source_url,
+            http_status=None, success=True, retry_count=0,
+            parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
+            message="served_from_raw_cache",
+        )
+
+    parsed = None
+    if game is not None:
+        parsed = parse_acta_partido(
+            game, match_id=match_id, home_team_id=row["home_team_id"],
+            away_team_id=row["away_team_id"], source_url=source_url,
+        )
+
+    return match_id, log_entry, parsed, fetch_seconds
+
+
+def run_acta_enrichment(
+    settings: Settings,
+    scope_category: str | None = None,
+    force_refetch: bool | None = None,
+    workers: int | None = None,
+) -> dict:
     if not settings.enrichment.fetch_acta_partido:
         raise RuntimeError(
             "enrichment.fetch_acta_partido is false in config - refusing to crawl "
@@ -246,12 +325,14 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
     cfg = settings.enrichment.acta_partido
     scope_category = scope_category or cfg.scope_category
     force_refetch = cfg.force_refetch if force_refetch is None else force_refetch
+    workers = cfg.workers if workers is None else workers
     season_label = settings.target.season_label
 
     acta_settings = dataclasses.replace(
         settings,
         network=dataclasses.replace(settings.network, rate_limit_seconds=cfg.rate_limit_seconds),
     )
+    # Main-thread client: used only for run_id and (in workers=1 path) actual fetches.
     client = RffmClient(acta_settings)
 
     targets = _load_targets(settings, scope_category)
@@ -284,8 +365,10 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
     remaining = targets[~targets["match_id"].isin(done_ids)].reset_index(drop=True)
 
     logger.info(
-        "acta-partido enrichment: %d targets total, %d already done, %d remaining (season=%s category=%s)",
-        len(targets), len(already_done_this_scope), len(remaining), season_label, scope_category,
+        "acta-partido enrichment: %d targets total, %d already done, %d remaining "
+        "(season=%s category=%s workers=%d)",
+        len(targets), len(already_done_this_scope), len(remaining),
+        season_label, scope_category, workers,
     )
 
     progress = Progress(_progress_path(settings, season_label, scope_category), scope_category, len(targets))
@@ -297,98 +380,113 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
     pending_crawl_log_rows: list[dict] = []
     all_warnings: list[dict] = []
     flush_count = 0
+    items_since_flush = 0
 
-    for i, (_, row) in enumerate(remaining.iterrows(), start=1):
-        match_id = row["match_id"]
-        row_season_label = row["season"]
-        category = row["category"]
-        raw_path = _raw_path(settings, category, row_season_label, match_id)
-        source_url = f"{settings.site.base_url}{settings.site.pages.acta_partido}/{match_id}"
-
-        game = None
-        cache_hit = False
-        if raw_path.exists() and not force_refetch:
-            cached_html = raw_path.read_text(encoding="utf-8")
-            page_props = extract_next_data(cached_html)
-            game = (page_props or {}).get("game")
-            if game is not None:
-                progress.skipped_cached += 1
-                cache_hit = True
-            else:
-                logger.warning("Cached acta file unparseable, will refetch: %s", raw_path)
-
-        if game is None:
-            # Reaches here both on a cold cache and on a cache-read that
-            # failed to yield a usable "game" object - either way, fetch
-            # fresh. This also records a real crawl_log entry via `client`.
-            fetch_started = time.monotonic()
-            result = fetch_acta_partido(
-                client, acta_settings, season_id=row["season_id"], competicion=row["competition_id"],
-                grupo=row["group_id"], match_id=match_id,
-            )
-            if result.ok and result.raw_html:
-                atomic_write_text(raw_path, result.raw_html)
-                game = (result.page_props or {}).get("game")
-                progress.record_fetch(time.monotonic() - fetch_started)
-            log_entry = downgrade_crawl_log_if_no_content(
-                dataclasses.asdict(client.crawl_log[-1]), content_ok=game is not None,
+    if workers == 1:
+        # Serial path: identical to the original loop, uses the main-thread client.
+        local = threading.local()
+        local.client = client
+        for _, row in remaining.iterrows():
+            match_id, log_entry, parsed, fetch_seconds = _fetch_one_match(
+                row, settings, acta_settings, local, client.run_id, force_refetch,
             )
             pending_crawl_log_rows.append(log_entry)
-        elif cache_hit:
-            # A cache hit never touches the network client, so it never
-            # produces a crawl_log entry on its own - synthesize one so this
-            # match is correctly marked "done" for future/other-environment
-            # resumability (layer 2), not just this process's raw-HTML cache.
-            pending_crawl_log_rows.append(dict(
-                run_id=client.run_id, timestamp=_now_iso(), stage="acta_partido",
-                entity_type="match_acta", entity_id=match_id, source_url=source_url,
-                http_status=None, success=True, retry_count=0,
-                parser_type="html_next_data_cached", raw_saved_path=str(raw_path),
-                message="served_from_raw_cache",
-            ))
-
-        progress.completed += 1
-        progress.last_item_processed = match_id
-
-        if game is None:
-            progress.failed += 1
-        else:
-            done_ids.add(match_id)
-            parsed = parse_acta_partido(
-                game, match_id=match_id, home_team_id=row["home_team_id"],
-                away_team_id=row["away_team_id"], source_url=source_url,
-            )
-            batches["lineups"].extend(parsed["lineups"])
-            batches["goals"].extend(parsed["goals"])
-            batches["cards"].extend(parsed["cards"])
-            batches["staff"].extend(parsed["staff"])
-            batches["officials"].extend(parsed["officials"])
-            all_warnings.extend(parsed["warnings"])
-
-        if progress.completed % cfg.progress_report_every == 0:
-            progress.write()
-            logger.info(
-                "acta-partido progress: %d/%d (cached=%d fresh=%d failed=%d)",
-                progress.completed, progress.total_targets, progress.skipped_cached,
-                progress.freshly_fetched_ok, progress.failed,
-            )
-
-        if i % cfg.csv_flush_every == 0:
-            _flush_batch(processed, scope_category, batches, pending_crawl_log_rows)
-            progress.write()
-            upsert_coverage_manifest(
-                settings.processed_root, season=season_label, season_id=season_id,
-                category_base=scope_category, stage="acta_partido", status="partial",
-                targets_total=len(target_match_ids), targets_completed=progress.completed,
-                targets_failed=progress.failed, started_at=started_at,
-            )
-            flush_count += 1
-            if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
-                git_push_progress(
-                    _PUSH_BRANCH,
-                    f"rffm-crawl checkpoint: acta_partido {scope_category} "
-                    f"({progress.completed}/{progress.total_targets})",
+            progress.completed += 1
+            progress.last_item_processed = match_id
+            if parsed is None:
+                progress.failed += 1
+            else:
+                if fetch_seconds > 0:
+                    progress.record_fetch(fetch_seconds)
+                done_ids.add(match_id)
+                batches["lineups"].extend(parsed["lineups"])
+                batches["goals"].extend(parsed["goals"])
+                batches["cards"].extend(parsed["cards"])
+                batches["staff"].extend(parsed["staff"])
+                batches["officials"].extend(parsed["officials"])
+                all_warnings.extend(parsed["warnings"])
+            items_since_flush += 1
+            if progress.completed % cfg.progress_report_every == 0:
+                progress.write()
+                logger.info(
+                    "acta-partido progress: %d/%d (cached=%d fresh=%d failed=%d)",
+                    progress.completed, progress.total_targets, progress.skipped_cached,
+                    progress.freshly_fetched_ok, progress.failed,
                 )
+            if items_since_flush >= cfg.csv_flush_every:
+                _flush_batch(processed, scope_category, batches, pending_crawl_log_rows)
+                progress.write()
+                upsert_coverage_manifest(
+                    settings.processed_root, season=season_label, season_id=season_id,
+                    category_base=scope_category, stage="acta_partido", status="partial",
+                    targets_total=len(target_match_ids), targets_completed=progress.completed,
+                    targets_failed=progress.failed, started_at=started_at,
+                )
+                items_since_flush = 0
+                flush_count += 1
+                if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
+                    git_push_progress(
+                        _PUSH_BRANCH,
+                        f"rffm-crawl checkpoint: acta_partido {scope_category} "
+                        f"({progress.completed}/{progress.total_targets})",
+                    )
+    else:
+        # Parallel path: one worker per in-flight match, results collected and
+        # merged in the main thread so _flush_batch / progress / git_push stay
+        # single-threaded. Each thread gets its own RffmClient (via
+        # threading.local) so rate-limit buckets are fully independent.
+        local = threading.local()
+        rows_list = [row for _, row in remaining.iterrows()]
+
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="rffm-acta") as executor:
+            futures = {
+                executor.submit(_fetch_one_match, row, settings, acta_settings, local, client.run_id, force_refetch): row
+                for row in rows_list
+            }
+            for future in as_completed(futures):
+                match_id, log_entry, parsed, fetch_seconds = future.result()
+                pending_crawl_log_rows.append(log_entry)
+                progress.completed += 1
+                progress.last_item_processed = match_id
+                if parsed is None:
+                    progress.failed += 1
+                else:
+                    if fetch_seconds > 0:
+                        progress.record_fetch(fetch_seconds)
+                    else:
+                        progress.skipped_cached += 1
+                    done_ids.add(match_id)
+                    batches["lineups"].extend(parsed["lineups"])
+                    batches["goals"].extend(parsed["goals"])
+                    batches["cards"].extend(parsed["cards"])
+                    batches["staff"].extend(parsed["staff"])
+                    batches["officials"].extend(parsed["officials"])
+                    all_warnings.extend(parsed["warnings"])
+                items_since_flush += 1
+                if progress.completed % cfg.progress_report_every == 0:
+                    progress.write()
+                    logger.info(
+                        "acta-partido progress: %d/%d (cached=%d fresh=%d failed=%d)",
+                        progress.completed, progress.total_targets, progress.skipped_cached,
+                        progress.freshly_fetched_ok, progress.failed,
+                    )
+                if items_since_flush >= cfg.csv_flush_every:
+                    _flush_batch(processed, scope_category, batches, pending_crawl_log_rows)
+                    progress.write()
+                    upsert_coverage_manifest(
+                        settings.processed_root, season=season_label, season_id=season_id,
+                        category_base=scope_category, stage="acta_partido", status="partial",
+                        targets_total=len(target_match_ids), targets_completed=progress.completed,
+                        targets_failed=progress.failed, started_at=started_at,
+                    )
+                    items_since_flush = 0
+                    flush_count += 1
+                    if _PUSH_BRANCH and flush_count % _PUSH_EVERY_N_FLUSHES == 0:
+                        git_push_progress(
+                            _PUSH_BRANCH,
+                            f"rffm-crawl checkpoint: acta_partido {scope_category} "
+                            f"({progress.completed}/{progress.total_targets})",
+                        )
 
     # Final flush - runs even if `remaining` was empty (everything already
     # done in a previous run/environment) or shorter than one full batch.
