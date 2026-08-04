@@ -95,13 +95,16 @@ logger = logging.getLogger("rffm_scraper.acta_pipeline")
 _PUSH_BRANCH = os.environ.get("RFFM_GIT_PUSH_BRANCH")
 _PUSH_EVERY_N_FLUSHES = 5
 
-# (batch dict key, output filename, pydantic model, validate_rows label)
+# (batch dict key, subdir, filename template, pydantic model, validate_rows label)
+# Files are written to processed/<subdir>/<scope_category>.csv so each
+# category's data stays in its own file (avoids the >100 MB GitHub limit
+# that a single match_lineups.csv hits once several categories are combined).
 _OUTPUT_TABLES = [
-    ("lineups", "match_lineups.csv", MatchLineupEntry, "match_lineup"),
-    ("goals", "match_goals.csv", MatchGoalEvent, "match_goal"),
-    ("cards", "match_cards.csv", MatchCardEvent, "match_card"),
-    ("staff", "match_staff.csv", MatchStaff, "match_staff"),
-    ("officials", "match_officials.csv", MatchOfficial, "match_official"),
+    ("lineups", "match_lineups", MatchLineupEntry, "match_lineup"),
+    ("goals", "match_goals", MatchGoalEvent, "match_goal"),
+    ("cards", "match_cards", MatchCardEvent, "match_card"),
+    ("staff", "match_staff", MatchStaff, "match_staff"),
+    ("officials", "match_officials", MatchOfficial, "match_official"),
 ]
 
 
@@ -190,35 +193,37 @@ def _progress_path(settings: Settings, season_label: str, scope_category: str):
 # against the dtype=str id columns in matches_df/targets ("You are trying to
 # merge on int64 and str columns") - caught by the verification dry run.
 _ID_COLUMNS = {
-    "match_lineups.csv": ["match_id", "team_id", "player_id"],
-    "match_goals.csv": ["match_id", "team_id", "player_id"],
-    "match_cards.csv": ["match_id", "team_id", "player_id"],
+    "match_lineups": ["match_id", "team_id", "player_id"],
+    "match_goals": ["match_id", "team_id", "player_id"],
+    "match_cards": ["match_id", "team_id", "player_id"],
 }
 
 
-def _reread_table(processed, filename: str) -> pd.DataFrame:
+def _reread_table(processed, subdir: str, scope_category: str) -> pd.DataFrame:
     """Read a fully-consolidated output table back from disk for the
     end-of-run quality-check pass - the in-memory batch lists only hold
     *this run's* newly-processed rows once a run has resumed past a
     previous partial run, so quality checks (which need the full picture)
     must read the merged-on-disk state instead."""
-    path = processed / filename
+    path = processed / subdir / f"{scope_category}.csv"
     if not path.exists():
         return pd.DataFrame()
-    id_cols = _ID_COLUMNS.get(filename)
+    id_cols = _ID_COLUMNS.get(subdir)
     dtype = {col: str for col in id_cols} if id_cols else None
     return pd.read_csv(path, dtype=dtype)
 
 
-def _flush_batch(processed, batches: dict[str, list[dict]], crawl_log_rows: list[dict]) -> None:
+def _flush_batch(processed, scope_category: str, batches: dict[str, list[dict]], crawl_log_rows: list[dict]) -> None:
     """Merge one batch's accumulated rows into each output CSV + the crawl
     log, atomically. Clears the batch lists in place so callers can keep
     reusing the same dict/list objects across the whole run."""
-    for key, filename, model_cls, label in _OUTPUT_TABLES:
+    for key, subdir, model_cls, label in _OUTPUT_TABLES:
         rows = batches[key]
         if rows:
             df = pd.DataFrame(validate_rows(model_cls, rows, label))
-            append_or_write_csv(df, processed / filename)
+            out_path = processed / subdir / f"{scope_category}.csv"
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            append_or_write_csv(df, out_path)
             rows.clear()
 
     if crawl_log_rows:
@@ -258,17 +263,17 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
         )
 
     # Resumability source of truth: the UNION of (a) crawl-log successes and
-    # (b) match_ids already present in match_lineups.csv. (a) alone catches
-    # a match that legitimately produced zero lineup rows (which (b) can't
-    # tell apart from "never attempted"); (b) alone catches matches whose
-    # data is already fully committed but whose crawl_log entry predates
+    # (b) match_ids already present in match_lineups/<scope>.csv. (a) alone
+    # catches a match that legitimately produced zero lineup rows (which (b)
+    # can't tell apart from "never attempted"); (b) alone catches matches
+    # whose data is already fully committed but whose crawl_log entry predates
     # this batched design (older runs only logged *fresh* fetches, never
     # cache hits, so an old crawl_log can under-count relative to what's
-    # actually in match_lineups.csv) - relying on (a) alone in that case
-    # would re-fetch-from-cache and duplicate already-committed rows via
+    # actually in match_lineups/<scope>.csv) - relying on (a) alone in that
+    # case would re-fetch-from-cache and duplicate already-committed rows via
     # append_or_write_csv. Together they're safe against both failure modes.
     done_ids: set[str] = already_done_ids(processed / "acta_crawl_log.csv", entity_type="match_acta")
-    lineups_path = processed / "match_lineups.csv"
+    lineups_path = processed / "match_lineups" / f"{scope_category}.csv"
     if lineups_path.exists():
         done_ids |= set(pd.read_csv(lineups_path, usecols=["match_id"], dtype=str)["match_id"].dropna())
     already_done_this_scope = done_ids & set(target_match_ids)
@@ -365,7 +370,7 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
             )
 
         if i % cfg.csv_flush_every == 0:
-            _flush_batch(processed, batches, pending_crawl_log_rows)
+            _flush_batch(processed, scope_category, batches, pending_crawl_log_rows)
             progress.write()
             upsert_coverage_manifest(
                 settings.processed_root, season=season_label, season_id=season_id,
@@ -383,7 +388,7 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
 
     # Final flush - runs even if `remaining` was empty (everything already
     # done in a previous run/environment) or shorter than one full batch.
-    _flush_batch(processed, batches, pending_crawl_log_rows)
+    _flush_batch(processed, scope_category, batches, pending_crawl_log_rows)
     progress.write()
     if _PUSH_BRANCH:
         git_push_progress(
@@ -401,9 +406,9 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
         targets_failed=len(missing), started_at=started_at, completed_at=_now_iso(),
     )
 
-    lineups_df = _reread_table(processed, "match_lineups.csv")
-    goals_df = _reread_table(processed, "match_goals.csv")
-    cards_df = _reread_table(processed, "match_cards.csv")
+    lineups_df = _reread_table(processed, "match_lineups", scope_category)
+    goals_df = _reread_table(processed, "match_goals", scope_category)
+    cards_df = _reread_table(processed, "match_cards", scope_category)
 
     quality_issues = run_acta_quality_checks(
         lineups_df, goals_df, cards_df, targets, set(target_match_ids), all_warnings,

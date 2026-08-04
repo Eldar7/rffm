@@ -169,7 +169,6 @@ class MatchLineupEntry(Row):
     match_id: str
     team_id: str
     player_id: str
-    player_name_raw: str
     jersey_number: Optional[int]
     is_starter: Optional[bool]
     is_substitute: Optional[bool]
@@ -178,34 +177,26 @@ class MatchLineupEntry(Row):
     position_raw: Optional[str]
     position_abbr_raw: Optional[str]
     sex_raw: Optional[str]
-    source_url: str
-    scraped_at: str
 
 
 class MatchGoalEvent(Row):
     match_id: str
     team_id: str
     player_id: Optional[str]
-    player_name_raw: str
     minute: Optional[int]
     minute_raw: Optional[str]
     goal_type_raw: Optional[str]
-    source_url: str
-    scraped_at: str
 
 
 class MatchCardEvent(Row):
     match_id: str
     team_id: str
     player_id: Optional[str]
-    player_name_raw: str
     minute: Optional[int]
     minute_raw: Optional[str]
     card_type_raw: Optional[str]
     card_type_label: Optional[str]
     is_second_yellow: Optional[bool]
-    source_url: str
-    scraped_at: str
 
 
 class MatchStaff(Row):
@@ -215,8 +206,6 @@ class MatchStaff(Row):
     role_raw: str
     person_id: Optional[str]
     person_name: str
-    source_url: str
-    scraped_at: str
 
 
 class MatchOfficial(Row):
@@ -225,8 +214,6 @@ class MatchOfficial(Row):
     official_id: Optional[str]
     official_name: str
     role_raw: str
-    source_url: str
-    scraped_at: str
 
 
 class Player(Row):

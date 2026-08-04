@@ -4,7 +4,7 @@
 Off by default - robots.txt disallows /fichajugador/. Requires
 `enrichment.fetch_fichajugador: true` in config.yaml as an explicit,
 informed opt-in (checked again here as a second guard). Reads targets from
-output/processed/rffm/match_lineups.csv, produced by `python enrich_acta.py`
+output/processed/rffm/<season>/match_lineups/<category>.csv, produced by `python enrich_acta.py`
 - run that first.
 
 Usage:
