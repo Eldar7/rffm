@@ -125,8 +125,8 @@ def run_club_enrichment(settings: Settings, force_refetch: bool | None = None) -
     remaining = [tid for tid in target_team_ids if tid not in done_ids]
 
     logger.info(
-        "clubs enrichment: %d targets total, %d already done, %d remaining",
-        len(target_team_ids), len(already_done), len(remaining),
+        "clubs enrichment: %d targets total, %d already done, %d remaining (season=%s)",
+        len(target_team_ids), len(already_done), len(remaining), season_label,
     )
 
     progress = Progress(_progress_path(settings, season_label), season_label, len(target_team_ids))

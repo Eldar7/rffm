@@ -169,8 +169,8 @@ def run_player_enrichment(settings: Settings, scope_category: str | None = None,
     remaining = [pid for pid in target_player_ids if pid not in done_ids]
 
     logger.info(
-        "fichajugador enrichment: %d targets total, %d already done, %d remaining (scope=%s)",
-        len(target_player_ids), len(already_done_this_scope), len(remaining), scope_category,
+        "fichajugador enrichment: %d targets total, %d already done, %d remaining (season=%s scope=%s)",
+        len(target_player_ids), len(already_done_this_scope), len(remaining), season_label, scope_category,
     )
 
     progress = Progress(_progress_path(settings, season_label, scope_category), scope_category, len(target_player_ids))

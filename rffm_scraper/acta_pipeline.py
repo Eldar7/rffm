@@ -280,8 +280,8 @@ def run_acta_enrichment(settings: Settings, scope_category: str | None = None, f
     remaining = targets[~targets["match_id"].isin(done_ids)].reset_index(drop=True)
 
     logger.info(
-        "acta-partido enrichment: %d targets total, %d already done, %d remaining (category=%s)",
-        len(targets), len(already_done_this_scope), len(remaining), scope_category,
+        "acta-partido enrichment: %d targets total, %d already done, %d remaining (season=%s category=%s)",
+        len(targets), len(already_done_this_scope), len(remaining), season_label, scope_category,
     )
 
     progress = Progress(_progress_path(settings, season_label, scope_category), scope_category, len(targets))
