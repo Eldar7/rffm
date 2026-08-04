@@ -45,6 +45,22 @@ on:
         required: false
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      season_label:
+        required: true
+        type: string
+      stage:
+        required: true
+        type: string
+      scope_category:
+        required: false
+        type: string
+        default: ""
+      all_categories:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -58,6 +74,8 @@ concurrency:
 jobs:
   crawl:
     runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.run_branch.outputs.branch }}
     # Bounded well under GitHub's 6h hosted-runner ceiling. If a season's
     # full target list can't be finished in one job, the batched/atomic
     # flush design (row_io.append_or_write_csv, coverage_manifest.csv)
@@ -148,7 +166,10 @@ jobs:
           RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: python3 enrich_clubs.py --log-level INFO
 
-      - name: Commit and push updated processed data
+      - name: Commit and push to run branch
+        # Runs even on failure/cancel so whatever was collected gets pushed.
+        # Merge into main is a separate job below so a cancel of THIS job
+        # (runner timeout) cannot interrupt the merge step.
         if: always()
         env:
           RUN_BRANCH: ${{ steps.run_branch.outputs.branch }}
@@ -189,31 +210,53 @@ jobs:
             git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${scope_desc} (final)"
           fi
 
-          # Push whatever's here to this run's OWN branch first. Periodic
-          # checkpoints during the run (if any) already pushed most of this
-          # same branch, so this is normally a small fast-forward; retried
-          # only to absorb a transient network blip, never a real conflict
-          # (nothing else writes to a run-dedicated branch).
-          pushed_branch=false
           for attempt in 1 2 3 4 5; do
             if git push origin "HEAD:$RUN_BRANCH"; then
               echo "Pushed $RUN_BRANCH on attempt $attempt."
-              pushed_branch=true
-              break
+              exit 0
             fi
             sleep $((attempt * 5))
           done
-          if [ "$pushed_branch" != "true" ]; then
-            echo "::error::Failed to push $RUN_BRANCH after retries - crawl output NOT pushed anywhere."
-            exit 1
+          echo "::error::Failed to push $RUN_BRANCH after retries - crawl output NOT pushed anywhere."
+          exit 1
+
+  merge-to-main:
+    # Separate job so a cancel/timeout of the crawl job cannot interrupt this.
+    # always() ensures it runs even when the crawl job was cancelled — that is
+    # exactly the scenario where it matters most: partial data on the run
+    # branch that must reach main before the next crawl run starts fresh.
+    runs-on: ubuntu-latest
+    needs: crawl
+    if: always()
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge run branch into main
+        env:
+          RUN_BRANCH: ${{ needs.crawl.outputs.branch }}
+        run: |
+          git config user.name "rffm-crawl-bot"
+          git config user.email "actions@github.com"
+
+          if [ -z "$RUN_BRANCH" ]; then
+            echo "No run branch recorded (crawl job never started). Nothing to merge."
+            exit 0
           fi
 
-          # Fold this run's branch into main. This DOES need fetch/rebase/
-          # retry, since main moves independently of any one run's branch
-          # (other stages/dispatches, or a direct push). If it can't be
-          # resolved automatically, the run's data is still safe on
-          # $RUN_BRANCH regardless - this step failing means "merge
-          # manually", never "data lost".
+          # Fetch the run branch — it may have periodic checkpoint commits
+          # from git_push_progress as well as the final commit above.
+          git fetch origin "$RUN_BRANCH" || {
+            echo "Run branch $RUN_BRANCH not found on remote (nothing was pushed). Nothing to merge."
+            exit 0
+          }
+
+          git checkout "origin/$RUN_BRANCH" -b merge-work
+
           for attempt in 1 2 3 4 5; do
             git fetch origin main
             if ! git rebase origin/main; then

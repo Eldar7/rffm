@@ -1,0 +1,90 @@
+name: RFFM crawl-all (orchestrator)
+run-name: "crawl-all: ${{ inputs.dry_run && 'dry-run' || 'live' }}"
+
+# Self-chaining orchestrator: runs one crawl step at a time by calling
+# rffm-crawl.yml via workflow_call (synchronous), then re-dispatches itself
+# for the next step. Each "link" in the chain covers exactly one stage
+# (≤5h), so the 6h job timeout is never an issue.
+#
+# Chain is safe to interrupt at any point — next_crawl_step.py reads
+# coverage_manifest.csv on every start and skips already-complete steps,
+# so re-dispatching manually continues exactly where it stopped.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the next step without actually running it"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write   # needed to dispatch itself (gh workflow run)
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330   # 5m headroom over the child's 300m limit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compute next step
+        id: next
+        run: |
+          pip install pandas --quiet
+          output=$(python .github/scripts/next_crawl_step.py)
+          if [ -z "$output" ]; then
+            echo "All steps complete — nothing left to crawl."
+            echo "done=true" >> "$GITHUB_OUTPUT"
+          else
+            IFS='|' read -r season stage scope all_cat <<< "$output"
+            echo "season=$season"   >> "$GITHUB_OUTPUT"
+            echo "stage=$stage"     >> "$GITHUB_OUTPUT"
+            echo "scope=$scope"     >> "$GITHUB_OUTPUT"
+            echo "all_categories=$all_cat" >> "$GITHUB_OUTPUT"
+            echo "done=false"       >> "$GITHUB_OUTPUT"
+            echo "Next: season=$season stage=$stage scope=${scope:-ALL} all_categories=$all_cat"
+          fi
+
+      - name: Run crawl step
+        if: steps.next.outputs.done == 'false' && inputs.dry_run != true
+        id: crawl
+        continue-on-error: true
+        uses: ./.github/workflows/rffm-crawl.yml
+        with:
+          season_label:   ${{ steps.next.outputs.season }}
+          stage:          ${{ steps.next.outputs.stage }}
+          scope_category: ${{ steps.next.outputs.scope }}
+          all_categories: ${{ steps.next.outputs.all_categories == 'true' }}
+
+      - name: Chain — dispatch next run
+        # Always dispatch (even if the crawl step failed/was cancelled) so the
+        # chain continues. next_crawl_step.py will re-queue whatever is still
+        # partial or missing. Only skip when there is nothing left (done=true)
+        # or this is a dry run.
+        if: steps.next.outputs.done == 'false' && inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for attempt in 1 2 3; do
+            if gh workflow run crawl-all.yml \
+              --repo "$GITHUB_REPOSITORY" \
+              --ref "$GITHUB_REF_NAME" \
+              --field dry_run=false; then
+              echo "Dispatched next crawl-all run (attempt $attempt)."
+              exit 0
+            fi
+            echo "Dispatch attempt $attempt failed, retrying..."
+            sleep $((attempt * 10))
+          done
+          echo "::error::Failed to dispatch next crawl-all run after 3 attempts. Re-run this workflow manually to continue."
+          exit 1

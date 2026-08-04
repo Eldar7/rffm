@@ -144,6 +144,83 @@ category-scoped to begin with).
 - After a job ends: `coverage_manifest.csv`, updated only by that job's
   flushes/final commit.
 
+## Bulk orchestration (`crawl-all.yml`)
+
+`crawl-all.yml` runs the entire backfill plan — all seasons, all stages, all
+categories — as a self-chaining sequence of `rffm-crawl.yml` invocations.
+It is the right tool when you want to "crawl everything and walk away."
+
+### How it works
+
+1. `crawl-all` runs. It installs pandas, calls
+   `.github/scripts/next_crawl_step.py`, which reads `coverage_manifest.csv`
+   and returns the next incomplete step from the hardcoded plan (see below).
+2. It calls `rffm-crawl.yml` via `workflow_call` (synchronous — this runner
+   blocks until the child finishes, including its `merge-to-main` job).
+3. Once the child finishes (regardless of success/failure/cancel), it
+   dispatches a **new** `crawl-all` run via `gh workflow run` and exits.
+4. The new run repeats from step 1 — picks the next uncovered step —
+   forming a self-sustaining chain until `next_crawl_step.py` exits 1
+   ("all done").
+
+Each link of the chain runs one crawl stage (≤ 5h), so the 6h job limit
+is never hit. The chain is safe to interrupt at any time: re-dispatch
+`crawl-all` manually and it continues from exactly where it stopped (the
+manifest is the single source of truth, not any runner-local state).
+
+### The plan
+
+Ordered newest-to-oldest, full sequence per season:
+
+```
+core (--all-categories) → clubs → acta_partido × 10 categories → fichajugador × 10 categories
+```
+
+Categories in priority order: BENJAMIN, PREBENJAMIN, ALEVIN, INFANTIL,
+CADETE, JUVENIL, AFICIONADO, SENIOR, VETERANOS, UNIVERSITARIO. OTHER
+(cup/copa competitions) is excluded — no meaningful acta/fichajugador data.
+
+Seasons with only BENJAMIN+PREBENJAMIN in `groups.csv` (crawled before
+`--all-categories` existed) are flagged for core re-crawl automatically
+by `next_crawl_step.py` — it detects the narrow category set and omits
+those core rows from "done", forcing a full re-crawl with `--all-categories`
+before any enrichment for the new categories is attempted.
+
+### Running it
+
+**Dry-run first** (prints the next step, does nothing):
+> Actions → "RFFM crawl-all (orchestrator)" → Run workflow → `dry_run=true`
+
+**Live run:**
+> Actions → "RFFM crawl-all (orchestrator)" → Run workflow → `dry_run=false`
+
+To stop the chain: simply don't re-dispatch after the current run finishes,
+or cancel the currently-running `crawl-all`. The chain has no daemon process
+— each link is an independent workflow run that ends cleanly.
+
+### Error handling
+
+- **Child `rffm-crawl` failed or cancelled**: `continue-on-error: true` on
+  the call step means the dispatch still fires. The child's `merge-to-main`
+  job (separate runner, `if: always()`) ensures partial data reached main
+  before the next run starts. `next_crawl_step.py` will re-queue the same
+  step since the manifest row is still `partial` or missing.
+- **Dispatch step itself failed** (API flake): 3 retries with backoff. If
+  all fail, the chain stops with an explicit error — re-dispatch manually.
+- **All done**: `next_crawl_step.py` exits 1, `crawl-all` skips the crawl
+  and dispatch steps and exits cleanly.
+
+### Two-job structure of `rffm-crawl.yml`
+
+`rffm-crawl.yml` now has two jobs:
+
+- **`crawl`**: runs the pipeline, commits and pushes to the run-branch
+  (`if: always()` so a timeout/cancel still pushes whatever was collected).
+- **`merge-to-main`**: separate runner, `needs: crawl`, `if: always()`.
+  Fetches the run-branch and rebases it onto main. Runs even when `crawl`
+  was cancelled — this is the key guarantee that partial progress from a
+  timed-out run reaches main before the next run does a fresh checkout.
+
 ## Experimental local parallel core crawl
 
 `main.py` is sequential by default (`--workers 1`) and the GitHub Actions
