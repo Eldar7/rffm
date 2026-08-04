@@ -54,6 +54,8 @@ jobs:
           if [ -z "$output" ]; then
             echo "All steps complete — nothing left to crawl."
             echo "done=true" >> "$GITHUB_OUTPUT"
+            echo "## crawl-all: done" >> "$GITHUB_STEP_SUMMARY"
+            echo "All steps complete — nothing left to crawl." >> "$GITHUB_STEP_SUMMARY"
           else
             IFS='|' read -r season stage scope all_cat <<< "$output"
             echo "season=$season"          >> "$GITHUB_OUTPUT"
@@ -62,6 +64,15 @@ jobs:
             echo "all_categories=$all_cat" >> "$GITHUB_OUTPUT"
             echo "done=false"              >> "$GITHUB_OUTPUT"
             echo "Next: season=$season stage=$stage scope=${scope:-ALL} all_categories=$all_cat"
+            {
+              echo "## crawl-all: $stage $season / ${scope:-ALL}"
+              echo "| field | value |"
+              echo "|---|---|"
+              echo "| season | \`$season\` |"
+              echo "| stage | \`$stage\` |"
+              echo "| scope | \`${scope:-ALL}\` |"
+              echo "| all_categories | \`$all_cat\` |"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
   run-crawl:
