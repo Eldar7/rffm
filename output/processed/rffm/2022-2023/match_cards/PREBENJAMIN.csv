@@ -1,0 +1,12 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+1670935,555336,165578,"BAENA LOZANO, ALEJANDRO",16,16,100,amarilla,False,https://www.rffm.es/acta-partido/1670935,2026-08-04T23:05:05.701816+00:00
+1670972,555336,165578,"BAENA LOZANO, ALEJANDRO",999,999,101,roja,False,https://www.rffm.es/acta-partido/1670972,2026-08-04T23:05:11.774684+00:00
+1670865,2740045,20173794,"GARCIA CARRETERO, CARLOS",30,30,100,amarilla,False,https://www.rffm.es/acta-partido/1670865,2026-08-04T23:05:32.066469+00:00
+1671267,344793,11917773,"RUIZ MUÑOZ, JUAN JOSE",31,31,100,amarilla,False,https://www.rffm.es/acta-partido/1671267,2026-08-04T23:06:04.090919+00:00
+1671308,605,16886321,"MUÑOZ MALDONADO, SERGIO",18,18,101,roja,False,https://www.rffm.es/acta-partido/1671308,2026-08-04T23:06:09.594096+00:00
+1671326,1782,16271728,"SÁEZ MANZANO, IVÁN",33,33,100,amarilla,False,https://www.rffm.es/acta-partido/1671326,2026-08-04T23:06:13.182906+00:00
+1671378,3068,14878556,"RAMOS CARRETERO, FRANCISCO",999,999,100,amarilla,False,https://www.rffm.es/acta-partido/1671378,2026-08-04T23:06:21.081364+00:00
+1671458,680622,16180462,"SANCHEZ PARDO, ALEJANDRO",38,38,100,amarilla,False,https://www.rffm.es/acta-partido/1671458,2026-08-04T23:06:34.956098+00:00
+1671610,344714,2740633,"JORGE JIMENEZ, BORJA",26,26,100,amarilla,False,https://www.rffm.es/acta-partido/1671610,2026-08-04T23:06:56.987196+00:00
+1671707,417686,16512343,"RAYA-DEMIDOFF VALENCIA, ALVARO",32,32,101,roja,False,https://www.rffm.es/acta-partido/1671707,2026-08-04T23:07:10.182461+00:00
+1694391,4934959,16117002,"OLMEDO FRETES, EDUARDO ANDRES",27,27,101,roja,False,https://www.rffm.es/acta-partido/1694391,2026-08-04T23:07:20.129400+00:00
