@@ -104,7 +104,9 @@ here (see "Checking progress" below).
   deliberate, add one once this has run cleanly a few times).
 - **Inputs**: `season_label` (free text, must exist in the site's
   `/api/seasons`), `stage` (`core`/`acta_partido`/`fichajugador`/`clubs`),
-  `scope_category` (free text, ignored for `core`).
+  `scope_category` (free text, ignored for `core`), `workers` (integer,
+  default 0 = use `config.yaml` value; ignored for `core`). Currently
+  `config.yaml` defaults all three enrichment stages to `workers: 8`.
 - `permissions: contents: write` for the final push via the default
   `GITHUB_TOKEN` — no extra secrets.
 - `concurrency` grouped on `(season_label, stage)`, `cancel-in-progress: false`
@@ -135,6 +137,17 @@ interrupted run. Widening an already-`core`'d season to a new category:
 skip straight to `acta_partido`/`fichajugador` with the new
 `scope_category` (`clubs` needs no re-dispatch - it was never
 category-scoped to begin with).
+
+**Parallel workers for enrichment stages:** `acta_partido`, `fichajugador`,
+and `clubs` all support parallel HTTP workers (`config.yaml`'s
+`*.workers`, CLI `--workers N`, or the `rffm-crawl.yml` `workers` input).
+Each worker gets its own `RffmClient` and independent rate-limit bucket, so
+`workers=8` with `rate_limit_seconds=1.25` yields ~6 req/s vs ~0.8 req/s
+serial. Empirically: 7 942 PREBENJAMIN matches (2022-2023) completed in
+~22 min at 8 workers vs ~2.8 h serial; a 20 k-match category like INFANTIL
+should fit in ~55 min. `crawl-all.yml` uses the config default (currently 8)
+without needing any change. Set `workers: 1` in config (or `--workers 1`)
+to revert to serial if you suspect a rate-limiting issue.
 
 **Checking progress:**
 - Live, while a job runs: Actions tab → the running job → expand the crawl
