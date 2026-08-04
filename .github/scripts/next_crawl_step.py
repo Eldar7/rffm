@@ -101,11 +101,14 @@ def manifest_scope(step: dict) -> str:
 
 
 def main() -> int:
+    plan = build_plan()
     done = load_done()
-    for step in build_plan():
+    total = len(plan)
+    done_count = sum(1 for s in plan if (s["season"], s["stage"], manifest_scope(s)) in done)
+    for step in plan:
         key = (step["season"], step["stage"], manifest_scope(step))
         if key not in done:
-            print(f"{step['season']}|{step['stage']}|{step['scope']}|{str(step['all_categories']).lower()}")
+            print(f"{step['season']}|{step['stage']}|{step['scope']}|{str(step['all_categories']).lower()}|{done_count}|{total}")
             return 0
     return 1
 

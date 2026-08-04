@@ -57,21 +57,22 @@ jobs:
             echo "## crawl-all: done" >> "$GITHUB_STEP_SUMMARY"
             echo "All steps complete — nothing left to crawl." >> "$GITHUB_STEP_SUMMARY"
           else
-            IFS='|' read -r season stage scope all_cat <<< "$output"
+            IFS='|' read -r season stage scope all_cat done_count total_count <<< "$output"
             echo "season=$season"          >> "$GITHUB_OUTPUT"
             echo "stage=$stage"            >> "$GITHUB_OUTPUT"
             echo "scope=$scope"            >> "$GITHUB_OUTPUT"
             echo "all_categories=$all_cat" >> "$GITHUB_OUTPUT"
             echo "done=false"              >> "$GITHUB_OUTPUT"
-            echo "Next: season=$season stage=$stage scope=${scope:-ALL} all_categories=$all_cat"
+            echo "Next: season=$season stage=$stage scope=${scope:-ALL} all_categories=$all_cat ($done_count/$total_count steps done)"
             {
-              echo "## crawl-all: $stage $season / ${scope:-ALL}"
+              echo "## crawl-all: $stage $season / ${scope:-ALL} ($done_count/$total_count)"
               echo "| field | value |"
               echo "|---|---|"
               echo "| season | \`$season\` |"
               echo "| stage | \`$stage\` |"
               echo "| scope | \`${scope:-ALL}\` |"
               echo "| all_categories | \`$all_cat\` |"
+              echo "| progress | \`$done_count / $total_count steps\` |"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 

@@ -52,8 +52,15 @@ def append_or_write_csv(new_rows_df: pd.DataFrame, path: pathlib.Path) -> None:
     csv_flush_every is set to), not once per row, so it stays cheap.
     """
     if path.exists():
-        existing_df = pd.read_csv(path, dtype=str, keep_default_na=True)
-        combined = pd.concat([existing_df, new_rows_df], ignore_index=True)
+        try:
+            existing_df = pd.read_csv(path, dtype=str, keep_default_na=True)
+            combined = pd.concat([existing_df, new_rows_df], ignore_index=True)
+        except (pd.errors.EmptyDataError, pd.errors.ParserError):
+            # File exists but is empty or corrupt (e.g. a 0-byte file written
+            # when all rows failed validation in a previous run). Treat as
+            # non-existent and overwrite with the new data.
+            logger.warning("Existing CSV at %s is empty/unreadable — overwriting", path)
+            combined = new_rows_df
     else:
         combined = new_rows_df
     write_csv(combined, path)

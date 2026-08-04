@@ -220,16 +220,20 @@ def _flush_batch(processed, scope_category: str, batches: dict[str, list[dict]],
     for key, subdir, model_cls, label in _OUTPUT_TABLES:
         rows = batches[key]
         if rows:
-            df = pd.DataFrame(validate_rows(model_cls, rows, label))
-            out_path = processed / subdir / f"{scope_category}.csv"
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            append_or_write_csv(df, out_path)
+            validated = validate_rows(model_cls, rows, label)
             rows.clear()
+            if validated:
+                df = pd.DataFrame(validated)
+                out_path = processed / subdir / f"{scope_category}.csv"
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                append_or_write_csv(df, out_path)
 
     if crawl_log_rows:
-        log_df = pd.DataFrame(validate_rows(CrawlLogEntry, crawl_log_rows, "acta_crawl_log"))
-        append_or_write_csv(log_df, processed / "acta_crawl_log.csv")
+        validated_log = validate_rows(CrawlLogEntry, crawl_log_rows, "acta_crawl_log")
         crawl_log_rows.clear()
+        if validated_log:
+            log_df = pd.DataFrame(validated_log)
+            append_or_write_csv(log_df, processed / "acta_crawl_log.csv")
 
 
 def run_acta_enrichment(settings: Settings, scope_category: str | None = None, force_refetch: bool | None = None) -> dict:

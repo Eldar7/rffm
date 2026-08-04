@@ -115,14 +115,18 @@ def _flush_batch(processed, batches: dict[str, list[dict]], crawl_log_rows: list
     for key, filename, model_cls, label in _OUTPUT_TABLES:
         rows = batches[key]
         if rows:
-            df = pd.DataFrame(validate_rows(model_cls, rows, label))
-            append_or_write_csv(df, processed / filename)
+            validated = validate_rows(model_cls, rows, label)
             rows.clear()
+            if validated:
+                df = pd.DataFrame(validated)
+                append_or_write_csv(df, processed / filename)
 
     if crawl_log_rows:
-        log_df = pd.DataFrame(validate_rows(CrawlLogEntry, crawl_log_rows, "fichajugador_crawl_log"))
-        append_or_write_csv(log_df, processed / "fichajugador_crawl_log.csv")
+        validated_log = validate_rows(CrawlLogEntry, crawl_log_rows, "fichajugador_crawl_log")
         crawl_log_rows.clear()
+        if validated_log:
+            log_df = pd.DataFrame(validated_log)
+            append_or_write_csv(log_df, processed / "fichajugador_crawl_log.csv")
 
 
 def run_player_enrichment(settings: Settings, scope_category: str | None = None, force_refetch: bool | None = None) -> dict:
