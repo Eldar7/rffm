@@ -106,7 +106,8 @@ def already_done_ids(crawl_log_path: pathlib.Path, entity_type: str | None = Non
 _COVERAGE_MANIFEST_COLUMNS = [
     "season", "season_id", "category_base", "stage", "status",
     "targets_total", "targets_completed", "targets_failed",
-    "started_at", "last_updated_at", "completed_at", "notes",
+    "started_at", "last_updated_at", "completed_at",
+    "gh_run_id", "gh_run_branch", "notes",
 ]
 
 
@@ -155,6 +156,8 @@ def upsert_coverage_manifest(
         started_at=started_at,
         last_updated_at=_now_iso(),
         completed_at=completed_at or "",
+        gh_run_id=os.environ.get("GITHUB_RUN_ID", ""),
+        gh_run_branch=os.environ.get("RFFM_GIT_PUSH_BRANCH", ""),
         notes=notes,
     )
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)

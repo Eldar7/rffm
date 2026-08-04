@@ -1,4 +1,5 @@
 name: RFFM crawl
+run-name: "${{ inputs.stage }} ${{ inputs.season_label }} / ${{ inputs.stage == 'core' && (inputs.all_categories && 'ALL' || 'priority') || inputs.scope_category }}"
 
 # Manually-dispatched crawl job for any stage. Deliberately dispatch-only for
 # now (no `schedule:` trigger yet) - add a cron once this has been watched
@@ -120,6 +121,8 @@ jobs:
 
       - name: Run core crawl
         if: inputs.stage == 'core'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: |
           if [ "${{ inputs.all_categories }}" = "true" ]; then
             python3 main.py --all-categories --log-level INFO
@@ -141,6 +144,8 @@ jobs:
 
       - name: Run clubs enrichment
         if: inputs.stage == 'clubs'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: python3 enrich_clubs.py --log-level INFO
 
       - name: Commit and push updated processed data
