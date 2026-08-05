@@ -60,9 +60,9 @@ def main(argv=None) -> int:
     if args.all_categories:
         settings.target.crawl_all_categories = True
     logging.getLogger("rffm_scraper").info(
-        "Starting RFFM crawl: season=%s categories=%s all_categories=%s",
-        settings.target.season_label, settings.target.category_priority,
-        settings.target.crawl_all_categories,
+        "Starting RFFM crawl: season=%s categories=%s",
+        settings.target.season_label,
+        "ALL" if settings.target.crawl_all_categories else settings.target.category_priority,
     )
     summary = run_pipeline(
         settings,
