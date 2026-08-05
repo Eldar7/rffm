@@ -20,7 +20,7 @@ MANIFEST_PATH = "output/processed/rffm/coverage_manifest.csv"
 # Enrichment categories in priority order (OTHER skipped — cup/copa competitions
 # have no meaningful acta/fichajugador data worth crawling at scale).
 ENRICH_CATEGORIES = [
-    "BENJAMIN", "PREBENJAMIN", "ALEVIN", "INFANTIL",
+    "PREBENJAMIN", "BENJAMIN", "ALEVIN", "INFANTIL",
     "CADETE", "JUVENIL", "AFICIONADO", "SENIOR", "VETERANOS", "UNIVERSITARIO",
 ]
 
