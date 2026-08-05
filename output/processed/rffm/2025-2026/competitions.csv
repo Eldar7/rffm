@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2025-2026,21,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,COPA RFEF FASE AUTONOMICA,24206667,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=21&tipojuego=1,2026-08-02T23:46:15.486979+00:00
 2025-2026,21,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,FINAL COPA RFEF FASE AUTONÓMICA,24605960,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=21&tipojuego=1,2026-08-02T23:46:23.951922+00:00
 2025-2026,21,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY OFF TERCERA FEDERACION,26665407,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=21&tipojuego=1,2026-08-02T23:46:26.181042+00:00
@@ -245,5 +245,5 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2025-2026,21,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,BENJAMIN FEMENINO FS,24038097,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=21&tipojuego=3,2026-08-03T00:38:52.537591+00:00
 2025-2026,21,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,COPA BENJAMIN FEMENINO -fase de grupos- FS,25695516,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=21&tipojuego=3,2026-08-03T00:38:54.377970+00:00
 2025-2026,21,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,COPA BENJAMIN FEMENINO -fase final- FS ,26688373,phase fase final,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=21&tipojuego=3,2026-08-03T00:38:58.673118+00:00
-2025-2026,21,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,24037891,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=21&tipojuego=4,2026-08-03T00:39:01.202753+00:00
-2025-2026,21,OTHER,DEBUTANTE,False,OTHER,FIESTA DE LOS DEBUTANTES,26697697,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=21&tipojuego=4,2026-08-03T00:39:33.392245+00:00
+2025-2026,21,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,24037891,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=21&tipojuego=4,2026-08-03T00:39:01.202753+00:00
+2025-2026,21,DEBUTANTE,DEBUTANTE,False,OTHER,FIESTA DE LOS DEBUTANTES,26697697,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=21&tipojuego=4,2026-08-03T00:39:33.392245+00:00

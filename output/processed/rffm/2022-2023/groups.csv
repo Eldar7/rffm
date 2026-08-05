@@ -1,4 +1,4 @@
-season,season_id,category,competition,competition_id,group,group_id,group_label_raw,subgroup_label,source_url,scraped_at
+﻿season,season_id,category,competition,competition_id,group,group_id,group_label_raw,subgroup_label,source_url,scraped_at
 2022-2023,18,OTHER,FINAL COPA RFEF FASE AUTONÓMICA,15567824,FINAL,15567850,FINAL,,https://www.rffm.es/api/groups?competicion=15567824,2026-08-05T00:47:20.329292+00:00
 2022-2023,18,OTHER,PLAY OFF TERCERA RFEF,17080551,ELIMINATORIA A IDA,17080638,ELIMINATORIA A IDA,,https://www.rffm.es/api/groups?competicion=17080551,2026-08-05T00:47:20.330324+00:00
 2022-2023,18,OTHER,PLAY OFF TERCERA RFEF,17080551,ELIMINATORIA B IDA,17080655,ELIMINATORIA B IDA,,https://www.rffm.es/api/groups?competicion=17080551,2026-08-05T00:47:20.331397+00:00
@@ -860,21 +860,21 @@ season,season_id,category,competition,competition_id,group,group_id,group_label_
 2022-2023,18,ALEVIN,Copa alevín femenina - F.S.,19245941,Eliminatorias,19214112,Eliminatorias,,https://www.rffm.es/api/groups?competicion=19245941,2026-08-05T00:54:27.514055+00:00
 2022-2023,18,BENJAMIN,Benjamín Femenina - F.S.,19202929,Grupo Unico,19171100,Grupo Unico,,https://www.rffm.es/api/groups?competicion=19202929,2026-08-05T00:54:27.637001+00:00
 2022-2023,18,BENJAMIN,Copa Benjamín Femenina - F.S.,19247316,Grupo unico,19215487,Grupo unico,,https://www.rffm.es/api/groups?competicion=19247316,2026-08-05T00:54:27.645345+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 1,15293081,Grupo 1,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:27.870364+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 3,15293083,Grupo 3,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:28.258529+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 4,15293084,Grupo 4,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:28.268714+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 5,15293085,Grupo 5,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.020003+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 7,15293086,Grupo 7,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.354642+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 8,15293087,Grupo 8,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.615876+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 9,15293088,Grupo 9,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.693947+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 10,15293089,Grupo 10,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.047568+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 11,15293090,Grupo 11,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.218443+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 12,16666448,Grupo 12,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.224702+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 13,16666450,Grupo 13,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.353797+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 14,16666464,Grupo 14,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.989633+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 15,16666463,Grupo 15,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.762443+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 16,16666470,Grupo 16,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.794546+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 17,16666478,Grupo 17,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.844862+00:00
-2022-2023,18,OTHER,DEBUTANTE,15293080,Grupo 18,16666480,Grupo 18,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.870178+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 1,15293081,Grupo 1,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:27.870364+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 3,15293083,Grupo 3,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:28.258529+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 4,15293084,Grupo 4,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:28.268714+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 5,15293085,Grupo 5,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.020003+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 7,15293086,Grupo 7,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.354642+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 8,15293087,Grupo 8,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.615876+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 9,15293088,Grupo 9,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:29.693947+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 10,15293089,Grupo 10,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.047568+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 11,15293090,Grupo 11,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.218443+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 12,16666448,Grupo 12,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.224702+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 13,16666450,Grupo 13,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.353797+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 14,16666464,Grupo 14,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:30.989633+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 15,16666463,Grupo 15,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.762443+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 16,16666470,Grupo 16,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.794546+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 17,16666478,Grupo 17,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.844862+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,15293080,Grupo 18,16666480,Grupo 18,,https://www.rffm.es/api/groups?competicion=15293080,2026-08-05T00:54:31.870178+00:00
 2022-2023,18,AFICIONADO,FUTBOL PLAYA - COPA MASCULINA ABSOLUTA,17135294,TRIANGULAR,17135295,TRIANGULAR,,https://www.rffm.es/api/groups?competicion=17135294,2026-08-05T00:54:31.901773+00:00
 2022-2023,18,AFICIONADO,I COPA RFFM. DE FUTBOL PLAYA AFICIONADO MASCULINO,15293859,Final,15293884,Final,,https://www.rffm.es/api/groups?competicion=15293859,2026-08-05T00:54:32.003651+00:00

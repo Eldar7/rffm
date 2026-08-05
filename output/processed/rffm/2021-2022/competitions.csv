@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2021-2022,17,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,COPA R.F.F.M. ,13570964,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=17&tipojuego=1,2026-08-05T01:00:19.549277+00:00
 2021-2022,17,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,FINAL COPA R.F.F.M.,13798603,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=17&tipojuego=1,2026-08-05T01:00:19.551039+00:00
 2021-2022,17,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY OFF TERCERA RFEF,15251445,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=17&tipojuego=1,2026-08-05T01:00:19.551421+00:00
@@ -152,4 +152,4 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2021-2022,17,ALEVIN,ALEVIN FEMENINO SALA,True,OTHER,TORNEO ALEVIN FEMENINO GETAFE - F.S.,19054102,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=17&tipojuego=3,2026-08-05T01:07:27.998051+00:00
 2021-2022,17,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,Benjamín Femenina - F.S.,19027127,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=17&tipojuego=3,2026-08-05T01:07:28.633102+00:00
 2021-2022,17,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,Copa Benjamín Femenina - F.S.,19053458,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=17&tipojuego=3,2026-08-05T01:07:29.867953+00:00
-2021-2022,17,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,13564949,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=17&tipojuego=4,2026-08-05T01:07:30.005921+00:00
+2021-2022,17,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,13564949,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=17&tipojuego=4,2026-08-05T01:07:30.005921+00:00

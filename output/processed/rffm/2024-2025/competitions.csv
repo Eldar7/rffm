@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2024-2025,20,OTHER,SEGUNDA FEDERACION,False,SEGUNDA,COPA RFEF FASE AUTONÓMICA,21661439,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=20&tipojuego=1,2026-08-02T22:38:12.529831+00:00
 2024-2025,20,OTHER,SEGUNDA FEDERACION,False,SEGUNDA,FINAL COPA RFEF FASE AUTONÓMICA,21911601,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=20&tipojuego=1,2026-08-02T22:38:12.531580+00:00
 2024-2025,20,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY OFF TERCERA FEDERACION,23970451,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=20&tipojuego=1,2026-08-02T22:38:12.532881+00:00
@@ -84,7 +84,7 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2024-2025,20,PREBENJAMIN,PREBENJAMIN,False,PRIMERA,SEGUNDA FASE PRIMERA PREBENJAMIN,23648104,phase segunda fase,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:05.830010+00:00
 2024-2025,20,PREBENJAMIN,PREBENJAMIN,False,PRIMERA,SEGUNDA FASE T. CAMPEONES PRIMERA PREBENJAMIN,24014705,playoff SEGUNDA FASE,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:28.524329+00:00
 2024-2025,20,PREBENJAMIN,PREBENJAMIN,False,PRIMERA,TORNEO DE CAMPEONES PRIMERA PREBENJAMIN,24003637,playoff,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:29.231040+00:00
-2024-2025,20,OTHER,DEBUTANTE,False,OTHER,III FIESTA DEL FÚTBOL DEBUTANTE,23974109,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:34.036687+00:00
+2024-2025,20,DEBUTANTE,DEBUTANTE,False,OTHER,III FIESTA DEL FÚTBOL DEBUTANTE,23974109,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:34.036687+00:00
 2024-2025,20,SENIOR,PRIMERA FEMENINO SENIOR F-7,True,PRIMERA,AFICIONADO - JUVENIL FEMENINO SENIOR F-7 SIERRA OESTE,23094647,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:38.110857+00:00
 2024-2025,20,SENIOR,PRIMERA FEMENINO SENIOR F-7,True,PRIMERA,PRIMERA FEMENINO SENIOR F-7,21434290,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:38.112429+00:00
 2024-2025,20,CADETE,CADETE F-7 FEMENINO,True,OTHER,CADETE F-7 FEMENINO,21970741,regular_season,Futbol-7,2,https://www.rffm.es/api/competitions?temporada=20&tipojuego=2,2026-08-02T22:42:38.125559+00:00
@@ -219,6 +219,6 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2024-2025,20,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,BENJAMIN FEMENINO FS,21434282,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=20&tipojuego=3,2026-08-02T22:43:53.613811+00:00
 2024-2025,20,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,COPA BENJAMIN FEMENINO FS ,23954156,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=20&tipojuego=3,2026-08-02T22:43:53.615377+00:00
 2024-2025,20,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,COPA BENJAMIN FEMENINO FS -Fase final-,24011501,phase fase final,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=20&tipojuego=3,2026-08-02T22:43:54.044669+00:00
-2024-2025,20,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,21434080,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:43:54.461801+00:00
-2024-2025,20,OTHER,DEBUTANTE,False,SEGUNDA,SEGUNDA FASE DEBUTANTE,23873341,phase segunda fase,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:43:57.646296+00:00
-2024-2025,20,OTHER,DEBUTANTE,False,OTHER,TORNEO DEBUTANTE NAVIDAD 2024,23474206,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:44:01.332083+00:00
+2024-2025,20,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,21434080,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:43:54.461801+00:00
+2024-2025,20,DEBUTANTE,DEBUTANTE,False,SEGUNDA,SEGUNDA FASE DEBUTANTE,23873341,phase segunda fase,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:43:57.646296+00:00
+2024-2025,20,DEBUTANTE,DEBUTANTE,False,OTHER,TORNEO DEBUTANTE NAVIDAD 2024,23474206,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=20&tipojuego=4,2026-08-02T22:44:01.332083+00:00

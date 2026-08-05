@@ -137,14 +137,15 @@ combinations are actually enriched vs. core-only.
 Matched via `rffm_scraper.normalize.classify_age_category` against a fixed
 vocabulary (`AGE_CATEGORY_VOCABULARY`), substring-matched most-specific
 first (`PREBENJAMIN` before `BENJAMIN`, since the former contains the
-latter): `PREBENJAMIN, BENJAMIN, ALEVIN, INFANTIL, CADETE, JUVENIL,
-VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER`.
+latter): `DEBUTANTE, PREBENJAMIN, BENJAMIN, ALEVIN, INFANTIL, CADETE,
+JUVENIL, VETERANOS, UNIVERSITARIO, AFICIONADO, SENIOR`. No match → `OTHER`.
 
 Typical ages (RFEF standard — boundaries are approximate and can vary by
 competition or season):
 
 | `category_base` | Typical age | Birth years (2026–27) |
 |---|---|---|
+| `DEBUTANTE` | 4–5 (pre-Prebenjamín) | 2021–2022 |
 | `PREBENJAMIN` | 6–7 | 2019–2020 |
 | `BENJAMIN` | 8–9 | 2017–2018 |
 | `ALEVIN` | 10–11 | 2015–2016 |
@@ -227,7 +228,7 @@ tier — a real, common case, not a parsing gap). **Tier ordering and full
 A handful of RFFM's 93 2025-2026 categories carry no age word at all —
 mostly senior/adult federation-tier leagues (`TERCERA FEDERACION`, `SEGUNDA
 DIVISIÓN B DE FÚTBOL SALA`, `TERCERA DIVISIÓN DE FÚTBOL SALA`) or leisure
-formats (`FUTBOL ANDANDO F-7` — walking football, `DEBUTANTE`, `FASE ZONAL
+formats (`FUTBOL ANDANDO F-7` — walking football, `FASE ZONAL
 7`/`FASE ZONAL SALA` — a zonal qualifying phase, age unclear) or
 gender-only labels missing an age word entirely (`PREFERENTE FEMENINO
 SALA`, `PREFERENTE FUTBOL FEMENINO`, `PRIMERA FUTBOL FEMENINO`, `PRIMERA

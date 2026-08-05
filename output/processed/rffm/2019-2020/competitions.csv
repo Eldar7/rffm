@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2019-2020,15,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,COPA R.F.F.M. - 3ª DIVISION,10667458,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=15&tipojuego=1,2026-08-05T01:23:54.872429+00:00
 2019-2020,15,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,COPA R.F.F.M. - 3ª DIVISION - FINAL,10723181,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=15&tipojuego=1,2026-08-05T01:23:54.874413+00:00
 2019-2020,15,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY-OFF DE ASCENSO A 2ª DIVISION B,12234409,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=15&tipojuego=1,2026-08-05T01:23:54.875388+00:00
@@ -67,4 +67,4 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2019-2020,15,CADETE,CADETE FEMENINO SALA,True,OTHER,Cadete Femenina - F.S.,18570199,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=15&tipojuego=3,2026-08-05T01:27:00.311818+00:00
 2019-2020,15,INFANTIL,INFANTIL FEMENINO SALA,True,OTHER,Infantil femenina - F.S.,18570200,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=15&tipojuego=3,2026-08-05T01:27:02.465267+00:00
 2019-2020,15,ALEVIN,ALEVIN FEMENINO SALA,True,OTHER,Alevín Femenina - F.S.,18570201,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=15&tipojuego=3,2026-08-05T01:27:03.054609+00:00
-2019-2020,15,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,10724197,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=15&tipojuego=4,2026-08-05T01:27:03.570332+00:00
+2019-2020,15,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,10724197,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=15&tipojuego=4,2026-08-05T01:27:03.570332+00:00

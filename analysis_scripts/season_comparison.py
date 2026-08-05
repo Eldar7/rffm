@@ -21,10 +21,11 @@ SEASONS = sorted(
 )
 
 CAT_ORDER = [
-    "PREBENJAMIN", "BENJAMIN", "ALEVIN", "INFANTIL", "CADETE",
+  "DEBUTANTE", "PREBENJAMIN", "BENJAMIN", "ALEVIN", "INFANTIL", "CADETE",
     "JUVENIL", "AFICIONADO", "SENIOR", "UNIVERSITARIO", "VETERANOS", "OTHER",
 ]
 CAT_LABELS = {
+  "DEBUTANTE": "Debutante",
     "PREBENJAMIN": "Prebenjamín", "BENJAMIN": "Benjamín", "ALEVIN": "Alevín",
     "INFANTIL": "Infantil", "CADETE": "Cadete", "JUVENIL": "Juvenil",
     "AFICIONADO": "Aficionado", "SENIOR": "Sénior",

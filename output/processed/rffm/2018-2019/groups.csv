@@ -1,4 +1,4 @@
-season,season_id,category,competition,competition_id,group,group_id,group_label_raw,subgroup_label,source_url,scraped_at
+﻿season,season_id,category,competition,competition_id,group,group_id,group_label_raw,subgroup_label,source_url,scraped_at
 2018-2019,14,OTHER,COPA R.F.F.M. 3ª DIVISION,9015896,Grupo 1,9035765,Grupo 1,,https://www.rffm.es/api/groups?competicion=9015896,2026-08-05T01:33:44.217037+00:00
 2018-2019,14,OTHER,COPA R.F.F.M. 3ª DIVISION,9015896,Grupo 2,9035766,Grupo 2,,https://www.rffm.es/api/groups?competicion=9015896,2026-08-05T01:33:44.217947+00:00
 2018-2019,14,OTHER,COPA R.F.F.M. 3ª DIVISION - FINAL,9052313,FINAL COPA RFFM 3º DIVISION,9196588,FINAL COPA RFFM 3º DIVISION,,https://www.rffm.es/api/groups?competicion=9052313,2026-08-05T01:33:44.219038+00:00
@@ -339,14 +339,14 @@ season,season_id,category,competition,competition_id,group,group_id,group_label_
 2018-2019,14,BENJAMIN,PRIMERA BENJAMIN F7 - TORNEO DE CAMPEONES,10638293,Grupo P,10655668,Grupo P,,https://www.rffm.es/api/groups?competicion=10638293,2026-08-05T01:37:23.774714+00:00
 2018-2019,14,BENJAMIN,PRIMERA BENJAMIN F7 - TORNEO DE CAMPEONES - 1º A 4º PUESTOS,10663031,Finales,10663058,Finales,,https://www.rffm.es/api/groups?competicion=10663031,2026-08-05T01:37:23.894443+00:00
 2018-2019,14,BENJAMIN,PRIMERA BENJAMIN F7 - TORNEO DE CAMPEONES - FASE FINAL,10638311,Fase Final,10638327,Fase Final,,https://www.rffm.es/api/groups?competicion=10638311,2026-08-05T01:37:24.650934+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo A,10658811,Grupo A,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:24.718805+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo B,10658915,Grupo B,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:24.953366+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo C,10658917,Grupo C,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:25.369901+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo D,10658921,Grupo D,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:25.453756+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo E,10658818,Grupo E,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.177227+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo F,10658925,Grupo F,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.308181+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo G,10658927,Grupo G,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.378548+00:00
-2018-2019,14,OTHER,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo H,10658928,Grupo H,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.557467+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo A,10658811,Grupo A,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:24.718805+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo B,10658915,Grupo B,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:24.953366+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo C,10658917,Grupo C,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:25.369901+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo D,10658921,Grupo D,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:25.453756+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo E,10658818,Grupo E,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.177227+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo F,10658925,Grupo F,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.308181+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo G,10658927,Grupo G,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.378548+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - FIN DE TEMPORADA,10658777,Grupo H,10658928,Grupo H,,https://www.rffm.es/api/groups?competicion=10658777,2026-08-05T01:37:26.557467+00:00
 2018-2019,14,INFANTIL,PREFERENTE FEMENINO INFANTIL F-7,9565752,Grupo 1,9585442,Grupo 1,,https://www.rffm.es/api/groups?competicion=9565752,2026-08-05T01:37:26.711405+00:00
 2018-2019,14,INFANTIL,PREFERENTE FEMENINO INFANTIL F-7 - TORNEO DE CAMPEONES,10570773,Grupo 1,10570794,Grupo 1,,https://www.rffm.es/api/groups?competicion=10570773,2026-08-05T01:37:27.512151+00:00
 2018-2019,14,UNIVERSITARIO,Liga Universitaria Fase Final Femenina - F.S.,18563032,"Semifinales, Tercer y Cuarto puesto y Final ",18531203,"Semifinales, Tercer y Cuarto puesto y Final ",,https://www.rffm.es/api/groups?competicion=18563032,2026-08-05T01:37:27.538357+00:00
@@ -418,10 +418,10 @@ season,season_id,category,competition,competition_id,group,group_id,group_label_
 2018-2019,14,ALEVIN,Copa Alevín Femenina Eliminatorias - F.S.,18568867,Semifinales y Final,18537041,Semifinales y Final,,https://www.rffm.es/api/groups?competicion=18568867,2026-08-05T01:37:55.606626+00:00
 2018-2019,14,ALEVIN,Copa Federación Alevín Femenina - F.S.,18566074,Grupo A,18534245,Grupo A,,https://www.rffm.es/api/groups?competicion=18566074,2026-08-05T01:37:55.896979+00:00
 2018-2019,14,ALEVIN,Copa Federación Alevín Femenina - F.S.,18566074,Grupo B,18534246,Grupo B,,https://www.rffm.es/api/groups?competicion=18566074,2026-08-05T01:37:56.463016+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 1,10505100,Grupo 1,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:56.601771+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 2,10423104,Grupo 2,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:56.777017+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 3,10423415,Grupo 3,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.178966+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 4,10423523,Grupo 4,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.222801+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 5,10562355,Grupo 5,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.230864+00:00
-2018-2019,14,OTHER,DEBUTANTE,10423037,Grupo 6,10424732,Grupo 6,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.256004+00:00
-2018-2019,14,OTHER,DEBUTANTE - DOS GRUPOS,10584050,Grupo 1,10584543,Grupo 1,,https://www.rffm.es/api/groups?competicion=10584050,2026-08-05T01:37:58.373180+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 1,10505100,Grupo 1,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:56.601771+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 2,10423104,Grupo 2,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:56.777017+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 3,10423415,Grupo 3,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.178966+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 4,10423523,Grupo 4,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.222801+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 5,10562355,Grupo 5,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.230864+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE,10423037,Grupo 6,10424732,Grupo 6,,https://www.rffm.es/api/groups?competicion=10423037,2026-08-05T01:37:58.256004+00:00
+2018-2019,14,DEBUTANTE,DEBUTANTE - DOS GRUPOS,10584050,Grupo 1,10584543,Grupo 1,,https://www.rffm.es/api/groups?competicion=10584050,2026-08-05T01:37:58.373180+00:00

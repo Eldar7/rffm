@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2022-2023,18,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,FINAL COPA RFEF FASE AUTONÓMICA,15567824,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=18&tipojuego=1,2026-08-05T00:47:20.329292+00:00
 2022-2023,18,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY OFF TERCERA RFEF,17080551,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=18&tipojuego=1,2026-08-05T00:47:20.330324+00:00
 2022-2023,18,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,TERCERA RFEF,15310343,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=18&tipojuego=1,2026-08-05T00:47:20.337511+00:00
@@ -143,6 +143,6 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2022-2023,18,ALEVIN,ALEVIN FEMENINO SALA,True,OTHER,Copa alevín femenina - F.S.,19245941,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=18&tipojuego=3,2026-08-05T00:54:27.514055+00:00
 2022-2023,18,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,Benjamín Femenina - F.S.,19202929,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=18&tipojuego=3,2026-08-05T00:54:27.637001+00:00
 2022-2023,18,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,Copa Benjamín Femenina - F.S.,19247316,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=18&tipojuego=3,2026-08-05T00:54:27.645345+00:00
-2022-2023,18,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,15293080,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=18&tipojuego=4,2026-08-05T00:54:27.870364+00:00
+2022-2023,18,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,15293080,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=18&tipojuego=4,2026-08-05T00:54:27.870364+00:00
 2022-2023,18,AFICIONADO,FUTBOL PLAYA AFICIONADO MASCULINO,False,OTHER,FUTBOL PLAYA - COPA MASCULINA ABSOLUTA,17135294,regular_season,Fútbol-Playa,5,https://www.rffm.es/api/competitions?temporada=18&tipojuego=5,2026-08-05T00:54:31.901773+00:00
 2022-2023,18,AFICIONADO,FUTBOL PLAYA AFICIONADO MASCULINO,False,OTHER,I COPA RFFM. DE FUTBOL PLAYA AFICIONADO MASCULINO,15293859,regular_season,Fútbol-Playa,5,https://www.rffm.es/api/competitions?temporada=18&tipojuego=5,2026-08-05T00:54:32.003651+00:00

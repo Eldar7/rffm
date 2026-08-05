@@ -1,4 +1,4 @@
-season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
+﻿season,season_id,category_base,category_label_raw,is_femenino,division_level,competition,competition_id,phase_label,game_type,game_type_id,source_url,scraped_at
 2023-2024,19,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,COPA R.F.E.F. FASE AUTONOMICA,17217772,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=19&tipojuego=1,2026-08-05T00:34:04.420327+00:00
 2023-2024,19,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,FINAL COPA RFEF FASE AUTONÓMICA,19526801,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=19&tipojuego=1,2026-08-05T00:34:04.422487+00:00
 2023-2024,19,OTHER,TERCERA FEDERACION,False,TERCERA FEDERACION,PLAY OFF TERCERA FEDERACION,21366920,regular_season,Futbol-11,1,https://www.rffm.es/api/competitions?temporada=19&tipojuego=1,2026-08-05T00:34:04.423569+00:00
@@ -199,5 +199,5 @@ season,season_id,category_base,category_label_raw,is_femenino,division_level,com
 2023-2024,19,ALEVIN,ALEVIN FEMENINO SALA,True,OTHER,Torneo alevin femenino fin de temporada - fase final -,21408059,phase fase final,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=19&tipojuego=3,2026-08-05T00:41:34.865075+00:00
 2023-2024,19,ALEVIN,ALEVIN FEMENINO SALA,True,OTHER,Torneo alevín femenino fin de temporada - fase grupos -,21345249,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=19&tipojuego=3,2026-08-05T00:41:35.639820+00:00
 2023-2024,19,BENJAMIN,BENJAMIN FEMENINO SALA,True,OTHER,Benjamín Femenina - F.S.,17145950,regular_season,Fútbol Sala,3,https://www.rffm.es/api/competitions?temporada=19&tipojuego=3,2026-08-05T00:41:36.904540+00:00
-2023-2024,19,OTHER,DEBUTANTE,False,OTHER,DEBUTANTE,17145766,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=19&tipojuego=4,2026-08-05T00:41:37.751289+00:00
-2023-2024,19,OTHER,DEBUTANTE,False,OTHER,FIESTA DEL FÚTBOL - DEBUTANTE,21414014,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=19&tipojuego=4,2026-08-05T00:41:41.546392+00:00
+2023-2024,19,DEBUTANTE,DEBUTANTE,False,OTHER,DEBUTANTE,17145766,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=19&tipojuego=4,2026-08-05T00:41:37.751289+00:00
+2023-2024,19,DEBUTANTE,DEBUTANTE,False,OTHER,FIESTA DEL FÚTBOL - DEBUTANTE,21414014,regular_season,Fútbol-5,4,https://www.rffm.es/api/competitions?temporada=19&tipojuego=4,2026-08-05T00:41:41.546392+00:00

@@ -50,6 +50,7 @@ def match_category_base(raw_label: str, category_priority: list[str]) -> str | N
 # word, which correctly fall through to OTHER below rather than being
 # guessed at).
 AGE_CATEGORY_VOCABULARY: list[tuple[str, str]] = [
+    ("DEBUTANTE", "DEBUTANTE"),
     ("PREBENJAMIN", "PREBENJAMIN"),
     ("BENJAMIN", "BENJAMIN"),
     ("ALEV", "ALEVIN"),  # stem, not "ALEVIN" - RFFM abbreviates as "ALEV-F7"/"ALEV.F-7" in some labels
