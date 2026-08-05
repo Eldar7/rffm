@@ -40,6 +40,12 @@ def has_result_mask(df: pd.DataFrame) -> pd.Series:
     return (hs != "") & (aw != "")
 
 
+def has_non_zero_score_mask(df: pd.DataFrame) -> pd.Series:
+    hs = pd.to_numeric(df["home_score"], errors="coerce")
+    aw = pd.to_numeric(df["away_score"], errors="coerce")
+    return hs.notna() & aw.notna() & ((hs != 0) | (aw != 0))
+
+
 def load_lineup_match_ids(season_dir: Path) -> set[str]:
     path = season_dir / "match_lineups" / "DEBUTANTE.csv"
     if not path.exists():
@@ -66,6 +72,35 @@ def club_appearances_from_matches(d: pd.DataFrame, teams: pd.DataFrame, season: 
     app = app.dropna(subset=["club_name_raw"])
     app["season"] = season
     return app[["season", "match_id", "tid", "club_name_raw"]]
+
+
+def summarize_clubs(apps: pd.DataFrame, matches_col: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+    by_season = (
+        apps.groupby(["season", "club_name_raw"])["match_id"]
+        .nunique()
+        .reset_index(name=matches_col)
+        .sort_values(["season", "club_name_raw"])
+    )
+
+    overall = (
+        apps.groupby("club_name_raw")
+        .agg(
+            **{
+                matches_col: ("match_id", "nunique"),
+                "seasons_count": ("season", "nunique"),
+            }
+        )
+        .reset_index()
+    )
+    season_list = (
+        apps.groupby("club_name_raw")["season"]
+        .apply(lambda s: ", ".join(sorted(set(s))))
+        .reset_index(name="seasons")
+    )
+    overall = overall.merge(season_list, on="club_name_raw", how="left")
+    overall = overall.sort_values([matches_col, "club_name_raw"], ascending=[False, True]).reset_index(drop=True)
+
+    return overall, by_season
 
 
 def build_matches_by_season() -> pd.DataFrame:
@@ -111,9 +146,11 @@ def build_debutante_quality_by_season() -> pd.DataFrame:
 
         d["match_id"] = d["match_id"].astype(str)
         has_result = has_result_mask(d)
+        has_non_zero = has_non_zero_score_mask(d)
         lineup_ids = load_lineup_match_ids(sdir)
         has_lineup = d["match_id"].isin(lineup_ids)
         has_both = has_result & has_lineup
+        true_play = has_result & has_lineup & has_non_zero
 
         rows.append(
             {
@@ -125,39 +162,14 @@ def build_debutante_quality_by_season() -> pd.DataFrame:
                 "with_lineup_pct": float(has_lineup.mean() * 100),
                 "with_result_and_lineup_count": int(has_both.sum()),
                 "with_result_and_lineup_pct": float(has_both.mean() * 100),
+                "with_non_zero_score_count": int(has_non_zero.sum()),
+                "with_non_zero_score_pct": float(has_non_zero.mean() * 100),
+                "true_play_count": int(true_play.sum()),
+                "true_play_pct": float(true_play.mean() * 100),
             }
         )
 
     return pd.DataFrame(rows).sort_values("season")
-
-
-def summarize_clubs(apps: pd.DataFrame, matches_col: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    by_season = (
-        apps.groupby(["season", "club_name_raw"])["match_id"]
-        .nunique()
-        .reset_index(name=matches_col)
-        .sort_values(["season", "club_name_raw"])
-    )
-
-    overall = (
-        apps.groupby("club_name_raw")
-        .agg(
-            **{
-                matches_col: ("match_id", "nunique"),
-                "seasons_count": ("season", "nunique"),
-            }
-        )
-        .reset_index()
-    )
-    season_list = (
-        apps.groupby("club_name_raw")["season"]
-        .apply(lambda s: ", ".join(sorted(set(s))))
-        .reset_index(name="seasons")
-    )
-    overall = overall.merge(season_list, on="club_name_raw", how="left")
-    overall = overall.sort_values([matches_col, "club_name_raw"], ascending=[False, True]).reset_index(drop=True)
-
-    return overall, by_season
 
 
 def build_clubs_all() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -183,7 +195,7 @@ def build_clubs_all() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def build_clubs_real_played() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Clubs with strictly evidenced matches (result and lineup present)."""
+    """Clubs with strict true-play matches: result+lineup and non-zero score."""
     all_rows = []
     for sdir in season_dirs():
         season = sdir.name
@@ -200,9 +212,10 @@ def build_clubs_real_played() -> tuple[pd.DataFrame, pd.DataFrame]:
 
         d["match_id"] = d["match_id"].astype(str)
         has_result = has_result_mask(d)
+        has_non_zero = has_non_zero_score_mask(d)
         lineup_ids = load_lineup_match_ids(sdir)
         has_lineup = d["match_id"].isin(lineup_ids)
-        d = d[has_result & has_lineup].copy()
+        d = d[has_result & has_lineup & has_non_zero].copy()
         if d.empty:
             continue
 
@@ -263,9 +276,10 @@ def build_2025_2026_best_real_team_by_club() -> tuple[pd.DataFrame, pd.DataFrame
     m = matches[matches["category"].fillna("").str.upper() == "DEBUTANTE"].copy()
     m["match_id"] = m["match_id"].astype(str)
     has_result = has_result_mask(m)
+    has_non_zero = has_non_zero_score_mask(m)
     lineup_ids = load_lineup_match_ids(base)
     has_lineup = m["match_id"].isin(lineup_ids)
-    m = m[has_result & has_lineup].copy()
+    m = m[has_result & has_lineup & has_non_zero].copy()
 
     return team_rank_from_matches(m, teams, "team_matches_real")
 
