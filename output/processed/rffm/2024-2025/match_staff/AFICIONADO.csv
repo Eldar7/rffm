@@ -47085,3 +47085,275 @@ match_id,team_id,role_kind,role_raw,person_id,person_name,source_url,scraped_at
 5304983,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5304983,2026-08-05T17:02:30.572025+00:00
 5304983,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5304983,2026-08-05T17:02:30.572025+00:00
 5304983,19434031.0,other_staff,ENCARGADO MATERIAL SALA,20419652,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5304983,2026-08-05T17:02:30.572025+00:00
+5304988,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5304988,2026-08-05T17:02:31.018952+00:00
+5304988,21756779.0,assistant_coach,assistant_coach,23741292,"DEL BARRIO HERRAIZ, MIGUEL",https://www.rffm.es/acta-partido/5304988,2026-08-05T17:02:31.018952+00:00
+5304985,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5304985,2026-08-05T17:02:31.023411+00:00
+5304991,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5304991,2026-08-05T17:02:31.436806+00:00
+5304991,20043450.0,team_delegate,team_delegate,,"TEIJEIRO PARGA, CRISTIAN",https://www.rffm.es/acta-partido/5304991,2026-08-05T17:02:31.436806+00:00
+5304991,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5304991,2026-08-05T17:02:31.436806+00:00
+5304991,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5304991,2026-08-05T17:02:31.436806+00:00
+5304987,21431285.0,head_coach,head_coach,3223065,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5304987,2026-08-05T17:02:31.540398+00:00
+5304987,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5304987,2026-08-05T17:02:31.540398+00:00
+5304990,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5304990,2026-08-05T17:02:31.618039+00:00
+5304990,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5304990,2026-08-05T17:02:31.618039+00:00
+5304986,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5304986,2026-08-05T17:02:31.915461+00:00
+5304986,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5304986,2026-08-05T17:02:31.915461+00:00
+5304994,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5304994,2026-08-05T17:02:32.119321+00:00
+5304994,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5304994,2026-08-05T17:02:32.119321+00:00
+5304994,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5304994,2026-08-05T17:02:32.119321+00:00
+5304993,19068165.0,other_staff,AUXILIAR SALA,23383679,"MENDES ANASAGASTI, JOSE MARIA",https://www.rffm.es/acta-partido/5304993,2026-08-05T17:02:32.269936+00:00
+5304993,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5304993,2026-08-05T17:02:32.269936+00:00
+5304997,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5304997,2026-08-05T17:02:32.313361+00:00
+5304997,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5304997,2026-08-05T17:02:32.313361+00:00
+5304997,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5304997,2026-08-05T17:02:32.313361+00:00
+5305000,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305000,2026-08-05T17:02:32.347220+00:00
+5305000,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5305000,2026-08-05T17:02:32.347220+00:00
+5305000,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5305000,2026-08-05T17:02:32.347220+00:00
+5305000,17145342.0,team_delegate,team_delegate,,"DE ALDAMA SAN JULIÁN, MANUEL",https://www.rffm.es/acta-partido/5305000,2026-08-05T17:02:32.347220+00:00
+5304995,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5304995,2026-08-05T17:02:32.651289+00:00
+5304995,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5304995,2026-08-05T17:02:32.651289+00:00
+5329876,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5329876,2026-08-05T17:02:32.773452+00:00
+5329876,21756779.0,other_staff,AUXILIAR SALA,22203797,"DE UÑA DE LA ROSA, JOSE LUIS",https://www.rffm.es/acta-partido/5329876,2026-08-05T17:02:32.773452+00:00
+5329876,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5329876,2026-08-05T17:02:32.773452+00:00
+5304998,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5304998,2026-08-05T17:02:32.886089+00:00
+5304998,21431285.0,team_delegate,team_delegate,,"GARCIA TROYA, ALEJANDRO",https://www.rffm.es/acta-partido/5304998,2026-08-05T17:02:32.886089+00:00
+5304998,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5304998,2026-08-05T17:02:32.886089+00:00
+5305005,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305005,2026-08-05T17:02:33.578910+00:00
+5305005,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5305005,2026-08-05T17:02:33.578910+00:00
+5305005,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5305005,2026-08-05T17:02:33.578910+00:00
+5305001,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5305001,2026-08-05T17:02:33.579242+00:00
+5305001,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5305001,2026-08-05T17:02:33.579242+00:00
+5305003,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5305003,2026-08-05T17:02:33.779724+00:00
+5305003,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5305003,2026-08-05T17:02:33.779724+00:00
+5305003,21431285.0,head_coach,head_coach,3223065,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5305003,2026-08-05T17:02:33.779724+00:00
+5305002,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5305002,2026-08-05T17:02:33.782486+00:00
+5305002,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5305002,2026-08-05T17:02:33.782486+00:00
+5305002,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5305002,2026-08-05T17:02:33.782486+00:00
+5305004,17145342.0,team_delegate,team_delegate,,"DE ALDAMA SAN JULIÁN, MANUEL",https://www.rffm.es/acta-partido/5305004,2026-08-05T17:02:33.789449+00:00
+5305004,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5305004,2026-08-05T17:02:33.789449+00:00
+5304999,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5304999,2026-08-05T17:02:33.827370+00:00
+5304999,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5304999,2026-08-05T17:02:33.827370+00:00
+5304999,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5304999,2026-08-05T17:02:33.827370+00:00
+5305010,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5305010,2026-08-05T17:02:33.992181+00:00
+5305010,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305010,2026-08-05T17:02:33.992181+00:00
+5305011,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5305011,2026-08-05T17:02:34.242377+00:00
+5305011,19068165.0,other_staff,AUXILIAR SALA,23383679,"MENDES ANASAGASTI, JOSE MARIA",https://www.rffm.es/acta-partido/5305011,2026-08-05T17:02:34.242377+00:00
+5305011,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5305011,2026-08-05T17:02:34.242377+00:00
+5305006,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5305006,2026-08-05T17:02:34.291347+00:00
+5305006,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5305006,2026-08-05T17:02:34.291347+00:00
+5304996,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5304996,2026-08-05T17:02:34.483860+00:00
+5304996,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5304996,2026-08-05T17:02:34.483860+00:00
+5305009,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5305009,2026-08-05T17:02:34.797083+00:00
+5305009,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5305009,2026-08-05T17:02:34.797083+00:00
+5305009,17145342.0,team_delegate,team_delegate,,"DE ALDAMA SAN JULIÁN, MANUEL",https://www.rffm.es/acta-partido/5305009,2026-08-05T17:02:34.797083+00:00
+5305012,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5305012,2026-08-05T17:02:34.813635+00:00
+5305012,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5305012,2026-08-05T17:02:34.813635+00:00
+5305012,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5305012,2026-08-05T17:02:34.813635+00:00
+5305012,20043450.0,team_delegate,team_delegate,,"TEIJEIRO PARGA, CRISTIAN",https://www.rffm.es/acta-partido/5305012,2026-08-05T17:02:34.813635+00:00
+5305007,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5305007,2026-08-05T17:02:34.818505+00:00
+5305007,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5305007,2026-08-05T17:02:34.818505+00:00
+5305008,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5305008,2026-08-05T17:02:34.819060+00:00
+5305008,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5305008,2026-08-05T17:02:34.819060+00:00
+5305008,19093658.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5305008,2026-08-05T17:02:34.819060+00:00
+5305017,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5305017,2026-08-05T17:02:34.947791+00:00
+5305017,19093658.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5305017,2026-08-05T17:02:34.947791+00:00
+5305013,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5305013,2026-08-05T17:02:35.944567+00:00
+5305013,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5305013,2026-08-05T17:02:35.944567+00:00
+5305013,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5305013,2026-08-05T17:02:35.944567+00:00
+5305020,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5305020,2026-08-05T17:02:35.996814+00:00
+5305020,21431285.0,team_delegate,team_delegate,,"GARCIA TROYA, ALEJANDRO",https://www.rffm.es/acta-partido/5305020,2026-08-05T17:02:35.996814+00:00
+5305020,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5305020,2026-08-05T17:02:35.996814+00:00
+5305019,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5305019,2026-08-05T17:02:36.010870+00:00
+5305019,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5305019,2026-08-05T17:02:36.010870+00:00
+5305019,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305019,2026-08-05T17:02:36.010870+00:00
+5305019,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5305019,2026-08-05T17:02:36.010870+00:00
+5305014,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305014,2026-08-05T17:02:36.192492+00:00
+5305014,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5305014,2026-08-05T17:02:36.192492+00:00
+5305014,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5305014,2026-08-05T17:02:36.192492+00:00
+5305018,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5305018,2026-08-05T17:02:36.205384+00:00
+5305018,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5305018,2026-08-05T17:02:36.205384+00:00
+5305021,19093658.0,head_coach,head_coach,19373961,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/5305021,2026-08-05T17:02:36.248982+00:00
+5305021,19093658.0,team_delegate,team_delegate,,"NISTAL GARCÍA, DAVID",https://www.rffm.es/acta-partido/5305021,2026-08-05T17:02:36.248982+00:00
+5305021,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5305021,2026-08-05T17:02:36.248982+00:00
+5305016,19068165.0,head_coach,head_coach,23369129,"FERNÁNDEZ GARCIA, JORGE",https://www.rffm.es/acta-partido/5305016,2026-08-05T17:02:36.399316+00:00
+5305022,17145342.0,head_coach,head_coach,22766384,"DE LAS HERAS ESTEBARANZ, DAVID",https://www.rffm.es/acta-partido/5305022,2026-08-05T17:02:36.799911+00:00
+5305022,17145342.0,team_delegate,team_delegate,,"DE ALDAMA SAN JULIÁN, MANUEL",https://www.rffm.es/acta-partido/5305022,2026-08-05T17:02:36.799911+00:00
+5305022,21756779.0,head_coach,head_coach,22074717,"JUAN JOSÉ SAYAGO, FERNANDO JAVIER",https://www.rffm.es/acta-partido/5305022,2026-08-05T17:02:36.799911+00:00
+5305023,19434031.0,head_coach,head_coach,22896836,"GONZÁLEZ POLO, JAVIER",https://www.rffm.es/acta-partido/5305023,2026-08-05T17:02:36.805448+00:00
+5305023,19434031.0,team_delegate,team_delegate,,"IGLESIAS HERNANDEZ, ALEJANDRO",https://www.rffm.es/acta-partido/5305023,2026-08-05T17:02:36.805448+00:00
+5305023,20043450.0,head_coach,head_coach,22753631,"PARADA ALVAREZ, JORGE",https://www.rffm.es/acta-partido/5305023,2026-08-05T17:02:36.805448+00:00
+5305029,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305029,2026-08-05T17:02:36.870757+00:00
+5305024,21421575.0,head_coach,head_coach,21349441,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5305024,2026-08-05T17:02:37.082962+00:00
+5305024,17145324.0,head_coach,head_coach,23833120,"LÓPEZ DURÁN, LUIS",https://www.rffm.es/acta-partido/5305024,2026-08-05T17:02:37.082962+00:00
+5305024,17145324.0,team_delegate,team_delegate,,"MARTIN SANCIPRIANO, JOSE MANUEL",https://www.rffm.es/acta-partido/5305024,2026-08-05T17:02:37.082962+00:00
+5305030,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305030,2026-08-05T17:02:37.087726+00:00
+5305027,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305027,2026-08-05T17:02:37.580112+00:00
+5305027,19824054.0,other_staff,AUXILIAR SALA,22434663,"MUÑANTE DUEÑAS, DANIEL MARCIAL",https://www.rffm.es/acta-partido/5305027,2026-08-05T17:02:37.580112+00:00
+5305027,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305027,2026-08-05T17:02:37.580112+00:00
+5305027,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305027,2026-08-05T17:02:37.580112+00:00
+5305025,18745502.0,head_coach,head_coach,22047802,"DURÁN ZAFRILLA, JORGE",https://www.rffm.es/acta-partido/5305025,2026-08-05T17:02:37.773911+00:00
+5305025,21431285.0,head_coach,head_coach,23285893,"ALONSO LORENZO, DIEGO",https://www.rffm.es/acta-partido/5305025,2026-08-05T17:02:37.773911+00:00
+5305028,19161617.0,head_coach,head_coach,22780607,"SANCHEZ HERNANDEZ, JESUS IGNACIO",https://www.rffm.es/acta-partido/5305028,2026-08-05T17:02:38.006940+00:00
+5305028,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305028,2026-08-05T17:02:38.006940+00:00
+5305033,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305033,2026-08-05T17:02:38.088439+00:00
+5305033,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305033,2026-08-05T17:02:38.088439+00:00
+5305033,19824054.0,other_staff,AUXILIAR SALA,22434663,"MUÑANTE DUEÑAS, DANIEL MARCIAL",https://www.rffm.es/acta-partido/5305033,2026-08-05T17:02:38.088439+00:00
+5324864,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5324864,2026-08-05T17:02:38.185612+00:00
+5324864,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5324864,2026-08-05T17:02:38.185612+00:00
+5324864,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5324864,2026-08-05T17:02:38.185612+00:00
+5305032,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305032,2026-08-05T17:02:38.718143+00:00
+5305032,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305032,2026-08-05T17:02:38.718143+00:00
+5305032,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305032,2026-08-05T17:02:38.718143+00:00
+5305032,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305032,2026-08-05T17:02:38.718143+00:00
+5305031,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305031,2026-08-05T17:02:38.734408+00:00
+5305034,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305034,2026-08-05T17:02:38.773111+00:00
+5305034,19161617.0,head_coach,head_coach,22780607,"SANCHEZ HERNANDEZ, JESUS IGNACIO",https://www.rffm.es/acta-partido/5305034,2026-08-05T17:02:38.773111+00:00
+5305038,19824054.0,other_staff,AUXILIAR SALA,22434663,"MUÑANTE DUEÑAS, DANIEL MARCIAL",https://www.rffm.es/acta-partido/5305038,2026-08-05T17:02:38.779834+00:00
+5305038,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305038,2026-08-05T17:02:38.779834+00:00
+5305039,19161617.0,head_coach,head_coach,22780607,"SANCHEZ HERNANDEZ, JESUS IGNACIO",https://www.rffm.es/acta-partido/5305039,2026-08-05T17:02:38.806426+00:00
+5305039,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305039,2026-08-05T17:02:38.806426+00:00
+5305036,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305036,2026-08-05T17:02:39.193171+00:00
+5305036,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305036,2026-08-05T17:02:39.193171+00:00
+5305036,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305036,2026-08-05T17:02:39.193171+00:00
+5305044,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305044,2026-08-05T17:02:39.432455+00:00
+5305044,19824054.0,other_staff,AUXILIAR SALA,22434663,"MUÑANTE DUEÑAS, DANIEL MARCIAL",https://www.rffm.es/acta-partido/5305044,2026-08-05T17:02:39.432455+00:00
+5305045,19161617.0,head_coach,head_coach,22780607,"SANCHEZ HERNANDEZ, JESUS IGNACIO",https://www.rffm.es/acta-partido/5305045,2026-08-05T17:02:39.581140+00:00
+5305042,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305042,2026-08-05T17:02:39.972306+00:00
+5305042,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305042,2026-08-05T17:02:39.972306+00:00
+5305043,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305043,2026-08-05T17:02:40.141898+00:00
+5305043,18926522.0,assistant_coach,assistant_coach,23373217,"PEÑA MARTIN, JOSE LUIS",https://www.rffm.es/acta-partido/5305043,2026-08-05T17:02:40.141898+00:00
+5305043,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305043,2026-08-05T17:02:40.141898+00:00
+5305037,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305037,2026-08-05T17:02:40.439043+00:00
+5305037,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305037,2026-08-05T17:02:40.439043+00:00
+5305037,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305037,2026-08-05T17:02:40.439043+00:00
+5305049,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305049,2026-08-05T17:02:40.482655+00:00
+5305041,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305041,2026-08-05T17:02:40.508694+00:00
+5305041,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305041,2026-08-05T17:02:40.508694+00:00
+5305047,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305047,2026-08-05T17:02:40.747514+00:00
+5305047,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305047,2026-08-05T17:02:40.747514+00:00
+5305051,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305051,2026-08-05T17:02:40.946432+00:00
+5305054,21606823.0,assistant_coach,assistant_coach,22988432,"GARCIA DIAZ, LAURA",https://www.rffm.es/acta-partido/5305054,2026-08-05T17:02:40.983495+00:00
+5305054,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305054,2026-08-05T17:02:40.983495+00:00
+5305046,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305046,2026-08-05T17:02:40.989802+00:00
+5305046,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305046,2026-08-05T17:02:40.989802+00:00
+5305046,22507709.0,head_coach,head_coach,11134342,"HORNA COZAR, OSCAR",https://www.rffm.es/acta-partido/5305046,2026-08-05T17:02:40.989802+00:00
+5305053,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305053,2026-08-05T17:02:41.041159+00:00
+5305053,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305053,2026-08-05T17:02:41.041159+00:00
+5305048,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305048,2026-08-05T17:02:41.306272+00:00
+5305048,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305048,2026-08-05T17:02:41.306272+00:00
+5305048,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305048,2026-08-05T17:02:41.306272+00:00
+5305052,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305052,2026-08-05T17:02:41.608528+00:00
+5305052,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305052,2026-08-05T17:02:41.608528+00:00
+5305052,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305052,2026-08-05T17:02:41.608528+00:00
+5305055,19161617.0,head_coach,head_coach,22780607,"SANCHEZ HERNANDEZ, JESUS IGNACIO",https://www.rffm.es/acta-partido/5305055,2026-08-05T17:02:41.821758+00:00
+5305055,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305055,2026-08-05T17:02:41.821758+00:00
+5305058,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305058,2026-08-05T17:02:41.982284+00:00
+5305060,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305060,2026-08-05T17:02:42.099085+00:00
+5305059,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305059,2026-08-05T17:02:42.231746+00:00
+5305059,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305059,2026-08-05T17:02:42.231746+00:00
+5305063,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305063,2026-08-05T17:02:42.451328+00:00
+5305063,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305063,2026-08-05T17:02:42.451328+00:00
+5305056,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305056,2026-08-05T17:02:42.455876+00:00
+5305056,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305056,2026-08-05T17:02:42.455876+00:00
+5305062,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305062,2026-08-05T17:02:43.070568+00:00
+5305062,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305062,2026-08-05T17:02:43.070568+00:00
+5305062,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305062,2026-08-05T17:02:43.070568+00:00
+5305061,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305061,2026-08-05T17:02:43.260651+00:00
+5305065,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305065,2026-08-05T17:02:43.276804+00:00
+5305065,21606823.0,assistant_coach,assistant_coach,22988432,"GARCIA DIAZ, LAURA",https://www.rffm.es/acta-partido/5305065,2026-08-05T17:02:43.276804+00:00
+5305065,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305065,2026-08-05T17:02:43.276804+00:00
+5305057,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305057,2026-08-05T17:02:43.361693+00:00
+5305057,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305057,2026-08-05T17:02:43.361693+00:00
+5305057,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305057,2026-08-05T17:02:43.361693+00:00
+5305057,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305057,2026-08-05T17:02:43.361693+00:00
+5305070,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305070,2026-08-05T17:02:43.448877+00:00
+5305070,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305070,2026-08-05T17:02:43.448877+00:00
+5305066,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305066,2026-08-05T17:02:43.451929+00:00
+5305066,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305066,2026-08-05T17:02:43.451929+00:00
+5305066,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305066,2026-08-05T17:02:43.451929+00:00
+5305067,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305067,2026-08-05T17:02:43.456624+00:00
+5305067,22507709.0,other_staff,AUXILIAR SALA,20181552,"SANGOQUIZA LOACHAMIN, LUIS DAVID",https://www.rffm.es/acta-partido/5305067,2026-08-05T17:02:43.456624+00:00
+5305067,17155859.0,head_coach,head_coach,23024881,"PALAZUELO GONZALEZ, DAVID",https://www.rffm.es/acta-partido/5305067,2026-08-05T17:02:43.456624+00:00
+5305069,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305069,2026-08-05T17:02:43.733660+00:00
+5305069,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305069,2026-08-05T17:02:43.733660+00:00
+5305071,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305071,2026-08-05T17:02:43.843889+00:00
+5305071,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305071,2026-08-05T17:02:43.843889+00:00
+5305071,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305071,2026-08-05T17:02:43.843889+00:00
+5305075,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305075,2026-08-05T17:02:44.383505+00:00
+5305075,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305075,2026-08-05T17:02:44.383505+00:00
+5305072,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305072,2026-08-05T17:02:44.507720+00:00
+5305072,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305072,2026-08-05T17:02:44.507720+00:00
+5305072,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305072,2026-08-05T17:02:44.507720+00:00
+5305077,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305077,2026-08-05T17:02:44.670079+00:00
+5305077,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305077,2026-08-05T17:02:44.670079+00:00
+5305077,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305077,2026-08-05T17:02:44.670079+00:00
+5305077,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305077,2026-08-05T17:02:44.670079+00:00
+5305076,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305076,2026-08-05T17:02:45.382923+00:00
+5305076,22380117.0,assistant_coach,assistant_coach,23117614,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/5305076,2026-08-05T17:02:45.382923+00:00
+5305080,17155859.0,head_coach,head_coach,23024881,"PALAZUELO GONZALEZ, DAVID",https://www.rffm.es/acta-partido/5305080,2026-08-05T17:02:45.398767+00:00
+5305080,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305080,2026-08-05T17:02:45.398767+00:00
+5305080,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305080,2026-08-05T17:02:45.398767+00:00
+5305085,17155859.0,assistant_coach,assistant_coach,23665692,"GARCIA GUTIERREZ, JAVIER",https://www.rffm.es/acta-partido/5305085,2026-08-05T17:02:45.589159+00:00
+5305078,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305078,2026-08-05T17:02:45.618219+00:00
+5305078,22507709.0,head_coach,head_coach,11134342,"HORNA COZAR, OSCAR",https://www.rffm.es/acta-partido/5305078,2026-08-05T17:02:45.618219+00:00
+5305081,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305081,2026-08-05T17:02:45.712973+00:00
+5305081,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305081,2026-08-05T17:02:45.712973+00:00
+5305081,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305081,2026-08-05T17:02:45.712973+00:00
+5305074,18926522.0,assistant_coach,assistant_coach,23373217,"PEÑA MARTIN, JOSE LUIS",https://www.rffm.es/acta-partido/5305074,2026-08-05T17:02:45.799312+00:00
+5305074,17155859.0,head_coach,head_coach,23024881,"PALAZUELO GONZALEZ, DAVID",https://www.rffm.es/acta-partido/5305074,2026-08-05T17:02:45.799312+00:00
+5305082,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305082,2026-08-05T17:02:45.806168+00:00
+5305082,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305082,2026-08-05T17:02:45.806168+00:00
+5305082,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305082,2026-08-05T17:02:45.806168+00:00
+5305087,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305087,2026-08-05T17:02:45.995561+00:00
+5305083,18926522.0,assistant_coach,assistant_coach,23373217,"PEÑA MARTIN, JOSE LUIS",https://www.rffm.es/acta-partido/5305083,2026-08-05T17:02:46.063080+00:00
+5305083,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305083,2026-08-05T17:02:46.063080+00:00
+5305086,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305086,2026-08-05T17:02:46.073011+00:00
+5305086,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305086,2026-08-05T17:02:46.073011+00:00
+5305089,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305089,2026-08-05T17:02:46.169062+00:00
+5305089,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305089,2026-08-05T17:02:46.169062+00:00
+5305089,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305089,2026-08-05T17:02:46.169062+00:00
+5305092,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305092,2026-08-05T17:02:46.225201+00:00
+5305092,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305092,2026-08-05T17:02:46.225201+00:00
+5305088,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305088,2026-08-05T17:02:46.371444+00:00
+5305088,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305088,2026-08-05T17:02:46.371444+00:00
+5305088,18926522.0,assistant_coach,assistant_coach,23373217,"PEÑA MARTIN, JOSE LUIS",https://www.rffm.es/acta-partido/5305088,2026-08-05T17:02:46.371444+00:00
+5305091,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305091,2026-08-05T17:02:47.021729+00:00
+5305091,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305091,2026-08-05T17:02:47.021729+00:00
+5305094,17155859.0,assistant_coach,assistant_coach,23665692,"GARCIA GUTIERREZ, JAVIER",https://www.rffm.es/acta-partido/5305094,2026-08-05T17:02:47.029910+00:00
+5305094,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305094,2026-08-05T17:02:47.029910+00:00
+5305093,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305093,2026-08-05T17:02:47.118793+00:00
+5305093,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305093,2026-08-05T17:02:47.118793+00:00
+5305097,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305097,2026-08-05T17:02:47.170493+00:00
+5305097,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305097,2026-08-05T17:02:47.170493+00:00
+5305097,18926522.0,assistant_coach,assistant_coach,23373217,"PEÑA MARTIN, JOSE LUIS",https://www.rffm.es/acta-partido/5305097,2026-08-05T17:02:47.170493+00:00
+5305099,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305099,2026-08-05T17:02:47.247156+00:00
+5305099,21606823.0,assistant_coach,assistant_coach,22896678,"CASAS PEREZ, MARTA",https://www.rffm.es/acta-partido/5305099,2026-08-05T17:02:47.247156+00:00
+5305099,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305099,2026-08-05T17:02:47.247156+00:00
+5305099,17155859.0,head_coach,head_coach,23024881,"PALAZUELO GONZALEZ, DAVID",https://www.rffm.es/acta-partido/5305099,2026-08-05T17:02:47.247156+00:00
+5305096,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305096,2026-08-05T17:02:47.387217+00:00
+5305098,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305098,2026-08-05T17:02:47.518305+00:00
+5305098,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305098,2026-08-05T17:02:47.518305+00:00
+5305103,17155859.0,assistant_coach,assistant_coach,23665692,"GARCIA GUTIERREZ, JAVIER",https://www.rffm.es/acta-partido/5305103,2026-08-05T17:02:47.538690+00:00
+5305103,22380117.0,head_coach,head_coach,23115590,"MOLINA DIEZ, JESUS RAMÓN",https://www.rffm.es/acta-partido/5305103,2026-08-05T17:02:47.538690+00:00
+5305101,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305101,2026-08-05T17:02:47.885146+00:00
+5305101,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305101,2026-08-05T17:02:47.885146+00:00
+5305105,19824054.0,other_staff,AUXILIAR SALA,22434663,"MUÑANTE DUEÑAS, DANIEL MARCIAL",https://www.rffm.es/acta-partido/5305105,2026-08-05T17:02:48.231136+00:00
+5305102,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305102,2026-08-05T17:02:48.405932+00:00
+5305102,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305102,2026-08-05T17:02:48.405932+00:00
+5305102,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305102,2026-08-05T17:02:48.405932+00:00
+5305107,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305107,2026-08-05T17:02:48.485168+00:00
+5305107,22196036.0,team_delegate,team_delegate,,"VILLACASTIN ASENJO, ALBERTO",https://www.rffm.es/acta-partido/5305107,2026-08-05T17:02:48.485168+00:00
+5305108,18346704.0,head_coach,head_coach,22166322,"PLAZA PULIDO, JORGE",https://www.rffm.es/acta-partido/5305108,2026-08-05T17:02:48.551942+00:00
+5305108,18346704.0,assistant_coach,assistant_coach,22511010,"GOMEZ GONZALEZ, IVAN",https://www.rffm.es/acta-partido/5305108,2026-08-05T17:02:48.551942+00:00
+5305108,17155859.0,assistant_coach,assistant_coach,23665692,"GARCIA GUTIERREZ, JAVIER",https://www.rffm.es/acta-partido/5305108,2026-08-05T17:02:48.551942+00:00
+5305106,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305106,2026-08-05T17:02:48.622677+00:00
+5305110,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305110,2026-08-05T17:02:48.804077+00:00
+5305110,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305110,2026-08-05T17:02:48.804077+00:00
+5305110,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305110,2026-08-05T17:02:48.804077+00:00
+5305112,17155859.0,assistant_coach,assistant_coach,23665692,"GARCIA GUTIERREZ, JAVIER",https://www.rffm.es/acta-partido/5305112,2026-08-05T17:02:48.984045+00:00
+5305112,22507709.0,head_coach,head_coach,22949065,"DE LA CRUZ LOPEZ, ANGEL",https://www.rffm.es/acta-partido/5305112,2026-08-05T17:02:48.984045+00:00
+5305115,21606823.0,head_coach,head_coach,22870346,"ALFONSO MARTIN, CRISTIAN",https://www.rffm.es/acta-partido/5305115,2026-08-05T17:02:49.496431+00:00
+5305115,21606823.0,team_delegate,team_delegate,,"ZAZO CRUZ, JOSE MIGUEL",https://www.rffm.es/acta-partido/5305115,2026-08-05T17:02:49.496431+00:00
+5305114,19824054.0,head_coach,head_coach,22927801,"MENDEZ GONZALEZ, MARCOS CLODOALDO",https://www.rffm.es/acta-partido/5305114,2026-08-05T17:02:49.501491+00:00
+5305111,22196036.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5305111,2026-08-05T17:02:49.624411+00:00
+5305111,18926522.0,head_coach,head_coach,22823432,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/5305111,2026-08-05T17:02:49.624411+00:00
