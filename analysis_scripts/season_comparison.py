@@ -64,11 +64,12 @@ def norm_id(v):
 def load_all_data() -> dict:
     """
     Returns a dict ready for JSON embedding:
-      seasons, all_cats, all_divs, cat_labels, div_labels,
+      seasons, all_cats, all_divs, all_gts, cat_labels, div_labels,
       first_season_for_cat, season_clubs, buckets
     """
     all_cats_seen: set = set()
     all_divs_seen: set = set()
+    all_gts_seen: set = set()
     first_season_for_cat: dict = {}
     season_clubs: dict = {}
     buckets: list = []
@@ -114,39 +115,42 @@ def load_all_data() -> dict:
             if mb.empty:
                 continue
 
-            played    = mb[mb["is_finished"].str.lower() == "true"]
-            hs        = pd.to_numeric(played["home_score"], errors="coerce")
-            as_       = pd.to_numeric(played["away_score"], errors="coerce")
-            goals     = int((hs.sum() + as_.sum()))
-            wm        = int(mb["competition_id"].isin(fem_comp_ids).sum())
+            # Split into game-type buckets so game-type filters can affect all metrics.
+            for gt_raw, mb_gt in mb.groupby("game_type", dropna=False):
+                gt = str(gt_raw).strip() if pd.notna(gt_raw) else "UNKNOWN"
+                if not gt or gt.lower() == "nan":
+                    gt = "UNKNOWN"
+                all_gts_seen.add(gt)
 
-            # Distinct teams
-            team_ids  = set(mb["hid"].dropna()) | set(mb["aid"].dropna())
+                played_gt = mb_gt[mb_gt["is_finished"].str.lower() == "true"]
+                hs_gt = pd.to_numeric(played_gt["home_score"], errors="coerce")
+                as_gt = pd.to_numeric(played_gt["away_score"], errors="coerce")
+                goals_gt = int((hs_gt.sum() + as_gt.sum()))
+                wm_gt = int(mb_gt["competition_id"].isin(fem_comp_ids).sum())
 
-            # Club indices (for JS-side deduplication across buckets)
-            clubs_set = {tid_to_club[t] for t in team_ids if t in tid_to_club}
-            ci        = sorted({club_to_idx[c] for c in clubs_set if c in club_to_idx})
+                team_ids_gt = set(mb_gt["hid"].dropna()) | set(mb_gt["aid"].dropna())
+                clubs_set_gt = {tid_to_club[t] for t in team_ids_gt if t in tid_to_club}
+                ci_gt = sorted({club_to_idx[c] for c in clubs_set_gt if c in club_to_idx})
+                vi_count_gt = int(mb_gt["venue_id"].dropna().nunique())
+                venue_ids_gt = sorted(mb_gt["venue_id"].dropna().unique().tolist())
 
-            # Venues
-            vi_count  = int(mb["venue_id"].dropna().nunique())
-
-            # Game types
-            gt = {str(k): int(v) for k, v in mb["game_type"].value_counts().items()}
-
-            buckets.append({
-                "s":  season,
-                "c":  cat,
-                "d":  div,
-                "mp": int(len(played)),
-                "mu": int(len(mb) - len(played)),
-                "g":  goals,
-                "wm": wm,
-                "co": len(comp_ids_list),
-                "t":  len(team_ids),
-                "ci": ci,
-                "vi": vi_count,
-                "gt": gt,
-            })
+                buckets.append({
+                    "s":  season,
+                    "c":  cat,
+                    "d":  div,
+                    "gt": gt,
+                    "mp": int(len(played_gt)),
+                    "mu": int(len(mb_gt) - len(played_gt)),
+                    "g":  goals_gt,
+                    "wm": wm_gt,
+                    "co": len(comp_ids_list),
+                    "coi": sorted(comp_ids_set),
+                    "t":  len(team_ids_gt),
+                    "ti": sorted(team_ids_gt),
+                    "ci": ci_gt,
+                    "vi": vi_count_gt,
+                    "vii": venue_ids_gt,
+                })
 
     # Sort cats and divs by preferred order (unknowns appended at end)
     def order_key(lst, v):
@@ -154,11 +158,13 @@ def load_all_data() -> dict:
 
     all_cats = sorted(all_cats_seen, key=lambda x: order_key(CAT_ORDER, x))
     all_divs = sorted(all_divs_seen, key=lambda x: order_key(DIV_ORDER, x))
+    all_gts = sorted(all_gts_seen)
 
     return {
         "seasons":              SEASONS,
         "all_cats":             all_cats,
         "all_divs":             all_divs,
+        "all_gts":              all_gts,
         "cat_labels":           {c: CAT_LABELS.get(c, c) for c in all_cats},
         "div_labels":           {d: DIV_LABELS.get(d, d) for d in all_divs},
         "first_season_for_cat": first_season_for_cat,
@@ -270,8 +276,16 @@ tr:nth-child(even) td { background: #f8f9fc; }
       <button onclick="quickSelect('divs','none')">None</button>
     </div>
   </div>
+  <div class="filter-row">
+    <span class="filter-label">Game type</span>
+    <div class="filter-chips" id="chips-gts"></div>
+    <div class="quick-btns">
+      <button onclick="quickSelect('gts','all')">All</button>
+      <button onclick="quickSelect('gts','none')">None</button>
+    </div>
+  </div>
   <div class="coverage-note" id="coverage-note"></div>
-  <div class="empty-note" id="empty-note">No data matches the current filter — select at least one age group and one division.</div>
+  <div class="empty-note" id="empty-note">No data matches the current filter — select at least one age group, one division, and one game type.</div>
 </div>
 
 <h2>Key numbers — latest season <span id="kpi-season-label" style="font-weight:normal;font-size:.9rem"></span></h2>
@@ -295,7 +309,7 @@ tr:nth-child(even) td { background: #f8f9fc; }
   <div class="chart-wrap" style="grid-column: 1 / -1"><h3>Matches by age category — all seasons (stacked)</h3><canvas id="ch-cat-stacked"></canvas></div>
 </div>
 
-<h2>Age category × Division — all data <small style="font-weight:normal;font-size:.8rem;color:#888">(filters do not apply)</small></h2>
+<h2>Age category × Division — all data <small style="font-weight:normal;font-size:.8rem;color:#888">(filtered by game type)</small></h2>
 <div class="chart-wrap" style="padding-bottom:.5rem">
   <div id="heatmap-div" style="width:100%;min-height:420px"></div>
 </div>
@@ -312,11 +326,14 @@ const COLORS = [
 ];
 const CAT_COLORS = {};
 DATA.all_cats.forEach((c, i) => { CAT_COLORS[c] = COLORS[i % COLORS.length]; });
+const GT_COLORS = {};
+DATA.all_gts.forEach((gt, i) => { GT_COLORS[gt] = COLORS[i % COLORS.length]; });
 
 // ── filter state ──
 const STATE = {
   cats: new Set(DATA.all_cats),
   divs: new Set(DATA.all_divs),
+  gts: new Set(DATA.all_gts),
 };
 
 // ── build filter chips ──
@@ -341,8 +358,14 @@ function buildChips(containerId, items, stateSet, labelMap, colorMap) {
 }
 
 function quickSelect(group, action) {
-  const stateSet = group === 'cats' ? STATE.cats : STATE.divs;
-  const items    = group === 'cats' ? DATA.all_cats : DATA.all_divs;
+  const stateSet =
+    group === 'cats' ? STATE.cats :
+    group === 'divs' ? STATE.divs :
+    STATE.gts;
+  const items =
+    group === 'cats' ? DATA.all_cats :
+    group === 'divs' ? DATA.all_divs :
+    DATA.all_gts;
   const container = document.getElementById('chips-' + group);
   items.forEach(val => {
     if (action === 'all') stateSet.add(val); else stateSet.delete(val);
@@ -444,13 +467,17 @@ function initCharts() {
 
 // ── heatmap (static, all data) ──
 function buildHeatmap() {
+  updateHeatmap();
+}
+
+function updateHeatmap() {
   const cats = DATA.all_cats;
   const divs = DATA.all_divs;
 
   // z[cat_idx][div_idx] = total matches
   const mat = cats.map(c =>
     divs.map(d =>
-      DATA.buckets.filter(b => b.c === c && b.d === d)
+      DATA.buckets.filter(b => b.c === c && b.d === d && STATE.gts.has(b.gt))
                   .reduce((s, b) => s + b.mp + b.mu, 0)
     )
   );
@@ -462,15 +489,28 @@ function buildHeatmap() {
   const catLabels = cats.map(c => DATA.cat_labels[c] || c);
   const divLabels = divs.map(d => DATA.div_labels[d] || d);
 
-  Plotly.newPlot('heatmap-div', [{
+  Plotly.react('heatmap-div', [{
     type: 'heatmap',
     z,
     x: divLabels,
     y: catLabels,
     text: zText,
     texttemplate: '%{text}',
-    colorscale: 'Blues',
+    textfont: { color: '#1f2937', size: 10 },
+    colorscale: [
+      [0.0, '#f7fcf5'],
+      [0.2, '#e5f5e0'],
+      [0.4, '#a1d99b'],
+      [0.6, '#41ab5d'],
+      [0.8, '#238b45'],
+      [1.0, '#00441b'],
+    ],
     showscale: true,
+    colorbar: {
+      title: { text: 'Matches', side: 'right' },
+      thickness: 14,
+      tickfont: { size: 10 },
+    },
     hoverongaps: false,
     hovertemplate: '<b>%{y}</b> × <b>%{x}</b><br>Matches: %{z:,}<extra></extra>',
   }], {
@@ -485,34 +525,43 @@ function buildHeatmap() {
 
 // ── main recompute ──
 function recompute() {
+  const seasons = DATA.seasons;
+
   // per-season aggregates
   const agg = {};
-  DATA.seasons.forEach(s => {
-    agg[s] = { mp: 0, mu: 0, g: 0, wm: 0, co: 0, t: 0, ci: new Set(), vi: 0, gt: {} };
+  seasons.forEach(s => {
+    agg[s] = { mp: 0, mu: 0, g: 0, wm: 0, co: 0, t: 0, ci: new Set(), vi: 0, gt: {}, coi: new Set(), ti: new Set(), vii: new Set() };
   });
 
   let anyData = false;
   for (const b of DATA.buckets) {
-    if (!STATE.cats.has(b.c) || !STATE.divs.has(b.d)) continue;
+    if (!STATE.cats.has(b.c) || !STATE.divs.has(b.d) || !STATE.gts.has(b.gt)) continue;
     const a = agg[b.s];
     a.mp += b.mp;
     a.mu += b.mu;
     a.g  += b.g;
     a.wm += b.wm;
-    a.co += b.co;
-    a.t  += b.t;
-    a.vi += b.vi;
+    for (const cid of (b.coi || [])) a.coi.add(cid);
+    for (const tid of (b.ti || [])) a.ti.add(tid);
+    for (const vid of (b.vii || [])) a.vii.add(vid);
     for (const i of b.ci) a.ci.add(i);
-    for (const [gt, cnt] of Object.entries(b.gt || {})) {
-      a.gt[gt] = (a.gt[gt] || 0) + cnt;
-    }
+    const gtTotal = b.mp + b.mu;
+    a.gt[b.gt] = (a.gt[b.gt] || 0) + gtTotal;
     if (b.mp + b.mu > 0) anyData = true;
   }
+
+  for (const s of seasons) {
+    agg[s].co = agg[s].coi.size;
+    agg[s].t = agg[s].ti.size;
+    agg[s].vi = agg[s].vii.size;
+  }
+
+  // Keep heatmap synchronized with selected game types.
+  updateHeatmap();
 
   document.getElementById('empty-note').classList.toggle('visible', !anyData);
 
   // ── trend charts ──
-  const seasons = DATA.seasons;
   setDs(CHARTS.matches, 0, seasons.map(s => agg[s].mp));
   setDs(CHARTS.matches, 1, seasons.map(s => agg[s].mu));
   CHARTS.matches.update('none');
@@ -545,7 +594,7 @@ function recompute() {
     .filter(c => STATE.cats.has(c))
     .map(c => {
       const cnt = DATA.buckets
-        .filter(b => b.s === last && b.c === c && STATE.divs.has(b.d))
+        .filter(b => b.s === last && b.c === c && STATE.divs.has(b.d) && STATE.gts.has(b.gt))
         .reduce((s, b) => s + b.mp + b.mu, 0);
       return [c, cnt];
     })
@@ -561,7 +610,7 @@ function recompute() {
     .filter(d => STATE.divs.has(d))
     .map(d => {
       const cnt = DATA.buckets
-        .filter(b => b.s === last && b.d === d && STATE.cats.has(b.c))
+        .filter(b => b.s === last && b.d === d && STATE.cats.has(b.c) && STATE.gts.has(b.gt))
         .reduce((s, b) => s + b.mp + b.mu, 0);
       return [d, cnt];
     })
@@ -585,7 +634,7 @@ function recompute() {
   CHARTS.catStacked.data.datasets = selectedCats.map(cat => ({
     label: DATA.cat_labels[cat],
     data: seasons.map(s =>
-      DATA.buckets.filter(b => b.s === s && b.c === cat && STATE.divs.has(b.d))
+      DATA.buckets.filter(b => b.s === s && b.c === cat && STATE.divs.has(b.d) && STATE.gts.has(b.gt))
         .reduce((sum, b) => sum + b.mp + b.mu, 0)
     ),
     backgroundColor: CAT_COLORS[cat],
@@ -617,7 +666,7 @@ function recompute() {
   </tr></thead>`;
   const tbody = '<tbody>' + seasons.map(s => {
     const a = agg[s];
-    const cats_in_season = [...new Set(DATA.buckets.filter(b => b.s === s && STATE.cats.has(b.c) && STATE.divs.has(b.d)).map(b => b.c))];
+    const cats_in_season = [...new Set(DATA.buckets.filter(b => b.s === s && STATE.cats.has(b.c) && STATE.divs.has(b.d) && STATE.gts.has(b.gt)).map(b => b.c))];
     const scopeStr = cats_in_season.map(c => DATA.cat_labels[c]).join(', ') || '—';
     const avg = a.mp > 0 ? (a.g / a.mp).toFixed(2) : '—';
     const wpct = (a.mp + a.mu) > 0 ? (a.wm / (a.mp + a.mu) * 100).toFixed(1) + '%' : '—';
@@ -656,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   buildChips('chips-cats', DATA.all_cats, STATE.cats, DATA.cat_labels, CAT_COLORS);
   buildChips('chips-divs', DATA.all_divs, STATE.divs, DATA.div_labels, null);
+  buildChips('chips-gts', DATA.all_gts, STATE.gts, {}, GT_COLORS);
   initCharts();
   recompute();
 });
