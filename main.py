@@ -31,8 +31,8 @@ def parse_args(argv=None) -> argparse.Namespace:
              "target.crawl_all_categories to true for this run.",
     )
     parser.add_argument(
-        "--workers", type=int, default=1,
-        help="Concurrent core/venue fetch workers (default: 1). Each worker has its own rate limiter.",
+        "--workers", type=int, default=8,
+        help="Concurrent core/venue fetch workers (default: 8). Each worker has its own rate limiter.",
     )
     parser.add_argument(
         "--limit-groups", type=int,

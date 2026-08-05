@@ -46,7 +46,7 @@ on:
         type: boolean
         default: false
       workers:
-        description: "Parallel fetch threads for acta_partido/fichajugador/clubs (default: use config value, currently 8). Has no effect on core stage."
+        description: "Parallel fetch threads for all stages including core (default 0 = use config value, currently 8 for all stages)."
         required: false
         type: number
         default: 0
@@ -151,10 +151,14 @@ jobs:
         env:
           RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
         run: |
+          extra=""
+          if [ "${{ inputs.workers }}" != "0" ] && [ -n "${{ inputs.workers }}" ]; then
+            extra="--workers ${{ inputs.workers }}"
+          fi
           if [ "${{ inputs.all_categories }}" = "true" ]; then
-            python3 main.py --all-categories --log-level INFO
+            python3 main.py --all-categories --log-level INFO $extra
           else
-            python3 main.py --log-level INFO
+            python3 main.py --log-level INFO $extra
           fi
 
       - name: Run acta-partido enrichment

@@ -42,8 +42,11 @@ SEASONS = [
 # core first (all-categories), then clubs, then per-category enrich stages.
 def build_plan() -> list[dict]:
     steps = []
+    # All core stages first so match data for every season is available before
+    # any enrichment starts.
     for season in SEASONS:
         steps.append({"season": season, "stage": "core", "scope": "", "all_categories": True})
+    for season in SEASONS:
         steps.append({"season": season, "stage": "clubs", "scope": "", "all_categories": False})
         for cat in ENRICH_CATEGORIES:
             steps.append({"season": season, "stage": "acta_partido", "scope": cat, "all_categories": False})
