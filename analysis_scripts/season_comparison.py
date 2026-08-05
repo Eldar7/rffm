@@ -177,6 +177,7 @@ HTML = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <title>RFFM — Season comparison</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.27.0/plotly.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: system-ui, sans-serif; max-width: 1160px; margin: 0 auto; padding: 0 1rem 3rem; color: #222; background: #f5f6f8; }
@@ -290,7 +291,13 @@ tr:nth-child(even) td { background: #f8f9fc; }
 <div class="grid">
   <div class="chart-wrap"><h3>Matches by age category (latest season)</h3><canvas id="ch-cat-latest"></canvas></div>
   <div class="chart-wrap"><h3>Matches by game type (latest season)</h3><canvas id="ch-gt-latest"></canvas></div>
+  <div class="chart-wrap"><h3>Matches by division (latest season)</h3><canvas id="ch-div-latest"></canvas></div>
   <div class="chart-wrap" style="grid-column: 1 / -1"><h3>Matches by age category — all seasons (stacked)</h3><canvas id="ch-cat-stacked"></canvas></div>
+</div>
+
+<h2>Age category × Division — all data <small style="font-weight:normal;font-size:.8rem;color:#888">(filters do not apply)</small></h2>
+<div class="chart-wrap" style="padding-bottom:.5rem">
+  <div id="heatmap-div" style="width:100%;min-height:420px"></div>
 </div>
 
 <h2>Summary table</h2>
@@ -426,6 +433,54 @@ function initCharts() {
     [], { legend: false });
 
   CHARTS.catStacked = makeBar('ch-cat-stacked', [], null, { stacked: true, legend: true });
+
+  CHARTS.divLatest = makeBar('ch-div-latest',
+    [{ label: 'Matches', data: [], backgroundColor: [] }],
+    [], { legend: false });
+
+  // Heatmap — built once, never updated by filters
+  buildHeatmap();
+}
+
+// ── heatmap (static, all data) ──
+function buildHeatmap() {
+  const cats = DATA.all_cats;
+  const divs = DATA.all_divs;
+
+  // z[cat_idx][div_idx] = total matches
+  const mat = cats.map(c =>
+    divs.map(d =>
+      DATA.buckets.filter(b => b.c === c && b.d === d)
+                  .reduce((s, b) => s + b.mp + b.mu, 0)
+    )
+  );
+
+  // Replace zeros with null so Plotly renders them as empty cells
+  const z = mat.map(row => row.map(v => v === 0 ? null : v));
+  const zText = mat.map(row => row.map(v => v === 0 ? '' : v.toLocaleString()));
+
+  const catLabels = cats.map(c => DATA.cat_labels[c] || c);
+  const divLabels = divs.map(d => DATA.div_labels[d] || d);
+
+  Plotly.newPlot('heatmap-div', [{
+    type: 'heatmap',
+    z,
+    x: divLabels,
+    y: catLabels,
+    text: zText,
+    texttemplate: '%{text}',
+    colorscale: 'Blues',
+    showscale: true,
+    hoverongaps: false,
+    hovertemplate: '<b>%{y}</b> × <b>%{x}</b><br>Matches: %{z:,}<extra></extra>',
+  }], {
+    margin: { l: 110, r: 60, t: 20, b: 130 },
+    xaxis: { tickangle: -40, tickfont: { size: 11 } },
+    yaxis: { tickfont: { size: 11 }, autorange: 'reversed' },
+    paper_bgcolor: '#fff',
+    plot_bgcolor: '#fff',
+    font: { family: 'system-ui, sans-serif' },
+  }, { responsive: true, displayModeBar: false });
 }
 
 // ── main recompute ──
@@ -500,6 +555,22 @@ function recompute() {
   CHARTS.catLatest.data.datasets[0].data = catPairs.map(([, v]) => v);
   CHARTS.catLatest.data.datasets[0].backgroundColor = catPairs.map(([c]) => CAT_COLORS[c]);
   CHARTS.catLatest.update('none');
+
+  // division breakdown (latest season)
+  const divPairs = DATA.all_divs
+    .filter(d => STATE.divs.has(d))
+    .map(d => {
+      const cnt = DATA.buckets
+        .filter(b => b.s === last && b.d === d && STATE.cats.has(b.c))
+        .reduce((s, b) => s + b.mp + b.mu, 0);
+      return [d, cnt];
+    })
+    .filter(([, v]) => v > 0);
+
+  CHARTS.divLatest.data.labels = divPairs.map(([d]) => DATA.div_labels[d]);
+  CHARTS.divLatest.data.datasets[0].data = divPairs.map(([, v]) => v);
+  CHARTS.divLatest.data.datasets[0].backgroundColor = divPairs.map((_, i) => COLORS[i % COLORS.length]);
+  CHARTS.divLatest.update('none');
 
   // game type breakdown
   const gtAgg = agg[last].gt;

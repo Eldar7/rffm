@@ -36,6 +36,24 @@ from rffm_scraper.normalize import (
 logger = logging.getLogger("rffm_scraper.discovery")
 
 
+# Surgical data correction agreed for 2022-2023 only: these competition ids
+# are explicit "1ª PREBENJAMIN ..." stages that should be classified as
+# PRIMERA. Keyed by (season_label, competition_id) to avoid touching any
+# other season or competition naming pattern.
+DIVISION_LEVEL_OVERRIDES: dict[tuple[str, str], str] = {
+    ("2022-2023", "16948677"): "PRIMERA",
+    ("2022-2023", "16907698"): "PRIMERA",
+    ("2022-2023", "16969301"): "PRIMERA",
+    ("2025-2026", "26687967"): "PRIMERA",
+    ("2025-2026", "26700985"): "PRIMERA",
+    ("2025-2026", "26701868"): "PRIMERA",
+}
+
+
+def _override_division_level_if_needed(season_label: str, competition_id: str, current: str) -> str:
+    return DIVISION_LEVEL_OVERRIDES.get((season_label, competition_id), current)
+
+
 @dataclasses.dataclass
 class DiscoveredGroup:
     season_id: str
@@ -136,6 +154,11 @@ def run_discovery(client: RffmClient, settings: Settings, *, workers: int = 1) -
                 )
             division_level = classify_division_level(
                 raw_category_label, fallback_label=comp.get("nombre", "")
+            )
+            division_level = _override_division_level_if_needed(
+                settings.target.season_label,
+                str(comp.get("codigo", "")),
+                division_level,
             )
             is_fem = is_femenino_label(raw_category_label)
             phase_label = phase_label_from_competition_name(comp.get("nombre", ""))
