@@ -67182,3 +67182,949 @@ match_id,team_id,role_kind,role_raw,person_id,person_name,source_url,scraped_at
 5462092,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462092,2026-08-05T04:10:06.263577+00:00
 5462090,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462090,2026-08-05T04:10:06.629619+00:00
 5462090,24651509.0,head_coach,head_coach,10376930,"TORETS PERILLAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462090,2026-08-05T04:10:06.629619+00:00
+5462102,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462102,2026-08-05T04:10:06.806654+00:00
+5462102,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462102,2026-08-05T04:10:06.806654+00:00
+5462102,18728880.0,team_delegate,team_delegate,,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5462102,2026-08-05T04:10:06.806654+00:00
+5462099,24651509.0,head_coach,head_coach,10376930,"TORETS PERILLAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462099,2026-08-05T04:10:06.834538+00:00
+5462099,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462099,2026-08-05T04:10:06.834538+00:00
+5462097,24472854.0,head_coach,head_coach,25570214,"MURILLO DE PABLO, BRUNO",https://www.rffm.es/acta-partido/5462097,2026-08-05T04:10:07.003247+00:00
+5462097,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462097,2026-08-05T04:10:07.003247+00:00
+5462097,24902230.0,assistant_coach,assistant_coach,25696070,"ATANES ARENAS, IGNACIO",https://www.rffm.es/acta-partido/5462097,2026-08-05T04:10:07.003247+00:00
+5462101,17156865.0,head_coach,head_coach,22828692,"MARTÍNEZ SÁNCHEZ, JOSE MANUEL",https://www.rffm.es/acta-partido/5462101,2026-08-05T04:10:07.185798+00:00
+5462101,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462101,2026-08-05T04:10:07.185798+00:00
+5462101,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462101,2026-08-05T04:10:07.185798+00:00
+5462101,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462101,2026-08-05T04:10:07.185798+00:00
+5462103,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5462103,2026-08-05T04:10:07.351802+00:00
+5462103,18728894.0,team_delegate,team_delegate,,"ALBARES VILA, MANUEL",https://www.rffm.es/acta-partido/5462103,2026-08-05T04:10:07.351802+00:00
+5462103,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462103,2026-08-05T04:10:07.351802+00:00
+5462100,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462100,2026-08-05T04:10:08.121688+00:00
+5462100,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462100,2026-08-05T04:10:08.121688+00:00
+5462109,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462109,2026-08-05T04:10:08.165507+00:00
+5462109,18728880.0,team_delegate,team_delegate,,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5462109,2026-08-05T04:10:08.165507+00:00
+5462109,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5462109,2026-08-05T04:10:08.165507+00:00
+5462106,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462106,2026-08-05T04:10:08.191077+00:00
+5462106,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462106,2026-08-05T04:10:08.191077+00:00
+5462106,19097561.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462106,2026-08-05T04:10:08.191077+00:00
+5462098,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462098,2026-08-05T04:10:08.398272+00:00
+5462098,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462098,2026-08-05T04:10:08.398272+00:00
+5462104,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462104,2026-08-05T04:10:08.410949+00:00
+5462104,24902230.0,assistant_coach,assistant_coach,25696070,"ATANES ARENAS, IGNACIO",https://www.rffm.es/acta-partido/5462104,2026-08-05T04:10:08.410949+00:00
+5462104,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462104,2026-08-05T04:10:08.410949+00:00
+5462110,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462110,2026-08-05T04:10:08.417175+00:00
+5462110,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462110,2026-08-05T04:10:08.417175+00:00
+5462108,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462108,2026-08-05T04:10:08.665238+00:00
+5462108,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462108,2026-08-05T04:10:08.665238+00:00
+5462108,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462108,2026-08-05T04:10:08.665238+00:00
+5462108,18439648.0,team_delegate,team_delegate,,"OTERO DURAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462108,2026-08-05T04:10:08.665238+00:00
+5462105,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462105,2026-08-05T04:10:08.676823+00:00
+5462105,24472854.0,head_coach,head_coach,22470924,"GARCIA SANTAMARIA, PATRICIA",https://www.rffm.es/acta-partido/5462105,2026-08-05T04:10:08.676823+00:00
+5462105,24472854.0,team_delegate,team_delegate,,"MARTIN GOMEZ, JORGE",https://www.rffm.es/acta-partido/5462105,2026-08-05T04:10:08.676823+00:00
+5462107,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462107,2026-08-05T04:10:09.074555+00:00
+5462107,24651509.0,head_coach,head_coach,10376930,"TORETS PERILLAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462107,2026-08-05T04:10:09.074555+00:00
+5462113,18728849.0,head_coach,head_coach,25957159,"MANCHEÑO TORRIJOS, JOAQUIN",https://www.rffm.es/acta-partido/5462113,2026-08-05T04:10:09.165706+00:00
+5462113,18728849.0,other_staff,EPR SALA,26196158,"PARRADO SANCHEZ, RAUL",https://www.rffm.es/acta-partido/5462113,2026-08-05T04:10:09.165706+00:00
+5462113,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462113,2026-08-05T04:10:09.165706+00:00
+5462113,22270299.0,team_delegate,team_delegate,,"GARCIA-CONDE SANCHEZ, JUAN JOSE",https://www.rffm.es/acta-partido/5462113,2026-08-05T04:10:09.165706+00:00
+5462115,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462115,2026-08-05T04:10:09.452953+00:00
+5462115,24254932.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462115,2026-08-05T04:10:09.452953+00:00
+5462117,18439648.0,team_delegate,team_delegate,,"OTERO DURAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462117,2026-08-05T04:10:09.453559+00:00
+5462117,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462117,2026-08-05T04:10:09.453559+00:00
+5462114,24472854.0,head_coach,head_coach,20228533,"FERNÁNDEZ MORENO, AIDA",https://www.rffm.es/acta-partido/5462114,2026-08-05T04:10:09.457789+00:00
+5462114,24472854.0,team_delegate,team_delegate,,"GONZALEZ ARGUDO, MIGUEL",https://www.rffm.es/acta-partido/5462114,2026-08-05T04:10:09.457789+00:00
+5462114,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462114,2026-08-05T04:10:09.457789+00:00
+5462116,24651509.0,head_coach,head_coach,22813574,"DIAZ JODRA, EMILIO",https://www.rffm.es/acta-partido/5462116,2026-08-05T04:10:09.516225+00:00
+5462116,18757498.0,head_coach,head_coach,22862018,"MUÑOZ RUIPÉREZ, JUAN CARLOS",https://www.rffm.es/acta-partido/5462116,2026-08-05T04:10:09.516225+00:00
+5462116,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462116,2026-08-05T04:10:09.516225+00:00
+5566835,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5566835,2026-08-05T04:10:10.013308+00:00
+5566835,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5566835,2026-08-05T04:10:10.013308+00:00
+5566835,18728894.0,team_delegate,team_delegate,,"ALBARES VILA, MANUEL",https://www.rffm.es/acta-partido/5566835,2026-08-05T04:10:10.013308+00:00
+5568003,17146008.0,head_coach,head_coach,22166539,"PUEBLA RONQUILLO, LUIS ALBINO",https://www.rffm.es/acta-partido/5568003,2026-08-05T04:10:10.288185+00:00
+5568003,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5568003,2026-08-05T04:10:10.288185+00:00
+5568003,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5568003,2026-08-05T04:10:10.288185+00:00
+5462125,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462125,2026-08-05T04:10:10.304525+00:00
+5462125,17146008.0,team_delegate,team_delegate,,"PUEBLA DIAZ PINTADO, DANIEL",https://www.rffm.es/acta-partido/5462125,2026-08-05T04:10:10.304525+00:00
+5462125,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462125,2026-08-05T04:10:10.304525+00:00
+5462121,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462121,2026-08-05T04:10:10.309632+00:00
+5462121,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462121,2026-08-05T04:10:10.309632+00:00
+5462122,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462122,2026-08-05T04:10:10.667787+00:00
+5462122,24472854.0,head_coach,head_coach,25570214,"MURILLO DE PABLO, BRUNO",https://www.rffm.es/acta-partido/5462122,2026-08-05T04:10:10.667787+00:00
+5462123,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462123,2026-08-05T04:10:10.988554+00:00
+5462123,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462123,2026-08-05T04:10:10.988554+00:00
+5462123,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462123,2026-08-05T04:10:10.988554+00:00
+5462123,19097561.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462123,2026-08-05T04:10:10.988554+00:00
+5568618,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5568618,2026-08-05T04:10:11.157395+00:00
+5568618,18728894.0,team_delegate,team_delegate,,"ALBARES VILA, MANUEL",https://www.rffm.es/acta-partido/5568618,2026-08-05T04:10:11.157395+00:00
+5568618,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5568618,2026-08-05T04:10:11.157395+00:00
+5568618,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5568618,2026-08-05T04:10:11.157395+00:00
+5462129,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462129,2026-08-05T04:10:11.157961+00:00
+5462129,24902230.0,assistant_coach,assistant_coach,25696070,"ATANES ARENAS, IGNACIO",https://www.rffm.es/acta-partido/5462129,2026-08-05T04:10:11.157961+00:00
+5462129,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462129,2026-08-05T04:10:11.157961+00:00
+5462120,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462120,2026-08-05T04:10:11.294347+00:00
+5462120,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462120,2026-08-05T04:10:11.294347+00:00
+5462131,24472854.0,head_coach,head_coach,25570214,"MURILLO DE PABLO, BRUNO",https://www.rffm.es/acta-partido/5462131,2026-08-05T04:10:11.552827+00:00
+5462131,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462131,2026-08-05T04:10:11.552827+00:00
+5462131,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462131,2026-08-05T04:10:11.552827+00:00
+5462134,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462134,2026-08-05T04:10:11.694445+00:00
+5462134,18439648.0,team_delegate,team_delegate,,"OTERO DURAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462134,2026-08-05T04:10:11.694445+00:00
+5462134,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5462134,2026-08-05T04:10:11.694445+00:00
+5462124,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462124,2026-08-05T04:10:11.725865+00:00
+5462124,24651509.0,head_coach,head_coach,20334890,"HAKAMI HAKAMI, HAMED",https://www.rffm.es/acta-partido/5462124,2026-08-05T04:10:11.725865+00:00
+5462135,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5462135,2026-08-05T04:10:11.741600+00:00
+5462135,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462135,2026-08-05T04:10:11.741600+00:00
+5462135,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462135,2026-08-05T04:10:11.741600+00:00
+5462133,24651509.0,head_coach,head_coach,10376930,"TORETS PERILLAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462133,2026-08-05T04:10:11.822738+00:00
+5462133,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462133,2026-08-05T04:10:11.822738+00:00
+5462142,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462142,2026-08-05T04:10:12.052142+00:00
+5462142,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462142,2026-08-05T04:10:12.052142+00:00
+5462142,18439648.0,team_delegate,team_delegate,,"OTERO DURAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462142,2026-08-05T04:10:12.052142+00:00
+5462132,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462132,2026-08-05T04:10:12.193300+00:00
+5462132,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462132,2026-08-05T04:10:12.193300+00:00
+5462132,18728880.0,other_staff,ENCARGADO MATERIAL SALA,20419652,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5462132,2026-08-05T04:10:12.193300+00:00
+5462138,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462138,2026-08-05T04:10:12.242091+00:00
+5462138,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462138,2026-08-05T04:10:12.242091+00:00
+5462138,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462138,2026-08-05T04:10:12.242091+00:00
+5462130,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462130,2026-08-05T04:10:12.442494+00:00
+5462130,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462130,2026-08-05T04:10:12.442494+00:00
+5462136,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462136,2026-08-05T04:10:12.618711+00:00
+5462136,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462136,2026-08-05T04:10:12.618711+00:00
+5462136,22270299.0,team_delegate,team_delegate,,"GARCIA-CONDE SANCHEZ, JUAN JOSE",https://www.rffm.es/acta-partido/5462136,2026-08-05T04:10:12.618711+00:00
+5462139,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462139,2026-08-05T04:10:12.946776+00:00
+5462139,18728880.0,team_delegate,team_delegate,,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5462139,2026-08-05T04:10:12.946776+00:00
+5462139,24472854.0,head_coach,head_coach,25570214,"MURILLO DE PABLO, BRUNO",https://www.rffm.es/acta-partido/5462139,2026-08-05T04:10:12.946776+00:00
+5462140,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462140,2026-08-05T04:10:13.045643+00:00
+5462140,17146008.0,team_delegate,team_delegate,,"PUEBLA DIAZ PINTADO, DANIEL",https://www.rffm.es/acta-partido/5462140,2026-08-05T04:10:13.045643+00:00
+5462140,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462140,2026-08-05T04:10:13.045643+00:00
+5462137,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462137,2026-08-05T04:10:13.084184+00:00
+5462137,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462137,2026-08-05T04:10:13.084184+00:00
+5462141,18728894.0,team_delegate,team_delegate,,"ALBARES VILA, MANUEL",https://www.rffm.es/acta-partido/5462141,2026-08-05T04:10:13.250365+00:00
+5462141,24651509.0,head_coach,head_coach,22813574,"DIAZ JODRA, EMILIO",https://www.rffm.es/acta-partido/5462141,2026-08-05T04:10:13.250365+00:00
+5462151,18439648.0,head_coach,head_coach,25590057,"CERVILLA MIGUEL, PABLO",https://www.rffm.es/acta-partido/5462151,2026-08-05T04:10:13.515236+00:00
+5462151,18439648.0,team_delegate,team_delegate,,"OTERO DURAN, ALEJANDRO",https://www.rffm.es/acta-partido/5462151,2026-08-05T04:10:13.515236+00:00
+5462151,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5462151,2026-08-05T04:10:13.515236+00:00
+5462145,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462145,2026-08-05T04:10:13.532619+00:00
+5462145,22270299.0,team_delegate,team_delegate,,"GARCIA-CONDE SANCHEZ, JUAN JOSE",https://www.rffm.es/acta-partido/5462145,2026-08-05T04:10:13.532619+00:00
+5462145,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462145,2026-08-05T04:10:13.532619+00:00
+5462147,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462147,2026-08-05T04:10:13.829701+00:00
+5462147,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462147,2026-08-05T04:10:13.829701+00:00
+5462147,18728880.0,other_staff,ENCARGADO MATERIAL SALA,20419652,"ROJO GARCÍA, CARLOS MANUEL",https://www.rffm.es/acta-partido/5462147,2026-08-05T04:10:13.829701+00:00
+5462150,24651509.0,head_coach,head_coach,20334890,"HAKAMI HAKAMI, HAMED",https://www.rffm.es/acta-partido/5462150,2026-08-05T04:10:13.954174+00:00
+5462150,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462150,2026-08-05T04:10:13.954174+00:00
+5462146,24902230.0,head_coach,head_coach,25595735,"PÉREZ CANO, DANIEL",https://www.rffm.es/acta-partido/5462146,2026-08-05T04:10:14.288387+00:00
+5462146,24902230.0,assistant_coach,assistant_coach,25696070,"ATANES ARENAS, IGNACIO",https://www.rffm.es/acta-partido/5462146,2026-08-05T04:10:14.288387+00:00
+5462146,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462146,2026-08-05T04:10:14.288387+00:00
+5462146,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462146,2026-08-05T04:10:14.288387+00:00
+5462149,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462149,2026-08-05T04:10:14.424362+00:00
+5462149,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5462149,2026-08-05T04:10:14.424362+00:00
+5462149,18728894.0,team_delegate,team_delegate,,"ALBARES VILA, MANUEL",https://www.rffm.es/acta-partido/5462149,2026-08-05T04:10:14.424362+00:00
+5462153,18757498.0,head_coach,head_coach,22910035,"GUTIÉRREZ ANGULO, FABIO",https://www.rffm.es/acta-partido/5462153,2026-08-05T04:10:14.535547+00:00
+5462153,18757498.0,team_delegate,team_delegate,,"GUTIÉRREZ ANGULO, LUIS MIGUEL",https://www.rffm.es/acta-partido/5462153,2026-08-05T04:10:14.535547+00:00
+5462153,22270299.0,head_coach,head_coach,25629849,"ARRANZ SANCHEZ, JORGE",https://www.rffm.es/acta-partido/5462153,2026-08-05T04:10:14.535547+00:00
+5462153,22270299.0,team_delegate,team_delegate,,"GARCIA-CONDE SANCHEZ, JUAN JOSE",https://www.rffm.es/acta-partido/5462153,2026-08-05T04:10:14.535547+00:00
+5462154,18728880.0,head_coach,head_coach,23718824,"AMADOR MONTESINOS, LUCAS",https://www.rffm.es/acta-partido/5462154,2026-08-05T04:10:14.802568+00:00
+5462154,24902230.0,head_coach,head_coach,22896243,"ATANES ARENAS, IGNACIO",https://www.rffm.es/acta-partido/5462154,2026-08-05T04:10:14.802568+00:00
+5462152,24254932.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462152,2026-08-05T04:10:14.806907+00:00
+5462152,24772220.0,head_coach,head_coach,24658394,"ESCUDERO LOPEZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462152,2026-08-05T04:10:14.806907+00:00
+5462155,17146008.0,head_coach,head_coach,25548594,"PUEBLA DIAZ PINTADO, CARLOS",https://www.rffm.es/acta-partido/5462155,2026-08-05T04:10:14.901912+00:00
+5462155,18728849.0,head_coach,head_coach,26162779,"GARCÍA BERLANGA, MIGUEL",https://www.rffm.es/acta-partido/5462155,2026-08-05T04:10:14.901912+00:00
+5462158,17156865.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5462158,2026-08-05T04:10:15.150608+00:00
+5462158,17156865.0,assistant_coach,assistant_coach,25639508,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462158,2026-08-05T04:10:15.150608+00:00
+5462158,24651509.0,head_coach,head_coach,20334890,"HAKAMI HAKAMI, HAMED",https://www.rffm.es/acta-partido/5462158,2026-08-05T04:10:15.150608+00:00
+5462156,18728894.0,head_coach,head_coach,22074741,"MERINO MORA, JOSE ANTONIO",https://www.rffm.es/acta-partido/5462156,2026-08-05T04:10:15.216105+00:00
+5462156,24472854.0,head_coach,head_coach,25570214,"MURILLO DE PABLO, BRUNO",https://www.rffm.es/acta-partido/5462156,2026-08-05T04:10:15.216105+00:00
+5462157,24706449.0,head_coach,head_coach,20144104,"RODRIGO MARTIN, JULIAN",https://www.rffm.es/acta-partido/5462157,2026-08-05T04:10:15.776306+00:00
+5462157,19097561.0,head_coach,head_coach,25689419,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462157,2026-08-05T04:10:15.776306+00:00
+5462157,19097561.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462157,2026-08-05T04:10:15.776306+00:00
+5462166,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462166,2026-08-05T04:10:16.560668+00:00
+5462166,19691247.0,head_coach,head_coach,22975288,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462166,2026-08-05T04:10:16.560668+00:00
+5462167,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462167,2026-08-05T04:10:16.570312+00:00
+5462167,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462167,2026-08-05T04:10:16.570312+00:00
+5462167,18439632.0,team_delegate,team_delegate,,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5462167,2026-08-05T04:10:16.570312+00:00
+5484363,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5484363,2026-08-05T04:10:16.766120+00:00
+5484363,17155850.0,head_coach,head_coach,22638538,"GIL CASTRO, JUVENAL",https://www.rffm.es/acta-partido/5484363,2026-08-05T04:10:16.766120+00:00
+5525942,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5525942,2026-08-05T04:10:16.775764+00:00
+5525942,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5525942,2026-08-05T04:10:16.775764+00:00
+5462165,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462165,2026-08-05T04:10:16.782480+00:00
+5462165,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462165,2026-08-05T04:10:16.782480+00:00
+5462165,25043802.0,team_delegate,team_delegate,,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462165,2026-08-05T04:10:16.782480+00:00
+5462164,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462164,2026-08-05T04:10:16.818144+00:00
+5462164,24031624.0,other_staff,EPR SALA,25559134,"BARRAJON MENDOZA, HECTOR",https://www.rffm.es/acta-partido/5462164,2026-08-05T04:10:16.818144+00:00
+5462164,17146534.0,head_coach,head_coach,19391018,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462164,2026-08-05T04:10:16.818144+00:00
+5462164,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462164,2026-08-05T04:10:16.818144+00:00
+5536435,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5536435,2026-08-05T04:10:16.824665+00:00
+5536435,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5536435,2026-08-05T04:10:16.824665+00:00
+5462172,17146534.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462172,2026-08-05T04:10:16.947097+00:00
+5462172,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462172,2026-08-05T04:10:16.947097+00:00
+5462172,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462172,2026-08-05T04:10:16.947097+00:00
+5462168,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462168,2026-08-05T04:10:17.065843+00:00
+5462168,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462168,2026-08-05T04:10:17.065843+00:00
+5462168,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462168,2026-08-05T04:10:17.065843+00:00
+5484348,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484348,2026-08-05T04:10:17.493307+00:00
+5484348,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5484348,2026-08-05T04:10:17.493307+00:00
+5462174,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462174,2026-08-05T04:10:17.494058+00:00
+5462174,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462174,2026-08-05T04:10:17.494058+00:00
+5462174,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462174,2026-08-05T04:10:17.494058+00:00
+5462174,25054323.0,team_delegate,team_delegate,,"RAEZ LIRIA, ALFONSO",https://www.rffm.es/acta-partido/5462174,2026-08-05T04:10:17.494058+00:00
+5462175,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462175,2026-08-05T04:10:17.561977+00:00
+5462175,18439632.0,team_delegate,team_delegate,,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462175,2026-08-05T04:10:17.561977+00:00
+5462175,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462175,2026-08-05T04:10:17.561977+00:00
+5462175,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462175,2026-08-05T04:10:17.561977+00:00
+5462173,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462173,2026-08-05T04:10:17.572870+00:00
+5462173,25043802.0,team_delegate,team_delegate,,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462173,2026-08-05T04:10:17.572870+00:00
+5462173,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462173,2026-08-05T04:10:17.572870+00:00
+5462169,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462169,2026-08-05T04:10:17.603220+00:00
+5505567,22473392.0,head_coach,head_coach,23275140,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5505567,2026-08-05T04:10:17.744976+00:00
+5505567,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505567,2026-08-05T04:10:17.744976+00:00
+5462176,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462176,2026-08-05T04:10:18.108845+00:00
+5462176,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462176,2026-08-05T04:10:18.108845+00:00
+5462179,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462179,2026-08-05T04:10:18.382995+00:00
+5462179,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462179,2026-08-05T04:10:18.382995+00:00
+5462179,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462179,2026-08-05T04:10:18.382995+00:00
+5462181,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462181,2026-08-05T04:10:18.595943+00:00
+5462181,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462181,2026-08-05T04:10:18.595943+00:00
+5462181,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462181,2026-08-05T04:10:18.595943+00:00
+5462182,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462182,2026-08-05T04:10:18.647299+00:00
+5462182,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462182,2026-08-05T04:10:18.647299+00:00
+5462182,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462182,2026-08-05T04:10:18.647299+00:00
+5462180,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462180,2026-08-05T04:10:18.776807+00:00
+5462180,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462180,2026-08-05T04:10:18.776807+00:00
+5462183,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462183,2026-08-05T04:10:18.784015+00:00
+5462183,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462183,2026-08-05T04:10:18.784015+00:00
+5462183,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462183,2026-08-05T04:10:18.784015+00:00
+5462188,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462188,2026-08-05T04:10:18.892001+00:00
+5462188,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462188,2026-08-05T04:10:18.892001+00:00
+5462184,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462184,2026-08-05T04:10:19.109572+00:00
+5462184,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462184,2026-08-05T04:10:19.109572+00:00
+5462191,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462191,2026-08-05T04:10:19.313494+00:00
+5462191,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462191,2026-08-05T04:10:19.313494+00:00
+5462191,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462191,2026-08-05T04:10:19.313494+00:00
+5505552,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505552,2026-08-05T04:10:19.580020+00:00
+5505552,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5505552,2026-08-05T04:10:19.580020+00:00
+5505552,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5505552,2026-08-05T04:10:19.580020+00:00
+5462189,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462189,2026-08-05T04:10:20.036918+00:00
+5462189,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462189,2026-08-05T04:10:20.036918+00:00
+5462189,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462189,2026-08-05T04:10:20.036918+00:00
+5484349,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484349,2026-08-05T04:10:20.044790+00:00
+5484349,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484349,2026-08-05T04:10:20.044790+00:00
+5462190,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462190,2026-08-05T04:10:20.189357+00:00
+5462190,18439632.0,team_delegate,team_delegate,,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5462190,2026-08-05T04:10:20.189357+00:00
+5462190,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462190,2026-08-05T04:10:20.189357+00:00
+5462197,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462197,2026-08-05T04:10:20.222980+00:00
+5462197,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462197,2026-08-05T04:10:20.222980+00:00
+5462197,18439632.0,team_delegate,team_delegate,,"PARTIDA JUAREZ, IKER",https://www.rffm.es/acta-partido/5462197,2026-08-05T04:10:20.222980+00:00
+5462194,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462194,2026-08-05T04:10:20.223516+00:00
+5462194,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462194,2026-08-05T04:10:20.223516+00:00
+5462194,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462194,2026-08-05T04:10:20.223516+00:00
+5462199,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462199,2026-08-05T04:10:20.617107+00:00
+5462199,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462199,2026-08-05T04:10:20.617107+00:00
+5462199,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462199,2026-08-05T04:10:20.617107+00:00
+5462199,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462199,2026-08-05T04:10:20.617107+00:00
+5484365,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5484365,2026-08-05T04:10:20.786813+00:00
+5484365,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484365,2026-08-05T04:10:20.786813+00:00
+5484365,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484365,2026-08-05T04:10:20.786813+00:00
+5462196,19807300.0,head_coach,head_coach,23722507,"JIMÉNEZ BLÁZQUEZ, RUBÉN JUAN",https://www.rffm.es/acta-partido/5462196,2026-08-05T04:10:20.959571+00:00
+5462196,19807300.0,team_delegate,team_delegate,,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462196,2026-08-05T04:10:20.959571+00:00
+5462196,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462196,2026-08-05T04:10:20.959571+00:00
+5462196,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462196,2026-08-05T04:10:20.959571+00:00
+5462198,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462198,2026-08-05T04:10:21.125522+00:00
+5462198,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462198,2026-08-05T04:10:21.125522+00:00
+5462198,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462198,2026-08-05T04:10:21.125522+00:00
+5462198,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462198,2026-08-05T04:10:21.125522+00:00
+5462205,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462205,2026-08-05T04:10:21.138222+00:00
+5462205,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462205,2026-08-05T04:10:21.138222+00:00
+5462202,17146534.0,head_coach,head_coach,19501093,"PEREZ CAMACHO, RICART",https://www.rffm.es/acta-partido/5462202,2026-08-05T04:10:21.326984+00:00
+5462202,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462202,2026-08-05T04:10:21.326984+00:00
+5462202,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462202,2026-08-05T04:10:21.326984+00:00
+5462202,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462202,2026-08-05T04:10:21.326984+00:00
+5462206,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462206,2026-08-05T04:10:21.338457+00:00
+5462206,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462206,2026-08-05T04:10:21.338457+00:00
+5462206,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462206,2026-08-05T04:10:21.338457+00:00
+5505568,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5505568,2026-08-05T04:10:21.338968+00:00
+5505568,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5505568,2026-08-05T04:10:21.338968+00:00
+5505568,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505568,2026-08-05T04:10:21.338968+00:00
+5462207,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462207,2026-08-05T04:10:21.455078+00:00
+5462207,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462207,2026-08-05T04:10:21.455078+00:00
+5462207,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462207,2026-08-05T04:10:21.455078+00:00
+5484350,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484350,2026-08-05T04:10:21.735224+00:00
+5484350,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484350,2026-08-05T04:10:21.735224+00:00
+5505554,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505554,2026-08-05T04:10:22.319847+00:00
+5505554,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5505554,2026-08-05T04:10:22.319847+00:00
+5462203,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462203,2026-08-05T04:10:22.494479+00:00
+5462203,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462203,2026-08-05T04:10:22.494479+00:00
+5505553,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505553,2026-08-05T04:10:22.501741+00:00
+5505553,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5505553,2026-08-05T04:10:22.501741+00:00
+5505553,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5505553,2026-08-05T04:10:22.501741+00:00
+5462211,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462211,2026-08-05T04:10:22.509127+00:00
+5462211,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462211,2026-08-05T04:10:22.509127+00:00
+5462211,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462211,2026-08-05T04:10:22.509127+00:00
+5462209,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462209,2026-08-05T04:10:22.555373+00:00
+5462209,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462209,2026-08-05T04:10:22.555373+00:00
+5462215,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462215,2026-08-05T04:10:22.908486+00:00
+5462215,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462215,2026-08-05T04:10:22.908486+00:00
+5462213,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462213,2026-08-05T04:10:23.019884+00:00
+5462213,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462213,2026-08-05T04:10:23.019884+00:00
+5462213,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462213,2026-08-05T04:10:23.019884+00:00
+5462214,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462214,2026-08-05T04:10:23.026629+00:00
+5462214,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462214,2026-08-05T04:10:23.026629+00:00
+5462214,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462214,2026-08-05T04:10:23.026629+00:00
+5462223,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462223,2026-08-05T04:10:23.343016+00:00
+5549560,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5549560,2026-08-05T04:10:23.540446+00:00
+5549560,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5549560,2026-08-05T04:10:23.540446+00:00
+5549560,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5549560,2026-08-05T04:10:23.540446+00:00
+5505569,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5505569,2026-08-05T04:10:24.019687+00:00
+5505569,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5505569,2026-08-05T04:10:24.019687+00:00
+5505569,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505569,2026-08-05T04:10:24.019687+00:00
+5462219,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462219,2026-08-05T04:10:24.180506+00:00
+5462219,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462219,2026-08-05T04:10:24.180506+00:00
+5462219,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462219,2026-08-05T04:10:24.180506+00:00
+5462219,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462219,2026-08-05T04:10:24.180506+00:00
+5484351,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484351,2026-08-05T04:10:24.185099+00:00
+5484351,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484351,2026-08-05T04:10:24.185099+00:00
+5484351,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5484351,2026-08-05T04:10:24.185099+00:00
+5484351,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5484351,2026-08-05T04:10:24.185099+00:00
+5462218,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462218,2026-08-05T04:10:24.242462+00:00
+5462218,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462218,2026-08-05T04:10:24.242462+00:00
+5462222,25054323.0,team_delegate,team_delegate,,"RAEZ LIRIA, ALFONSO",https://www.rffm.es/acta-partido/5462222,2026-08-05T04:10:24.247316+00:00
+5462222,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462222,2026-08-05T04:10:24.247316+00:00
+5462220,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462220,2026-08-05T04:10:24.359900+00:00
+5462220,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462220,2026-08-05T04:10:24.359900+00:00
+5462228,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462228,2026-08-05T04:10:24.550175+00:00
+5462228,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462228,2026-08-05T04:10:24.550175+00:00
+5462228,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462228,2026-08-05T04:10:24.550175+00:00
+5462227,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462227,2026-08-05T04:10:24.671594+00:00
+5462227,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462227,2026-08-05T04:10:24.671594+00:00
+5484352,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484352,2026-08-05T04:10:24.806955+00:00
+5484352,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484352,2026-08-05T04:10:24.806955+00:00
+5484352,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5484352,2026-08-05T04:10:24.806955+00:00
+5505555,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505555,2026-08-05T04:10:24.823573+00:00
+5505555,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5505555,2026-08-05T04:10:24.823573+00:00
+5505555,25043802.0,team_delegate,team_delegate,,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5505555,2026-08-05T04:10:24.823573+00:00
+5462226,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462226,2026-08-05T04:10:24.848930+00:00
+5462226,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462226,2026-08-05T04:10:24.848930+00:00
+5462226,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462226,2026-08-05T04:10:24.848930+00:00
+5462231,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462231,2026-08-05T04:10:25.035408+00:00
+5462231,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462231,2026-08-05T04:10:25.035408+00:00
+5462231,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462231,2026-08-05T04:10:25.035408+00:00
+5462230,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462230,2026-08-05T04:10:25.161928+00:00
+5462230,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462230,2026-08-05T04:10:25.161928+00:00
+5462232,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462232,2026-08-05T04:10:25.525274+00:00
+5462232,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462232,2026-08-05T04:10:25.525274+00:00
+5462232,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462232,2026-08-05T04:10:25.525274+00:00
+5462236,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462236,2026-08-05T04:10:25.845728+00:00
+5462236,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462236,2026-08-05T04:10:25.845728+00:00
+5462236,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462236,2026-08-05T04:10:25.845728+00:00
+5462239,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462239,2026-08-05T04:10:25.965021+00:00
+5462239,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462239,2026-08-05T04:10:25.965021+00:00
+5462237,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462237,2026-08-05T04:10:25.996816+00:00
+5462237,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462237,2026-08-05T04:10:25.996816+00:00
+5505570,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5505570,2026-08-05T04:10:26.041483+00:00
+5505570,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5505570,2026-08-05T04:10:26.041483+00:00
+5505570,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505570,2026-08-05T04:10:26.041483+00:00
+5484367,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5484367,2026-08-05T04:10:26.160933+00:00
+5484367,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484367,2026-08-05T04:10:26.160933+00:00
+5484367,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484367,2026-08-05T04:10:26.160933+00:00
+5545415,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5545415,2026-08-05T04:10:26.257046+00:00
+5545415,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5545415,2026-08-05T04:10:26.257046+00:00
+5462245,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462245,2026-08-05T04:10:26.437849+00:00
+5462245,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462245,2026-08-05T04:10:26.437849+00:00
+5462243,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462243,2026-08-05T04:10:26.807820+00:00
+5462243,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462243,2026-08-05T04:10:26.807820+00:00
+5462243,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462243,2026-08-05T04:10:26.807820+00:00
+5462240,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462240,2026-08-05T04:10:27.039944+00:00
+5462240,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462240,2026-08-05T04:10:27.039944+00:00
+5462240,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462240,2026-08-05T04:10:27.039944+00:00
+5462244,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462244,2026-08-05T04:10:27.623860+00:00
+5462244,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462244,2026-08-05T04:10:27.623860+00:00
+5462244,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462244,2026-08-05T04:10:27.623860+00:00
+5505556,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505556,2026-08-05T04:10:27.768731+00:00
+5505556,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5505556,2026-08-05T04:10:27.768731+00:00
+5505556,18439632.0,team_delegate,team_delegate,,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5505556,2026-08-05T04:10:27.768731+00:00
+5545332,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5545332,2026-08-05T04:10:27.771387+00:00
+5545332,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5545332,2026-08-05T04:10:27.771387+00:00
+5462248,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462248,2026-08-05T04:10:28.041462+00:00
+5462248,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462248,2026-08-05T04:10:28.041462+00:00
+5462248,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462248,2026-08-05T04:10:28.041462+00:00
+5505571,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5505571,2026-08-05T04:10:28.070522+00:00
+5505571,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5505571,2026-08-05T04:10:28.070522+00:00
+5505571,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505571,2026-08-05T04:10:28.070522+00:00
+5484353,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484353,2026-08-05T04:10:28.076858+00:00
+5484353,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484353,2026-08-05T04:10:28.076858+00:00
+5462254,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462254,2026-08-05T04:10:28.213265+00:00
+5462254,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462254,2026-08-05T04:10:28.213265+00:00
+5462252,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462252,2026-08-05T04:10:28.533033+00:00
+5462252,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462252,2026-08-05T04:10:28.533033+00:00
+5462252,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462252,2026-08-05T04:10:28.533033+00:00
+5462249,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462249,2026-08-05T04:10:28.539689+00:00
+5462249,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462249,2026-08-05T04:10:28.539689+00:00
+5462249,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462249,2026-08-05T04:10:28.539689+00:00
+5462249,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462249,2026-08-05T04:10:28.539689+00:00
+5462261,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462261,2026-08-05T04:10:28.699005+00:00
+5462261,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462261,2026-08-05T04:10:28.699005+00:00
+5462253,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462253,2026-08-05T04:10:28.707017+00:00
+5462253,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462253,2026-08-05T04:10:28.707017+00:00
+5462253,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462253,2026-08-05T04:10:28.707017+00:00
+5484368,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5484368,2026-08-05T04:10:28.711774+00:00
+5484368,18439632.0,team_delegate,team_delegate,,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5484368,2026-08-05T04:10:28.711774+00:00
+5484368,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484368,2026-08-05T04:10:28.711774+00:00
+5484368,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484368,2026-08-05T04:10:28.711774+00:00
+5462257,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462257,2026-08-05T04:10:28.803540+00:00
+5462257,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462257,2026-08-05T04:10:28.803540+00:00
+5462257,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462257,2026-08-05T04:10:28.803540+00:00
+5462262,22473392.0,head_coach,head_coach,23275140,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462262,2026-08-05T04:10:28.933076+00:00
+5462262,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462262,2026-08-05T04:10:28.933076+00:00
+5462260,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462260,2026-08-05T04:10:29.543628+00:00
+5462260,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462260,2026-08-05T04:10:29.543628+00:00
+5462260,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462260,2026-08-05T04:10:29.543628+00:00
+5484354,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484354,2026-08-05T04:10:29.624892+00:00
+5484354,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484354,2026-08-05T04:10:29.624892+00:00
+5484354,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5484354,2026-08-05T04:10:29.624892+00:00
+5484354,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5484354,2026-08-05T04:10:29.624892+00:00
+5462264,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462264,2026-08-05T04:10:29.818014+00:00
+5462264,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462264,2026-08-05T04:10:29.818014+00:00
+5462264,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462264,2026-08-05T04:10:29.818014+00:00
+5462256,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462256,2026-08-05T04:10:29.821520+00:00
+5462256,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462256,2026-08-05T04:10:29.821520+00:00
+5462256,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462256,2026-08-05T04:10:29.821520+00:00
+5505557,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505557,2026-08-05T04:10:29.949114+00:00
+5505557,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5505557,2026-08-05T04:10:29.949114+00:00
+5462270,19807300.0,head_coach,head_coach,23722507,"JIMÉNEZ BLÁZQUEZ, RUBÉN JUAN",https://www.rffm.es/acta-partido/5462270,2026-08-05T04:10:29.951952+00:00
+5462270,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462270,2026-08-05T04:10:29.951952+00:00
+5462269,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462269,2026-08-05T04:10:30.050562+00:00
+5462269,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462269,2026-08-05T04:10:30.050562+00:00
+5462269,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462269,2026-08-05T04:10:30.050562+00:00
+5505572,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5505572,2026-08-05T04:10:30.239400+00:00
+5505572,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505572,2026-08-05T04:10:30.239400+00:00
+5462266,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462266,2026-08-05T04:10:30.621826+00:00
+5462266,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462266,2026-08-05T04:10:30.621826+00:00
+5462266,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462266,2026-08-05T04:10:30.621826+00:00
+5462266,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462266,2026-08-05T04:10:30.621826+00:00
+5484369,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5484369,2026-08-05T04:10:30.840775+00:00
+5484369,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484369,2026-08-05T04:10:30.840775+00:00
+5484369,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484369,2026-08-05T04:10:30.840775+00:00
+5462279,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462279,2026-08-05T04:10:31.055994+00:00
+5462279,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462279,2026-08-05T04:10:31.055994+00:00
+5462274,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462274,2026-08-05T04:10:31.162566+00:00
+5462274,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462274,2026-08-05T04:10:31.162566+00:00
+5462274,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462274,2026-08-05T04:10:31.162566+00:00
+5462274,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462274,2026-08-05T04:10:31.162566+00:00
+5560224,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5560224,2026-08-05T04:10:31.427291+00:00
+5560224,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5560224,2026-08-05T04:10:31.427291+00:00
+5462272,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462272,2026-08-05T04:10:31.433682+00:00
+5462272,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462272,2026-08-05T04:10:31.433682+00:00
+5462272,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462272,2026-08-05T04:10:31.433682+00:00
+5462272,18439632.0,team_delegate,team_delegate,,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5462272,2026-08-05T04:10:31.433682+00:00
+5462277,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462277,2026-08-05T04:10:31.796908+00:00
+5462277,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462277,2026-08-05T04:10:31.796908+00:00
+5462277,19807300.0,head_coach,head_coach,25693852,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5462277,2026-08-05T04:10:31.796908+00:00
+5484355,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484355,2026-08-05T04:10:31.954818+00:00
+5484355,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484355,2026-08-05T04:10:31.954818+00:00
+5484355,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5484355,2026-08-05T04:10:31.954818+00:00
+5462273,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462273,2026-08-05T04:10:31.960481+00:00
+5462273,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462273,2026-08-05T04:10:31.960481+00:00
+5462273,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462273,2026-08-05T04:10:31.960481+00:00
+5505558,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505558,2026-08-05T04:10:32.295791+00:00
+5505558,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5505558,2026-08-05T04:10:32.295791+00:00
+5505559,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505559,2026-08-05T04:10:32.345995+00:00
+5505559,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5505559,2026-08-05T04:10:32.345995+00:00
+5505559,19807300.0,team_delegate,team_delegate,,"MANZANO HIGUERAS, JESUS",https://www.rffm.es/acta-partido/5505559,2026-08-05T04:10:32.345995+00:00
+5462280,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462280,2026-08-05T04:10:32.459190+00:00
+5462280,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462280,2026-08-05T04:10:32.459190+00:00
+5462280,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462280,2026-08-05T04:10:32.459190+00:00
+5484356,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484356,2026-08-05T04:10:32.622595+00:00
+5484356,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484356,2026-08-05T04:10:32.622595+00:00
+5484356,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5484356,2026-08-05T04:10:32.622595+00:00
+5462287,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462287,2026-08-05T04:10:32.651816+00:00
+5462287,18439632.0,team_delegate,team_delegate,,"PARTIDA JUAREZ, IKER",https://www.rffm.es/acta-partido/5462287,2026-08-05T04:10:32.651816+00:00
+5462287,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462287,2026-08-05T04:10:32.651816+00:00
+5462285,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462285,2026-08-05T04:10:32.676879+00:00
+5462285,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462285,2026-08-05T04:10:32.676879+00:00
+5462285,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462285,2026-08-05T04:10:32.676879+00:00
+5558345,19691247.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5558345,2026-08-05T04:10:32.757907+00:00
+5558345,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5558345,2026-08-05T04:10:32.757907+00:00
+5558345,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5558345,2026-08-05T04:10:32.757907+00:00
+5558345,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5558345,2026-08-05T04:10:32.757907+00:00
+5462284,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462284,2026-08-05T04:10:33.039381+00:00
+5462284,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462284,2026-08-05T04:10:33.039381+00:00
+5462284,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462284,2026-08-05T04:10:33.039381+00:00
+5462289,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462289,2026-08-05T04:10:33.336011+00:00
+5462289,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462289,2026-08-05T04:10:33.336011+00:00
+5462289,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462289,2026-08-05T04:10:33.336011+00:00
+5462295,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462295,2026-08-05T04:10:33.448898+00:00
+5462295,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462295,2026-08-05T04:10:33.448898+00:00
+5462295,18439632.0,head_coach,head_coach,22794989,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5462295,2026-08-05T04:10:33.448898+00:00
+5462288,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462288,2026-08-05T04:10:33.606127+00:00
+5462288,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462288,2026-08-05T04:10:33.606127+00:00
+5462288,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462288,2026-08-05T04:10:33.606127+00:00
+5462294,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462294,2026-08-05T04:10:33.631737+00:00
+5462294,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462294,2026-08-05T04:10:33.631737+00:00
+5462294,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462294,2026-08-05T04:10:33.631737+00:00
+5462294,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462294,2026-08-05T04:10:33.631737+00:00
+5462292,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462292,2026-08-05T04:10:33.641706+00:00
+5462292,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462292,2026-08-05T04:10:33.641706+00:00
+5484370,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5484370,2026-08-05T04:10:33.739005+00:00
+5484370,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484370,2026-08-05T04:10:33.739005+00:00
+5484370,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484370,2026-08-05T04:10:33.739005+00:00
+5462293,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462293,2026-08-05T04:10:33.902732+00:00
+5462293,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462293,2026-08-05T04:10:33.902732+00:00
+5462293,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462293,2026-08-05T04:10:33.902732+00:00
+5462293,25043802.0,team_delegate,team_delegate,,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462293,2026-08-05T04:10:33.902732+00:00
+5462296,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462296,2026-08-05T04:10:34.397815+00:00
+5462296,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462296,2026-08-05T04:10:34.397815+00:00
+5462296,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462296,2026-08-05T04:10:34.397815+00:00
+5462303,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462303,2026-08-05T04:10:34.665790+00:00
+5462303,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462303,2026-08-05T04:10:34.665790+00:00
+5462303,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462303,2026-08-05T04:10:34.665790+00:00
+5462303,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462303,2026-08-05T04:10:34.665790+00:00
+5462300,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462300,2026-08-05T04:10:34.837153+00:00
+5462300,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462300,2026-08-05T04:10:34.837153+00:00
+5462301,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462301,2026-08-05T04:10:35.067000+00:00
+5462301,24031624.0,head_coach,head_coach,25957159,"MANCHEÑO TORRIJOS, JOAQUIN",https://www.rffm.es/acta-partido/5462301,2026-08-05T04:10:35.067000+00:00
+5462309,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462309,2026-08-05T04:10:35.471107+00:00
+5462309,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462309,2026-08-05T04:10:35.471107+00:00
+5462309,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462309,2026-08-05T04:10:35.471107+00:00
+5484371,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5484371,2026-08-05T04:10:35.567036+00:00
+5484371,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484371,2026-08-05T04:10:35.567036+00:00
+5484371,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484371,2026-08-05T04:10:35.567036+00:00
+5462299,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462299,2026-08-05T04:10:35.572188+00:00
+5462299,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462299,2026-08-05T04:10:35.572188+00:00
+5462299,19807300.0,head_coach,head_coach,25693852,"CALVO DÍAZ, CARLOS",https://www.rffm.es/acta-partido/5462299,2026-08-05T04:10:35.572188+00:00
+5505560,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505560,2026-08-05T04:10:35.625648+00:00
+5505560,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5505560,2026-08-05T04:10:35.625648+00:00
+5462302,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462302,2026-08-05T04:10:35.699288+00:00
+5462302,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462302,2026-08-05T04:10:35.699288+00:00
+5462302,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462302,2026-08-05T04:10:35.699288+00:00
+5505574,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5505574,2026-08-05T04:10:35.794613+00:00
+5505574,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5505574,2026-08-05T04:10:35.794613+00:00
+5505574,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505574,2026-08-05T04:10:35.794613+00:00
+5462318,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462318,2026-08-05T04:10:36.251841+00:00
+5462318,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462318,2026-08-05T04:10:36.251841+00:00
+5462318,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462318,2026-08-05T04:10:36.251841+00:00
+5462311,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462311,2026-08-05T04:10:36.368980+00:00
+5462311,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462311,2026-08-05T04:10:36.368980+00:00
+5462311,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462311,2026-08-05T04:10:36.368980+00:00
+5462311,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462311,2026-08-05T04:10:36.368980+00:00
+5462316,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462316,2026-08-05T04:10:36.426494+00:00
+5462316,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462316,2026-08-05T04:10:36.426494+00:00
+5462316,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462316,2026-08-05T04:10:36.426494+00:00
+5462314,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462314,2026-08-05T04:10:36.432240+00:00
+5462314,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462314,2026-08-05T04:10:36.432240+00:00
+5462314,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462314,2026-08-05T04:10:36.432240+00:00
+5462304,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462304,2026-08-05T04:10:36.436461+00:00
+5462304,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462304,2026-08-05T04:10:36.436461+00:00
+5462304,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462304,2026-08-05T04:10:36.436461+00:00
+5462308,19807300.0,head_coach,head_coach,23722507,"JIMÉNEZ BLÁZQUEZ, RUBÉN JUAN",https://www.rffm.es/acta-partido/5462308,2026-08-05T04:10:36.777502+00:00
+5462308,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462308,2026-08-05T04:10:36.777502+00:00
+5462319,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462319,2026-08-05T04:10:37.297046+00:00
+5462319,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462319,2026-08-05T04:10:37.297046+00:00
+5462319,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462319,2026-08-05T04:10:37.297046+00:00
+5462319,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462319,2026-08-05T04:10:37.297046+00:00
+5462310,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462310,2026-08-05T04:10:37.404675+00:00
+5505561,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505561,2026-08-05T04:10:37.438769+00:00
+5505561,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5505561,2026-08-05T04:10:37.438769+00:00
+5505561,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5505561,2026-08-05T04:10:37.438769+00:00
+5462322,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462322,2026-08-05T04:10:37.518052+00:00
+5462322,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462322,2026-08-05T04:10:37.518052+00:00
+5462322,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462322,2026-08-05T04:10:37.518052+00:00
+5462325,19807300.0,head_coach,head_coach,22470901,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462325,2026-08-05T04:10:37.643780+00:00
+5462325,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462325,2026-08-05T04:10:37.643780+00:00
+5462325,18439632.0,team_delegate,team_delegate,,"PARTIDA JUAREZ, IKER",https://www.rffm.es/acta-partido/5462325,2026-08-05T04:10:37.643780+00:00
+5462317,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462317,2026-08-05T04:10:37.705549+00:00
+5462317,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462317,2026-08-05T04:10:37.705549+00:00
+5484358,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484358,2026-08-05T04:10:37.801265+00:00
+5484358,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484358,2026-08-05T04:10:37.801265+00:00
+5484358,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5484358,2026-08-05T04:10:37.801265+00:00
+5484358,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5484358,2026-08-05T04:10:37.801265+00:00
+5462323,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462323,2026-08-05T04:10:37.917006+00:00
+5462323,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462323,2026-08-05T04:10:37.917006+00:00
+5462326,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462326,2026-08-05T04:10:38.023335+00:00
+5462326,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462326,2026-08-05T04:10:38.023335+00:00
+5462326,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462326,2026-08-05T04:10:38.023335+00:00
+5484372,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5484372,2026-08-05T04:10:38.271607+00:00
+5484372,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484372,2026-08-05T04:10:38.271607+00:00
+5484372,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484372,2026-08-05T04:10:38.271607+00:00
+5462327,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462327,2026-08-05T04:10:38.480714+00:00
+5462327,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462327,2026-08-05T04:10:38.480714+00:00
+5462327,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462327,2026-08-05T04:10:38.480714+00:00
+5462334,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462334,2026-08-05T04:10:38.728017+00:00
+5462334,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462334,2026-08-05T04:10:38.728017+00:00
+5462334,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462334,2026-08-05T04:10:38.728017+00:00
+5462329,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462329,2026-08-05T04:10:39.026141+00:00
+5462329,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462329,2026-08-05T04:10:39.026141+00:00
+5462329,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462329,2026-08-05T04:10:39.026141+00:00
+5505575,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5505575,2026-08-05T04:10:39.043131+00:00
+5505575,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505575,2026-08-05T04:10:39.043131+00:00
+5505576,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5505576,2026-08-05T04:10:39.045464+00:00
+5505576,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5505576,2026-08-05T04:10:39.045464+00:00
+5505576,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505576,2026-08-05T04:10:39.045464+00:00
+5462330,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462330,2026-08-05T04:10:39.334551+00:00
+5462330,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462330,2026-08-05T04:10:39.334551+00:00
+5462330,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462330,2026-08-05T04:10:39.334551+00:00
+5462335,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462335,2026-08-05T04:10:39.337490+00:00
+5462335,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462335,2026-08-05T04:10:39.337490+00:00
+5462335,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462335,2026-08-05T04:10:39.337490+00:00
+5462335,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462335,2026-08-05T04:10:39.337490+00:00
+5462331,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462331,2026-08-05T04:10:39.790363+00:00
+5462331,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462331,2026-08-05T04:10:39.790363+00:00
+5462331,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462331,2026-08-05T04:10:39.790363+00:00
+5462333,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462333,2026-08-05T04:10:39.872264+00:00
+5462333,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462333,2026-08-05T04:10:39.872264+00:00
+5462333,19807300.0,head_coach,head_coach,25697278,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462333,2026-08-05T04:10:39.872264+00:00
+5462333,19807300.0,team_delegate,team_delegate,,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462333,2026-08-05T04:10:39.872264+00:00
+5462338,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462338,2026-08-05T04:10:39.910402+00:00
+5462338,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462338,2026-08-05T04:10:39.910402+00:00
+5462338,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462338,2026-08-05T04:10:39.910402+00:00
+5462342,19807300.0,head_coach,head_coach,26511816,"MOZAS HERNANDO, DANIEL",https://www.rffm.es/acta-partido/5462342,2026-08-05T04:10:39.950949+00:00
+5462342,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462342,2026-08-05T04:10:39.950949+00:00
+5462342,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462342,2026-08-05T04:10:39.950949+00:00
+5462339,18777237.0,head_coach,head_coach,25084477,"CEREZO GONZÁLEZ, UNAI",https://www.rffm.es/acta-partido/5462339,2026-08-05T04:10:39.997977+00:00
+5462339,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462339,2026-08-05T04:10:39.997977+00:00
+5462339,19691247.0,head_coach,head_coach,22975288,"LOPEZ CARMONA, ANTONIO",https://www.rffm.es/acta-partido/5462339,2026-08-05T04:10:39.997977+00:00
+5462339,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462339,2026-08-05T04:10:39.997977+00:00
+5462340,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462340,2026-08-05T04:10:40.284520+00:00
+5462340,18439632.0,head_coach,head_coach,22794989,"PARTIDA VERA, ÓSCAR",https://www.rffm.es/acta-partido/5462340,2026-08-05T04:10:40.284520+00:00
+5462340,18439632.0,team_delegate,team_delegate,,"PARTIDA JUAREZ, IKER",https://www.rffm.es/acta-partido/5462340,2026-08-05T04:10:40.284520+00:00
+5505562,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505562,2026-08-05T04:10:40.621083+00:00
+5505562,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5505562,2026-08-05T04:10:40.621083+00:00
+5505562,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5505562,2026-08-05T04:10:40.621083+00:00
+5484373,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5484373,2026-08-05T04:10:40.623967+00:00
+5484373,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484373,2026-08-05T04:10:40.623967+00:00
+5484373,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484373,2026-08-05T04:10:40.623967+00:00
+5462343,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462343,2026-08-05T04:10:40.847756+00:00
+5462343,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462343,2026-08-05T04:10:40.847756+00:00
+5462351,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462351,2026-08-05T04:10:40.948940+00:00
+5462351,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462351,2026-08-05T04:10:40.948940+00:00
+5462351,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462351,2026-08-05T04:10:40.948940+00:00
+5462348,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462348,2026-08-05T04:10:41.070998+00:00
+5462348,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462348,2026-08-05T04:10:41.070998+00:00
+5462348,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462348,2026-08-05T04:10:41.070998+00:00
+5462347,18439632.0,head_coach,head_coach,22828738,"MORENO MILLARA, DAVID",https://www.rffm.es/acta-partido/5462347,2026-08-05T04:10:41.077466+00:00
+5462347,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462347,2026-08-05T04:10:41.077466+00:00
+5462347,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462347,2026-08-05T04:10:41.077466+00:00
+5484374,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5484374,2026-08-05T04:10:41.143421+00:00
+5484374,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5484374,2026-08-05T04:10:41.143421+00:00
+5484374,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484374,2026-08-05T04:10:41.143421+00:00
+5484374,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484374,2026-08-05T04:10:41.143421+00:00
+5505577,25043802.0,head_coach,head_coach,25548061,"AGUILAR BASTANTE, NICOLAS",https://www.rffm.es/acta-partido/5505577,2026-08-05T04:10:41.792129+00:00
+5505577,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505577,2026-08-05T04:10:41.792129+00:00
+5462350,19807300.0,head_coach,head_coach,26511816,"MOZAS HERNANDO, DANIEL",https://www.rffm.es/acta-partido/5462350,2026-08-05T04:10:41.891638+00:00
+5462350,19807300.0,team_delegate,team_delegate,,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462350,2026-08-05T04:10:41.891638+00:00
+5462346,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462346,2026-08-05T04:10:41.900635+00:00
+5462346,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462346,2026-08-05T04:10:41.900635+00:00
+5462346,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462346,2026-08-05T04:10:41.900635+00:00
+5462357,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462357,2026-08-05T04:10:42.281078+00:00
+5462357,22473392.0,other_staff,ENCARGADO MATERIAL SALA,23182486,"MONTOYA HUARACHI, JOSÉ DANIEL",https://www.rffm.es/acta-partido/5462357,2026-08-05T04:10:42.281078+00:00
+5462357,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462357,2026-08-05T04:10:42.281078+00:00
+5462357,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462357,2026-08-05T04:10:42.281078+00:00
+5462356,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462356,2026-08-05T04:10:42.605160+00:00
+5462356,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462356,2026-08-05T04:10:42.605160+00:00
+5462356,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462356,2026-08-05T04:10:42.605160+00:00
+5462355,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462355,2026-08-05T04:10:42.613120+00:00
+5462355,18439632.0,head_coach,head_coach,20637478,"VILLA GARIJO, AGUSTIN",https://www.rffm.es/acta-partido/5462355,2026-08-05T04:10:42.613120+00:00
+5505563,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505563,2026-08-05T04:10:42.742063+00:00
+5505563,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5505563,2026-08-05T04:10:42.742063+00:00
+5462359,19807300.0,head_coach,head_coach,26511816,"MOZAS HERNANDO, DANIEL",https://www.rffm.es/acta-partido/5462359,2026-08-05T04:10:42.908528+00:00
+5462359,17149544.0,head_coach,head_coach,24993439,"BECERRA PÉREZ, GABRIEL ALEJANDRO",https://www.rffm.es/acta-partido/5462359,2026-08-05T04:10:42.908528+00:00
+5462352,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462352,2026-08-05T04:10:43.103087+00:00
+5462352,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462352,2026-08-05T04:10:43.103087+00:00
+5462352,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462352,2026-08-05T04:10:43.103087+00:00
+5462352,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462352,2026-08-05T04:10:43.103087+00:00
+5567198,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5567198,2026-08-05T04:10:43.378493+00:00
+5567198,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5567198,2026-08-05T04:10:43.378493+00:00
+5567198,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5567198,2026-08-05T04:10:43.378493+00:00
+5484375,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5484375,2026-08-05T04:10:43.725027+00:00
+5484375,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5484375,2026-08-05T04:10:43.725027+00:00
+5484375,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484375,2026-08-05T04:10:43.725027+00:00
+5484375,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484375,2026-08-05T04:10:43.725027+00:00
+5462360,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462360,2026-08-05T04:10:43.730668+00:00
+5462360,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462360,2026-08-05T04:10:43.730668+00:00
+5462363,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462363,2026-08-05T04:10:43.748260+00:00
+5462363,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462363,2026-08-05T04:10:43.748260+00:00
+5462363,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462363,2026-08-05T04:10:43.748260+00:00
+5462363,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462363,2026-08-05T04:10:43.748260+00:00
+5462364,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462364,2026-08-05T04:10:43.833903+00:00
+5462364,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462364,2026-08-05T04:10:43.833903+00:00
+5462364,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462364,2026-08-05T04:10:43.833903+00:00
+5462364,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462364,2026-08-05T04:10:43.833903+00:00
+5505578,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5505578,2026-08-05T04:10:43.890688+00:00
+5505578,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505578,2026-08-05T04:10:43.890688+00:00
+5484361,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484361,2026-08-05T04:10:43.940229+00:00
+5484361,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484361,2026-08-05T04:10:43.940229+00:00
+5484361,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5484361,2026-08-05T04:10:43.940229+00:00
+5484361,18439632.0,team_delegate,team_delegate,,"PARTIDA JUAREZ, IKER",https://www.rffm.es/acta-partido/5484361,2026-08-05T04:10:43.940229+00:00
+5462365,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462365,2026-08-05T04:10:44.265365+00:00
+5462372,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462372,2026-08-05T04:10:44.266134+00:00
+5462372,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462372,2026-08-05T04:10:44.266134+00:00
+5462372,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5462372,2026-08-05T04:10:44.266134+00:00
+5462368,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462368,2026-08-05T04:10:44.572803+00:00
+5462368,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462368,2026-08-05T04:10:44.572803+00:00
+5462368,25043802.0,head_coach,head_coach,25548061,"AGUILAR BASTANTE, NICOLAS",https://www.rffm.es/acta-partido/5462368,2026-08-05T04:10:44.572803+00:00
+5462374,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462374,2026-08-05T04:10:44.857401+00:00
+5462374,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462374,2026-08-05T04:10:44.857401+00:00
+5462373,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462373,2026-08-05T04:10:44.907923+00:00
+5484376,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5484376,2026-08-05T04:10:44.921998+00:00
+5484376,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5484376,2026-08-05T04:10:44.921998+00:00
+5484376,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484376,2026-08-05T04:10:44.921998+00:00
+5484376,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484376,2026-08-05T04:10:44.921998+00:00
+5462369,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462369,2026-08-05T04:10:44.953913+00:00
+5462369,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462369,2026-08-05T04:10:44.953913+00:00
+5462369,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462369,2026-08-05T04:10:44.953913+00:00
+5462369,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462369,2026-08-05T04:10:44.953913+00:00
+5505564,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505564,2026-08-05T04:10:45.110255+00:00
+5505564,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5505564,2026-08-05T04:10:45.110255+00:00
+5505564,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5505564,2026-08-05T04:10:45.110255+00:00
+5462376,19691247.0,head_coach,head_coach,19377509,"TRIGUERO ORTIZ, JAVIER",https://www.rffm.es/acta-partido/5462376,2026-08-05T04:10:45.431822+00:00
+5462376,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462376,2026-08-05T04:10:45.431822+00:00
+5462376,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462376,2026-08-05T04:10:45.431822+00:00
+5462382,19807300.0,head_coach,head_coach,26511816,"MOZAS HERNANDO, DANIEL",https://www.rffm.es/acta-partido/5462382,2026-08-05T04:10:45.980630+00:00
+5462382,19807300.0,team_delegate,team_delegate,,"ESPIGA PALACIOS, ADRIÁN",https://www.rffm.es/acta-partido/5462382,2026-08-05T04:10:45.980630+00:00
+5462382,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462382,2026-08-05T04:10:45.980630+00:00
+5462380,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5462380,2026-08-05T04:10:46.177720+00:00
+5462380,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462380,2026-08-05T04:10:46.177720+00:00
+5462380,20010115.0,team_delegate,team_delegate,,"PLANELLES HUECAS, SILVIA",https://www.rffm.es/acta-partido/5462380,2026-08-05T04:10:46.177720+00:00
+5462381,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462381,2026-08-05T04:10:46.183226+00:00
+5462381,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462381,2026-08-05T04:10:46.183226+00:00
+5462381,18777237.0,team_delegate,team_delegate,,"GUTIÉRREZ BUENO, JESÚS",https://www.rffm.es/acta-partido/5462381,2026-08-05T04:10:46.183226+00:00
+5505579,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5505579,2026-08-05T04:10:46.190323+00:00
+5505579,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5505579,2026-08-05T04:10:46.190323+00:00
+5505579,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505579,2026-08-05T04:10:46.190323+00:00
+5462377,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462377,2026-08-05T04:10:46.198172+00:00
+5462377,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462377,2026-08-05T04:10:46.198172+00:00
+5462377,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462377,2026-08-05T04:10:46.198172+00:00
+5484362,17155850.0,head_coach,head_coach,24799384,"BEAKA MBULA, FLAVIA",https://www.rffm.es/acta-partido/5484362,2026-08-05T04:10:46.309178+00:00
+5484362,25054323.0,head_coach,head_coach,25983733,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5484362,2026-08-05T04:10:46.309178+00:00
+5484362,25054323.0,team_delegate,team_delegate,,"CARRASCO LASTRE, MARIO",https://www.rffm.es/acta-partido/5484362,2026-08-05T04:10:46.309178+00:00
+5462389,20010115.0,head_coach,head_coach,25717516,"DE LOS REYES RODRIGUEZ, VÍCTOR",https://www.rffm.es/acta-partido/5462389,2026-08-05T04:10:46.428607+00:00
+5462389,20010115.0,other_staff,EPR SALA,20645248,"IGLESIAS BRAVO, ALBERTO",https://www.rffm.es/acta-partido/5462389,2026-08-05T04:10:46.428607+00:00
+5462389,20010115.0,other_staff,EPR SALA,26482214,"ESQUIVIAS FERNÁNDEZ, ÁLVARO",https://www.rffm.es/acta-partido/5462389,2026-08-05T04:10:46.428607+00:00
+5462389,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5462389,2026-08-05T04:10:46.428607+00:00
+5462385,25043802.0,head_coach,head_coach,22828662,"LAISECA FERNANDEZ, BALDOMERO",https://www.rffm.es/acta-partido/5462385,2026-08-05T04:10:46.873956+00:00
+5462385,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462385,2026-08-05T04:10:46.873956+00:00
+5462384,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462384,2026-08-05T04:10:46.919516+00:00
+5462384,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462384,2026-08-05T04:10:46.919516+00:00
+5462384,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462384,2026-08-05T04:10:46.919516+00:00
+5462384,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462384,2026-08-05T04:10:46.919516+00:00
+5505565,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505565,2026-08-05T04:10:47.088220+00:00
+5462386,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462386,2026-08-05T04:10:47.348600+00:00
+5462386,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462386,2026-08-05T04:10:47.348600+00:00
+5462386,21591902.0,head_coach,head_coach,22975424,"RECIO ORTIZ, JOSE LUIS",https://www.rffm.es/acta-partido/5462386,2026-08-05T04:10:47.348600+00:00
+5462386,21591902.0,team_delegate,team_delegate,,"RECIO ORTIZ, DAVID",https://www.rffm.es/acta-partido/5462386,2026-08-05T04:10:47.348600+00:00
+5462390,18777237.0,head_coach,head_coach,22861706,"DELEUZE GARCÍA, IÑIGO ALBERTO",https://www.rffm.es/acta-partido/5462390,2026-08-05T04:10:47.398268+00:00
+5462390,19807300.0,head_coach,head_coach,26511816,"MOZAS HERNANDO, DANIEL",https://www.rffm.es/acta-partido/5462390,2026-08-05T04:10:47.398268+00:00
+5484377,24031624.0,team_delegate,team_delegate,,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5484377,2026-08-05T04:10:47.474359+00:00
+5484377,24031624.0,other_staff,EPR SALA,25590354,"PEREZ CARRALERO, ABEL",https://www.rffm.es/acta-partido/5484377,2026-08-05T04:10:47.474359+00:00
+5484377,17155850.0,assistant_coach,assistant_coach,25802064,"LORENTE RIEROLA, JAIME",https://www.rffm.es/acta-partido/5484377,2026-08-05T04:10:47.474359+00:00
+5462399,24156148.0,head_coach,head_coach,23258620,"GONZÁLEZ SALDAÑA, JESÚS",https://www.rffm.es/acta-partido/5462399,2026-08-05T04:10:47.495100+00:00
+5462399,24156148.0,team_delegate,team_delegate,,"GARCÍA CAMACHO, MIGUEL ANGEL",https://www.rffm.es/acta-partido/5462399,2026-08-05T04:10:47.495100+00:00
+5462399,22473392.0,head_coach,head_coach,25860510,"GÓMEZ ARANDA, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/5462399,2026-08-05T04:10:47.495100+00:00
+5505580,17149544.0,head_coach,head_coach,20222197,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/5505580,2026-08-05T04:10:47.911284+00:00
+5505580,25037967.0,head_coach,head_coach,25624985,"OCAMPOS GONZÁLEZ, JOSÉ MARÍA",https://www.rffm.es/acta-partido/5505580,2026-08-05T04:10:47.911284+00:00
+5462394,25054323.0,head_coach,head_coach,22862389,"SANCHO GOMEZ, MIGUEL ROMAN",https://www.rffm.es/acta-partido/5462394,2026-08-05T04:10:48.065112+00:00
+5462394,17146534.0,head_coach,head_coach,25563778,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/5462394,2026-08-05T04:10:48.065112+00:00
+5462394,17146534.0,team_delegate,team_delegate,,"RODRIGUEZ RUIZ DE SOMAVIA, FRANCISCO JAVIER",https://www.rffm.es/acta-partido/5462394,2026-08-05T04:10:48.065112+00:00
+5462392,18439632.0,head_coach,head_coach,22975523,"RUIZ PALOMAR, ALEJANDRO",https://www.rffm.es/acta-partido/5462392,2026-08-05T04:10:48.324923+00:00
+5462392,19691247.0,head_coach,head_coach,21767266,"PIÑA MENDIETA, JAVIER",https://www.rffm.es/acta-partido/5462392,2026-08-05T04:10:48.324923+00:00
+5462392,19691247.0,assistant_coach,assistant_coach,21779779,"DELGADO IGLESIAS, DAVID",https://www.rffm.es/acta-partido/5462392,2026-08-05T04:10:48.324923+00:00
+5564495,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5564495,2026-08-05T04:10:48.761116+00:00
+5564495,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5564495,2026-08-05T04:10:48.761116+00:00
+5564495,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5564495,2026-08-05T04:10:48.761116+00:00
+5564495,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5564495,2026-08-05T04:10:48.761116+00:00
+5564496,24010136.0,head_coach,head_coach,25893123,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5564496,2026-08-05T04:10:49.193175+00:00
+5564496,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5564496,2026-08-05T04:10:49.193175+00:00
+5564411,21637539.0,head_coach,head_coach,22550536,"HUERTAS ESCUDERO, MIGUEL",https://www.rffm.es/acta-partido/5564411,2026-08-05T04:10:49.294438+00:00
+5564411,17155562.0,head_coach,head_coach,19913959,"MERCHÁN VELÁZQUEZ, JORGE",https://www.rffm.es/acta-partido/5564411,2026-08-05T04:10:49.294438+00:00
+5564411,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5564411,2026-08-05T04:10:49.294438+00:00
+5564411,17155562.0,other_staff,ENCARGADO MATERIAL SALA,25696545,"MERCHAN JUAN, LUIS MIGUEL",https://www.rffm.es/acta-partido/5564411,2026-08-05T04:10:49.294438+00:00
+5507280,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5507280,2026-08-05T04:10:49.305451+00:00
+5507280,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5507280,2026-08-05T04:10:49.305451+00:00
+5507280,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5507280,2026-08-05T04:10:49.305451+00:00
+5564494,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5564494,2026-08-05T04:10:49.305968+00:00
+5564494,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5564494,2026-08-05T04:10:49.305968+00:00
+5564494,21637539.0,head_coach,head_coach,22550536,"HUERTAS ESCUDERO, MIGUEL",https://www.rffm.es/acta-partido/5564494,2026-08-05T04:10:49.305968+00:00
+5564726,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5564726,2026-08-05T04:10:49.336615+00:00
+5564726,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5564726,2026-08-05T04:10:49.336615+00:00
+5564726,24010136.0,head_coach,head_coach,25893123,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5564726,2026-08-05T04:10:49.336615+00:00
+5564726,24010136.0,other_staff,EPR SALA,26445271,"SALVADOR GARCIA, LAURA",https://www.rffm.es/acta-partido/5564726,2026-08-05T04:10:49.336615+00:00
+5567435,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5567435,2026-08-05T04:10:49.628959+00:00
+5567435,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5567435,2026-08-05T04:10:49.628959+00:00
+5567436,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5567436,2026-08-05T04:10:49.845383+00:00
+5567436,17148877.0,team_delegate,team_delegate,,"RAMIRO FERNANDEZ, MIRIAM",https://www.rffm.es/acta-partido/5567436,2026-08-05T04:10:49.845383+00:00
+5567436,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5567436,2026-08-05T04:10:49.845383+00:00
+5567437,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5567437,2026-08-05T04:10:49.903379+00:00
+5567437,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5567437,2026-08-05T04:10:49.903379+00:00
+5567437,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5567437,2026-08-05T04:10:49.903379+00:00
+5567437,17148877.0,team_delegate,team_delegate,,"RAMIRO FERNANDEZ, MIRIAM",https://www.rffm.es/acta-partido/5567437,2026-08-05T04:10:49.903379+00:00
+5460073,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460073,2026-08-05T04:10:49.970489+00:00
+5460073,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460073,2026-08-05T04:10:49.970489+00:00
+5460078,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460078,2026-08-05T04:10:50.025847+00:00
+5460078,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460078,2026-08-05T04:10:50.025847+00:00
+5460078,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460078,2026-08-05T04:10:50.025847+00:00
+5460072,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460072,2026-08-05T04:10:50.108493+00:00
+5460072,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460072,2026-08-05T04:10:50.108493+00:00
+5460072,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460072,2026-08-05T04:10:50.108493+00:00
+5460071,21637539.0,head_coach,head_coach,25544232,"FERNANDEZ MARTIN, GABRIEL",https://www.rffm.es/acta-partido/5460071,2026-08-05T04:10:50.382842+00:00
+5460071,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460071,2026-08-05T04:10:50.382842+00:00
+5460077,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460077,2026-08-05T04:10:50.494269+00:00
+5460077,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460077,2026-08-05T04:10:50.494269+00:00
+5460077,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460077,2026-08-05T04:10:50.494269+00:00
+5460077,17155562.0,team_delegate,team_delegate,,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460077,2026-08-05T04:10:50.494269+00:00
+5460076,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460076,2026-08-05T04:10:50.809249+00:00
+5460076,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460076,2026-08-05T04:10:50.809249+00:00
+5460079,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460079,2026-08-05T04:10:51.168686+00:00
+5460079,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460079,2026-08-05T04:10:51.168686+00:00
+5460080,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460080,2026-08-05T04:10:51.204392+00:00
+5460080,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460080,2026-08-05T04:10:51.204392+00:00
+5460080,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460080,2026-08-05T04:10:51.204392+00:00
+5460081,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460081,2026-08-05T04:10:51.212138+00:00
+5460081,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460081,2026-08-05T04:10:51.212138+00:00
+5460081,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460081,2026-08-05T04:10:51.212138+00:00
+5460081,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460081,2026-08-05T04:10:51.212138+00:00
+5460085,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460085,2026-08-05T04:10:51.580080+00:00
+5460085,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460085,2026-08-05T04:10:51.580080+00:00
+5460085,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460085,2026-08-05T04:10:51.580080+00:00
+5460084,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460084,2026-08-05T04:10:51.673736+00:00
+5460084,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460084,2026-08-05T04:10:51.673736+00:00
+5460089,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460089,2026-08-05T04:10:51.799481+00:00
+5460089,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460089,2026-08-05T04:10:51.799481+00:00
+5460086,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460086,2026-08-05T04:10:52.082306+00:00
+5460086,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460086,2026-08-05T04:10:52.082306+00:00
+5460086,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460086,2026-08-05T04:10:52.082306+00:00
+5460088,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460088,2026-08-05T04:10:52.124475+00:00
+5460088,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460088,2026-08-05T04:10:52.124475+00:00
+5460088,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460088,2026-08-05T04:10:52.124475+00:00
+5460093,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460093,2026-08-05T04:10:52.446295+00:00
+5460093,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460093,2026-08-05T04:10:52.446295+00:00
+5460087,24010136.0,head_coach,head_coach,25649748,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5460087,2026-08-05T04:10:52.455943+00:00
+5460087,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460087,2026-08-05T04:10:52.455943+00:00
+5460092,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460092,2026-08-05T04:10:52.494445+00:00
+5460092,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460092,2026-08-05T04:10:52.494445+00:00
+5460092,24010136.0,head_coach,head_coach,20230439,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5460092,2026-08-05T04:10:52.494445+00:00
+5460094,17155562.0,head_coach,head_coach,19913959,"MERCHÁN VELÁZQUEZ, JORGE",https://www.rffm.es/acta-partido/5460094,2026-08-05T04:10:52.621186+00:00
+5460094,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460094,2026-08-05T04:10:52.621186+00:00
+5460094,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460094,2026-08-05T04:10:52.621186+00:00
+5460095,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460095,2026-08-05T04:10:52.778055+00:00
+5460095,22398812.0,team_delegate,team_delegate,,"FERNANDEZ GONZALEZ, JOAQUIN",https://www.rffm.es/acta-partido/5460095,2026-08-05T04:10:52.778055+00:00
+5460095,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460095,2026-08-05T04:10:52.778055+00:00
+5460095,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460095,2026-08-05T04:10:52.778055+00:00
+5460097,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460097,2026-08-05T04:10:52.930068+00:00
+5460097,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460097,2026-08-05T04:10:52.930068+00:00
+5460097,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460097,2026-08-05T04:10:52.930068+00:00
+5460096,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460096,2026-08-05T04:10:52.977255+00:00
+5460096,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460096,2026-08-05T04:10:52.977255+00:00
+5460099,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460099,2026-08-05T04:10:53.310426+00:00
+5460099,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460099,2026-08-05T04:10:53.310426+00:00
+5460101,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460101,2026-08-05T04:10:53.683109+00:00
+5460101,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460101,2026-08-05T04:10:53.683109+00:00
+5460101,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460101,2026-08-05T04:10:53.683109+00:00
+5460101,17148877.0,team_delegate,team_delegate,,"RAMIRO FERNANDEZ, MIRIAM",https://www.rffm.es/acta-partido/5460101,2026-08-05T04:10:53.683109+00:00
+5460100,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460100,2026-08-05T04:10:53.689832+00:00
+5460100,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460100,2026-08-05T04:10:53.689832+00:00
+5460100,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460100,2026-08-05T04:10:53.689832+00:00
+5460106,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460106,2026-08-05T04:10:53.697023+00:00
+5460106,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460106,2026-08-05T04:10:53.697023+00:00
+5460106,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460106,2026-08-05T04:10:53.697023+00:00
+5460105,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460105,2026-08-05T04:10:53.792673+00:00
+5460105,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460105,2026-08-05T04:10:53.792673+00:00
+5460105,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460105,2026-08-05T04:10:53.792673+00:00
+5460104,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460104,2026-08-05T04:10:53.872073+00:00
+5460104,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460104,2026-08-05T04:10:53.872073+00:00
+5460109,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460109,2026-08-05T04:10:54.130535+00:00
+5460109,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460109,2026-08-05T04:10:54.130535+00:00
+5460109,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460109,2026-08-05T04:10:54.130535+00:00
+5460109,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460109,2026-08-05T04:10:54.130535+00:00
+5460108,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460108,2026-08-05T04:10:54.586500+00:00
+5460108,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460108,2026-08-05T04:10:54.586500+00:00
+5460108,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460108,2026-08-05T04:10:54.586500+00:00
+5460107,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460107,2026-08-05T04:10:54.590845+00:00
+5460107,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460107,2026-08-05T04:10:54.590845+00:00
+5460112,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460112,2026-08-05T04:10:54.803942+00:00
+5460112,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460112,2026-08-05T04:10:54.803942+00:00
+5460112,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460112,2026-08-05T04:10:54.803942+00:00
+5460114,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460114,2026-08-05T04:10:54.866509+00:00
+5460114,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460114,2026-08-05T04:10:54.866509+00:00
+5460114,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460114,2026-08-05T04:10:54.866509+00:00
+5460114,17148877.0,team_delegate,team_delegate,,"RAMIRO FERNANDEZ, MIRIAM",https://www.rffm.es/acta-partido/5460114,2026-08-05T04:10:54.866509+00:00
+5460113,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460113,2026-08-05T04:10:54.882110+00:00
+5460113,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460113,2026-08-05T04:10:54.882110+00:00
+5460113,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460113,2026-08-05T04:10:54.882110+00:00
+5460116,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460116,2026-08-05T04:10:55.126253+00:00
+5460116,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460116,2026-08-05T04:10:55.126253+00:00
+5460116,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460116,2026-08-05T04:10:55.126253+00:00
+5460117,17148877.0,head_coach,head_coach,25864925,"LLANES FILOSO, MARÍA",https://www.rffm.es/acta-partido/5460117,2026-08-05T04:10:55.157379+00:00
+5460117,17148877.0,team_delegate,team_delegate,,"PEREZ MARTIN, ADRIAN",https://www.rffm.es/acta-partido/5460117,2026-08-05T04:10:55.157379+00:00
+5460117,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460117,2026-08-05T04:10:55.157379+00:00
+5460115,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460115,2026-08-05T04:10:55.383884+00:00
+5460115,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460115,2026-08-05T04:10:55.383884+00:00
+5460115,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460115,2026-08-05T04:10:55.383884+00:00
+5460122,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460122,2026-08-05T04:10:55.518550+00:00
+5460122,17155562.0,head_coach,head_coach,21970542,"BRETON ORTIZ, FRANCISCO",https://www.rffm.es/acta-partido/5460122,2026-08-05T04:10:55.518550+00:00
+5460122,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460122,2026-08-05T04:10:55.518550+00:00
+5460120,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460120,2026-08-05T04:10:55.835864+00:00
+5460120,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460120,2026-08-05T04:10:55.835864+00:00
+5460120,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460120,2026-08-05T04:10:55.835864+00:00
+5460121,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460121,2026-08-05T04:10:56.117851+00:00
+5460121,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460121,2026-08-05T04:10:56.117851+00:00
+5460121,17148877.0,team_delegate,team_delegate,,"PEREZ MARTIN, ADRIAN",https://www.rffm.es/acta-partido/5460121,2026-08-05T04:10:56.117851+00:00
+5460123,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460123,2026-08-05T04:10:56.150368+00:00
+5460123,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460123,2026-08-05T04:10:56.150368+00:00
+5460123,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460123,2026-08-05T04:10:56.150368+00:00
+5460123,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460123,2026-08-05T04:10:56.150368+00:00
+5460125,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460125,2026-08-05T04:10:56.155019+00:00
+5460125,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460125,2026-08-05T04:10:56.155019+00:00
+5460125,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460125,2026-08-05T04:10:56.155019+00:00
+5558251,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5558251,2026-08-05T04:10:56.380823+00:00
+5558251,17148877.0,team_delegate,team_delegate,,"RAMIRO FERNANDEZ, MIRIAM",https://www.rffm.es/acta-partido/5558251,2026-08-05T04:10:56.380823+00:00
+5558251,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5558251,2026-08-05T04:10:56.380823+00:00
+5558251,24010136.0,other_staff,EPR SALA,26445271,"SALVADOR GARCIA, LAURA",https://www.rffm.es/acta-partido/5558251,2026-08-05T04:10:56.380823+00:00
+5460127,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460127,2026-08-05T04:10:56.385049+00:00
+5460127,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460127,2026-08-05T04:10:56.385049+00:00
+5460128,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460128,2026-08-05T04:10:56.636944+00:00
+5460128,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460128,2026-08-05T04:10:56.636944+00:00
+5460128,24010136.0,head_coach,head_coach,25893123,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5460128,2026-08-05T04:10:56.636944+00:00
+5460129,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460129,2026-08-05T04:10:56.741535+00:00
+5460129,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460129,2026-08-05T04:10:56.741535+00:00
+5460129,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460129,2026-08-05T04:10:56.741535+00:00
+5460134,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460134,2026-08-05T04:10:57.085556+00:00
+5460134,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460134,2026-08-05T04:10:57.085556+00:00
+5460134,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460134,2026-08-05T04:10:57.085556+00:00
+5562751,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5562751,2026-08-05T04:10:57.412330+00:00
+5562751,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5562751,2026-08-05T04:10:57.412330+00:00
+5460133,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460133,2026-08-05T04:10:57.422635+00:00
+5460133,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460133,2026-08-05T04:10:57.422635+00:00
+5460133,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460133,2026-08-05T04:10:57.422635+00:00
+5460137,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460137,2026-08-05T04:10:57.489703+00:00
+5460137,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460137,2026-08-05T04:10:57.489703+00:00
+5460137,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460137,2026-08-05T04:10:57.489703+00:00
+5460137,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460137,2026-08-05T04:10:57.489703+00:00
+5460135,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460135,2026-08-05T04:10:57.521022+00:00
+5460135,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460135,2026-08-05T04:10:57.521022+00:00
+5460140,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460140,2026-08-05T04:10:58.168637+00:00
+5460140,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460140,2026-08-05T04:10:58.168637+00:00
+5460140,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460140,2026-08-05T04:10:58.168637+00:00
+5460136,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460136,2026-08-05T04:10:58.250358+00:00
+5460136,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460136,2026-08-05T04:10:58.250358+00:00
+5460136,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460136,2026-08-05T04:10:58.250358+00:00
+5460142,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460142,2026-08-05T04:10:58.282663+00:00
+5460142,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460142,2026-08-05T04:10:58.282663+00:00
+5460142,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460142,2026-08-05T04:10:58.282663+00:00
+5460141,24044431.0,head_coach,head_coach,22862466,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/5460141,2026-08-05T04:10:58.544605+00:00
+5460141,21637539.0,head_coach,head_coach,22550536,"HUERTAS ESCUDERO, MIGUEL",https://www.rffm.es/acta-partido/5460141,2026-08-05T04:10:58.544605+00:00
+5460145,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460145,2026-08-05T04:10:58.822072+00:00
+5460145,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460145,2026-08-05T04:10:58.822072+00:00
+5460143,24010136.0,head_coach,head_coach,25893123,"CODES ALCOY, NOELIA MARIA",https://www.rffm.es/acta-partido/5460143,2026-08-05T04:10:58.831996+00:00
+5460143,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460143,2026-08-05T04:10:58.831996+00:00
+5460148,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460148,2026-08-05T04:10:58.917441+00:00
+5460148,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460148,2026-08-05T04:10:58.917441+00:00
+5460150,17155562.0,head_coach,head_coach,24549677,"GÁMEZ MORENO, MARÍA",https://www.rffm.es/acta-partido/5460150,2026-08-05T04:10:58.925686+00:00
+5460150,17155562.0,team_delegate,team_delegate,,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460150,2026-08-05T04:10:58.925686+00:00
+5460150,21637539.0,head_coach,head_coach,26071470,"MARTIN DEL AGUA, PAULA",https://www.rffm.es/acta-partido/5460150,2026-08-05T04:10:58.925686+00:00
+5460144,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460144,2026-08-05T04:10:58.928849+00:00
+5460144,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460144,2026-08-05T04:10:58.928849+00:00
+5460151,22398812.0,head_coach,head_coach,22339438,"CENTENO MURIEL, RAUL",https://www.rffm.es/acta-partido/5460151,2026-08-05T04:10:59.149600+00:00
+5460151,22398812.0,assistant_coach,assistant_coach,25689973,"BABIANO MARTIN, AITOR",https://www.rffm.es/acta-partido/5460151,2026-08-05T04:10:59.149600+00:00
+5460151,24044431.0,assistant_coach,assistant_coach,24649312,"ALONSO UREÑA, MARIO",https://www.rffm.es/acta-partido/5460151,2026-08-05T04:10:59.149600+00:00
+5460149,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460149,2026-08-05T04:10:59.249292+00:00
+5460149,17146030.0,head_coach,head_coach,25651770,"FERNANDEZ MARTIN, GABRIEL",https://www.rffm.es/acta-partido/5460149,2026-08-05T04:10:59.249292+00:00
+5460152,24010136.0,head_coach,head_coach,19553528,"MERINO OJEDA, SARA",https://www.rffm.es/acta-partido/5460152,2026-08-05T04:10:59.560842+00:00
+5460152,17148877.0,head_coach,head_coach,25864875,"MULERO DE LA FUENTE, JUAN",https://www.rffm.es/acta-partido/5460152,2026-08-05T04:10:59.560842+00:00
+5460153,17146030.0,head_coach,head_coach,23214760,"PLAZA MARTÍN, SARA",https://www.rffm.es/acta-partido/5460153,2026-08-05T04:10:59.790464+00:00
+5460153,17155562.0,head_coach,head_coach,23662407,"DÍEZ CANSECO NIETO, EVA",https://www.rffm.es/acta-partido/5460153,2026-08-05T04:10:59.790464+00:00
+5460153,17155562.0,team_delegate,team_delegate,,"ARRIBA SANCHEZ, FRANCISCO J",https://www.rffm.es/acta-partido/5460153,2026-08-05T04:10:59.790464+00:00
