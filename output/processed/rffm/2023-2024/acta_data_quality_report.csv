@@ -1,10 +1,21 @@
 check_name,severity,entity_type,entity_id,group_id,competition_id,details
-acta_lineup_coverage_gap,warning,match,5092385,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5092407,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-anomalous_event_minute,warning,match_card,5092351:126274,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092351:138779,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092352:10847,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092352:20799550,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092363:13092,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092363:100914,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5092369:94374,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+acta_lineup_coverage_gap,warning,match,1717564,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717565,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717574,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717592,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717593,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717594,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717597,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717598,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717601,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717606,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717687,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717688,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717691,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717696,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717719,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717722,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1717748,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5106769,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5106841,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5106897,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
