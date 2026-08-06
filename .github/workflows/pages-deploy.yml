@@ -1,0 +1,58 @@
+name: Deploy RFFM site to GitHub Pages
+
+# Rebuilds the static GitHub Pages site from the CSVs already committed
+# under output/processed/rffm/ (analysis_scripts/build_site.py) and
+# publishes it. Never scrapes rffm.es and never writes back to the repo -
+# entirely separate from rffm-crawl.yml/crawl-all.yml. Requires GitHub
+# Pages to be set to "Source: GitHub Actions" once in repo Settings > Pages
+# (not something a workflow file can do for you).
+#
+# Triggers: manual dispatch any time, plus a daily cron so the published
+# site stays in sync with whatever the crawl workflows have committed
+# since the last run.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "17 4 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build site
+        run: python analysis_scripts/build_site.py --output-dir site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
