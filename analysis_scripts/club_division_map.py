@@ -17,6 +17,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from site_theme import FONT_LINKS, lang_switch_html
+
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
 
@@ -154,11 +156,12 @@ def load_data(season: str) -> dict:
 
 
 HTML = r"""<!DOCTYPE html>
-<html lang="es">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RFFM %SEASON% — Mapa de clubes por división</title>
+<title>RFFM %SEASON% — карта клубов по дивизионам</title>
+%FONT_LINKS%
 <style>
 :root{
   --bg:#eef0ea; --surface:#ffffff; --ink:#1b2a1f; --ink-soft:#516155; --ink-faint:#8b9a8e;
@@ -194,13 +197,14 @@ body{
   line-height:1.5; -webkit-font-smoothing:antialiased;
 }
 .page{ max-width:1400px; margin:0 auto; padding:2.25rem 1.25rem 4rem; display:flex; flex-direction:column; gap:1.5rem; }
-h1{ font-family: ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight:800;
-  letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.4rem,2.8vw,1.9rem); line-height:1.2; }
-header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3px solid var(--ink); padding-bottom:1rem;}
-.eyebrow{ font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
+h1{ font-family: 'Oswald', ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.4rem,2.8vw,1.9rem); line-height:1.2; }
+header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3px solid var(--ink); padding-bottom:1rem; position:relative;}
+.eyebrow{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
 .masthead p{margin:0; color:var(--ink-soft); font-size:0.95rem; max-width:70ch;}
-a.back{font-size:0.8rem; color:var(--accent); text-decoration:none;}
+a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 a.back:hover{text-decoration:underline;}
+.masthead .lang-switch{position:absolute; top:0; right:0;}
 
 .stats{display:flex; flex-wrap:wrap; gap:0.75rem;}
 .stat{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:0.7rem 1rem;
@@ -220,6 +224,11 @@ button.toggle{ font-family:inherit; font-size:0.82rem; font-weight:600; color:va
 button.toggle:hover{color:var(--ink); border-color:var(--accent);}
 button.toggle.active{background:var(--accent-soft); color:var(--accent); border-color:var(--accent);}
 .result-count{font-size:0.8rem; color:var(--ink-soft); white-space:nowrap;}
+
+.lang-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; }
+.lang-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
+  padding:4px 12px; background:var(--surface); color:var(--ink-soft); border:none; cursor:pointer; }
+.lang-opt.is-active{background:var(--accent); color:#fff;}
 
 .legend{ display:flex; flex-wrap:wrap; gap:1.1rem; font-size:0.8rem; color:var(--ink-soft); align-items:center; }
 .legend .chip-sample{ display:inline-flex; align-items:center; gap:0.35rem; }
@@ -272,10 +281,11 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
 
 <div class="page">
   <header class="masthead">
+    %LANG_SWITCH%
     <a class="back" href="index.html">&larr; RFFM data</a>
-    <span class="eyebrow">RFFM (Madrid) &middot; Temporada %SEASON% &middot; Fútbol-7</span>
-    <h1>Mapa de clubes por división — Benjamín &amp; Prebenjamín</h1>
-    <p>Cada fila es un club, cada columna una división. La celda muestra cuántos equipos tiene el club ahí y la mejor posición alcanzada (de cualquiera de sus equipos) en su grupo. El tono de fondo se oscurece hacia las divisiones más altas.</p>
+    <span class="eyebrow"><span data-i18n="eyebrow">RFFM (Мадрид) &middot; Сезон %SEASON% &middot; Футбол-7</span></span>
+    <h1><span data-i18n="h1">Карта клубов по дивизионам — Бенхамин &amp; Пребенхамин</span></h1>
+    <p><span data-i18n="lede">Каждая строка &mdash; клуб, каждый столбец &mdash; дивизион. В ячейке &mdash; сколько команд клуба там выступает и лучшая позиция (любой из его команд) в своей группе. Фон темнее для более высоких дивизионов.</span></p>
   </header>
 
   <div class="stats" id="stats"></div>
@@ -283,18 +293,18 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
   <div class="controls">
     <div class="search">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchBox" placeholder="Buscar club (p. ej. Aravaca, Getafe, Real Madrid)&hellip;" autocomplete="off">
+      <input type="text" id="searchBox" placeholder="Поиск клуба (напр. Aravaca, Getafe, Real Madrid)&hellip;" autocomplete="off">
     </div>
-    <button class="toggle" id="presentToggle" type="button">Solo con presencia visible</button>
+    <button class="toggle" id="presentToggle" type="button"><span data-i18n="onlyPresent">Только с присутствием</span></button>
     <span class="result-count" id="resultCount"></span>
   </div>
 
   <div class="legend">
-    <span class="chip-sample"><span class="tier-dot" style="background:var(--tier-1)"></span>División más alta disponible</span>
-    <span class="chip-sample"><span class="tier-dot" style="background:var(--tier-4)"></span>División más baja disponible</span>
-    <span class="chip-sample"><span style="display:inline-block;width:0.9rem;height:0.9rem;border-radius:4px;box-shadow:inset 0 0 0 1.5px var(--gold);"></span>Líder de su grupo</span>
-    <span>Celda: nº de equipos del club ahí &middot; mejor posición/tamaño del grupo</span>
-    <span>&#128205; = sede más frecuente en Google Maps (formato "sede" rotativo — no necesariamente su campo fijo, ver nota al pie)</span>
+    <span class="chip-sample"><span class="tier-dot" style="background:var(--tier-1)"></span><span data-i18n="legend1">Высшая доступная лига</span></span>
+    <span class="chip-sample"><span class="tier-dot" style="background:var(--tier-4)"></span><span data-i18n="legend2">Низшая доступная лига</span></span>
+    <span class="chip-sample"><span style="display:inline-block;width:0.9rem;height:0.9rem;border-radius:4px;box-shadow:inset 0 0 0 1.5px var(--gold);"></span><span data-i18n="legend3">Лидер своей группы</span></span>
+    <span data-i18n="legend4">Ячейка: число команд клуба там &middot; лучшая позиция/размер группы</span>
+    <span data-i18n="legend5">&#128205; = самая частая площадка в Google Maps (формат «sede», ротация по турам — не обязательно постоянное поле, см. сноску)</span>
   </div>
 
   <div class="table-shell">
@@ -310,15 +320,19 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
   </div>
 
   <footer class="note">
-    Alcance: clubes con al menos un equipo Benjamín o Prebenjamín en fútbol-7 con clasificación registrada, temporada %SEASON%.
-    Posiciones de la fase regular únicamente. Fuente: <code>output/processed/rffm/{teams,competitions,standings,matches,venues}.csv</code>.
+    <span data-i18n="foot1">Охват: клубы минимум с одной командой Бенхамин или Пребенхамин в футболе-7 с зарегистрированной классификацией, сезон %SEASON%. Только позиции регулярного сезона. Источник: <code>output/processed/rffm/{teams,competitions,standings,matches,venues}.csv</code>.</span>
     <br><br>
-    <strong>Sobre el &#128205;:</strong> Benjamín/Prebenjamín suele jugarse en formato <em>"sede"</em> — los partidos "de casa" rotan entre varios campos asignados por jornada, no un estadio fijo del club. El pin abre en Google Maps el campo donde <em>más veces</em> jugó de local el equipo/los equipos de ese club en estas categorías esta temporada, con el % de sus partidos como local que se disputaron ahí — tómalo como orientativo, no como dirección oficial.
+    <span data-i18n="foot2"><strong>О значке &#128205;:</strong> Бенхамин/Пребенхамин обычно играют в формате <em>«sede»</em> — «домашние» матчи проходят на разных полях, назначаемых по турам, а не на одном постоянном стадионе клуба. Значок открывает в Google Maps поле, где команда(ы) клуба чаще всего играли дома в этих категориях в этом сезоне, с указанием % домашних матчей там &mdash; ориентировочно, не официальный адрес.</span>
   </footer>
 </div>
 
 <script id="pageData" type="application/json">%DATA_JSON%</script>
 <script>
+const LANG = {
+  ru: { club: 'Клуб', total: 'Всего команд', clubsWord: 'клубов', noResults: 'Нет результатов.', searchPh: 'Поиск клуба (напр. Aravaca, Getafe, Real Madrid)…', of: 'в' },
+  es: { club: 'Club', total: 'Total equipos', clubsWord: 'clubes', noResults: 'Sin resultados.', searchPh: 'Buscar club (p. ej. Aravaca, Getafe, Real Madrid)…', of: 'en' },
+};
+let CURLANG = 'ru';
 const DATA = JSON.parse(document.getElementById('pageData').textContent);
 const COLUMNS = DATA.columns;
 const CLUBS = DATA.clubs;
@@ -338,7 +352,7 @@ function buildHead() {
   const headRow = document.getElementById('headRow');
   const corner = document.createElement('th');
   corner.className = 'club-head';
-  corner.textContent = 'Club';
+  corner.textContent = LANG[CURLANG].club;
   headRow.appendChild(corner);
 
   let lastCat = null, span = 0, catTh = null;
@@ -363,7 +377,7 @@ function buildHead() {
 
   const totalTh = document.createElement('th');
   totalTh.className = 'total-head';
-  totalTh.textContent = 'Total equipos';
+  totalTh.textContent = LANG[CURLANG].total;
   totalTh.dataset.key = '__total';
   totalTh.addEventListener('click', () => sortBy('__total'));
   headRow.appendChild(totalTh);
@@ -390,7 +404,7 @@ function render() {
   if (onlyPresent) rows = rows.filter(c => c.total_teams > 0);
   rows = rows.slice().sort((a, b) => sortDir * (cellValue(a, sortKey) - cellValue(b, sortKey)) || a.club.localeCompare(b.club));
 
-  document.getElementById('resultCount').textContent = rows.length.toLocaleString() + ' clubes';
+  document.getElementById('resultCount').textContent = rows.length.toLocaleString() + ' ' + LANG[CURLANG].clubsWord;
 
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
@@ -399,7 +413,7 @@ function render() {
     const td = document.createElement('td');
     td.colSpan = COLUMNS.length + 2;
     td.className = 'empty-state';
-    td.textContent = 'Sin resultados.';
+    td.textContent = LANG[CURLANG].noResults;
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
@@ -451,7 +465,7 @@ function render() {
 
     const totalTd = document.createElement('td');
     totalTd.className = 'total-cell';
-    totalTd.innerHTML = `<strong>${club.total_teams}</strong> en ${club.total_divs}`;
+    totalTd.innerHTML = `<strong>${club.total_teams}</strong> ${LANG[CURLANG].of} ${club.total_divs}`;
     tr.appendChild(totalTd);
 
     frag.appendChild(tr);
@@ -459,11 +473,16 @@ function render() {
   tbody.appendChild(frag);
 }
 
-document.getElementById('stats').innerHTML = [
-  ['clubes', CLUBS.length],
-  ['equipos (Benjamín+Prebenjamín)', CLUBS.reduce((s, c) => s + c.total_teams, 0)],
-  ['divisiones cubiertas', COLUMNS.length],
-].map(([l, n]) => `<div class="stat"><div class="n">${n.toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+const STAT_LABELS = {
+  ru: ['клубов', 'команд (Бенхамин+Пребенхамин)', 'дивизионов охвачено'],
+  es: ['clubes', 'equipos (Benjamín+Prebenjamín)', 'divisiones cubiertas'],
+};
+function renderStats() {
+  const nums = [CLUBS.length, CLUBS.reduce((s, c) => s + c.total_teams, 0), COLUMNS.length];
+  document.getElementById('stats').innerHTML = STAT_LABELS[CURLANG].map((l, idx) =>
+    `<div class="stat"><div class="n">${nums[idx].toLocaleString()}</div><div class="l">${l}</div></div>`
+  ).join('');
+}
 
 document.getElementById('searchBox').addEventListener('input', render);
 document.getElementById('presentToggle').addEventListener('click', function () {
@@ -472,18 +491,62 @@ document.getElementById('presentToggle').addEventListener('click', function () {
 });
 
 buildHead();
+renderStats();
 render();
+
+const I18N_ES = %I18N_ES_JSON%;
+document.querySelectorAll('.lang-opt').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    CURLANG = btn.getAttribute('data-lang-btn');
+    document.querySelectorAll('.lang-opt').forEach(function (b) {
+      b.classList.toggle('is-active', b === btn);
+    });
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      if (el.dataset.ru === undefined) el.dataset.ru = el.innerHTML;
+      if (CURLANG === 'ru') {
+        el.innerHTML = el.dataset.ru;
+      } else if (Object.prototype.hasOwnProperty.call(I18N_ES, el.dataset.i18n)) {
+        el.innerHTML = I18N_ES[el.dataset.i18n];
+      }
+    });
+    document.getElementById('searchBox').placeholder = LANG[CURLANG].searchPh;
+    document.getElementById('headRow').innerHTML = '';
+    document.getElementById('catRow').innerHTML = '<th class="corner"></th>';
+    buildHead();
+    renderStats();
+    render();
+  });
+});
 </script>
 </body>
 </html>
 """
 
 
+I18N_ES = {
+    "eyebrow": "RFFM (Madrid) &middot; Temporada %SEASON% &middot; Fútbol-7",
+    "h1": "Mapa de clubes por división — Benjamín &amp; Prebenjamín",
+    "lede": "Cada fila es un club, cada columna una división. La celda muestra cuántos equipos tiene el club ahí y la mejor posición alcanzada (de cualquiera de sus equipos) en su grupo. El tono de fondo se oscurece hacia las divisiones más altas.",
+    "onlyPresent": "Solo con presencia visible",
+    "legend1": "División más alta disponible",
+    "legend2": "División más baja disponible",
+    "legend3": "Líder de su grupo",
+    "legend4": "Celda: nº de equipos del club ahí &middot; mejor posición/tamaño del grupo",
+    "legend5": '&#128205; = sede más frecuente en Google Maps (formato "sede" rotativo — no necesariamente su campo fijo, ver nota al pie)',
+    "foot1": 'Alcance: clubes con al menos un equipo Benjamín o Prebenjamín en fútbol-7 con clasificación registrada, temporada %SEASON%. Posiciones de la fase regular únicamente. Fuente: <code>output/processed/rffm/{teams,competitions,standings,matches,venues}.csv</code>.',
+    "foot2": '<strong>Sobre el &#128205;:</strong> Benjamín/Prebenjamín suele jugarse en formato <em>"sede"</em> — los partidos "de casa" rotan entre varios campos asignados por jornada, no un estadio fijo del club. El pin abre en Google Maps el campo donde <em>más veces</em> jugó de local el equipo/los equipos de ese club en estas categorías esta temporada, con el % de sus partidos como local que se disputaron ahí — tómalo como orientativo, no como dirección oficial.',
+}
+
+
 def build_html(data: dict) -> str:
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    i18n_es = {k: v.replace("%SEASON%", data["season"]) for k, v in I18N_ES.items()}
     return (HTML
             .replace("%DATA_JSON%", data_json)
-            .replace("%SEASON%", data["season"]))
+            .replace("%SEASON%", data["season"])
+            .replace("%FONT_LINKS%", FONT_LINKS)
+            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%I18N_ES_JSON%", json.dumps(i18n_es, ensure_ascii=False)))
 
 
 def main():

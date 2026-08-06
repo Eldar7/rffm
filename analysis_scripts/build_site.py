@@ -12,6 +12,7 @@ Usage:
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -21,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import season_comparison
 import club_division_map
 import weird_scores_report
+from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, lang_switch_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -48,99 +50,119 @@ def coverage_rows() -> list[dict]:
 
 
 INDEX_HTML = r"""<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RFFM data — Madrid youth &amp; adult football, {SEASON_RANGE}</title>
-<style>
-:root{
-  --bg:#f5f6f8; --surface:#ffffff; --ink:#1a1d23; --ink-soft:#5a6270; --ink-faint:#8b93a3;
-  --accent:#4e79a7; --accent-soft:#e2e8f4; --line:#dde3ed; --line-strong:#c8d0de;
-  --shadow: 0 1px 2px rgba(20,20,20,0.06); --row-hover:#f4f7fc; --ok:#59a14f; --warn:#f28e2b;
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#14171c; --surface:#1c2028; --ink:#eef0f4; --ink-soft:#a7aebb; --ink-faint:#6c7280;
-    --accent:#7aa7d9; --accent-soft:#25344a; --line:#2b3040; --line-strong:#3a4058;
-    --shadow: 0 1px 3px rgba(0,0,0,0.4); --row-hover:#232837; --ok:#7fc276; --warn:#e3a45c;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#14171c; --surface:#1c2028; --ink:#eef0f4; --ink-soft:#a7aebb; --ink-faint:#6c7280;
-  --accent:#7aa7d9; --accent-soft:#25344a; --line:#2b3040; --line-strong:#3a4058;
-  --shadow: 0 1px 3px rgba(0,0,0,0.4); --row-hover:#232837; --ok:#7fc276; --warn:#e3a45c;
-}
-:root[data-theme="light"]{
-  --bg:#f5f6f8; --surface:#ffffff; --ink:#1a1d23; --ink-soft:#5a6270; --ink-faint:#8b93a3;
-  --accent:#4e79a7; --accent-soft:#e2e8f4; --line:#dde3ed; --line-strong:#c8d0de;
-  --shadow: 0 1px 2px rgba(20,20,20,0.06); --row-hover:#f4f7fc; --ok:#59a14f; --warn:#f28e2b;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;}
-body{ background:var(--bg); color:var(--ink); font-family: system-ui, sans-serif; line-height:1.5; }
-.page{ max-width:1000px; margin:0 auto; padding:2.5rem 1.25rem 4rem; display:flex; flex-direction:column; gap:2rem; }
-h1{font-size:1.7rem; margin:0 0 0.3rem;}
-h2{font-size:1.05rem; margin:0 0 0.8rem; color:var(--accent);}
-p.lede{color:var(--ink-soft); font-size:0.95rem; max-width:75ch; margin:0;}
-p.foot{color:var(--ink-faint); font-size:0.8rem; max-width:75ch;}
-code{ font-family: ui-monospace, monospace; font-size:0.86em; background:var(--accent-soft);
+<title>RFFM data — футбол Мадрида, {SEASON_RANGE}</title>
+%FONT_LINKS%
+<style>%CSS%
+.page{ max-width:1000px; }
+h2{ font-size:clamp(20px, 3vw, 26px); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:18px; }
+p.foot{color:var(--ink-muted); font-size:0.8rem; max-width:75ch; font-family:'JetBrains Mono',monospace;}
+code{ font-family: 'JetBrains Mono', monospace; font-size:0.86em; background:var(--surface-2);
   padding:0.05em 0.35em; border-radius:3px; }
-
-.cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem; }
-.card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1.1rem 1.2rem;
-  box-shadow:var(--shadow); text-decoration:none; color:var(--ink); display:flex; flex-direction:column; gap:0.4rem; }
-.card:hover{border-color:var(--accent);}
-.card .title{font-weight:700; font-size:1rem;}
-.card .desc{font-size:0.85rem; color:var(--ink-soft);}
-
-.table-wrap{overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow);}
-table{border-collapse:collapse; width:100%; font-size:0.83rem;}
-th, td{padding:0.45rem 0.7rem; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap;}
-th{background:var(--accent); color:#fff; font-size:0.74rem;}
-tr:last-child td{border-bottom:none;}
-tr:nth-child(even) td{background:var(--row-hover);}
-.status-ok{color:var(--ok); font-weight:600;}
-.status-warn{color:var(--warn); font-weight:600;}
-.cats{font-size:0.76rem; color:var(--ink-soft); white-space:normal;}
+.status-ok{color:var(--accent); font-weight:700;}
+.status-warn{color:var(--gold); font-weight:700;}
 </style>
 </head>
 <body>
-<div class="page">
-  <header>
-    <h1>RFFM data — Real Federación de Fútbol de Madrid</h1>
-    <p class="lede">Competitions, fixtures/results, standings, venues and enrichment data crawled from
-      <a href="https://www.rffm.es" target="_blank" rel="noopener">rffm.es</a>, rebuilt into this page
-      straight from the CSVs committed in <code>output/processed/rffm/</code> — no manual step in between.</p>
-  </header>
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <div class="kicker"><span data-i18n="kicker">RFFM &middot; Данные федерации</span></div>
+      <h1><span data-i18n="h1">Футбол Мадрида —<br>данные RFFM</span></h1>
+    </div>
+    <div class="scope-block">
+      %LANG_SWITCH%
+      <div class="scope">
+        <span data-i18n="scope1">Сезоны <b>{SEASON_RANGE}</b></span>
+      </div>
+    </div>
+  </div>
+  <p class="lede" style="margin:22px 0 0"><span data-i18n="lede">Соревнования, матчи/результаты, турнирные таблицы, площадки и обогащённые данные, собранные с
+    <a href="https://www.rffm.es" target="_blank" rel="noopener">rffm.es</a> и пересобранные в эту страницу
+    прямо из CSV в <code>output/processed/rffm/</code> &mdash; без ручных шагов между ними.</span></p>
 
   <section>
-    <h2>Reports</h2>
+    <div class="section-head">
+      <h2><span data-i18n="h_reports">Отчёты</span></h2>
+    </div>
     <div class="cards">
       {CARDS}
     </div>
   </section>
 
   <section>
-    <h2>Season / category coverage</h2>
-    <div class="table-wrap">
+    <div class="section-head">
+      <h2><span data-i18n="h_coverage">Охват по сезонам и категориям</span></h2>
+    </div>
+    <div class="table-scroll">
       <table>
-        <thead><tr><th>Season</th><th>Core crawl</th><th>Clubs enrichment</th>
-          <th>acta_partido complete for</th><th>fichajugador complete for</th></tr></thead>
+        <thead><tr><th><span data-i18n="th_season">Сезон</span></th><th><span data-i18n="th_core">Core-краулинг</span></th><th><span data-i18n="th_clubs">Обогащение клубов</span></th>
+          <th><span data-i18n="th_acta">acta_partido готово для</span></th><th><span data-i18n="th_ficha">fichajugador готово для</span></th></tr></thead>
         <tbody>
           {COVERAGE_ROWS}
         </tbody>
       </table>
     </div>
-    <p class="foot">Full column-level detail: <code>output/processed/rffm/coverage_manifest.csv</code>.</p>
+    <p class="foot"><span data-i18n="foot_detail">Полная детализация: <code>output/processed/rffm/coverage_manifest.csv</code>.</span></p>
   </section>
 
-  <p class="foot">Rebuilt automatically by <code>.github/workflows/pages-deploy.yml</code> — see
-    <code>analysis_scripts/build_site.py</code> for how each report is generated.</p>
+  <footer><span data-i18n="footer">Пересобирается автоматически <code>.github/workflows/pages-deploy.yml</code> &middot; см.
+    <code>analysis_scripts/build_site.py</code>, как строится каждый отчёт.</span></footer>
 </div>
+<script>
+(function () {
+  var I18N_ES = %I18N_ES_JSON%;
+  %LANG_JS%
+})();
+</script>
 </body>
 </html>
 """
+
+I18N_ES = {
+    "kicker": "RFFM &middot; Datos de la federación",
+    "h1": "Fútbol de Madrid —<br>datos de la RFFM",
+    "scope1": "Temporadas <b>{SEASON_RANGE}</b>",
+    "lede": 'Competiciones, partidos/resultados, clasificaciones, campos y datos enriquecidos recopilados de '
+            '<a href="https://www.rffm.es" target="_blank" rel="noopener">rffm.es</a>, reconstruidos en esta página '
+            'directamente desde los CSV de <code>output/processed/rffm/</code> &mdash; sin pasos manuales de por medio.',
+    "h_reports": "Informes",
+    "h_coverage": "Cobertura por temporada y categoría",
+    "th_season": "Temporada", "th_core": "Rastreo core", "th_clubs": "Enriquecimiento de clubes",
+    "th_acta": "acta_partido completo para", "th_ficha": "fichajugador completo para",
+    "foot_detail": 'Detalle completo: <code>output/processed/rffm/coverage_manifest.csv</code>.',
+    "footer": 'Reconstruido automáticamente por <code>.github/workflows/pages-deploy.yml</code> &middot; ver '
+              '<code>analysis_scripts/build_site.py</code> para saber cómo se genera cada informe.',
+}
+
+CARDS_RU = [
+    {
+        "href": "weird_scores.html",
+        "title": "Странные счета, доминаторы и аутсайдеры",
+        "desc": "Самые крупные разгромы, нулевые ничьи и лучшая/худшая разница мячей у команд и клубов.",
+    },
+    {
+        "href": "club_division_map.html",
+        "title": "Карта клубов по дивизионам",
+        "desc": "Матрица турнирных позиций клубов Бенхамин/Пребенхамин с самой частой домашней площадкой.",
+    },
+    {
+        "href": "season_comparison.html",
+        "title": "Сравнение сезонов",
+        "desc": "Матчи, клубы, голы и соревнования по сезонам с фильтрами по возрасту / дивизиону / типу игры.",
+    },
+]
+CARDS_ES = [
+    "Marcadores extraños, dominadores y colistas",
+    "Las goleadas más grandes, empates a cero y la mejor/peor diferencia de goles de equipos y clubes.",
+    "Mapa de clubes por división",
+    "Matriz de posiciones de clubes Benjamín/Prebenjamín con su sede más frecuente.",
+    "Comparación entre temporadas",
+    "Partidos, clubes, goles y competiciones por temporada, filtrables por edad / división / tipo de juego.",
+]
 
 
 def status_span(status: str) -> str:
@@ -152,32 +174,19 @@ def status_span(status: str) -> str:
 
 
 def build_index(seasons: list[str], coverage: list[dict]) -> str:
-    cards = [
-        {
-            "href": "season_comparison.html",
-            "title": "Cross-season comparison",
-            "desc": "Matches, clubs, goals and competitions per season, filterable by age category / division / game type.",
-        },
-        {
-            "href": "club_division_map.html",
-            "title": "Club × division map",
-            "desc": "Benjamín/Prebenjamín club standings matrix, with each club's most-frequent home venue.",
-        },
-        {
-            "href": "weird_scores.html",
-            "title": "Weird scores, dominators & outsiders",
-            "desc": "Biggest blowouts, highest-scoring matches, and the best/worst goal-difference teams.",
-        },
-    ]
     cards_html = "\n      ".join(
-        f'<a class="card" href="{c["href"]}"><span class="title">{c["title"]}</span>'
-        f'<span class="desc">{c["desc"]}</span></a>'
-        for c in cards
+        f'<a class="card" href="{c["href"]}"><span class="title" data-i18n="card_t{n}">{c["title"]}</span>'
+        f'<span class="desc" data-i18n="card_d{n}">{c["desc"]}</span></a>'
+        for n, c in enumerate(CARDS_RU)
     )
+    i18n_es = dict(I18N_ES)
+    for n, (title, desc) in enumerate(zip(CARDS_ES[0::2], CARDS_ES[1::2])):
+        i18n_es[f"card_t{n}"] = title
+        i18n_es[f"card_d{n}"] = desc
 
     rows_html = "\n          ".join(
         "<tr><td>{season}</td><td>{core}</td><td>{clubs}</td>"
-        "<td class=\"cats\">{acta}</td><td class=\"cats\">{ficha}</td></tr>".format(
+        "<td class=\"meta\">{acta}</td><td class=\"meta\">{ficha}</td></tr>".format(
             season=r["season"],
             core=status_span(r["core_status"]),
             clubs=status_span(r["clubs_status"]),
@@ -188,10 +197,17 @@ def build_index(seasons: list[str], coverage: list[dict]) -> str:
     )
 
     season_range = f"{seasons[0]}–{seasons[-1]}" if seasons else ""
+    i18n_es = {k: (v.replace("{SEASON_RANGE}", season_range) if isinstance(v, str) else v)
+               for k, v in i18n_es.items()}
     return (INDEX_HTML
             .replace("{SEASON_RANGE}", season_range)
             .replace("{CARDS}", cards_html)
-            .replace("{COVERAGE_ROWS}", rows_html))
+            .replace("{COVERAGE_ROWS}", rows_html)
+            .replace("%FONT_LINKS%", FONT_LINKS)
+            .replace("%CSS%", CSS)
+            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%LANG_JS%", LANG_SWITCH_JS)
+            .replace("%I18N_ES_JSON%", json.dumps(i18n_es, ensure_ascii=False)))
 
 
 def main():

@@ -15,6 +15,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from site_theme import FONT_LINKS, lang_switch_html
+
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 SEASONS = sorted(
     [d.name for d in BASE.iterdir() if d.is_dir() and len(d.name) == 9 and "-" in d.name]
@@ -179,147 +181,207 @@ def load_all_data() -> dict:
 # ---------------------------------------------------------------------------
 
 HTML = r"""<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>RFFM — Season comparison</title>
+<title>RFFM — сравнение сезонов</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.27.0/plotly.min.js"></script>
+%FONT_LINKS%
 <style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#1a1d23; --ink-soft:#5a6270; --ink-faint:#8b93a3;
+  --accent:#4e79a7; --accent-soft:#e2e8f4; --line:#dde3ed; --line-strong:#c8d0de;
+  --shadow: 0 1px 2px rgba(20,20,20,0.06); --row-hover:#f8f9fc;
+  --warn-bg:#fff8e8; --warn-line:#f28e2b; --bad-bg:#fde8e8; --bad-line:#e15759;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171c; --surface:#1c2028; --ink:#eef0f4; --ink-soft:#a7aebb; --ink-faint:#6c7280;
+    --accent:#7aa7d9; --accent-soft:#25344a; --line:#2b3040; --line-strong:#3a4058;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4); --row-hover:#232837;
+    --warn-bg:#332a10; --warn-line:#e3a45c; --bad-bg:#3a2226; --bad-line:#e97a7c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171c; --surface:#1c2028; --ink:#eef0f4; --ink-soft:#a7aebb; --ink-faint:#6c7280;
+  --accent:#7aa7d9; --accent-soft:#25344a; --line:#2b3040; --line-strong:#3a4058;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4); --row-hover:#232837;
+  --warn-bg:#332a10; --warn-line:#e3a45c; --bad-bg:#3a2226; --bad-line:#e97a7c;
+}
+:root[data-theme="light"]{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#1a1d23; --ink-soft:#5a6270; --ink-faint:#8b93a3;
+  --accent:#4e79a7; --accent-soft:#e2e8f4; --line:#dde3ed; --line-strong:#c8d0de;
+  --shadow: 0 1px 2px rgba(20,20,20,0.06); --row-hover:#f8f9fc;
+  --warn-bg:#fff8e8; --warn-line:#f28e2b; --bad-bg:#fde8e8; --bad-line:#e15759;
+}
 *, *::before, *::after { box-sizing: border-box; }
-body { font-family: system-ui, sans-serif; max-width: 1160px; margin: 0 auto; padding: 0 1rem 3rem; color: #222; background: #f5f6f8; }
-h1 { font-size: 1.5rem; margin: 1.2rem 0 .3rem; }
-h2 { font-size: 1.1rem; margin: 2rem 0 .6rem; color: #4e79a7; border-bottom: 1px solid #dde3ed; padding-bottom: .3rem; }
-small { color: #888; font-weight: normal; }
+body { font-family: 'PT Sans', system-ui, sans-serif; max-width: 1160px; margin: 0 auto; padding: 0 1rem 3rem; color: var(--ink); background: var(--bg); }
+h1 { font-family: 'Oswald', system-ui, sans-serif; font-weight: 700; text-transform: uppercase; font-size: 1.7rem; margin: 1.2rem 0 .3rem; }
+h2 { font-family: 'Oswald', system-ui, sans-serif; font-weight: 700; text-transform: uppercase; font-size: 1.1rem; margin: 2rem 0 .6rem; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
+small { color: var(--ink-faint); font-weight: normal; }
+a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
+.masthead-row{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;}
+.lang-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; margin-top:1.1rem; }
+.lang-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
+  padding:4px 12px; background:var(--surface); color:var(--ink-soft); border:none; cursor:pointer; }
+.lang-opt.is-active{background:var(--accent); color:#fff;}
 
 /* ── filter panel ── */
 .filter-panel {
-  background: #fff; border: 1px solid #dde3ed; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
   padding: 1rem 1.2rem; margin: 1rem 0;
 }
 .filter-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: .7rem; flex-wrap: wrap; }
 .filter-row:last-child { margin-bottom: 0; }
 .filter-label { font-size: .78rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .04em; color: #666; white-space: nowrap; padding-top: .35rem; min-width: 90px; }
+  letter-spacing: .04em; color: var(--ink-soft); white-space: nowrap; padding-top: .35rem; min-width: 90px; }
 .filter-chips { display: flex; flex-wrap: wrap; gap: .35rem; flex: 1; }
 .chip {
   display: inline-flex; align-items: center; gap: .3rem;
   padding: .28rem .65rem; border-radius: 999px; font-size: .8rem; cursor: pointer;
-  border: 1.5px solid #c8d0de; background: #f0f3f8; color: #555;
+  border: 1.5px solid var(--line-strong); background: var(--accent-soft); color: var(--ink-soft);
   user-select: none; transition: background .12s, border-color .12s, color .12s;
 }
-.chip.active { background: #4e79a7; border-color: #4e79a7; color: #fff; }
-.chip:hover:not(.active) { background: #e2e8f4; border-color: #a0afcc; }
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:hover:not(.active) { background: var(--accent-soft); border-color: var(--ink-faint); }
 .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .7; }
 .quick-btns { display: flex; gap: .3rem; align-items: center; padding-top: .25rem; }
 .quick-btns button {
-  font-size: .72rem; padding: .2rem .55rem; border: 1px solid #c8d0de; border-radius: 4px;
-  background: #fff; color: #555; cursor: pointer; white-space: nowrap;
+  font-size: .72rem; padding: .2rem .55rem; border: 1px solid var(--line-strong); border-radius: 4px;
+  background: var(--surface); color: var(--ink-soft); cursor: pointer; white-space: nowrap;
 }
-.quick-btns button:hover { background: #eef2f9; }
+.quick-btns button:hover { background: var(--accent-soft); }
 
 /* ── coverage note ── */
 .coverage-note {
-  font-size: .78rem; background: #fff8e8; border-left: 3px solid #f28e2b;
+  font-size: .78rem; background: var(--warn-bg); border-left: 3px solid var(--warn-line);
   padding: .5rem .8rem; border-radius: 4px; margin-top: .6rem; line-height: 1.6;
-  display: none;
+  display: none; color: var(--ink);
 }
 .coverage-note.visible { display: block; }
 .empty-note {
-  font-size: .82rem; background: #fde8e8; border-left: 3px solid #e15759;
+  font-size: .82rem; background: var(--bad-bg); border-left: 3px solid var(--bad-line);
   padding: .5rem .8rem; border-radius: 4px; margin-top: .6rem;
-  display: none;
+  display: none; color: var(--ink);
 }
 .empty-note.visible { display: block; }
 
 /* ── kpi row ── */
 .kpi-row { display: flex; flex-wrap: wrap; gap: .8rem; margin: .8rem 0 1.2rem; }
-.kpi { background: #fff; border: 1px solid #dde3ed; border-radius: 8px; padding: .7rem 1rem; min-width: 130px; }
-.kpi .val { font-size: 1.5rem; font-weight: 700; color: #4e79a7; line-height: 1; }
-.kpi .lbl { font-size: .72rem; color: #777; margin-top: .25rem; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: .7rem 1rem; min-width: 130px; box-shadow: var(--shadow); }
+.kpi .val { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.kpi .lbl { font-size: .72rem; color: var(--ink-soft); margin-top: .25rem; }
 
 /* ── charts ── */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(470px, 1fr)); gap: 1.2rem; }
-.chart-wrap { background: #fff; border: 1px solid #dde3ed; border-radius: 8px; padding: .9rem 1.1rem 1.2rem; }
-.chart-wrap h3 { font-size: .88rem; color: #444; margin: 0 0 .5rem; }
+.chart-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: .9rem 1.1rem 1.2rem; box-shadow: var(--shadow); }
+.chart-wrap h3 { font-size: .88rem; color: var(--ink-soft); margin: 0 0 .5rem; font-weight: 600; }
 
 /* ── table ── */
 .table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: .8rem; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #dde3ed; }
-th, td { border-bottom: 1px solid #e5e9f0; padding: .38rem .65rem; text-align: right; white-space: nowrap; }
-th { background: #4e79a7; color: #fff; font-size: .75rem; text-align: center; border-bottom: none; }
+table { border-collapse: collapse; width: 100%; font-size: .8rem; background: var(--surface); border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+th, td { border-bottom: 1px solid var(--line); padding: .38rem .65rem; text-align: right; white-space: nowrap; }
+th { background: var(--accent); color: #fff; font-size: .75rem; text-align: center; border-bottom: none; }
 td:first-child, th:first-child { text-align: left; }
 tr:last-child td { border-bottom: none; }
-tr:nth-child(even) td { background: #f8f9fc; }
+tr:nth-child(even) td { background: var(--row-hover); }
 </style>
 </head>
 <body>
 
-<h1>RFFM — Cross-season comparison</h1>
-<p style="font-size:.78rem;color:#888;margin:.2rem 0 .8rem">
-  Data: <code>output/processed/rffm/*/</code> &nbsp;|&nbsp; Seasons: <span id="seasons-list"></span>
-</p>
+<a class="back" href="index.html">&larr; RFFM data</a>
+<div class="masthead-row">
+  <div>
+    <h1><span data-i18n="h1">RFFM — сравнение сезонов</span></h1>
+    <p style="font-size:.78rem;color:var(--ink-faint);margin:.2rem 0 .8rem">
+      <span data-i18n="datalede">Данные: <code>output/processed/rffm/*/</code> &nbsp;|&nbsp; Сезоны:</span> <span id="seasons-list"></span>
+    </p>
+  </div>
+  %LANG_SWITCH%
+</div>
 
 <div class="filter-panel">
   <div class="filter-row">
-    <span class="filter-label">Age groups</span>
+    <span class="filter-label" data-i18n="lbl_cats">Возраст</span>
     <div class="filter-chips" id="chips-cats"></div>
     <div class="quick-btns">
-      <button onclick="quickSelect('cats','all')">All</button>
-      <button onclick="quickSelect('cats','none')">None</button>
+      <button onclick="quickSelect('cats','all')" data-i18n="btn_all1">Все</button>
+      <button onclick="quickSelect('cats','none')" data-i18n="btn_none1">Нет</button>
     </div>
   </div>
   <div class="filter-row">
-    <span class="filter-label">Division</span>
+    <span class="filter-label" data-i18n="lbl_divs">Дивизион</span>
     <div class="filter-chips" id="chips-divs"></div>
     <div class="quick-btns">
-      <button onclick="quickSelect('divs','all')">All</button>
-      <button onclick="quickSelect('divs','none')">None</button>
+      <button onclick="quickSelect('divs','all')" data-i18n="btn_all2">Все</button>
+      <button onclick="quickSelect('divs','none')" data-i18n="btn_none2">Нет</button>
     </div>
   </div>
   <div class="filter-row">
-    <span class="filter-label">Game type</span>
+    <span class="filter-label" data-i18n="lbl_gts">Тип игры</span>
     <div class="filter-chips" id="chips-gts"></div>
     <div class="quick-btns">
-      <button onclick="quickSelect('gts','all')">All</button>
-      <button onclick="quickSelect('gts','none')">None</button>
+      <button onclick="quickSelect('gts','all')" data-i18n="btn_all3">Все</button>
+      <button onclick="quickSelect('gts','none')" data-i18n="btn_none3">Нет</button>
     </div>
   </div>
   <div class="coverage-note" id="coverage-note"></div>
-  <div class="empty-note" id="empty-note">No data matches the current filter — select at least one age group, one division, and one game type.</div>
+  <div class="empty-note" id="empty-note" data-i18n="empty_note">Нет данных по текущему фильтру — выберите хотя бы одну возрастную категорию, дивизион и тип игры.</div>
 </div>
 
-<h2>Key numbers — latest season <span id="kpi-season-label" style="font-weight:normal;font-size:.9rem"></span></h2>
+<h2><span data-i18n="h2_kpi">Ключевые цифры — последний сезон</span> <span id="kpi-season-label" style="font-weight:normal;font-size:.9rem"></span></h2>
 <div class="kpi-row" id="kpi-row"></div>
 
-<h2>Season-over-season trends</h2>
+<h2 data-i18n="h2_trends">Динамика по сезонам</h2>
 <div class="grid">
-  <div class="chart-wrap"><h3>Matches per season (played vs. unplayed)</h3><canvas id="ch-matches"></canvas></div>
-  <div class="chart-wrap"><h3>Clubs and teams per season</h3><canvas id="ch-clubs"></canvas></div>
-  <div class="chart-wrap"><h3>Competitions per season</h3><canvas id="ch-comps"></canvas></div>
-  <div class="chart-wrap"><h3>Total goals per season</h3><canvas id="ch-goals"></canvas></div>
-  <div class="chart-wrap"><h3>Average goals per played match</h3><canvas id="ch-avg"></canvas></div>
-  <div class="chart-wrap"><h3>Women's football share (% of all matches)</h3><canvas id="ch-women"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_matches">Матчи по сезонам (сыграно / не сыграно)</h3><canvas id="ch-matches"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_clubs">Клубы и команды по сезонам</h3><canvas id="ch-clubs"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_comps">Соревнования по сезонам</h3><canvas id="ch-comps"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_goals">Голы по сезонам</h3><canvas id="ch-goals"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_avg">Среднее число голов за сыгранный матч</h3><canvas id="ch-avg"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_women">Доля женского футбола (% всех матчей)</h3><canvas id="ch-women"></canvas></div>
 </div>
 
-<h2>Category &amp; format breakdown — latest season</h2>
+<h2 data-i18n="h2_breakdown">Разбивка по категориям и форматам — последний сезон</h2>
 <div class="grid">
-  <div class="chart-wrap"><h3>Matches by age category (latest season)</h3><canvas id="ch-cat-latest"></canvas></div>
-  <div class="chart-wrap"><h3>Matches by game type (latest season)</h3><canvas id="ch-gt-latest"></canvas></div>
-  <div class="chart-wrap"><h3>Matches by division (latest season)</h3><canvas id="ch-div-latest"></canvas></div>
-  <div class="chart-wrap" style="grid-column: 1 / -1"><h3>Matches by age category — all seasons (stacked)</h3><canvas id="ch-cat-stacked"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_catlatest">Матчи по возрастной категории (последний сезон)</h3><canvas id="ch-cat-latest"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_gtlatest">Матчи по типу игры (последний сезон)</h3><canvas id="ch-gt-latest"></canvas></div>
+  <div class="chart-wrap"><h3 data-i18n="ch_divlatest">Матчи по дивизиону (последний сезон)</h3><canvas id="ch-div-latest"></canvas></div>
+  <div class="chart-wrap" style="grid-column: 1 / -1"><h3 data-i18n="ch_catstacked">Матчи по возрастной категории — все сезоны (стек)</h3><canvas id="ch-cat-stacked"></canvas></div>
 </div>
 
-<h2>Age category × Division — all data <small style="font-weight:normal;font-size:.8rem;color:#888">(filtered by game type)</small></h2>
+<h2><span data-i18n="h2_heatmap">Возрастная категория × дивизион — все данные</span> <small style="font-weight:normal;font-size:.8rem;color:var(--ink-faint)" data-i18n="heatmap_note">(с учётом фильтра по типу игры)</small></h2>
 <div class="chart-wrap" style="padding-bottom:.5rem">
   <div id="heatmap-div" style="width:100%;min-height:420px"></div>
 </div>
 
-<h2>Summary table</h2>
+<h2 data-i18n="h2_summary">Сводная таблица</h2>
 <div class="table-wrap"><table id="summary-table"></table></div>
 
 <script>
 const DATA = %DATA_JSON%;
+let CURLANG = 'ru';
+const LANG = {
+  ru: {
+    played: 'Сыграно', unplayed: 'Не сыграно', clubs: 'Клубы', teams: 'Команды',
+    competitions: 'Соревнования', goals: 'Голы', avgGoals: 'Голов/матч', womenPct: 'Матчи среди женщин, %',
+    matches: 'Матчи',
+    kpi: ['матчей сыграно', 'клубов', 'команд', 'соревнований', 'голов забито', 'голов/матч в среднем', 'женских матчей', 'площадок'],
+    thead: ['Сезон', 'Охват', 'Сыграно', 'Не сыграно', 'Клубы', 'Команды', 'Соревнования', 'Голы', 'Голов/матч', 'Женских, %', 'Площадки'],
+    coverage: n => `&#9432; Ограниченный охват: ${n}`,
+    availFrom: (label, season) => `<b>${label}</b>: доступно с сезона <b>${season}</b>`,
+  },
+  es: {
+    played: 'Disputados', unplayed: 'Sin disputar', clubs: 'Clubes', teams: 'Equipos',
+    competitions: 'Competiciones', goals: 'Goles', avgGoals: 'Goles/partido', womenPct: "Partidos femeninos, %",
+    matches: 'Partidos',
+    kpi: ['partidos disputados', 'clubes', 'equipos', 'competiciones', 'goles marcados', 'goles/partido de media', 'partidos femeninos', 'sedes'],
+    thead: ['Temporada', 'Alcance', 'Disputados', 'Sin disputar', 'Clubes', 'Equipos', 'Competiciones', 'Goles', 'Goles/partido', 'Femenino, %', 'Sedes'],
+    coverage: n => `&#9432; Cobertura limitada: ${n}`,
+    availFrom: (label, season) => `<b>${label}</b>: disponible desde la temporada <b>${season}</b>`,
+  },
+};
 
 const COLORS = [
   "#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f",
@@ -419,47 +481,47 @@ function initCharts() {
   const empty8 = () => DATA.seasons.map(() => 0);
 
   CHARTS.matches = makeBar('ch-matches', [
-    { label: 'Played',   data: empty8(), backgroundColor: COLORS[0] },
-    { label: 'Unplayed', data: empty8(), backgroundColor: COLORS[9] },
+    { label: LANG[CURLANG].played,   data: empty8(), backgroundColor: COLORS[0] },
+    { label: LANG[CURLANG].unplayed, data: empty8(), backgroundColor: COLORS[9] },
   ], null, { stacked: true });
 
   CHARTS.clubs = makeBar('ch-clubs', [
-    { label: 'Clubs', data: empty8(), backgroundColor: COLORS[1] },
-    { label: 'Teams', data: empty8(), backgroundColor: COLORS[2] },
+    { label: LANG[CURLANG].clubs, data: empty8(), backgroundColor: COLORS[1] },
+    { label: LANG[CURLANG].teams, data: empty8(), backgroundColor: COLORS[2] },
   ]);
 
   CHARTS.comps = makeBar('ch-comps', [
-    { label: 'Competitions', data: empty8(), backgroundColor: COLORS[3] },
+    { label: LANG[CURLANG].competitions, data: empty8(), backgroundColor: COLORS[3] },
   ]);
 
   CHARTS.goals = makeBar('ch-goals', [
-    { label: 'Goals', data: empty8(), backgroundColor: COLORS[4] },
+    { label: LANG[CURLANG].goals, data: empty8(), backgroundColor: COLORS[4] },
   ]);
 
   CHARTS.avg = makeLine('ch-avg', [{
-    label: 'Avg goals/match', data: empty8(),
+    label: LANG[CURLANG].avgGoals, data: empty8(),
     borderColor: COLORS[0], backgroundColor: COLORS[0] + '33',
     fill: true, tension: 0.3, pointRadius: 4,
   }]);
 
   CHARTS.women = makeLine('ch-women', [{
-    label: "Women's matches %", data: empty8(),
+    label: LANG[CURLANG].womenPct, data: empty8(),
     borderColor: COLORS[6], backgroundColor: COLORS[6] + '33',
     fill: true, tension: 0.3, pointRadius: 4,
   }]);
 
   CHARTS.catLatest = makeBar('ch-cat-latest',
-    [{ label: 'Matches', data: [], backgroundColor: [] }],
+    [{ label: LANG[CURLANG].matches, data: [], backgroundColor: [] }],
     [], { legend: false });
 
   CHARTS.gtLatest = makeBar('ch-gt-latest',
-    [{ label: 'Matches', data: [], backgroundColor: [] }],
+    [{ label: LANG[CURLANG].matches, data: [], backgroundColor: [] }],
     [], { legend: false });
 
   CHARTS.catStacked = makeBar('ch-cat-stacked', [], null, { stacked: true, legend: true });
 
   CHARTS.divLatest = makeBar('ch-div-latest',
-    [{ label: 'Matches', data: [], backgroundColor: [] }],
+    [{ label: LANG[CURLANG].matches, data: [], backgroundColor: [] }],
     [], { legend: false });
 
   // Heatmap — built once, never updated by filters
@@ -644,15 +706,16 @@ function recompute() {
 
   // ── KPI tiles ──
   const la = agg[last];
+  const K = LANG[CURLANG].kpi;
   const kpiData = [
-    { val: la.mp.toLocaleString(),                                           lbl: 'matches played' },
-    { val: la.ci.size.toLocaleString(),                                      lbl: 'clubs' },
-    { val: la.t.toLocaleString(),                                            lbl: 'teams' },
-    { val: la.co.toLocaleString(),                                           lbl: 'competitions' },
-    { val: la.g.toLocaleString(),                                            lbl: 'goals scored' },
-    { val: la.mp > 0 ? (la.g / la.mp).toFixed(2) : '—',                    lbl: 'avg goals/match' },
-    { val: (la.mp + la.mu) > 0 ? (la.wm / (la.mp + la.mu) * 100).toFixed(1) + '%' : '—', lbl: "women's matches" },
-    { val: la.vi.toLocaleString(),                                           lbl: 'venues' },
+    { val: la.mp.toLocaleString(),                                           lbl: K[0] },
+    { val: la.ci.size.toLocaleString(),                                      lbl: K[1] },
+    { val: la.t.toLocaleString(),                                            lbl: K[2] },
+    { val: la.co.toLocaleString(),                                           lbl: K[3] },
+    { val: la.g.toLocaleString(),                                            lbl: K[4] },
+    { val: la.mp > 0 ? (la.g / la.mp).toFixed(2) : '—',                    lbl: K[5] },
+    { val: (la.mp + la.mu) > 0 ? (la.wm / (la.mp + la.mu) * 100).toFixed(1) + '%' : '—', lbl: K[6] },
+    { val: la.vi.toLocaleString(),                                           lbl: K[7] },
   ];
   const kpiRow = document.getElementById('kpi-row');
   kpiRow.innerHTML = kpiData.map(k =>
@@ -660,10 +723,11 @@ function recompute() {
   ).join('');
 
   // ── summary table ──
+  const TH = LANG[CURLANG].thead;
   const thead = `<thead><tr>
-    <th>Season</th><th>Scope</th><th>Played</th><th>Unplayed</th>
-    <th>Clubs</th><th>Teams</th><th>Competitions</th><th>Goals</th>
-    <th>Avg goals/match</th><th>Women's %</th><th>Venues</th>
+    <th>${TH[0]}</th><th>${TH[1]}</th><th>${TH[2]}</th><th>${TH[3]}</th>
+    <th>${TH[4]}</th><th>${TH[5]}</th><th>${TH[6]}</th><th>${TH[7]}</th>
+    <th>${TH[8]}</th><th>${TH[9]}</th><th>${TH[10]}</th>
   </tr></thead>`;
   const tbody = '<tbody>' + seasons.map(s => {
     const a = agg[s];
@@ -672,7 +736,7 @@ function recompute() {
     const avg = a.mp > 0 ? (a.g / a.mp).toFixed(2) : '—';
     const wpct = (a.mp + a.mu) > 0 ? (a.wm / (a.mp + a.mu) * 100).toFixed(1) + '%' : '—';
     return `<tr>
-      <td>${s}</td><td style="font-size:.72rem;color:#666">${scopeStr}</td>
+      <td>${s}</td><td style="font-size:.72rem;color:var(--ink-faint)">${scopeStr}</td>
       <td>${a.mp.toLocaleString()}</td><td>${a.mu.toLocaleString()}</td>
       <td>${a.ci.size.toLocaleString()}</td><td>${a.t.toLocaleString()}</td>
       <td>${a.co.toLocaleString()}</td><td>${a.g.toLocaleString()}</td>
@@ -687,10 +751,8 @@ function recompute() {
   );
   const noteEl = document.getElementById('coverage-note');
   if (late.length) {
-    const lines = late.map(c =>
-      `<b>${DATA.cat_labels[c]}</b>: available from <b>${DATA.first_season_for_cat[c]}</b> onward`
-    );
-    noteEl.innerHTML = '&#9432; Limited coverage: ' + lines.join(' &nbsp;·&nbsp; ');
+    const lines = late.map(c => LANG[CURLANG].availFrom(DATA.cat_labels[c], DATA.first_season_for_cat[c]));
+    noteEl.innerHTML = LANG[CURLANG].coverage(lines.join(' &nbsp;·&nbsp; '));
     noteEl.classList.add('visible');
   } else {
     noteEl.classList.remove('visible');
@@ -709,6 +771,34 @@ document.addEventListener('DOMContentLoaded', () => {
   buildChips('chips-gts', DATA.all_gts, STATE.gts, {}, GT_COLORS);
   initCharts();
   recompute();
+
+  const I18N_ES = %I18N_ES_JSON%;
+  document.querySelectorAll('.lang-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      CURLANG = btn.getAttribute('data-lang-btn');
+      document.querySelectorAll('.lang-opt').forEach(b => b.classList.toggle('is-active', b === btn));
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        if (el.dataset.ru === undefined) el.dataset.ru = el.innerHTML;
+        if (CURLANG === 'ru') el.innerHTML = el.dataset.ru;
+        else if (Object.prototype.hasOwnProperty.call(I18N_ES, el.dataset.i18n)) el.innerHTML = I18N_ES[el.dataset.i18n];
+      });
+      document.documentElement.lang = CURLANG;
+      CHARTS.matches.data.datasets[0].label = LANG[CURLANG].played;
+      CHARTS.matches.data.datasets[1].label = LANG[CURLANG].unplayed;
+      CHARTS.clubs.data.datasets[0].label = LANG[CURLANG].clubs;
+      CHARTS.clubs.data.datasets[1].label = LANG[CURLANG].teams;
+      CHARTS.comps.data.datasets[0].label = LANG[CURLANG].competitions;
+      CHARTS.goals.data.datasets[0].label = LANG[CURLANG].goals;
+      CHARTS.avg.data.datasets[0].label = LANG[CURLANG].avgGoals;
+      CHARTS.women.data.datasets[0].label = LANG[CURLANG].womenPct;
+      [CHARTS.matches, CHARTS.clubs, CHARTS.comps, CHARTS.goals, CHARTS.avg, CHARTS.women].forEach(c => c.update('none'));
+      recompute();
+      try { localStorage.setItem('rffm_lang', CURLANG); } catch (e) {}
+    });
+  });
+  let saved = null;
+  try { saved = localStorage.getItem('rffm_lang'); } catch (e) {}
+  if (saved === 'es') document.querySelector('[data-lang-btn="es"]').click();
 });
 </script>
 </body>
@@ -716,9 +806,42 @@ document.addEventListener('DOMContentLoaded', () => {
 """
 
 
+I18N_ES = {
+    "h1": "RFFM — comparación entre temporadas",
+    "datalede": 'Datos: <code>output/processed/rffm/*/</code> &nbsp;|&nbsp; Temporadas:',
+    "lbl_cats": "Categorías",
+    "btn_all1": "Todas", "btn_none1": "Ninguna",
+    "lbl_divs": "División",
+    "btn_all2": "Todas", "btn_none2": "Ninguna",
+    "lbl_gts": "Tipo de juego",
+    "btn_all3": "Todos", "btn_none3": "Ninguno",
+    "empty_note": "No hay datos para el filtro actual — selecciona al menos una categoría, una división y un tipo de juego.",
+    "h2_kpi": "Cifras clave — última temporada",
+    "h2_trends": "Tendencias entre temporadas",
+    "ch_matches": "Partidos por temporada (disputados vs. sin disputar)",
+    "ch_clubs": "Clubes y equipos por temporada",
+    "ch_comps": "Competiciones por temporada",
+    "ch_goals": "Goles totales por temporada",
+    "ch_avg": "Goles de media por partido disputado",
+    "ch_women": "Fútbol femenino (% de todos los partidos)",
+    "h2_breakdown": "Desglose por categoría y formato — última temporada",
+    "ch_catlatest": "Partidos por categoría de edad (última temporada)",
+    "ch_gtlatest": "Partidos por tipo de juego (última temporada)",
+    "ch_divlatest": "Partidos por división (última temporada)",
+    "ch_catstacked": "Partidos por categoría de edad — todas las temporadas (apilado)",
+    "h2_heatmap": "Categoría de edad × División — todos los datos",
+    "heatmap_note": "(filtrado por tipo de juego)",
+    "h2_summary": "Tabla resumen",
+}
+
+
 def build_html(data: dict) -> str:
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    return HTML.replace("%DATA_JSON%", data_json)
+    return (HTML
+            .replace("%DATA_JSON%", data_json)
+            .replace("%FONT_LINKS%", FONT_LINKS)
+            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%I18N_ES_JSON%", json.dumps(I18N_ES, ensure_ascii=False)))
 
 
 def main():
