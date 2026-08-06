@@ -1,206 +1,257 @@
 check_name,severity,entity_type,entity_id,group_id,competition_id,details
-acta_lineup_coverage_gap,warning,match,5009833,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5009883,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5052851,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5053220,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5054638,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5054644,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5054651,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5054803,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5055007,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5057608,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061798,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061805,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061811,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061817,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061822,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061828,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061833,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061839,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061844,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061851,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061858,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061864,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061871,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061877,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061883,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061888,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061894,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061899,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061905,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5061910,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063424,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063431,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063439,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063454,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063461,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063469,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063476,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063484,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063491,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063498,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063504,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063507,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063515,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063522,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063530,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063545,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063552,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063560,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063567,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063575,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063582,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063589,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063595,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063734,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063745,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063751,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063756,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063762,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063767,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063773,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063778,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063784,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063789,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063795,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063800,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063806,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063811,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063817,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063822,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063828,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063833,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063839,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063844,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063850,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5063855,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5064180,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5073758,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5077653,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078560,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078745,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078746,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078757,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078758,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078769,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078770,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078781,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078782,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078793,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078794,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078805,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078811,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078812,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078823,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078824,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078835,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078836,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078847,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078848,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078859,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078860,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078865,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5078871,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079170,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079174,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079175,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079242,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079249,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079255,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079263,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079269,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079275,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079280,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079286,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079291,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079296,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079303,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079309,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079316,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079322,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079329,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079335,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079341,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079346,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079352,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5079357,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080465,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080484,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080486,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080492,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080498,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080505,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080511,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080518,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080524,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080531,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080537,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080544,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5080550,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5081091,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084261,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084268,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084274,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084278,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084284,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084289,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084295,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084301,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084308,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084314,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084321,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084327,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084334,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5084340,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5099311,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5107854,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5108024,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5108136,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5108137,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5108185,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131824,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131825,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131826,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131827,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131828,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131829,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131830,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131831,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131832,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131833,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131834,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131835,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131844,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131845,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131846,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131850,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131851,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5131852,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137153,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137154,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137155,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137156,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137157,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137158,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137179,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-acta_lineup_coverage_gap,warning,match,5137180,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
-anomalous_event_minute,warning,match_goal,5011646:14203983,,,"minute=273 (minute_raw=273) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5009719:16523907,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5010710:11320071,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5013847:20773414,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5013847:13439675,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5010906:19721846,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5010905:9343483,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5010924:14860917,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5011128:15383114,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5078311:20623489,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5060832:19275836,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5072384:19725714,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5075501:11130728,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5058031:17130383,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5063323:20443958,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5060562:14440794,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5063921:20716018,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5136279:14603618,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5136279:14603618,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
-anomalous_event_minute,warning,match_card,5073704:2805285,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+acta_lineup_coverage_gap,warning,match,1721138,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,1929885,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5008596,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5008609,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5034500,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5038638,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5045567,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5048154,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5049424,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5050381,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5050506,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5068196,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5071179,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5073893,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5073900,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5077506,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081781,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081787,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081792,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081803,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081809,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081814,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081820,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081825,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081831,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081836,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081842,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081847,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081853,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5081858,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5083398,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5083400,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5092504,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5102297,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5112668,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5116017,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5116592,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5128089,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134159,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134160,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134161,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134162,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134163,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134164,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134165,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134166,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134167,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134168,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134169,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+acta_lineup_coverage_gap,warning,match,5134170,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+anomalous_event_minute,warning,match_card,3724782:13585470,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724784:8570588,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724784:10131578,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724808:12153969,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724821:12309187,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724891:14802763,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724888:9732020,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724925:20786270,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3724921:9824934,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1716951:9770743,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718187:13580337,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718150:11829234,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718236:10171331,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718311:9075086,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718325:14790757,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718337:10301509,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718345:9988943,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718345:12540497,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718495:19328558,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1718522:11640827,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1720912:13117420,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721148:9609767,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721148:11841845,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721148:11841845,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721203:10081170,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721257:20632442,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721350:9547044,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721479:10099032,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721529:9980866,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721536:20083768,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729546:10106352,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729546:14525415,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729556:20083768,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722838:8684020,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722862:11940300,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722988:15568878,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722988:13531875,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1721563:10242537,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729873:16107862,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729873:9929856,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729886:8824669,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1971882:20094470,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3729953:16442126,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,3730030:13281133,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722137:13225171,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722137:13225171,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722137:14631156,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722182:10218686,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722182:11762633,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722187:19777795,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722200:19793275,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722200:15773764,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722237:10070949,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722258:14152851,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722258:14330974,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722258:15742231,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722270:19777795,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722269:16415309,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722387:20595515,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722487:12296284,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722552:15368871,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722552:14840225,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722734:14230252,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722734:15869894,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722734:11228241,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722754:11825000,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722806:14745730,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1722806:15985209,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034398:12730601,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034490:20347856,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034531:20693482,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034588:16338204,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038501:16388871,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038526:14602660,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038591:10765840,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037958:16104985,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081120:13578756,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081120:15766311,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037049:16415704,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034914:14431666,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034927:16265623,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034952:13883010,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083960:10114450,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083960:20201392,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083909:13271964,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083909:13273397,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5035287:16161829,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5035358:10181598,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038306:20335801,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038405:10242607,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5038414:14774427,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037335:20623536,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037396:19779403,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037409:19779403,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037435:12742325,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5037435:14501100,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5033996:14601946,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5034007:20112385,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050758:14765740,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1914545:13312711,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1914649:12673559,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1914670:11768234,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1914843:10913266,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1914843:12095902,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1929862:13199151,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1930225:11677515,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1929716:13152514,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1929762:12814323,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1929762:12817901,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,1929797:10696031,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5007813:10853063,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5007818:20640391,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008236:20094237,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008259:14295571,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008356:16144857,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008356:20694868,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008404:16380385,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008431:11880116,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008834:20233024,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008919:13248992,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008934:20691733,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008942:20855675,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5045042:20647481,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5008948:10129088,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5077744:16269698,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5077918:16391948,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5077918:11944011,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5049345:12680182,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5127957:11556687,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5049572:13068854,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5049572:13068854,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5049626:14283587,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5049626:16717030,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081292:11916812,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050139:20377377,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050213:19755107,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050238:9446137,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050238:9446137,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050238:20670880,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050298:11855494,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050331:14179276,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5050637:16297859,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5065616:19435208,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5065616:19435208,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5065631:20615728,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5065643:16379306,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5072190:14252452,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5082335:20690307,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5066800:14586888,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5066800:12858081,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5066911:20342959,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5067076:16304951,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5067076:19921026,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5072867:20645791,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5072874:20613386,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083078:20623594,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5067998:14503332,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5068049:14969350,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5068257:19725025,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5068804:10685119,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5068963:13157769,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5069037:15048315,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5069037:14627628,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083254:19935298,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083333:20806718,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083349:19618509,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5069264:13907497,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5069355:13907497,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5069703:20134121,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083372:19606145,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070025:3044558,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070025:20407452,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070058:14810904,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070058:13642213,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070065:16352967,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5080155:16476592,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070820:20838675,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070837:19655801,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070851:19656167,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070854:20457115,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070964:19934342,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5070997:19622598,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5071083:16209299,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5071304:16967002,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5071469:13159514,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5083580:16306438,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081587:14636847,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081618:16496065,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5081663:14497507,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5072053:20203158,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5073887:20658476,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5073887:20594303,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5073887:20594542,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5074150:2804161,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5074150:2804540,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5110017:2808124,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5110017:20359028,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5110017:20359028,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5107749:2806973,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5107778:20075034,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5109641:20629553,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5109641:20629553,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5109754:2804161,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5073218:19692390,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5073218:20503794,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
+anomalous_event_minute,warning,match_card,5109905:2796450,,,"minute=999 (minute_raw=999) exceeds sane bound of 130 - likely a site sentinel, not a literal match minute"
