@@ -5,6 +5,9 @@ env/
 ENV/
 tmp/
 
+# Generated GitHub Pages site (built by analysis_scripts/build_site.py in CI)
+/site/
+
 # Python
 __pycache__/
 *.py[cod]
