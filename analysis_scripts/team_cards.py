@@ -97,6 +97,7 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
                 except ValueError:
                     pass
             entry = {
+                "match_id": clean(r["match_id"]),
                 "date": clean(r["match_date"]), "time": clean(r["match_time"]),
                 "home": is_home, "opp": opp_name, "opp_tid": clean(opp_tid),
                 "sf": sf, "sa": sa, "result": result, "status": clean(r["status"]),
@@ -128,8 +129,13 @@ I18N_ES = {
     "th_date": "Fecha", "th_comp": "Competición", "th_opp": "Rival", "th_score": "Resultado", "th_ha": "L/V",
     "home": "Local", "away": "Visitante",
     "scheduled": "por jugar",
-    "footer": 'Construido a partir de <code>output/processed/rffm/matches.csv</code>. Ver '
-              '<code>analysis_scripts/team_cards.py</code>.',
+    "tab_matches": "Partidos", "tab_roster": "Plantilla",
+    "h_roster": "Plantilla por partido",
+    "roster_p": "Filas — jugadores, columnas — partidos de la temporada. Círculo relleno — titular, círculo hueco — "
+                "suplente que entró, borde dorado — capitán, número al lado — goles marcados, barra — tarjeta.",
+    "footer": 'Construido a partir de <code>output/processed/rffm/matches.csv</code> y '
+              '<code>match_lineups/match_goals/match_cards</code>. Ver <code>analysis_scripts/team_cards.py</code>, '
+              '<code>analysis_scripts/team_rosters.py</code>.',
 }
 
 HTML = r"""<!DOCTYPE html>
@@ -212,6 +218,44 @@ td.comp-cell{max-width:22rem;}
 .score-pending{color:var(--ink-faint); font-weight:400; font-style:italic; font-size:0.8rem;}
 .empty-state{padding:2rem; text-align:center; color:var(--ink-faint);}
 footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
+
+.tabs{display:flex; gap:0.4rem;}
+.tab-btn{ font-family:inherit; font-size:0.82rem; font-weight:700; color:var(--ink-soft); background:var(--surface);
+  border:1.5px solid var(--line-strong); border-radius:999px; padding:0.35rem 0.9rem; cursor:pointer; }
+.tab-btn:hover{color:var(--ink); border-color:var(--accent);}
+.tab-btn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+.matrix-scroll{overflow:auto; max-height:75vh;}
+table.matrix{font-size:0.76rem;}
+table.matrix th, table.matrix td{padding:0.3rem 0.4rem; white-space:nowrap;}
+th.player-head{ position:sticky; left:0; z-index:3; background:var(--surface); text-align:left;
+  border-right:1px solid var(--line-strong); min-width:11rem; }
+td.player-cell{ position:sticky; left:0; z-index:1; background:var(--surface);
+  border-right:1px solid var(--line-strong); text-align:left; }
+tbody tr:hover td.player-cell{background:var(--accent-soft);}
+.player-name{color:var(--ink); font-weight:600;}
+.jersey-badge{ display:inline-block; min-width:1.3rem; text-align:center; font-family:'JetBrains Mono',monospace;
+  font-size:0.68rem; font-weight:700; padding:0.02rem 0.25rem; border-radius:3px; margin-right:0.35rem;
+  background:var(--accent-soft); color:var(--accent); }
+.gk-badge{font-size:0.62rem; color:var(--ink-faint); margin-left:0.3rem;}
+th.match-head{ text-align:center; font-weight:700; cursor:default; }
+th.match-head .mh-date{display:block; color:var(--ink);}
+th.match-head .mh-opp{display:block; font-size:0.62rem; color:var(--ink-faint); font-weight:400; max-width:5.5rem;
+  overflow:hidden; text-overflow:ellipsis; margin:0 auto;}
+td.cell-mark{text-align:center;}
+.mark-start, .mark-sub{ display:inline-block; width:0.7rem; height:0.7rem; border-radius:50%; }
+.mark-start{background:var(--accent);}
+.mark-sub{background:transparent; border:1.5px solid var(--accent);}
+.mark-cap{box-shadow:0 0 0 2px var(--gold);}
+.mark-goals{ display:inline-block; margin-left:0.2rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
+  font-weight:700; color:var(--win); vertical-align:middle; }
+.mark-card{display:inline-block; width:0.45rem; height:0.62rem; border-radius:1px; margin-left:0.15rem; vertical-align:middle;}
+.mark-card.amarilla{background:var(--draw);}
+.mark-card.roja{background:var(--loss);}
+.mark-card.doble-amarilla{background:linear-gradient(180deg, var(--draw) 50%, var(--loss) 50%);}
+.matrix-loading, .matrix-empty{padding:1.5rem; text-align:center; color:var(--ink-faint);}
 </style>
 </head>
 <body>
@@ -224,7 +268,12 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     <p class="club-sub" id="clubName"></p>
   </header>
 
-  <section>
+  <div class="tabs">
+    <button type="button" class="tab-btn active" id="tabBtnMatches" data-i18n="tab_matches">Матчи</button>
+    <button type="button" class="tab-btn" id="tabBtnRoster" data-i18n="tab_roster">Состав</button>
+  </div>
+
+  <section class="tab-pane active" id="paneMatches">
     <div class="section-h"><h2 data-i18n="h_matches">Матчи сезона</h2><span class="n" id="matchCount"></span></div>
     <div class="table-shell">
       <table id="matchTable">
@@ -240,8 +289,22 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     </div>
   </section>
 
-  <footer class="note" data-i18n="footer">Построено из <code>output/processed/rffm/matches.csv</code>. См.
-    <code>analysis_scripts/team_cards.py</code>.</footer>
+  <section class="tab-pane" id="paneRoster">
+    <div class="section-h"><h2 data-i18n="h_roster">Состав по матчам</h2><span class="n" id="rosterCount"></span></div>
+    <p style="color:var(--ink-soft); font-size:0.82rem; max-width:70ch; margin:0 0 0.8rem;" data-i18n="roster_p">
+      Строки — игроки, столбцы — матчи сезона. Закрашенный кружок — в старте, пустой — вышел на замену,
+      золотая обводка — капитан, число рядом — забитые голы, полоска — карточка.
+    </p>
+    <div class="table-shell">
+      <div class="matrix-scroll" id="matrixScroll">
+        <div class="matrix-loading" id="matrixStatus" data-i18n="loading">Загрузка…</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note" data-i18n="footer">Построено из <code>output/processed/rffm/matches.csv</code> и
+    <code>match_lineups/match_goals/match_cards</code>. См. <code>analysis_scripts/team_cards.py</code>,
+    <code>analysis_scripts/team_rosters.py</code>.</footer>
 </div>
 <script>
 const LANG = {
@@ -296,11 +359,105 @@ function renderMatches(team) {
   }).join('');
 }
 
+let CUR_SEASON = null, CUR_TEAM_ID = null, CUR_TEAM = null, ROSTER_PAYLOAD = null, ROSTER_LOADING = false;
+
+function shortDate(d) {
+  if (!d) return '—';
+  const parts = d.split('-');
+  return parts.length === 3 ? `${parts[2]}.${parts[1]}` : d;
+}
+
+function cardClass(label) {
+  if (label === 'roja') return 'roja';
+  if (label === 'doble amarilla' || label === 'doble_amarilla') return 'doble-amarilla';
+  return 'amarilla';
+}
+
+function renderMatrix() {
+  const status = document.getElementById('matrixStatus');
+  const scroll = document.getElementById('matrixScroll');
+  if (!CUR_TEAM || !CUR_TEAM.matches.length) {
+    scroll.innerHTML = `<div class="matrix-empty">${LANG[CURLANG].notFound}</div>`;
+    return;
+  }
+  const roster = Object.entries((ROSTER_PAYLOAD && ROSTER_PAYLOAD.roster) || {});
+  if (!roster.length) {
+    scroll.innerHTML = `<div class="matrix-empty">${LANG[CURLANG].notFound}</div>`;
+    return;
+  }
+  document.getElementById('rosterCount').textContent = roster.length;
+  roster.sort((a, b) => {
+    const ja = parseInt(a[1].jersey, 10), jb = parseInt(b[1].jersey, 10);
+    if (!isNaN(ja) && !isNaN(jb)) return ja - jb;
+    if (!isNaN(ja)) return -1;
+    if (!isNaN(jb)) return 1;
+    return String(a[1].name).localeCompare(String(b[1].name));
+  });
+  const lineups = ROSTER_PAYLOAD.lineups || {};
+  const matches = CUR_TEAM.matches;
+
+  let head = `<th class="player-head">&nbsp;</th>` + matches.map(m => {
+    const opp = m.opp || '';
+    return `<th class="match-head" title="${esc(opp)} &middot; ${esc(m.comp || '')}">` +
+      `<span class="mh-date">${shortDate(m.date)}</span><span class="mh-opp">${esc(opp)}</span></th>`;
+  }).join('');
+
+  let rows = roster.map(([pid, p]) => {
+    const jersey = p.jersey ? `<span class="jersey-badge">${esc(p.jersey)}</span>` : '';
+    const gk = p.gk ? `<span class="gk-badge">GK</span>` : '';
+    let cells = matches.map(m => {
+      const cell = (lineups[m.match_id] || {})[pid];
+      if (!cell) return `<td class="cell-mark">&nbsp;</td>`;
+      const markCls = cell.start ? 'mark-start' : 'mark-sub';
+      const capCls = cell.cap ? ' mark-cap' : '';
+      const goals = cell.goals ? `<span class="mark-goals">&#9917;${cell.goals}</span>` : '';
+      const cards = (cell.cards || []).map(c => `<span class="mark-card ${cardClass(c)}"></span>`).join('');
+      return `<td class="cell-mark"><span class="${markCls}${capCls}"></span>${goals}${cards}</td>`;
+    }).join('');
+    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}`;
+    return `<tr><td class="player-cell"><span class="player-name">${jersey}<a href="${nameUrl}">${esc(p.name)}</a></span>${gk}</td>${cells}</tr>`;
+  }).join('');
+
+  scroll.innerHTML = `<table class="matrix"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadRoster() {
+  if (ROSTER_PAYLOAD || ROSTER_LOADING) { renderMatrix(); return; }
+  ROSTER_LOADING = true;
+  const status = document.getElementById('matrixStatus');
+  status.textContent = LANG[CURLANG].loading;
+  status.style.display = '';
+  try {
+    const res = await fetch(`data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
+    if (!res.ok) throw new Error('not found');
+    ROSTER_PAYLOAD = await res.json();
+  } catch (e) {
+    ROSTER_PAYLOAD = { roster: {}, lineups: {} };
+  }
+  ROSTER_LOADING = false;
+  renderMatrix();
+}
+
+document.getElementById('tabBtnMatches').addEventListener('click', function () {
+  this.classList.add('active');
+  document.getElementById('tabBtnRoster').classList.remove('active');
+  document.getElementById('paneMatches').classList.add('active');
+  document.getElementById('paneRoster').classList.remove('active');
+});
+document.getElementById('tabBtnRoster').addEventListener('click', function () {
+  this.classList.add('active');
+  document.getElementById('tabBtnMatches').classList.remove('active');
+  document.getElementById('paneRoster').classList.add('active');
+  document.getElementById('paneMatches').classList.remove('active');
+  loadRoster();
+});
+
 async function main() {
   const params = new URLSearchParams(location.search);
   const season = params.get('season');
   const clubSlug = params.get('club');
   const teamId = params.get('team');
+  CUR_SEASON = season; CUR_TEAM_ID = teamId;
   if (!season || !clubSlug || !teamId) {
     document.getElementById('matchBody').innerHTML =
       `<tr><td class="empty-state" colspan="5">${LANG[CURLANG].notFound}</td></tr>`;
@@ -325,7 +482,9 @@ async function main() {
   }
   document.getElementById('teamName').textContent = team.name;
   document.title = `${team.name} — RFFM`;
+  CUR_TEAM = team;
   renderMatches(team);
+  if (document.getElementById('paneRoster').classList.contains('active')) renderMatrix();
 }
 
 (function () {
