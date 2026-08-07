@@ -36226,3 +36226,840 @@ match_id,team_id,role_kind,role_raw,person_id,person_name,source_url,scraped_at
 1830314,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830314,2026-08-07T23:47:21.761443+00:00
 1830310,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830310,2026-08-07T23:47:21.815984+00:00
 1830319,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830319,2026-08-07T23:47:22.093738+00:00
+1830315,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1830315,2026-08-07T23:47:22.439682+00:00
+1830315,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1830315,2026-08-07T23:47:22.439682+00:00
+1830315,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1830315,2026-08-07T23:47:22.439682+00:00
+1830315,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1830315,2026-08-07T23:47:22.439682+00:00
+1830325,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1830325,2026-08-07T23:47:22.644913+00:00
+1830325,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830325,2026-08-07T23:47:22.644913+00:00
+1830328,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830328,2026-08-07T23:47:22.781361+00:00
+1830317,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830317,2026-08-07T23:47:22.810254+00:00
+1830317,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830317,2026-08-07T23:47:22.810254+00:00
+1830317,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1830317,2026-08-07T23:47:22.810254+00:00
+1830318,17149630,head_coach,head_coach,2796151,"GONZALEZ MERCHAN, DIEGO",https://www.rffm.es/acta-partido/1830318,2026-08-07T23:47:22.965749+00:00
+1830318,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1830318,2026-08-07T23:47:22.965749+00:00
+1830326,17149630,head_coach,head_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1830326,2026-08-07T23:47:23.127314+00:00
+1830334,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830334,2026-08-07T23:47:23.381056+00:00
+1830334,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830334,2026-08-07T23:47:23.381056+00:00
+1830329,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1830329,2026-08-07T23:47:23.488001+00:00
+1830327,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830327,2026-08-07T23:47:23.676495+00:00
+1832811,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1832811,2026-08-07T23:47:23.827698+00:00
+1830323,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1830323,2026-08-07T23:47:23.832137+00:00
+1830323,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1830323,2026-08-07T23:47:23.832137+00:00
+1830324,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830324,2026-08-07T23:47:23.865310+00:00
+1830341,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830341,2026-08-07T23:47:24.378686+00:00
+1830341,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1830341,2026-08-07T23:47:24.378686+00:00
+1830341,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1830341,2026-08-07T23:47:24.378686+00:00
+1830333,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1830333,2026-08-07T23:47:24.416625+00:00
+1830340,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830340,2026-08-07T23:47:24.682124+00:00
+1830332,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830332,2026-08-07T23:47:24.682808+00:00
+1830331,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1830331,2026-08-07T23:47:24.780149+00:00
+1830338,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1830338,2026-08-07T23:47:25.110890+00:00
+1830342,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830342,2026-08-07T23:47:25.706975+00:00
+1830330,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1830330,2026-08-07T23:47:25.822304+00:00
+1830330,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1830330,2026-08-07T23:47:25.822304+00:00
+1830330,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830330,2026-08-07T23:47:25.822304+00:00
+1830330,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1830330,2026-08-07T23:47:25.822304+00:00
+1832747,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1832747,2026-08-07T23:47:25.929885+00:00
+1830337,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830337,2026-08-07T23:47:26.045039+00:00
+1830337,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1830337,2026-08-07T23:47:26.045039+00:00
+1830337,18346141,head_coach,head_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1830337,2026-08-07T23:47:26.045039+00:00
+1830347,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830347,2026-08-07T23:47:26.376547+00:00
+1830344,18346141,head_coach,head_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1830344,2026-08-07T23:47:26.425543+00:00
+1830344,18346141,assistant_coach,assistant_coach,2796141,"DE LOS SANTOS RESPALDIZA, JAVIER",https://www.rffm.es/acta-partido/1830344,2026-08-07T23:47:26.425543+00:00
+1830344,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1830344,2026-08-07T23:47:26.425543+00:00
+1830351,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1830351,2026-08-07T23:47:26.613332+00:00
+1830356,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830356,2026-08-07T23:47:26.800204+00:00
+1830356,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1830356,2026-08-07T23:47:26.800204+00:00
+1830356,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1830356,2026-08-07T23:47:26.800204+00:00
+1830343,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830343,2026-08-07T23:47:26.810265+00:00
+1830343,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1830343,2026-08-07T23:47:26.810265+00:00
+1830346,18611230,head_coach,head_coach,2795963,"ABAD RODRÍGUEZ, MIGUEL ÁNGEL",https://www.rffm.es/acta-partido/1830346,2026-08-07T23:47:26.841515+00:00
+1830345,18950611,head_coach,head_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1830345,2026-08-07T23:47:27.103383+00:00
+1830348,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1830348,2026-08-07T23:47:27.112063+00:00
+1832748,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1832748,2026-08-07T23:47:27.214548+00:00
+1832748,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1832748,2026-08-07T23:47:27.214548+00:00
+1834029,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834029,2026-08-07T23:47:27.589340+00:00
+1830352,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1830352,2026-08-07T23:47:27.868843+00:00
+1830354,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830354,2026-08-07T23:47:28.017449+00:00
+1830354,18345557,head_coach,head_coach,2796019,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/1830354,2026-08-07T23:47:28.017449+00:00
+1830359,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1830359,2026-08-07T23:47:28.107421+00:00
+1830359,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1830359,2026-08-07T23:47:28.107421+00:00
+1830357,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1830357,2026-08-07T23:47:28.487128+00:00
+1830357,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1830357,2026-08-07T23:47:28.487128+00:00
+1830357,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1830357,2026-08-07T23:47:28.487128+00:00
+1830355,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830355,2026-08-07T23:47:28.627170+00:00
+1832754,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1832754,2026-08-07T23:47:28.732273+00:00
+1832754,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1832754,2026-08-07T23:47:28.732273+00:00
+1830360,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1830360,2026-08-07T23:47:28.850825+00:00
+1830360,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1830360,2026-08-07T23:47:28.850825+00:00
+1830360,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1830360,2026-08-07T23:47:28.850825+00:00
+1830358,17149318,assistant_coach,assistant_coach,2796407,"CRESPO OBISPO, DAVID",https://www.rffm.es/acta-partido/1830358,2026-08-07T23:47:29.151923+00:00
+1830358,18583713,head_coach,head_coach,2793289,"NUNES MARTÍN, ALEXANDRE",https://www.rffm.es/acta-partido/1830358,2026-08-07T23:47:29.151923+00:00
+1830362,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1830362,2026-08-07T23:47:29.297869+00:00
+1830362,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1830362,2026-08-07T23:47:29.297869+00:00
+1830366,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830366,2026-08-07T23:47:29.743385+00:00
+1830366,17145443,head_coach,head_coach,2796849,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/1830366,2026-08-07T23:47:29.743385+00:00
+1830364,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830364,2026-08-07T23:47:29.757992+00:00
+1830364,18956182,assistant_coach,assistant_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830364,2026-08-07T23:47:29.757992+00:00
+1830369,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830369,2026-08-07T23:47:29.762752+00:00
+1830376,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830376,2026-08-07T23:47:30.418775+00:00
+1830376,17149323,assistant_coach,assistant_coach,2796398,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/1830376,2026-08-07T23:47:30.418775+00:00
+1830374,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830374,2026-08-07T23:47:30.536590+00:00
+1830372,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830372,2026-08-07T23:47:30.558214+00:00
+1830379,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830379,2026-08-07T23:47:30.723680+00:00
+1830368,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830368,2026-08-07T23:47:30.799701+00:00
+1830377,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830377,2026-08-07T23:47:31.249899+00:00
+1830383,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830383,2026-08-07T23:47:31.377792+00:00
+1830383,17149323,assistant_coach,assistant_coach,2796398,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/1830383,2026-08-07T23:47:31.377792+00:00
+1830381,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830381,2026-08-07T23:47:31.824849+00:00
+1830389,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830389,2026-08-07T23:47:32.215833+00:00
+1830387,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830387,2026-08-07T23:47:32.950311+00:00
+1830391,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830391,2026-08-07T23:47:32.955093+00:00
+1830391,17149323,head_coach,head_coach,2796398,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/1830391,2026-08-07T23:47:32.955093+00:00
+1830391,17149323,assistant_coach,assistant_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830391,2026-08-07T23:47:32.955093+00:00
+1830396,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830396,2026-08-07T23:47:33.100068+00:00
+1830397,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830397,2026-08-07T23:47:33.372308+00:00
+1830404,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830404,2026-08-07T23:47:34.339767+00:00
+1830404,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830404,2026-08-07T23:47:34.339767+00:00
+1830394,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830394,2026-08-07T23:47:34.468970+00:00
+1830402,17271129,head_coach,head_coach,2796883,"GUTIERREZ VIGIL, AMADEO",https://www.rffm.es/acta-partido/1830402,2026-08-07T23:47:34.634539+00:00
+1830411,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830411,2026-08-07T23:47:35.092006+00:00
+1830411,17149323,head_coach,head_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1830411,2026-08-07T23:47:35.092006+00:00
+1830411,17149323,assistant_coach,assistant_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830411,2026-08-07T23:47:35.092006+00:00
+1830405,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830405,2026-08-07T23:47:35.199265+00:00
+1830405,17149323,assistant_coach,assistant_coach,2796398,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/1830405,2026-08-07T23:47:35.199265+00:00
+1830410,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830410,2026-08-07T23:47:35.318887+00:00
+1830419,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830419,2026-08-07T23:47:35.446999+00:00
+1830409,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830409,2026-08-07T23:47:35.524841+00:00
+1830416,18956182,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830416,2026-08-07T23:47:35.875751+00:00
+1830408,18956182,assistant_coach,assistant_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830408,2026-08-07T23:47:35.920676+00:00
+1830418,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830418,2026-08-07T23:47:36.317109+00:00
+1830417,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830417,2026-08-07T23:47:36.658020+00:00
+1830417,17271129,head_coach,head_coach,2796636,"RIVAS GIL, MARCOS",https://www.rffm.es/acta-partido/1830417,2026-08-07T23:47:36.658020+00:00
+1830423,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830423,2026-08-07T23:47:36.843842+00:00
+1830424,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830424,2026-08-07T23:47:37.091835+00:00
+1830424,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830424,2026-08-07T23:47:37.091835+00:00
+1830424,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1830424,2026-08-07T23:47:37.091835+00:00
+1830425,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1830425,2026-08-07T23:47:37.137511+00:00
+1830421,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1830421,2026-08-07T23:47:37.918667+00:00
+1830429,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1830429,2026-08-07T23:47:38.111044+00:00
+1830431,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830431,2026-08-07T23:47:38.141906+00:00
+1830431,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1830431,2026-08-07T23:47:38.141906+00:00
+1830430,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830430,2026-08-07T23:47:38.484055+00:00
+1830432,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1830432,2026-08-07T23:47:38.492648+00:00
+1830432,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830432,2026-08-07T23:47:38.492648+00:00
+1830433,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830433,2026-08-07T23:47:38.534002+00:00
+1830437,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830437,2026-08-07T23:47:38.627189+00:00
+1830437,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1830437,2026-08-07T23:47:38.627189+00:00
+1830439,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830439,2026-08-07T23:47:38.878902+00:00
+1830439,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830439,2026-08-07T23:47:38.878902+00:00
+1830436,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1830436,2026-08-07T23:47:39.163386+00:00
+1830436,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830436,2026-08-07T23:47:39.163386+00:00
+1830438,18956182,assistant_coach,assistant_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830438,2026-08-07T23:47:39.400118+00:00
+1830438,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1830438,2026-08-07T23:47:39.400118+00:00
+1830447,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1830447,2026-08-07T23:47:39.549674+00:00
+1830445,18346189,head_coach,head_coach,2795960,"MERCADO MILLÁN, FRANCISCO",https://www.rffm.es/acta-partido/1830445,2026-08-07T23:47:39.692657+00:00
+1830446,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830446,2026-08-07T23:47:40.086207+00:00
+1830444,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830444,2026-08-07T23:47:40.416809+00:00
+1830444,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1830444,2026-08-07T23:47:40.416809+00:00
+1830443,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830443,2026-08-07T23:47:40.421182+00:00
+1830452,17149519,assistant_coach,assistant_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1830452,2026-08-07T23:47:40.536196+00:00
+1830451,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1830451,2026-08-07T23:47:40.937700+00:00
+1830451,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1830451,2026-08-07T23:47:40.937700+00:00
+1830449,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1830449,2026-08-07T23:47:41.326021+00:00
+1830450,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1830450,2026-08-07T23:47:41.504325+00:00
+1830450,17149323,assistant_coach,assistant_coach,2799220,"SAEZ GARCIA RAMA, DANIEL",https://www.rffm.es/acta-partido/1830450,2026-08-07T23:47:41.504325+00:00
+1830457,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830457,2026-08-07T23:47:41.821442+00:00
+1830460,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830460,2026-08-07T23:47:41.871151+00:00
+1830459,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830459,2026-08-07T23:47:41.983827+00:00
+1830459,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830459,2026-08-07T23:47:41.983827+00:00
+1830465,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830465,2026-08-07T23:47:42.062699+00:00
+1830465,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830465,2026-08-07T23:47:42.062699+00:00
+1830455,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830455,2026-08-07T23:47:42.198377+00:00
+1830458,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830458,2026-08-07T23:47:42.507856+00:00
+1830458,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830458,2026-08-07T23:47:42.507856+00:00
+1830462,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830462,2026-08-07T23:47:42.584922+00:00
+1830461,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830461,2026-08-07T23:47:42.940609+00:00
+1830464,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830464,2026-08-07T23:47:43.065104+00:00
+1830464,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830464,2026-08-07T23:47:43.065104+00:00
+1830466,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830466,2026-08-07T23:47:43.127250+00:00
+1830469,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830469,2026-08-07T23:47:43.376023+00:00
+1830470,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830470,2026-08-07T23:47:43.438714+00:00
+1830470,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830470,2026-08-07T23:47:43.438714+00:00
+1830472,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830472,2026-08-07T23:47:44.199369+00:00
+1830472,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830472,2026-08-07T23:47:44.199369+00:00
+1830471,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830471,2026-08-07T23:47:44.216312+00:00
+1830478,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830478,2026-08-07T23:47:44.716854+00:00
+1830478,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830478,2026-08-07T23:47:44.716854+00:00
+1830475,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830475,2026-08-07T23:47:44.739522+00:00
+1830475,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830475,2026-08-07T23:47:44.739522+00:00
+1830477,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830477,2026-08-07T23:47:44.744512+00:00
+1830476,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830476,2026-08-07T23:47:44.782608+00:00
+1830473,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830473,2026-08-07T23:47:45.440694+00:00
+1830483,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830483,2026-08-07T23:47:45.445180+00:00
+1830483,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830483,2026-08-07T23:47:45.445180+00:00
+1830487,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830487,2026-08-07T23:47:45.530783+00:00
+1830484,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830484,2026-08-07T23:47:45.662629+00:00
+1830484,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830484,2026-08-07T23:47:45.662629+00:00
+1830481,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830481,2026-08-07T23:47:45.833079+00:00
+1830481,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830481,2026-08-07T23:47:45.833079+00:00
+1830480,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830480,2026-08-07T23:47:45.842919+00:00
+1830485,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830485,2026-08-07T23:47:46.319251+00:00
+1830489,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830489,2026-08-07T23:47:46.640183+00:00
+1830490,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830490,2026-08-07T23:47:46.644546+00:00
+1830490,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830490,2026-08-07T23:47:46.644546+00:00
+1830486,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830486,2026-08-07T23:47:46.828281+00:00
+1830494,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830494,2026-08-07T23:47:47.070180+00:00
+1830494,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830494,2026-08-07T23:47:47.070180+00:00
+1830495,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830495,2026-08-07T23:47:47.190178+00:00
+1830488,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830488,2026-08-07T23:47:47.216218+00:00
+1830491,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830491,2026-08-07T23:47:47.221687+00:00
+1830496,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830496,2026-08-07T23:47:48.026357+00:00
+1830496,17208918,head_coach,head_coach,2796114,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830496,2026-08-07T23:47:48.026357+00:00
+1830492,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830492,2026-08-07T23:47:48.058409+00:00
+1830497,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830497,2026-08-07T23:47:48.487748+00:00
+1830497,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830497,2026-08-07T23:47:48.487748+00:00
+1830500,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830500,2026-08-07T23:47:48.492819+00:00
+1830498,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830498,2026-08-07T23:47:48.555215+00:00
+1830501,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830501,2026-08-07T23:47:49.007930+00:00
+1830501,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830501,2026-08-07T23:47:49.007930+00:00
+1830502,17145600,head_coach,head_coach,2796461,"SÁNCHEZ SÁNCHEZ, DIEGO JOSÉ",https://www.rffm.es/acta-partido/1830502,2026-08-07T23:47:49.350022+00:00
+1830514,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830514,2026-08-07T23:47:49.848635+00:00
+1830503,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830503,2026-08-07T23:47:49.860049+00:00
+1830503,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830503,2026-08-07T23:47:49.860049+00:00
+1830508,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830508,2026-08-07T23:47:50.122088+00:00
+1830505,18926521,head_coach,head_coach,2796107,"MARTIN GOMEZ, JORGE",https://www.rffm.es/acta-partido/1830505,2026-08-07T23:47:50.126368+00:00
+1830507,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830507,2026-08-07T23:47:50.138653+00:00
+1830507,17208918,head_coach,head_coach,2795905,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830507,2026-08-07T23:47:50.138653+00:00
+1830506,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830506,2026-08-07T23:47:50.145883+00:00
+1830513,17208918,head_coach,head_coach,2795905,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1830513,2026-08-07T23:47:50.186646+00:00
+1830515,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830515,2026-08-07T23:47:50.861381+00:00
+1830510,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830510,2026-08-07T23:47:50.865732+00:00
+1830516,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1830516,2026-08-07T23:47:50.944337+00:00
+1830516,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830516,2026-08-07T23:47:50.944337+00:00
+1830511,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1830511,2026-08-07T23:47:50.946984+00:00
+1830512,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830512,2026-08-07T23:47:51.013486+00:00
+1830517,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1830517,2026-08-07T23:47:51.023149+00:00
+1830509,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830509,2026-08-07T23:47:51.506456+00:00
+1830509,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1830509,2026-08-07T23:47:51.506456+00:00
+1830520,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1830520,2026-08-07T23:47:51.914452+00:00
+1830520,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1830520,2026-08-07T23:47:51.914452+00:00
+1830526,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830526,2026-08-07T23:47:52.129997+00:00
+1830521,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830521,2026-08-07T23:47:52.594217+00:00
+1830531,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830531,2026-08-07T23:47:53.186662+00:00
+1830527,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830527,2026-08-07T23:47:53.201253+00:00
+1830527,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830527,2026-08-07T23:47:53.201253+00:00
+1830529,18957503,head_coach,head_coach,2796205,"GALLEGO RÁEZ, JUAN MANUEL",https://www.rffm.es/acta-partido/1830529,2026-08-07T23:47:53.265374+00:00
+1830533,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830533,2026-08-07T23:47:53.431296+00:00
+1830528,18407918,head_coach,head_coach,2795143,"CHENA DEL OSO, ALEJANDRO",https://www.rffm.es/acta-partido/1830528,2026-08-07T23:47:53.476747+00:00
+1830530,18771554,assistant_coach,assistant_coach,2796849,"SÁNCHEZ FERNÁNDEZ, JOSÉ MIGUEL",https://www.rffm.es/acta-partido/1830530,2026-08-07T23:47:53.478048+00:00
+1830536,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830536,2026-08-07T23:47:54.526666+00:00
+1830538,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830538,2026-08-07T23:47:54.618284+00:00
+1830534,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830534,2026-08-07T23:47:54.648348+00:00
+1830542,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830542,2026-08-07T23:47:55.071710+00:00
+1830539,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830539,2026-08-07T23:47:55.166293+00:00
+1830540,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830540,2026-08-07T23:47:55.781975+00:00
+1830540,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830540,2026-08-07T23:47:55.781975+00:00
+1830546,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830546,2026-08-07T23:47:55.787300+00:00
+1830550,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830550,2026-08-07T23:47:55.934472+00:00
+1830547,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830547,2026-08-07T23:47:55.943483+00:00
+1830545,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830545,2026-08-07T23:47:56.462820+00:00
+1830553,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830553,2026-08-07T23:47:56.968646+00:00
+1830553,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830553,2026-08-07T23:47:56.968646+00:00
+1830552,18771554,assistant_coach,assistant_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1830552,2026-08-07T23:47:57.105986+00:00
+1830551,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830551,2026-08-07T23:47:57.195397+00:00
+1830551,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830551,2026-08-07T23:47:57.195397+00:00
+1830557,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830557,2026-08-07T23:47:57.572484+00:00
+1830558,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830558,2026-08-07T23:47:58.257346+00:00
+1830562,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830562,2026-08-07T23:47:58.260647+00:00
+1830566,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830566,2026-08-07T23:47:58.374683+00:00
+1830559,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830559,2026-08-07T23:47:58.400787+00:00
+1830564,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830564,2026-08-07T23:47:58.887009+00:00
+1830564,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830564,2026-08-07T23:47:58.887009+00:00
+1830563,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830563,2026-08-07T23:47:59.468814+00:00
+1830574,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830574,2026-08-07T23:47:59.501114+00:00
+1830569,18771554,head_coach,head_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1830569,2026-08-07T23:47:59.675782+00:00
+1830569,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830569,2026-08-07T23:47:59.675782+00:00
+1830572,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830572,2026-08-07T23:47:59.681462+00:00
+1830572,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1830572,2026-08-07T23:47:59.681462+00:00
+1830570,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830570,2026-08-07T23:47:59.684851+00:00
+1830576,18771554,assistant_coach,assistant_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1830576,2026-08-07T23:48:00.843423+00:00
+1830579,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830579,2026-08-07T23:48:00.848450+00:00
+1830577,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830577,2026-08-07T23:48:01.042511+00:00
+1830578,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1830578,2026-08-07T23:48:01.076078+00:00
+1830575,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830575,2026-08-07T23:48:01.079850+00:00
+1830575,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830575,2026-08-07T23:48:01.079850+00:00
+1830586,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1830586,2026-08-07T23:48:01.182111+00:00
+1830585,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1830585,2026-08-07T23:48:01.569294+00:00
+1830583,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1830583,2026-08-07T23:48:02.245658+00:00
+1830583,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1830583,2026-08-07T23:48:02.245658+00:00
+1830591,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830591,2026-08-07T23:48:02.828303+00:00
+1830591,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830591,2026-08-07T23:48:02.828303+00:00
+1831907,19000229,head_coach,head_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1831907,2026-08-07T23:48:02.937617+00:00
+1830588,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830588,2026-08-07T23:48:02.962635+00:00
+1830581,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830581,2026-08-07T23:48:03.072247+00:00
+1830587,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830587,2026-08-07T23:48:03.290856+00:00
+1831902,19000229,head_coach,head_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1831902,2026-08-07T23:48:03.702367+00:00
+1831902,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1831902,2026-08-07T23:48:03.702367+00:00
+1830593,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830593,2026-08-07T23:48:04.326571+00:00
+1830597,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830597,2026-08-07T23:48:04.365702+00:00
+1830597,18894567,assistant_coach,assistant_coach,2793563,"MARTÍNEZ FERNÁNDEZ, JOSE CALIXTO",https://www.rffm.es/acta-partido/1830597,2026-08-07T23:48:04.365702+00:00
+1830597,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830597,2026-08-07T23:48:04.365702+00:00
+1831908,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1831908,2026-08-07T23:48:04.800663+00:00
+1830604,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830604,2026-08-07T23:48:04.893405+00:00
+1830601,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830601,2026-08-07T23:48:04.933626+00:00
+1830606,17210288,head_coach,head_coach,2796592,"ESCRIBA TORRERO, MIGUEL",https://www.rffm.es/acta-partido/1830606,2026-08-07T23:48:05.040688+00:00
+1830602,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830602,2026-08-07T23:48:05.045737+00:00
+1830599,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830599,2026-08-07T23:48:05.050004+00:00
+1830610,18408381,head_coach,head_coach,2804854,"SAIZ FERNÁNDEZ, ÁNGEL",https://www.rffm.es/acta-partido/1830610,2026-08-07T23:48:05.071043+00:00
+1830610,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830610,2026-08-07T23:48:05.071043+00:00
+1830600,18481882,assistant_coach,assistant_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1830600,2026-08-07T23:48:05.144700+00:00
+1830613,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830613,2026-08-07T23:48:05.608570+00:00
+1830608,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830608,2026-08-07T23:48:06.024862+00:00
+1830608,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830608,2026-08-07T23:48:06.024862+00:00
+1830612,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830612,2026-08-07T23:48:06.185832+00:00
+1830616,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830616,2026-08-07T23:48:06.190403+00:00
+1831909,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1831909,2026-08-07T23:48:06.513616+00:00
+1830615,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830615,2026-08-07T23:48:06.866076+00:00
+1830621,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830621,2026-08-07T23:48:07.298201+00:00
+1830621,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830621,2026-08-07T23:48:07.298201+00:00
+1831904,19000229,head_coach,head_coach,2795921,"SÁNCHEZ LÓPEZ, MIGUEL",https://www.rffm.es/acta-partido/1831904,2026-08-07T23:48:07.638139+00:00
+1830622,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830622,2026-08-07T23:48:07.721491+00:00
+1830619,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830619,2026-08-07T23:48:08.018682+00:00
+1830619,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830619,2026-08-07T23:48:08.018682+00:00
+1830624,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830624,2026-08-07T23:48:08.243085+00:00
+1831910,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1831910,2026-08-07T23:48:08.563633+00:00
+1833010,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1833010,2026-08-07T23:48:08.714030+00:00
+1833010,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1833010,2026-08-07T23:48:08.714030+00:00
+1830634,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830634,2026-08-07T23:48:08.718353+00:00
+1830633,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830633,2026-08-07T23:48:08.882244+00:00
+1830626,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830626,2026-08-07T23:48:08.899309+00:00
+1830630,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830630,2026-08-07T23:48:09.386174+00:00
+1831905,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1831905,2026-08-07T23:48:09.755253+00:00
+1830637,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830637,2026-08-07T23:48:10.103868+00:00
+1830635,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830635,2026-08-07T23:48:10.184842+00:00
+1830632,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830632,2026-08-07T23:48:10.440185+00:00
+1830640,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830640,2026-08-07T23:48:10.908415+00:00
+1830638,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830638,2026-08-07T23:48:11.308192+00:00
+1830638,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830638,2026-08-07T23:48:11.308192+00:00
+1830646,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830646,2026-08-07T23:48:11.356243+00:00
+1830641,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1830641,2026-08-07T23:48:11.496342+00:00
+1830643,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830643,2026-08-07T23:48:11.551028+00:00
+1830644,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830644,2026-08-07T23:48:11.682593+00:00
+1830644,18408418,assistant_coach,assistant_coach,2796316,"POL FERREIRA, JUAN",https://www.rffm.es/acta-partido/1830644,2026-08-07T23:48:11.682593+00:00
+1831906,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1831906,2026-08-07T23:48:11.730300+00:00
+1830645,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830645,2026-08-07T23:48:12.071689+00:00
+1830651,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1830651,2026-08-07T23:48:12.711887+00:00
+1830651,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1830651,2026-08-07T23:48:12.711887+00:00
+1831912,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1831912,2026-08-07T23:48:12.723468+00:00
+1831912,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1831912,2026-08-07T23:48:12.723468+00:00
+1830649,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1830649,2026-08-07T23:48:12.726639+00:00
+1830648,17155539,head_coach,head_coach,2796346,"MELERO CARRILLO, ANTONIO",https://www.rffm.es/acta-partido/1830648,2026-08-07T23:48:12.773692+00:00
+1830648,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1830648,2026-08-07T23:48:12.773692+00:00
+1834050,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834050,2026-08-07T23:48:12.801514+00:00
+1834048,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834048,2026-08-07T23:48:12.818119+00:00
+1834048,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834048,2026-08-07T23:48:12.818119+00:00
+1834047,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834047,2026-08-07T23:48:13.137321+00:00
+1834047,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834047,2026-08-07T23:48:13.137321+00:00
+1834051,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834051,2026-08-07T23:48:13.455841+00:00
+1834051,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834051,2026-08-07T23:48:13.455841+00:00
+1834052,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834052,2026-08-07T23:48:13.460424+00:00
+1834052,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834052,2026-08-07T23:48:13.460424+00:00
+1834057,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834057,2026-08-07T23:48:13.691607+00:00
+1834053,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834053,2026-08-07T23:48:13.818806+00:00
+1834053,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834053,2026-08-07T23:48:13.818806+00:00
+1834058,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834058,2026-08-07T23:48:13.938272+00:00
+1834049,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834049,2026-08-07T23:48:14.217514+00:00
+1834055,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834055,2026-08-07T23:48:14.411303+00:00
+1834055,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834055,2026-08-07T23:48:14.411303+00:00
+1834056,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834056,2026-08-07T23:48:14.699578+00:00
+1834056,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834056,2026-08-07T23:48:14.699578+00:00
+1834062,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834062,2026-08-07T23:48:14.723541+00:00
+1834059,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834059,2026-08-07T23:48:15.188385+00:00
+1834060,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834060,2026-08-07T23:48:15.318683+00:00
+1834066,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834066,2026-08-07T23:48:15.606350+00:00
+1834066,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834066,2026-08-07T23:48:15.606350+00:00
+1834064,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834064,2026-08-07T23:48:15.692566+00:00
+1834063,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834063,2026-08-07T23:48:15.967905+00:00
+1834063,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834063,2026-08-07T23:48:15.967905+00:00
+1834070,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834070,2026-08-07T23:48:15.972445+00:00
+1834070,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834070,2026-08-07T23:48:15.972445+00:00
+1834073,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834073,2026-08-07T23:48:16.133103+00:00
+1834073,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834073,2026-08-07T23:48:16.133103+00:00
+1834069,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834069,2026-08-07T23:48:16.182093+00:00
+1834067,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834067,2026-08-07T23:48:16.287803+00:00
+1834071,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834071,2026-08-07T23:48:16.327760+00:00
+1834068,17209757,head_coach,head_coach,2796529,"REYES VIZCAINO, IGNACIO",https://www.rffm.es/acta-partido/1834068,2026-08-07T23:48:16.345289+00:00
+1834074,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834074,2026-08-07T23:48:17.249632+00:00
+1834074,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834074,2026-08-07T23:48:17.249632+00:00
+1834078,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834078,2026-08-07T23:48:17.250024+00:00
+1834077,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834077,2026-08-07T23:48:17.460243+00:00
+1834075,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834075,2026-08-07T23:48:17.467964+00:00
+1834075,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834075,2026-08-07T23:48:17.467964+00:00
+1834076,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834076,2026-08-07T23:48:17.507765+00:00
+1834079,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834079,2026-08-07T23:48:17.733423+00:00
+1834079,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834079,2026-08-07T23:48:17.733423+00:00
+1834080,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834080,2026-08-07T23:48:18.111884+00:00
+1834083,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834083,2026-08-07T23:48:18.655067+00:00
+1834089,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834089,2026-08-07T23:48:18.694860+00:00
+1834086,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834086,2026-08-07T23:48:18.729184+00:00
+1834084,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834084,2026-08-07T23:48:18.885529+00:00
+1834084,18452825,assistant_coach,assistant_coach,2796104,"GARCIA CARO SANTAMARIA, JOSE MARIA",https://www.rffm.es/acta-partido/1834084,2026-08-07T23:48:18.885529+00:00
+1834084,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834084,2026-08-07T23:48:18.885529+00:00
+1834087,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834087,2026-08-07T23:48:18.896079+00:00
+1834087,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834087,2026-08-07T23:48:18.896079+00:00
+1834081,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834081,2026-08-07T23:48:18.900328+00:00
+1834081,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834081,2026-08-07T23:48:18.900328+00:00
+1834085,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834085,2026-08-07T23:48:19.110805+00:00
+1834088,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834088,2026-08-07T23:48:19.361467+00:00
+1834088,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834088,2026-08-07T23:48:19.361467+00:00
+1834093,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834093,2026-08-07T23:48:19.728905+00:00
+1834096,17209757,head_coach,head_coach,2796497,"CORROCHANO GARCIA, TOMAS",https://www.rffm.es/acta-partido/1834096,2026-08-07T23:48:19.736708+00:00
+1834091,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834091,2026-08-07T23:48:19.892391+00:00
+1834098,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834098,2026-08-07T23:48:19.901649+00:00
+1834098,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834098,2026-08-07T23:48:19.901649+00:00
+1834090,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834090,2026-08-07T23:48:19.961638+00:00
+1834094,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834094,2026-08-07T23:48:19.972536+00:00
+1834094,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834094,2026-08-07T23:48:19.972536+00:00
+1834092,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834092,2026-08-07T23:48:20.112838+00:00
+1834097,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834097,2026-08-07T23:48:20.625295+00:00
+1834095,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834095,2026-08-07T23:48:20.984700+00:00
+1834095,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834095,2026-08-07T23:48:20.984700+00:00
+1834101,18627864,head_coach,head_coach,2795970,"PANIAGUA GARCÍA, EULOGIO",https://www.rffm.es/acta-partido/1834101,2026-08-07T23:48:20.991393+00:00
+1834101,18408418,head_coach,head_coach,2796169,"GALAN AROCO, SERGIO",https://www.rffm.es/acta-partido/1834101,2026-08-07T23:48:20.991393+00:00
+1834099,18452825,head_coach,head_coach,2796124,"DÍAZ GARCÍA, ROBERTO",https://www.rffm.es/acta-partido/1834099,2026-08-07T23:48:21.161806+00:00
+1834102,17149640,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834102,2026-08-07T23:48:21.170623+00:00
+1834102,17145443,assistant_coach,assistant_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834102,2026-08-07T23:48:21.170623+00:00
+1834106,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834106,2026-08-07T23:48:21.367140+00:00
+1834106,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834106,2026-08-07T23:48:21.367140+00:00
+1834106,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1834106,2026-08-07T23:48:21.367140+00:00
+1834104,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834104,2026-08-07T23:48:21.551826+00:00
+1834103,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834103,2026-08-07T23:48:22.233227+00:00
+1834109,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834109,2026-08-07T23:48:22.238128+00:00
+1834109,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834109,2026-08-07T23:48:22.238128+00:00
+1834107,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834107,2026-08-07T23:48:22.403280+00:00
+1834110,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834110,2026-08-07T23:48:22.421700+00:00
+1834108,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834108,2026-08-07T23:48:22.422325+00:00
+1834114,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834114,2026-08-07T23:48:22.463461+00:00
+1834105,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834105,2026-08-07T23:48:22.603825+00:00
+1834112,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834112,2026-08-07T23:48:23.462482+00:00
+1834112,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834112,2026-08-07T23:48:23.462482+00:00
+1834117,18346141,head_coach,head_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1834117,2026-08-07T23:48:23.603519+00:00
+1834117,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834117,2026-08-07T23:48:23.603519+00:00
+1834116,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834116,2026-08-07T23:48:23.613678+00:00
+1834118,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834118,2026-08-07T23:48:23.677528+00:00
+1834115,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834115,2026-08-07T23:48:23.693406+00:00
+1834122,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834122,2026-08-07T23:48:23.830846+00:00
+1834120,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834120,2026-08-07T23:48:23.873373+00:00
+1834119,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834119,2026-08-07T23:48:24.361885+00:00
+1834121,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834121,2026-08-07T23:48:24.707907+00:00
+1834126,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834126,2026-08-07T23:48:24.922373+00:00
+1834126,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834126,2026-08-07T23:48:24.922373+00:00
+1834123,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834123,2026-08-07T23:48:25.004478+00:00
+1834123,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834123,2026-08-07T23:48:25.004478+00:00
+1834124,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834124,2026-08-07T23:48:25.014128+00:00
+1834124,18346141,assistant_coach,assistant_coach,2796141,"DE LOS SANTOS RESPALDIZA, JAVIER",https://www.rffm.es/acta-partido/1834124,2026-08-07T23:48:25.014128+00:00
+1834129,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834129,2026-08-07T23:48:25.500716+00:00
+1834127,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834127,2026-08-07T23:48:25.798118+00:00
+1834127,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834127,2026-08-07T23:48:25.798118+00:00
+1834127,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1834127,2026-08-07T23:48:25.798118+00:00
+1834130,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834130,2026-08-07T23:48:25.967891+00:00
+1834130,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834130,2026-08-07T23:48:25.967891+00:00
+1834131,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834131,2026-08-07T23:48:26.054566+00:00
+1836915,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1836915,2026-08-07T23:48:26.274255+00:00
+1836915,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1836915,2026-08-07T23:48:26.274255+00:00
+1836915,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1836915,2026-08-07T23:48:26.274255+00:00
+1834132,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834132,2026-08-07T23:48:26.306458+00:00
+1834133,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834133,2026-08-07T23:48:26.346631+00:00
+1834137,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834137,2026-08-07T23:48:26.511846+00:00
+1834137,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834137,2026-08-07T23:48:26.511846+00:00
+1834138,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834138,2026-08-07T23:48:26.521454+00:00
+1834138,18346141,assistant_coach,assistant_coach,2755310,"PICAZO CALLE, CARLOS",https://www.rffm.es/acta-partido/1834138,2026-08-07T23:48:26.521454+00:00
+1834136,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834136,2026-08-07T23:48:26.962238+00:00
+1834141,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834141,2026-08-07T23:48:27.245801+00:00
+1834141,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834141,2026-08-07T23:48:27.245801+00:00
+1834135,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834135,2026-08-07T23:48:27.250657+00:00
+1834142,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834142,2026-08-07T23:48:27.533785+00:00
+1834140,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834140,2026-08-07T23:48:27.542349+00:00
+1834140,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834140,2026-08-07T23:48:27.542349+00:00
+1834143,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834143,2026-08-07T23:48:27.544368+00:00
+1834146,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834146,2026-08-07T23:48:27.692803+00:00
+1834145,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834145,2026-08-07T23:48:28.850801+00:00
+1834145,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834145,2026-08-07T23:48:28.850801+00:00
+1834145,18346141,assistant_coach,assistant_coach,2796139,"REDONDO SANCHEZ, PEDRO JOSE",https://www.rffm.es/acta-partido/1834145,2026-08-07T23:48:28.850801+00:00
+1834150,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834150,2026-08-07T23:48:29.396494+00:00
+1834150,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834150,2026-08-07T23:48:29.396494+00:00
+1834147,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834147,2026-08-07T23:48:29.397493+00:00
+1834149,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834149,2026-08-07T23:48:29.433226+00:00
+1834148,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834148,2026-08-07T23:48:29.436299+00:00
+1834151,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834151,2026-08-07T23:48:29.443115+00:00
+1834151,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834151,2026-08-07T23:48:29.443115+00:00
+1834144,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834144,2026-08-07T23:48:29.556572+00:00
+1834154,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834154,2026-08-07T23:48:29.824834+00:00
+1834154,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834154,2026-08-07T23:48:29.824834+00:00
+1834158,17270228,head_coach,head_coach,2796962,"VERA HERAS, JOSE RAMON",https://www.rffm.es/acta-partido/1834158,2026-08-07T23:48:29.971002+00:00
+1834158,18346700,head_coach,head_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834158,2026-08-07T23:48:29.971002+00:00
+1834152,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834152,2026-08-07T23:48:29.978397+00:00
+1834155,18346141,head_coach,head_coach,2796140,"GARCIA BLANCO, JOSE JAVIER",https://www.rffm.es/acta-partido/1834155,2026-08-07T23:48:30.085144+00:00
+1834155,18310606,head_coach,head_coach,2796569,"SÁNCHEZ ALONSO, RAÚL",https://www.rffm.es/acta-partido/1834155,2026-08-07T23:48:30.085144+00:00
+1834157,18583805,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834157,2026-08-07T23:48:30.114923+00:00
+1834160,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834160,2026-08-07T23:48:30.552647+00:00
+1834160,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834160,2026-08-07T23:48:30.552647+00:00
+1834160,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834160,2026-08-07T23:48:30.552647+00:00
+1834159,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834159,2026-08-07T23:48:31.013105+00:00
+1834165,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834165,2026-08-07T23:48:31.561016+00:00
+1834165,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834165,2026-08-07T23:48:31.561016+00:00
+1834169,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834169,2026-08-07T23:48:31.571608+00:00
+1834169,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834169,2026-08-07T23:48:31.571608+00:00
+1834167,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834167,2026-08-07T23:48:31.575870+00:00
+1834167,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834167,2026-08-07T23:48:31.575870+00:00
+1834172,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834172,2026-08-07T23:48:31.615572+00:00
+1834164,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834164,2026-08-07T23:48:32.236214+00:00
+1834174,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834174,2026-08-07T23:48:32.299851+00:00
+1834174,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834174,2026-08-07T23:48:32.299851+00:00
+1834168,18481882,assistant_coach,assistant_coach,2800559,"ARAUJO APARICIO, JUAN CARLOS",https://www.rffm.es/acta-partido/1834168,2026-08-07T23:48:32.334857+00:00
+1834175,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834175,2026-08-07T23:48:32.632113+00:00
+1834176,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834176,2026-08-07T23:48:32.634810+00:00
+1834182,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834182,2026-08-07T23:48:32.803325+00:00
+1834182,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834182,2026-08-07T23:48:32.803325+00:00
+1834180,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834180,2026-08-07T23:48:32.901875+00:00
+1834184,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834184,2026-08-07T23:48:32.910087+00:00
+1834181,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834181,2026-08-07T23:48:33.437905+00:00
+1834185,17210288,head_coach,head_coach,2796277,"NAVIDAD SANTESTEBAN, IBAN",https://www.rffm.es/acta-partido/1834185,2026-08-07T23:48:33.908570+00:00
+1834185,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834185,2026-08-07T23:48:33.908570+00:00
+1834185,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834185,2026-08-07T23:48:33.908570+00:00
+1834188,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834188,2026-08-07T23:48:33.960181+00:00
+1834188,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834188,2026-08-07T23:48:33.960181+00:00
+1834187,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834187,2026-08-07T23:48:34.114085+00:00
+1834193,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834193,2026-08-07T23:48:34.133897+00:00
+1834192,17271129,head_coach,head_coach,2796636,"RIVAS GIL, MARCOS",https://www.rffm.es/acta-partido/1834192,2026-08-07T23:48:34.683518+00:00
+1837074,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1837074,2026-08-07T23:48:35.235784+00:00
+1834204,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834204,2026-08-07T23:48:35.434122+00:00
+1834202,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834202,2026-08-07T23:48:35.440904+00:00
+1834197,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834197,2026-08-07T23:48:35.443558+00:00
+1834197,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834197,2026-08-07T23:48:35.443558+00:00
+1834195,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834195,2026-08-07T23:48:35.471079+00:00
+1834195,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834195,2026-08-07T23:48:35.471079+00:00
+1834213,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834213,2026-08-07T23:48:36.189571+00:00
+1834213,17210288,head_coach,head_coach,2796275,"PARDO HERMOSA, ANGEL ALEJANDRO",https://www.rffm.es/acta-partido/1834213,2026-08-07T23:48:36.189571+00:00
+1834212,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834212,2026-08-07T23:48:36.248018+00:00
+1834210,17149630,head_coach,head_coach,2796906,"JIMENO AGUILERA, ALEJANDRO",https://www.rffm.es/acta-partido/1834210,2026-08-07T23:48:36.252594+00:00
+1834210,17149630,assistant_coach,assistant_coach,2796819,"RUIZ SAZ, ALVARO",https://www.rffm.es/acta-partido/1834210,2026-08-07T23:48:36.252594+00:00
+1834203,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834203,2026-08-07T23:48:36.357521+00:00
+1834209,17210288,head_coach,head_coach,2796277,"NAVIDAD SANTESTEBAN, IBAN",https://www.rffm.es/acta-partido/1834209,2026-08-07T23:48:36.457584+00:00
+1834208,17271129,head_coach,head_coach,2796345,"SANCHEZ JIMENEZ, CARLOS",https://www.rffm.es/acta-partido/1834208,2026-08-07T23:48:36.582119+00:00
+1834215,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834215,2026-08-07T23:48:37.275998+00:00
+1834215,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834215,2026-08-07T23:48:37.275998+00:00
+1834217,18345557,assistant_coach,assistant_coach,2796019,"GARCIA GARCÍA, JORGE ALBERTO",https://www.rffm.es/acta-partido/1834217,2026-08-07T23:48:37.513547+00:00
+1834217,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834217,2026-08-07T23:48:37.513547+00:00
+1834216,17208918,head_coach,head_coach,2795905,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1834216,2026-08-07T23:48:37.567788+00:00
+1834216,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834216,2026-08-07T23:48:37.567788+00:00
+1834220,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834220,2026-08-07T23:48:37.609606+00:00
+1834220,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834220,2026-08-07T23:48:37.609606+00:00
+1834224,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834224,2026-08-07T23:48:38.067630+00:00
+1834224,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834224,2026-08-07T23:48:38.067630+00:00
+1834224,18619475,assistant_coach,assistant_coach,2798757,"MANZANARES GONZÁLEZ, ADRIAN",https://www.rffm.es/acta-partido/1834224,2026-08-07T23:48:38.067630+00:00
+1834221,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834221,2026-08-07T23:48:38.208212+00:00
+1834221,18619475,assistant_coach,assistant_coach,2798757,"MANZANARES GONZÁLEZ, ADRIAN",https://www.rffm.es/acta-partido/1834221,2026-08-07T23:48:38.208212+00:00
+1834223,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834223,2026-08-07T23:48:38.493319+00:00
+1834223,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834223,2026-08-07T23:48:38.493319+00:00
+1834237,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834237,2026-08-07T23:48:38.809151+00:00
+1834228,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834228,2026-08-07T23:48:38.827361+00:00
+1834228,18619475,assistant_coach,assistant_coach,2793561,"ACICOLLA CUESTA, RUBEN",https://www.rffm.es/acta-partido/1834228,2026-08-07T23:48:38.827361+00:00
+1834228,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834228,2026-08-07T23:48:38.827361+00:00
+1834229,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834229,2026-08-07T23:48:38.827709+00:00
+1834231,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834231,2026-08-07T23:48:39.017724+00:00
+1834231,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834231,2026-08-07T23:48:39.017724+00:00
+1834232,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834232,2026-08-07T23:48:39.059113+00:00
+1834233,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834233,2026-08-07T23:48:39.071164+00:00
+1834236,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834236,2026-08-07T23:48:39.686559+00:00
+1834241,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834241,2026-08-07T23:48:39.941254+00:00
+1834238,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834238,2026-08-07T23:48:39.967202+00:00
+1834240,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834240,2026-08-07T23:48:39.973198+00:00
+1834239,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834239,2026-08-07T23:48:40.000415+00:00
+1834244,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834244,2026-08-07T23:48:40.134020+00:00
+1834243,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834243,2026-08-07T23:48:40.237788+00:00
+1834243,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834243,2026-08-07T23:48:40.237788+00:00
+1834243,18408381,assistant_coach,assistant_coach,2804854,"SAIZ FERNÁNDEZ, ÁNGEL",https://www.rffm.es/acta-partido/1834243,2026-08-07T23:48:40.237788+00:00
+1834245,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834245,2026-08-07T23:48:40.321968+00:00
+1834249,17208918,head_coach,head_coach,2795905,"CAMPOS AGUILAR, JUAN",https://www.rffm.es/acta-partido/1834249,2026-08-07T23:48:41.220631+00:00
+1834249,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834249,2026-08-07T23:48:41.220631+00:00
+1834257,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834257,2026-08-07T23:48:41.556389+00:00
+1834248,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834248,2026-08-07T23:48:41.737286+00:00
+1834248,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834248,2026-08-07T23:48:41.737286+00:00
+1834252,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834252,2026-08-07T23:48:41.818072+00:00
+1834252,18619475,assistant_coach,assistant_coach,2798757,"MANZANARES GONZÁLEZ, ADRIAN",https://www.rffm.es/acta-partido/1834252,2026-08-07T23:48:41.818072+00:00
+1834252,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834252,2026-08-07T23:48:41.818072+00:00
+1834251,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834251,2026-08-07T23:48:41.889244+00:00
+1834251,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834251,2026-08-07T23:48:41.889244+00:00
+1834256,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834256,2026-08-07T23:48:42.162563+00:00
+1834256,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834256,2026-08-07T23:48:42.162563+00:00
+1834260,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834260,2026-08-07T23:48:42.610878+00:00
+1834264,17155607,head_coach,head_coach,2795846,"ALCOCER REDONDO, CARLOS",https://www.rffm.es/acta-partido/1834264,2026-08-07T23:48:42.721240+00:00
+1834266,18408381,head_coach,head_coach,2796482,"BALLESTEROS CLAVERO, CARLOS",https://www.rffm.es/acta-partido/1834266,2026-08-07T23:48:42.892978+00:00
+1834259,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834259,2026-08-07T23:48:43.177434+00:00
+1834267,18619475,head_coach,head_coach,2796889,"SANCHEZ CRUZ, ISRAEL",https://www.rffm.es/acta-partido/1834267,2026-08-07T23:48:43.469002+00:00
+1834272,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834272,2026-08-07T23:48:43.884118+00:00
+1834272,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834272,2026-08-07T23:48:43.884118+00:00
+1834272,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834272,2026-08-07T23:48:43.884118+00:00
+1834271,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834271,2026-08-07T23:48:43.889390+00:00
+1834278,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834278,2026-08-07T23:48:43.995664+00:00
+1834277,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834277,2026-08-07T23:48:44.014387+00:00
+1834277,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834277,2026-08-07T23:48:44.014387+00:00
+1834276,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834276,2026-08-07T23:48:44.465661+00:00
+1834269,18408417,head_coach,head_coach,2796317,"MOLERO JIMENEZ, FERNANDO",https://www.rffm.es/acta-partido/1834269,2026-08-07T23:48:44.471279+00:00
+1834279,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834279,2026-08-07T23:48:44.880155+00:00
+1834279,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834279,2026-08-07T23:48:44.880155+00:00
+1834281,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834281,2026-08-07T23:48:44.956857+00:00
+1834281,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834281,2026-08-07T23:48:44.956857+00:00
+1834281,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834281,2026-08-07T23:48:44.956857+00:00
+1834281,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1834281,2026-08-07T23:48:44.956857+00:00
+1834287,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834287,2026-08-07T23:48:45.015438+00:00
+1834284,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834284,2026-08-07T23:48:45.017865+00:00
+1834285,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834285,2026-08-07T23:48:45.145413+00:00
+1834285,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1834285,2026-08-07T23:48:45.145413+00:00
+1834286,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834286,2026-08-07T23:48:45.193662+00:00
+1834286,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834286,2026-08-07T23:48:45.193662+00:00
+1834293,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834293,2026-08-07T23:48:46.137118+00:00
+1834293,18919335,assistant_coach,assistant_coach,2795966,"SAINERO GARCÍA, RICARDO FERNANDO",https://www.rffm.es/acta-partido/1834293,2026-08-07T23:48:46.137118+00:00
+1834288,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834288,2026-08-07T23:48:46.221671+00:00
+1834288,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834288,2026-08-07T23:48:46.221671+00:00
+1834294,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834294,2026-08-07T23:48:46.226206+00:00
+1834294,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834294,2026-08-07T23:48:46.226206+00:00
+1834295,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834295,2026-08-07T23:48:46.275973+00:00
+1834296,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834296,2026-08-07T23:48:46.421316+00:00
+1834292,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834292,2026-08-07T23:48:46.442779+00:00
+1834292,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834292,2026-08-07T23:48:46.442779+00:00
+1834297,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834297,2026-08-07T23:48:46.513577+00:00
+1834297,18919335,assistant_coach,assistant_coach,2795966,"SAINERO GARCÍA, RICARDO FERNANDO",https://www.rffm.es/acta-partido/1834297,2026-08-07T23:48:46.513577+00:00
+1834297,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834297,2026-08-07T23:48:46.513577+00:00
+1834297,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834297,2026-08-07T23:48:46.513577+00:00
+1834300,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834300,2026-08-07T23:48:47.442327+00:00
+1834300,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834300,2026-08-07T23:48:47.442327+00:00
+1834300,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834300,2026-08-07T23:48:47.442327+00:00
+1834305,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834305,2026-08-07T23:48:47.474361+00:00
+1834305,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834305,2026-08-07T23:48:47.474361+00:00
+1834304,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834304,2026-08-07T23:48:47.475246+00:00
+1834309,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834309,2026-08-07T23:48:47.633894+00:00
+1834309,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1834309,2026-08-07T23:48:47.633894+00:00
+1834309,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834309,2026-08-07T23:48:47.633894+00:00
+1834299,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834299,2026-08-07T23:48:47.634501+00:00
+1834299,18919335,assistant_coach,assistant_coach,2795966,"SAINERO GARCÍA, RICARDO FERNANDO",https://www.rffm.es/acta-partido/1834299,2026-08-07T23:48:47.634501+00:00
+1834306,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834306,2026-08-07T23:48:47.640704+00:00
+1834307,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834307,2026-08-07T23:48:47.887468+00:00
+1834307,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834307,2026-08-07T23:48:47.887468+00:00
+1834307,18919335,assistant_coach,assistant_coach,2795966,"SAINERO GARCÍA, RICARDO FERNANDO",https://www.rffm.es/acta-partido/1834307,2026-08-07T23:48:47.887468+00:00
+1834316,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834316,2026-08-07T23:48:48.451210+00:00
+1834316,18950611,assistant_coach,assistant_coach,2796620,"MORAGA CHAMARRO, MIGUEL",https://www.rffm.es/acta-partido/1834316,2026-08-07T23:48:48.451210+00:00
+1834316,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834316,2026-08-07T23:48:48.451210+00:00
+1834314,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834314,2026-08-07T23:48:48.690382+00:00
+1834314,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834314,2026-08-07T23:48:48.690382+00:00
+1834312,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834312,2026-08-07T23:48:48.746652+00:00
+1834315,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834315,2026-08-07T23:48:48.790419+00:00
+1834320,18891940,head_coach,head_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834320,2026-08-07T23:48:48.980668+00:00
+1834320,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834320,2026-08-07T23:48:48.980668+00:00
+1834322,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834322,2026-08-07T23:48:49.057691+00:00
+1834322,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834322,2026-08-07T23:48:49.057691+00:00
+1834321,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834321,2026-08-07T23:48:49.670158+00:00
+1834324,18891940,assistant_coach,assistant_coach,2795977,"GOMEZ HERNANDEZ, CARLOS",https://www.rffm.es/acta-partido/1834324,2026-08-07T23:48:49.922413+00:00
+1834325,18583276,head_coach,head_coach,2796256,"CARRASCO SANCHEZ, DIONISIO",https://www.rffm.es/acta-partido/1834325,2026-08-07T23:48:50.018211+00:00
+1834325,18583276,assistant_coach,assistant_coach,2796359,"HEREDIA RODRIGUEZ, MANUEL",https://www.rffm.es/acta-partido/1834325,2026-08-07T23:48:50.018211+00:00
+1834325,18919335,head_coach,head_coach,2796157,"FERNANDEZ IBAÑEZ, IGNACIO CARLOS",https://www.rffm.es/acta-partido/1834325,2026-08-07T23:48:50.018211+00:00
+1834325,18919335,assistant_coach,assistant_coach,2795966,"SAINERO GARCÍA, RICARDO FERNANDO",https://www.rffm.es/acta-partido/1834325,2026-08-07T23:48:50.018211+00:00
+1834323,18950611,head_coach,head_coach,2796563,"VAZQUEZ PALOMO, MANUEL",https://www.rffm.es/acta-partido/1834323,2026-08-07T23:48:50.044058+00:00
+1834329,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834329,2026-08-07T23:48:50.324049+00:00
+1834328,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834328,2026-08-07T23:48:50.407771+00:00
+1834333,17149519,assistant_coach,assistant_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834333,2026-08-07T23:48:50.420442+00:00
+1834334,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834334,2026-08-07T23:48:50.916006+00:00
+1834334,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834334,2026-08-07T23:48:50.916006+00:00
+1834334,18926521,head_coach,head_coach,2796038,"HERVAS SUELA, RICARDO",https://www.rffm.es/acta-partido/1834334,2026-08-07T23:48:50.916006+00:00
+1834334,18926521,assistant_coach,assistant_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834334,2026-08-07T23:48:50.916006+00:00
+1834337,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834337,2026-08-07T23:48:51.357514+00:00
+1834337,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834337,2026-08-07T23:48:51.357514+00:00
+1834341,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834341,2026-08-07T23:48:51.487830+00:00
+1834341,17149323,assistant_coach,assistant_coach,2796398,"NOVALBOS UTRILLA, DAVID",https://www.rffm.es/acta-partido/1834341,2026-08-07T23:48:51.487830+00:00
+1834342,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834342,2026-08-07T23:48:51.998273+00:00
+1834342,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834342,2026-08-07T23:48:51.998273+00:00
+1834344,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834344,2026-08-07T23:48:52.230156+00:00
+1834350,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834350,2026-08-07T23:48:52.634730+00:00
+1834348,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834348,2026-08-07T23:48:52.637231+00:00
+1834345,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834345,2026-08-07T23:48:52.641604+00:00
+1834349,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834349,2026-08-07T23:48:52.762870+00:00
+1834351,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834351,2026-08-07T23:48:52.902279+00:00
+1834353,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834353,2026-08-07T23:48:52.907067+00:00
+1834352,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834352,2026-08-07T23:48:53.460896+00:00
+1834357,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834357,2026-08-07T23:48:53.815787+00:00
+1834362,18926521,head_coach,head_coach,2796107,"MARTIN GOMEZ, JORGE",https://www.rffm.es/acta-partido/1834362,2026-08-07T23:48:53.915575+00:00
+1834362,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834362,2026-08-07T23:48:53.915575+00:00
+1834362,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834362,2026-08-07T23:48:53.915575+00:00
+1834361,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834361,2026-08-07T23:48:54.186841+00:00
+1834365,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834365,2026-08-07T23:48:54.922875+00:00
+1834365,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834365,2026-08-07T23:48:54.922875+00:00
+1834370,17149519,head_coach,head_coach,2796099,"BABIO CARABAÑA, JORGE",https://www.rffm.es/acta-partido/1834370,2026-08-07T23:48:55.172341+00:00
+1834370,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834370,2026-08-07T23:48:55.172341+00:00
+1834369,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834369,2026-08-07T23:48:55.193001+00:00
+1834369,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834369,2026-08-07T23:48:55.193001+00:00
+1834372,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834372,2026-08-07T23:48:55.292323+00:00
+1834372,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834372,2026-08-07T23:48:55.292323+00:00
+1834373,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834373,2026-08-07T23:48:55.434599+00:00
+1834379,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834379,2026-08-07T23:48:55.965914+00:00
+1834379,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834379,2026-08-07T23:48:55.965914+00:00
+1834376,17149323,head_coach,head_coach,2796684,"LIQUIÑANO MANDILLO, MANUEL ALEJANDRO",https://www.rffm.es/acta-partido/1834376,2026-08-07T23:48:56.139832+00:00
+1834376,17149323,assistant_coach,assistant_coach,2798276,"LOMBARDIA RECIO, OLGA",https://www.rffm.es/acta-partido/1834376,2026-08-07T23:48:56.139832+00:00
+1834377,18926521,head_coach,head_coach,2796447,"GUIJO GUTIERREZ, JOSE MARIA",https://www.rffm.es/acta-partido/1834377,2026-08-07T23:48:56.326564+00:00
+1834380,18926521,head_coach,head_coach,2796211,"GONZALEZ ARGUDO, ANGEL",https://www.rffm.es/acta-partido/1834380,2026-08-07T23:48:56.366112+00:00
+1834384,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834384,2026-08-07T23:48:56.717072+00:00
+1834388,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834388,2026-08-07T23:48:57.573141+00:00
+1834393,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834393,2026-08-07T23:48:57.652867+00:00
+1834397,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834397,2026-08-07T23:48:57.896880+00:00
+1834390,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834390,2026-08-07T23:48:58.057586+00:00
+1834391,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834391,2026-08-07T23:48:58.092072+00:00
+1834404,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834404,2026-08-07T23:48:58.946990+00:00
+1834404,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834404,2026-08-07T23:48:58.946990+00:00
+1834399,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834399,2026-08-07T23:48:58.968254+00:00
+1834400,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834400,2026-08-07T23:48:59.327154+00:00
+1834408,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834408,2026-08-07T23:48:59.738246+00:00
+1834407,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834407,2026-08-07T23:49:00.145348+00:00
+1834412,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834412,2026-08-07T23:49:00.150392+00:00
+1834416,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834416,2026-08-07T23:49:00.443626+00:00
+1834418,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834418,2026-08-07T23:49:00.983186+00:00
+1834419,18346245,head_coach,head_coach,2796723,"ROMERO PAGEO, DAVID",https://www.rffm.es/acta-partido/1834419,2026-08-07T23:49:01.222698+00:00
+1834425,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834425,2026-08-07T23:49:01.292113+00:00
+1834421,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834421,2026-08-07T23:49:02.022637+00:00
+1834427,18346245,head_coach,head_coach,2799213,"GASCO MORENO, ALBERTO",https://www.rffm.es/acta-partido/1834427,2026-08-07T23:49:02.355414+00:00
+1834428,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834428,2026-08-07T23:49:02.697634+00:00
+1834432,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834432,2026-08-07T23:49:02.735017+00:00
+1834432,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834432,2026-08-07T23:49:02.735017+00:00
+1834435,18900446,head_coach,head_coach,2799197,"LAGAR SANJUAN, LAURA",https://www.rffm.es/acta-partido/1834435,2026-08-07T23:49:02.815721+00:00
+1834436,18346245,head_coach,head_coach,2796729,"ALONSO DELGADO, JOSE LUIS",https://www.rffm.es/acta-partido/1834436,2026-08-07T23:49:03.192408+00:00
+1834439,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834439,2026-08-07T23:49:03.562961+00:00
+1834439,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834439,2026-08-07T23:49:03.562961+00:00
+1834442,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834442,2026-08-07T23:49:03.868504+00:00
+1834443,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834443,2026-08-07T23:49:03.965842+00:00
+1834445,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834445,2026-08-07T23:49:03.972823+00:00
+1834446,18957503,head_coach,head_coach,2794798,"DOS SANTOS MENÉNDEZ, VICTOR",https://www.rffm.es/acta-partido/1834446,2026-08-07T23:49:04.129741+00:00
+1834449,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834449,2026-08-07T23:49:05.083108+00:00
+1834450,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834450,2026-08-07T23:49:05.083970+00:00
+1834452,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834452,2026-08-07T23:49:05.089792+00:00
+1834453,18957503,head_coach,head_coach,2796205,"GALLEGO RÁEZ, JUAN MANUEL",https://www.rffm.es/acta-partido/1834453,2026-08-07T23:49:05.383587+00:00
+1834454,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834454,2026-08-07T23:49:06.007394+00:00
+1834454,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834454,2026-08-07T23:49:06.007394+00:00
+1834458,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834458,2026-08-07T23:49:06.268458+00:00
+1834457,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834457,2026-08-07T23:49:06.478803+00:00
+1834461,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834461,2026-08-07T23:49:06.533426+00:00
+1834460,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834460,2026-08-07T23:49:06.545926+00:00
+1834465,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834465,2026-08-07T23:49:07.517742+00:00
+1834464,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834464,2026-08-07T23:49:07.612786+00:00
+1834467,18346189,head_coach,head_coach,2796571,"FUERTES SANTAR, IVAN",https://www.rffm.es/acta-partido/1834467,2026-08-07T23:49:07.651466+00:00
+1834468,18957503,head_coach,head_coach,2796206,"MARTÍN RUBIO, ALFONSO",https://www.rffm.es/acta-partido/1834468,2026-08-07T23:49:08.109876+00:00
+1834468,18957503,assistant_coach,assistant_coach,2796205,"GALLEGO RÁEZ, JUAN MANUEL",https://www.rffm.es/acta-partido/1834468,2026-08-07T23:49:08.109876+00:00
+1834469,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834469,2026-08-07T23:49:08.947147+00:00
+1834469,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834469,2026-08-07T23:49:08.947147+00:00
+1834472,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834472,2026-08-07T23:49:09.023758+00:00
+1834476,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834476,2026-08-07T23:49:09.239231+00:00
+1834475,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834475,2026-08-07T23:49:09.297397+00:00
+1834480,19000229,head_coach,head_coach,2805421,"GARCÍA SACEDA, ALBERTO",https://www.rffm.es/acta-partido/1834480,2026-08-07T23:49:09.480394+00:00
+1834486,18956182,head_coach,head_coach,2796606,"MECO SUAREZ, MANUEL",https://www.rffm.es/acta-partido/1834486,2026-08-07T23:49:10.121642+00:00
+1834479,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834479,2026-08-07T23:49:10.154326+00:00
+1834484,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834484,2026-08-07T23:49:10.225877+00:00
+1834484,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834484,2026-08-07T23:49:10.225877+00:00
+1834482,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834482,2026-08-07T23:49:10.272770+00:00
+1834483,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834483,2026-08-07T23:49:10.345879+00:00
+1834490,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834490,2026-08-07T23:49:11.570197+00:00
+1834494,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834494,2026-08-07T23:49:11.579932+00:00
+1834488,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834488,2026-08-07T23:49:11.649130+00:00
+1834491,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834491,2026-08-07T23:49:11.800925+00:00
+1834487,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834487,2026-08-07T23:49:11.828512+00:00
+1834495,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834495,2026-08-07T23:49:12.225562+00:00
+1832115,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832115,2026-08-07T23:49:12.621714+00:00
+1832115,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832115,2026-08-07T23:49:12.621714+00:00
+1832110,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832110,2026-08-07T23:49:12.731207+00:00
+1832110,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832110,2026-08-07T23:49:12.731207+00:00
+1832110,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832110,2026-08-07T23:49:12.731207+00:00
+1834498,19000229,head_coach,head_coach,2798055,"MICELI, LUCAS DANIEL NEHUEN",https://www.rffm.es/acta-partido/1834498,2026-08-07T23:49:12.802895+00:00
+1832108,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832108,2026-08-07T23:49:12.833636+00:00
+1834497,18894567,head_coach,head_coach,2796782,"CEREZO MURO, GUILLERMO",https://www.rffm.es/acta-partido/1834497,2026-08-07T23:49:12.887816+00:00
+1832109,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832109,2026-08-07T23:49:12.893798+00:00
+1832114,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832114,2026-08-07T23:49:13.446614+00:00
+1832114,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832114,2026-08-07T23:49:13.446614+00:00
+1832121,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832121,2026-08-07T23:49:13.826220+00:00
+1832121,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832121,2026-08-07T23:49:13.826220+00:00
+1832118,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832118,2026-08-07T23:49:13.837496+00:00
+1832117,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832117,2026-08-07T23:49:14.150977+00:00
+1832123,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832123,2026-08-07T23:49:14.170380+00:00
+1832123,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832123,2026-08-07T23:49:14.170380+00:00
+1832123,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832123,2026-08-07T23:49:14.170380+00:00
+1832116,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832116,2026-08-07T23:49:14.170933+00:00
+1832126,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832126,2026-08-07T23:49:14.705394+00:00
+1832126,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832126,2026-08-07T23:49:14.705394+00:00
+1832125,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832125,2026-08-07T23:49:15.034906+00:00
+1832124,18405556,assistant_coach,assistant_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832124,2026-08-07T23:49:15.078549+00:00
+1832134,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832134,2026-08-07T23:49:15.121825+00:00
+1832134,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832134,2026-08-07T23:49:15.121825+00:00
+1832130,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832130,2026-08-07T23:49:15.464524+00:00
+1832130,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832130,2026-08-07T23:49:15.464524+00:00
+1832132,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832132,2026-08-07T23:49:15.478683+00:00
+1832131,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832131,2026-08-07T23:49:15.482073+00:00
+1832133,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832133,2026-08-07T23:49:15.957458+00:00
+1832133,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832133,2026-08-07T23:49:15.957458+00:00
+1832138,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832138,2026-08-07T23:49:16.255929+00:00
+1832138,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832138,2026-08-07T23:49:16.255929+00:00
+1832138,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832138,2026-08-07T23:49:16.255929+00:00
+1832136,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832136,2026-08-07T23:49:16.287616+00:00
+1832137,18346207,assistant_coach,assistant_coach,2796407,"CRESPO OBISPO, DAVID",https://www.rffm.es/acta-partido/1832137,2026-08-07T23:49:16.351816+00:00
+1832142,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832142,2026-08-07T23:49:16.422889+00:00
+1832142,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832142,2026-08-07T23:49:16.422889+00:00
+1832143,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832143,2026-08-07T23:49:16.573886+00:00
+1832143,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832143,2026-08-07T23:49:16.573886+00:00
+1832146,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832146,2026-08-07T23:49:17.253628+00:00
+1832145,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832145,2026-08-07T23:49:17.529979+00:00
+1832151,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832151,2026-08-07T23:49:17.605004+00:00
+1832151,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832151,2026-08-07T23:49:17.605004+00:00
+1832151,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832151,2026-08-07T23:49:17.605004+00:00
+1832149,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832149,2026-08-07T23:49:17.782582+00:00
+1832154,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832154,2026-08-07T23:49:18.024462+00:00
+1836578,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1836578,2026-08-07T23:49:18.031212+00:00
+1832152,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832152,2026-08-07T23:49:18.035538+00:00
+1832158,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832158,2026-08-07T23:49:18.781916+00:00
+1832158,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832158,2026-08-07T23:49:18.781916+00:00
+1832158,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832158,2026-08-07T23:49:18.781916+00:00
+1832160,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832160,2026-08-07T23:49:18.801968+00:00
+1832161,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832161,2026-08-07T23:49:18.870714+00:00
+1832161,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832161,2026-08-07T23:49:18.870714+00:00
+1832162,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832162,2026-08-07T23:49:19.094739+00:00
+1832162,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832162,2026-08-07T23:49:19.094739+00:00
+1832164,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832164,2026-08-07T23:49:19.134014+00:00
+1832166,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832166,2026-08-07T23:49:19.722020+00:00
+1832166,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832166,2026-08-07T23:49:19.722020+00:00
+1832166,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832166,2026-08-07T23:49:19.722020+00:00
+1832171,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832171,2026-08-07T23:49:19.933762+00:00
+1832171,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832171,2026-08-07T23:49:19.933762+00:00
+1832170,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832170,2026-08-07T23:49:20.015462+00:00
+1832170,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832170,2026-08-07T23:49:20.015462+00:00
+1832174,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832174,2026-08-07T23:49:20.079910+00:00
+1832173,18405556,assistant_coach,assistant_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832173,2026-08-07T23:49:20.223505+00:00
+1832172,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832172,2026-08-07T23:49:20.266896+00:00
+1832177,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832177,2026-08-07T23:49:20.946464+00:00
+1832177,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832177,2026-08-07T23:49:20.946464+00:00
+1832182,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832182,2026-08-07T23:49:21.258371+00:00
+1832179,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832179,2026-08-07T23:49:21.258901+00:00
+1832179,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832179,2026-08-07T23:49:21.258901+00:00
+1832179,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832179,2026-08-07T23:49:21.258901+00:00
+1832181,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832181,2026-08-07T23:49:21.296264+00:00
+1832180,18346207,assistant_coach,assistant_coach,2796407,"CRESPO OBISPO, DAVID",https://www.rffm.es/acta-partido/1832180,2026-08-07T23:49:21.457103+00:00
+1832180,18405556,assistant_coach,assistant_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832180,2026-08-07T23:49:21.457103+00:00
+1832187,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832187,2026-08-07T23:49:21.509648+00:00
+1832186,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832186,2026-08-07T23:49:21.581688+00:00
+1832186,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832186,2026-08-07T23:49:21.581688+00:00
+1832190,18310889,head_coach,head_coach,2794555,"FARIAS BRASIL, MARILIA",https://www.rffm.es/acta-partido/1832190,2026-08-07T23:49:22.227286+00:00
+1832190,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1832190,2026-08-07T23:49:22.227286+00:00
+1832189,17147830,head_coach,head_coach,2795948,"LÓPEZ GARCÍA, PABLO",https://www.rffm.es/acta-partido/1832189,2026-08-07T23:49:22.571552+00:00
+1832189,17147830,assistant_coach,assistant_coach,2796970,"LOPEZ DE LOPE, LUCIA",https://www.rffm.es/acta-partido/1832189,2026-08-07T23:49:22.571552+00:00
+1832188,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1832188,2026-08-07T23:49:22.741833+00:00
+1836940,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1836940,2026-08-07T23:49:22.914642+00:00
+1836944,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1836944,2026-08-07T23:49:23.080148+00:00
+1836946,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1836946,2026-08-07T23:49:23.088754+00:00
+1837368,17146831,head_coach,head_coach,2795912,"OSTOLAZA GARCIA, LUIS FERNANDO",https://www.rffm.es/acta-partido/1837368,2026-08-07T23:49:23.093413+00:00
+1837369,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1837369,2026-08-07T23:49:23.804906+00:00
+1837367,18405556,head_coach,head_coach,2796521,"SOLANA NUÑEZ, ENRIQUE",https://www.rffm.es/acta-partido/1837367,2026-08-07T23:49:24.008806+00:00
