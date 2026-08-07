@@ -47,6 +47,22 @@ def clean(v) -> str | None:
     return v or None
 
 
+def norm_id(v) -> str | None:
+    """team_id in match_lineups/match_goals/match_cards carries a trailing
+    ".0" for some category files and not others (ALEVIN/CADETE/INFANTIL/
+    JUVENIL/AFICIONADO/SENIOR: always ".0"; BENJAMIN/PREBENJAMIN: never) —
+    an upstream CSV-export quirk, not a real difference in the ID. Every
+    other part of this project (team_cards.py, club_division_map.py) already
+    strips it, so this must too or roster lookups by team_id silently miss
+    for ~3 out of 4 teams."""
+    s = clean(v)
+    if s is None:
+        return None
+    if s.endswith(".0"):
+        s = s[:-2]
+    return s or None
+
+
 CARD_LABEL_ES = {"amarilla": "amarilla", "roja": "roja", "doble_amarilla": "doble amarilla"}
 
 
@@ -68,7 +84,7 @@ def build_team_rosters(season: str) -> dict[str, dict]:
         lf = lineups_dir / f"{cat}.csv"
         lu = pd.read_csv(lf, dtype=str)
         for row in lu.itertuples(index=False):
-            tid, mid, pid = row.team_id, row.match_id, row.player_id
+            tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
             if not (tid and mid and pid):
                 continue
             te = team_entry(tid)
@@ -91,7 +107,7 @@ def build_team_rosters(season: str) -> dict[str, dict]:
         if gf.exists():
             goals = pd.read_csv(gf, dtype=str)
             for row in goals.itertuples(index=False):
-                tid, mid, pid = row.team_id, row.match_id, row.player_id
+                tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
                 if not (tid and mid and pid) or tid not in rosters:
                     continue
                 entry = rosters[tid]["lineups"].get(mid, {}).get(pid)
@@ -102,7 +118,7 @@ def build_team_rosters(season: str) -> dict[str, dict]:
         if cf.exists():
             cards = pd.read_csv(cf, dtype=str)
             for row in cards.itertuples(index=False):
-                tid, mid, pid = row.team_id, row.match_id, row.player_id
+                tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
                 if not (tid and mid and pid) or tid not in rosters:
                     continue
                 entry = rosters[tid]["lineups"].get(mid, {}).get(pid)
