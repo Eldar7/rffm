@@ -587,19 +587,25 @@ async function loadRoster() {
   renderPlayerSummary();
 }
 
-document.getElementById('tabBtnMatches').addEventListener('click', function () {
-  this.classList.add('active');
-  document.getElementById('tabBtnRoster').classList.remove('active');
-  document.getElementById('paneMatches').classList.add('active');
-  document.getElementById('paneRoster').classList.remove('active');
-});
-document.getElementById('tabBtnRoster').addEventListener('click', function () {
-  this.classList.add('active');
-  document.getElementById('tabBtnMatches').classList.remove('active');
-  document.getElementById('paneRoster').classList.add('active');
-  document.getElementById('paneMatches').classList.remove('active');
-  loadRoster();
-});
+// Which tab is open lives in the URL (?tab=roster) via replaceState — not
+// pushState, a tab flip isn't a "navigation" worth its own Back entry — so
+// a shared/reloaded link lands on the same tab the sharer was looking at.
+function showTab(name, opts) {
+  opts = opts || {};
+  const isRoster = name === 'roster';
+  document.getElementById('tabBtnRoster').classList.toggle('active', isRoster);
+  document.getElementById('tabBtnMatches').classList.toggle('active', !isRoster);
+  document.getElementById('paneRoster').classList.toggle('active', isRoster);
+  document.getElementById('paneMatches').classList.toggle('active', !isRoster);
+  if (isRoster) loadRoster();
+  if (!opts.silent) {
+    const params = new URLSearchParams(location.search);
+    if (isRoster) params.set('tab', 'roster'); else params.delete('tab');
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  }
+}
+document.getElementById('tabBtnMatches').addEventListener('click', () => showTab('matches'));
+document.getElementById('tabBtnRoster').addEventListener('click', () => showTab('roster'));
 
 async function main() {
   const params = new URLSearchParams(location.search);
@@ -633,7 +639,7 @@ async function main() {
   document.title = `${team.name} — RFFM`;
   CUR_TEAM = team;
   renderMatches(team);
-  if (document.getElementById('paneRoster').classList.contains('active')) { renderMatrix(); renderPlayerSummary(); }
+  showTab(params.get('tab') === 'roster' ? 'roster' : 'matches', { silent: true });
 }
 
 (function () {
