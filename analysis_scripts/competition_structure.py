@@ -24,11 +24,12 @@ Usage:
 
 import argparse
 import json
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
 
-from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
+from site_theme import FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -523,23 +524,77 @@ def timeline_html(spans: list) -> str:
     return f'<div class="tl-row" data-buckets="{legend}">' + "".join(cells) + "</div>"
 
 
-def tier_row_html(t: dict, is_last: bool) -> str:
+def _strip_accents(s: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+
+
+# A few tier names use different wording than the division_level token the
+# scraper's classify_division_level() assigns to the real competition rows
+# (see DATA_DICTIONARY.md / DIVISIONS.md) — mapped by hand here, everything
+# else matches by stripping accents/curly quotes.
+TIER_DIVISION_LEVEL_OVERRIDES = {
+    "TERCERA RFEF": "TERCERA FEDERACION",
+    "LIGA NACIONAL JUVENIL": "LIGA NACIONAL",
+    "TERCERA FEDERACIÓN DE FÚTBOL FEMENINO": "TERCERA FEDERACION",
+    "TERCERA DIVISIÓN": "TERCERA",
+    "SEGUNDA DIVISIÓN “B”": "SEGUNDA DIVISION B",
+}
+
+
+def _division_level_for_tier(name: str) -> str:
+    return TIER_DIVISION_LEVEL_OVERRIDES.get(name, _strip_accents(name).upper())
+
+
+def build_examples_index(season: str) -> dict:
+    """(category_base, game_type, is_femenino, division_level) -> up to 3 real
+    competition names from this season's competitions.csv — lets each tier
+    card show which actual RFFM tournaments live at that rung, instead of
+    just the abstract division_level name."""
+    comps = pd.read_csv(BASE / season / "competitions.csv", dtype=str)
+    comps = comps[comps["phase_label"] == "regular_season"]
+    comps["is_fem_bool"] = comps["is_femenino"] == "True"
+    idx: dict[tuple, list[str]] = {}
+    for (cat, gt, fem, dl), grp in comps.groupby(["category_base", "game_type", "is_fem_bool", "division_level"]):
+        idx[(cat, gt, fem, dl)] = sorted(grp["competition"].dropna().unique().tolist())[:3]
+    return idx
+
+
+def tier_examples(idx: dict, cat_candidates: list[str], game_type: str, is_fem: bool, tier_name: str) -> list[str]:
+    dl = _division_level_for_tier(tier_name)
+    for c in cat_candidates:
+        names = idx.get((c, game_type, is_fem, dl))
+        if names:
+            return names
+    return []
+
+
+def tier_row_html(t: dict, is_last: bool, examples: list[str], season: str) -> str:
     org_cls = "org-rfef" if t["org"] == "RFEF" else "org-rffm"
     admin_badge = f'<span class="admin-badge">RFFM la administra</span>' if t.get("admin") else ""
     note_html = f'<div class="tier-note">{t["note"]}</div>' if t.get("note") else ""
     asc_html = f'<div class="tier-line"><span class="tier-arrow up">↑</span>{t["asc"]}</div>' if t.get("asc") else ""
     desc_html = f'<div class="tier-line"><span class="tier-arrow down">↓</span>{t["desc"]}</div>' if t.get("desc") else ""
+    ex_html = ""
+    if examples:
+        chips = "".join(f'<span class="ex-chip">{e}</span>' for e in examples)
+        ex_html = f'<div class="tier-examples"><span class="ex-label">{season}:</span>{chips}</div>'
     connector = "" if is_last else '<div class="tier-connector"></div>'
     return f'''<div class="tier {org_cls}">
       <div class="tier-head"><span class="tier-name">{t["name"]}</span>
         <span class="tier-org">{t["org"]}</span>{admin_badge}</div>
       <div class="tier-scope">{t["scope"]}</div>
-      {asc_html}{desc_html}{note_html}
+      {asc_html}{desc_html}{note_html}{ex_html}
     </div>{connector}'''
 
 
-def pyramid_card_html(p: dict, timing: dict) -> str:
-    tiers_html = "".join(tier_row_html(t, i == len(p["tiers"]) - 1) for i, t in enumerate(p["tiers"]))
+def pyramid_card_html(p: dict, timing: dict, examples_idx: dict, season: str) -> str:
+    cat, game_type, is_fem = p["timing_key"]
+    cat_candidates = list(dict.fromkeys([p["cat"], cat, "OTHER"]))
+    tiers_html = "".join(
+        tier_row_html(t, i == len(p["tiers"]) - 1,
+                       tier_examples(examples_idx, cat_candidates, game_type, is_fem, t["name"]), season)
+        for i, t in enumerate(p["tiers"])
+    )
     spans = timing.get(p["timing_key"], [])
     tl = timeline_html(spans)
     return f'''<div class="pyramid-card" data-group="{p["group"]}">
@@ -571,6 +626,115 @@ GROUP_LABELS = [
     ("f7m", "Fútbol-7 · Masculino"), ("f7f", "Fútbol-7 · Femenino"),
     ("fsm", "Fútbol Sala · Masculino"), ("fsf", "Fútbol Sala · Femenino"),
 ]
+
+I18N_ES = {
+    "eyebrow": "RFFM (Madrid) &middot; estructura de competiciones",
+    "h1": "Pirámide de ligas de la RFFM: categorías, divisiones, ascensos",
+    "lede": "Para cada edad / tipo de juego / sexo &mdash; la escalera completa de divisiones de arriba a abajo: "
+            "cuántos equipos/grupos hay en cada división, cuántos ascienden y descienden entre divisiones vecinas, "
+            "y dónde la escalera sale del ámbito de la RFFM hacia competiciones organizadas por toda España (RFEF: "
+            "Tercera RFEF, Liga Nacional Juvenil, Tercera Federación Femenina). Las reglas de ascenso/descenso están "
+            "tomadas de las circulares oficiales «Bases de Ascensos y Descensos» de la RFFM (temporada 2025-2026, "
+            "ver la referencia bajo cada tarjeta); el calendario de fases al pie de cada tarjeta está calculado a "
+            "partir de las fechas reales de los partidos en los datos recopilados, no transcrito a mano.",
+    "leg1": '<span class="leg-swatch leg-rffm"></span><b>RFFM</b> &mdash; competición regional',
+    "leg2": '<span class="leg-swatch leg-rfef"></span><b>RFEF</b> &mdash; competición nacional (la RFFM puede administrarla en su territorio)',
+    "leg3": '<span class="leg-swatch leg-liga"></span>liga regular',
+    "leg4": '<span class="leg-swatch leg-fase2"></span>2ª fase (grupos por nivel)',
+    "leg5": '<span class="leg-swatch leg-playoff"></span>play-off / Torneo de Campeones',
+    "h_single": "Otras categorías de Fútbol Sala sin pirámide",
+    "h_single_n": "división única, sin ascensos ni descensos",
+    "single_p": "Prebenjamín/Benjamín/Alevín (masculino) y toda la línea Juvenil&ndash;Benjamín (femenino) de Fútbol "
+                "Sala juegan en la RFFM en una única división por edad &mdash; no hay ascensos ni descensos en absoluto, "
+                "y la estructura dentro de la temporada se resuelve con un formato de dos fases (1ª fase &mdash; liga "
+                "por proximidad geográfica, 2ª fase &mdash; reagrupación por nivel para disputar el título y el resto "
+                "de puestos).",
+    "h_how": "Cómo está organizado",
+    "h_strict": "Cuán estrictas son las reglas de ascenso/descenso",
+    "h_strict_n": "mecánica entre temporadas, no principios generales",
+    "how_p1": '<b>Dos fronteras distintas.</b> Un club puede cruzar dos fronteras diferentes: (1) entre divisiones '
+              '<i>dentro</i> de la RFFM (la escalera habitual de ascenso/descenso descrita en cada tarjeta) y (2) la '
+              'frontera entre la RFFM y la RFEF &mdash; cuando el campeón de la división superior de la RFFM en una '
+              'categoría asciende a una competición que ya no organiza la RFFM, sino la federación española en su '
+              'conjunto (Tercera RFEF, Liga Nacional Juvenil, Tercera Federación Femenina). La RFFM administra '
+              'físicamente estas tres competiciones en su territorio (inscripciones, calendario, árbitros) &mdash; '
+              'por eso siguen apareciendo en los datos recopilados por este proyecto &mdash; pero el derecho de '
+              'ascenso/descenso desde ellas ya pertenece a la RFEF, no a la RFFM. Por eso en la tabla de niveles de '
+              '<code>DIVISIONS.md</code> la nota de LIGA NACIONAL advierte «no confundir con el nivel regional» '
+              '&mdash; es en realidad la base de la pirámide nacional, no la cima de la regional.',
+    "how_p2": '<b>La «nueva Primera División Autonómica» de 2025/2026.</b> Para Juvenil, Cadete e Infantil, la '
+              'circular oficial introduce explícitamente una nueva división entre Preferente y el siguiente nivel a '
+              'partir de esta temporada &mdash; por eso parte de los ascensos de 2025/2026 no siguen la cadena '
+              'vertical habitual, sino un play-off entre los campeones de grupo de Primera y la parte baja de la '
+              'tabla de Preferente. Es una mecánica transitoria de la temporada de creación, no una regla '
+              'permanente.',
+    "how_p3": '<b>Por qué el calendario de abajo a veces tiene dos fases.</b> Muchas divisiones (sobre todo Fútbol '
+              'Sala en categorías inferiores y Primera de Fútbol-11 Aficionado) disputan en la práctica dos torneos '
+              'distintos dentro de la misma temporada: 1ª fase &mdash; liga normal (a menudo por proximidad '
+              'geográfica, sin tener en cuenta el nivel), 2ª fase &mdash; los clubes se reagrupan según el '
+              'coeficiente final de la 1ª fase en nuevos grupos, donde se deciden tanto el título como las plazas de '
+              'ascenso; los puntos de la primera fase <i>no se arrastran</i>. No son dos competiciones distintas '
+              '&mdash; es una sola escalera dividida en dos mitades de temporada.',
+    "how_p4": '<b>Play-off / Torneo de Campeones &mdash; aparte de la escalera.</b> Tras la liga regular, muchas '
+              'divisiones disputan un play-off corto entre los primeros de cada grupo (a veces llamado directamente '
+              '«Torneo de Campeones» / «Copa de Campeones»), pero según el reglamento no mueve al equipo hacia '
+              'arriba o abajo en la pirámide &mdash; es un trofeo aparte, por encima de los ascensos/descensos ya '
+              'decididos. Este es justamente el patrón detrás de la «Copa de Campeones de Autonómica Juvenil» que '
+              'parecía haber desaparecido: ver <code>DIVISIONS.md</code>, sección «The post-season phase pattern».',
+    "how_p5": '<b>Fuentes.</b> Los ascensos/descensos de cada pirámide proceden de los documentos oficiales de la '
+              'RFFM: «Bases de Ascensos y Descensos Competición Fútbol-11, temporada 2025-2026» (aprob. 10/07/2025), '
+              '«Bases de Ascensos y Descensos Competición Fútbol-7» (aprob. 23/12/2024) y «Bases de Ascensos y '
+              'Descensos Competición Fútbol Sala» (aprob. 23/12/2024), rffm.es. El calendario de fases está calculado '
+              'a partir de <code>matches.csv</code> de la temporada recopilada por este proyecto; ver '
+              '<code>DIVISIONS.md</code> para la tabla completa de niveles de <code>division_level</code> y '
+              '<code>club_division_map.html</code> para saber exactamente quién juega dónde.',
+    "strict_p1": '<b>El derecho de ascenso solo se pierde por un motivo &mdash; «filialidad/dependencia».</b> Un '
+                 'club no puede tener dos de sus equipos en la misma división (en las categorías más jóvenes las '
+                 'reglas son más laxas &mdash; en Primera Benjamín/Prebenjamín se permite más de un equipo del mismo '
+                 'club en un grupo; ver «Disposiciones comunes» de cada documento). Si el equipo que ganó el ascenso '
+                 'no puede subir por este motivo, el derecho pasa automáticamente al siguiente mejor clasificado '
+                 '<i>de la misma división</i> que no tenga ese impedimento &mdash; la plaza no se pierde, se '
+                 'desplaza hacia abajo en la tabla.',
+    "strict_p2": '<b>El orden de desempate es rígido, no discrecional.</b> Cuando varios equipos compiten por la '
+                 'misma plaza (por ejemplo, una vacante en la división superior que se abre después del 30 de '
+                 'junio), la decisión sigue siempre la misma cadena formalizada: 1) puesto en la clasificación final '
+                 'de su grupo; 2) coeficiente de puntos (puntos / partidos disputados &mdash; importante si los '
+                 'grupos jugaron distinto número de jornadas); 3) diferencia general de goles en todos los partidos '
+                 'de su grupo; 4) goles a favor (o coeficiente de goles a favor, si los grupos tienen distinto '
+                 'tamaño); y solo si nada de esto decide &mdash; un partido de desempate en campo neutral, en la '
+                 'fecha que designe la federación. Ningún documento deja aquí margen de discreción.',
+    "strict_p3": '<b>Si dos equipos del mismo club se ganan el ascenso y solo hay una plaza</b> &mdash; sube el que '
+                 'tenga mejor resultado deportivo según la misma cadena (coeficiente de puntos → diferencia de '
+                 'goles → goles a favor), y al inicio de la siguiente temporada se reasignan las letras «A»/«B» de '
+                 'los equipos de ese club: el que subió pasa a ser «A».',
+    "strict_p4": '<b>«Arrastre» &mdash; el efecto de tirar hacia abajo por toda la cadena.</b> El número de '
+                 'descensos anunciado en cada división es un <i>mínimo</i>, no una cifra definitiva. Si desciende '
+                 'más equipos de los garantizados desde arriba (incluso desde la RFEF &mdash; por ejemplo, por una '
+                 'mala temporada de los clubes madrileños en Segunda RFEF o Segunda Federación Femenina), el exceso '
+                 '«arrastra» hacia abajo el mismo número de más en la división inferior, y así sucesivamente por '
+                 'toda la pirámide &mdash; hasta Preferente/Primera. Los equipos descendidos precisamente por '
+                 'arrastre, y no por su propia clasificación, tienen derecho preferente a ocupar las vacantes que '
+                 'se abran en su antigua división la temporada siguiente.',
+    "strict_p5": '<b>La temporada transitoria 2025/2026 &mdash; nuevas divisiones creadas «desde cero» dentro de una '
+                 'pirámide ya existente.</b> Para Juvenil/Cadete/Infantil (Fútbol-11 y Sala) y Benjamín/Prebenjamín '
+                 '(Fútbol-7), la RFFM inserta esta misma temporada un nuevo escalón superior (p. ej. «1ª División '
+                 'Autonómica» o «División de Honor») entre divisiones ya existentes. Por eso parte de los ascensos '
+                 'de 2025/2026 son excepcionales: por ejemplo, a la nueva División de Honor Benjamín ascendieron en '
+                 'bloque los equipos del 1º al 6º puesto de cada grupo de Primera Autonómica 2024/2025 más los 4 '
+                 'mejores séptimos por coeficiente &mdash; en vez del habitual «solo el campeón» o «play-off entre '
+                 'el 1º y el 2º». Estas reglas transitorias están marcadas en las tarjetas con una nota en cursiva; '
+                 'a partir de la siguiente temporada normalmente se sustituyen por una fórmula fija de «los N '
+                 'mejores puestos ascienden directamente».',
+    "strict_p6": '<b>Formato «sede» frente a «local-visitante».</b> En las divisiones superiores (Honor/Autonómica/'
+                 'Preferente) los partidos casi siempre se juegan en el formato clásico de local y visitante; en '
+                 'Primera y por debajo, muchas categorías inferiores juegan en formato «sede» &mdash; varios clubes '
+                 'reciben por turnos toda una jornada completa en un mismo campo. Esto no afecta a los ascensos/'
+                 'descensos, pero explica por qué en <code>club_division_map.html</code> un mismo club suele tener '
+                 'varias sedes «locales» distintas en vez de una sola.',
+    "footer": 'Construido a partir de <code>output/processed/rffm/{competitions,matches}.csv</code> (calendario de '
+              'fases) y de las circulares oficiales de la RFFM (estructura de ascensos/descensos, cotejada a mano '
+              '&mdash; no se extrae automáticamente del sitio web). Ver <code>analysis_scripts/competition_structure.py</code>.',
+}
 
 HTML = r"""<!DOCTYPE html>
 <html lang="ru">
@@ -621,6 +785,11 @@ header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3
 a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 a.back:hover{text-decoration:underline;}
 .masthead .switch-row{position:absolute; top:0; right:0; display:flex; gap:0.5rem;}
+.lang-switch, .theme-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; }
+.lang-opt, .theme-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
+  padding:4px 12px; background:var(--surface); color:var(--ink-soft); border:none; cursor:pointer; }
+.lang-opt.is-active, .theme-opt.is-active{background:var(--accent); color:#fff;}
+.theme-opt{font-size:13px; padding:3px 10px;}
 
 .legend-panel{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1rem 1.2rem;
   box-shadow:var(--shadow); display:flex; flex-wrap:wrap; gap:1.1rem; align-items:center; font-size:0.82rem; color:var(--ink-soft); }
@@ -654,6 +823,11 @@ a.back:hover{text-decoration:underline;}
 .tier-arrow{ flex:none; font-weight:700; }
 .tier-arrow.up{ color:var(--accent); } .tier-arrow.down{ color:var(--rfef); }
 .tier-note{ margin-top:0.3rem; font-size:0.7rem; color:var(--ink-faint); font-style:italic; }
+.tier-examples{ margin-top:0.35rem; padding-top:0.3rem; border-top:1px dashed var(--line-strong);
+  display:flex; flex-wrap:wrap; gap:0.3rem; align-items:center; }
+.ex-label{ font-family:'JetBrains Mono',monospace; font-size:0.6rem; font-weight:700; color:var(--ink-faint); margin-right:0.1rem; }
+.ex-chip{ font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--ink); background:var(--surface);
+  border:1px solid var(--line-strong); border-radius:3px; padding:0.08rem 0.35rem; }
 .tier-connector{ height:0.9rem; width:2px; background:var(--line-strong); margin:0.1rem auto; }
 .single-note{ font-size:0.78rem; color:var(--ink-soft); }
 .pyramid-timing{ border-top:1px dashed var(--line); padding-top:0.5rem; }
@@ -686,9 +860,9 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   <header class="masthead">
     %SWITCH_ROW%
     <a class="back" href="index.html">&larr; RFFM data</a>
-    <span class="eyebrow">RFFM (Мадрид) &middot; структура соревнований</span>
-    <h1>Пирамида лиг RFFM: категории, дивизионы, переходы</h1>
-    <p>Для каждого возраста / типа игры / пола &mdash; полная лестница дивизионов сверху вниз: сколько команд/групп
+    <span class="eyebrow" data-i18n="eyebrow">RFFM (Мадрид) &middot; структура соревнований</span>
+    <h1 data-i18n="h1">Пирамида лиг RFFM: категории, дивизионы, переходы</h1>
+    <p data-i18n="lede">Для каждого возраста / типа игры / пола &mdash; полная лестница дивизионов сверху вниз: сколько команд/групп
       в каждом дивизионе, сколько переходит вверх и вниз между соседями, и где лестница выходит за пределы RFFM
       в общенациональные соревнования RFEF (Tercera RFEF, Liga Nacional Juvenil, Tercera Federación Femenina).
       Правила переходов взяты из официальных circular RFFM «Bases de Ascensos y Descensos» (сезон 2025-2026,
@@ -697,11 +871,11 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   </header>
 
   <div class="legend-panel">
-    <span><span class="leg-swatch leg-rffm"></span><b>RFFM</b> &mdash; региональное соревнование</span>
-    <span><span class="leg-swatch leg-rfef"></span><b>RFEF</b> &mdash; общенациональное (может администрироваться RFFM на своей территории)</span>
-    <span><span class="leg-swatch leg-liga"></span>регулярный чемпионат</span>
-    <span><span class="leg-swatch leg-fase2"></span>2-й этап (группы по уровню)</span>
-    <span><span class="leg-swatch leg-playoff"></span>плей-офф / Torneo de Campeones</span>
+    <span data-i18n="leg1"><span class="leg-swatch leg-rffm"></span><b>RFFM</b> &mdash; региональное соревнование</span>
+    <span data-i18n="leg2"><span class="leg-swatch leg-rfef"></span><b>RFEF</b> &mdash; общенациональное (может администрироваться RFFM на своей территории)</span>
+    <span data-i18n="leg3"><span class="leg-swatch leg-liga"></span>регулярный чемпионат</span>
+    <span data-i18n="leg4"><span class="leg-swatch leg-fase2"></span>2-й этап (группы по уровню)</span>
+    <span data-i18n="leg5"><span class="leg-swatch leg-playoff"></span>плей-офф / Torneo de Campeones</span>
   </div>
 
   <div class="filter-panel" id="filterPanel"></div>
@@ -709,9 +883,9 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   <div class="pyramid-grid" id="pyramidGrid"></div>
 
   <section>
-    <div class="section-h"><h2>Прочие категории Fútbol Sala без пирамиды</h2>
-      <span class="n">единственный дивизион, ascenso/descenso не предусмотрены</span></div>
-    <p style="color:var(--ink-soft); font-size:0.85rem; max-width:80ch;">
+    <div class="section-h"><h2 data-i18n="h_single">Прочие категории Fútbol Sala без пирамиды</h2>
+      <span class="n" data-i18n="h_single_n">единственный дивизион, ascenso/descenso не предусмотрены</span></div>
+    <p style="color:var(--ink-soft); font-size:0.85rem; max-width:80ch;" data-i18n="single_p">
       Prebenjamín/Benjamín/Alevín (мужской) и вся линейка Juvenil&ndash;Benjamín (женский) Fútbol Sala играют
       в РФФМ одним дивизионом на возраст &mdash; повышений/понижений нет вовсе, а внутригодовая структура
       реализуется через двухфазный формат (1-я фаза &mdash; лига по территориальной близости, 2-я фаза &mdash;
@@ -721,9 +895,9 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   </section>
 
   <section>
-    <div class="section-h"><h2>Как это устроено</h2></div>
+    <div class="section-h"><h2 data-i18n="h_how">Как это устроено</h2></div>
     <div class="info-panel">
-      <p><b>Два раздельных пограничных перехода.</b> Клуб может пересечь две разные границы: (1) между дивизионами
+      <p data-i18n="how_p1"><b>Два раздельных пограничных перехода.</b> Клуб может пересечь две разные границы: (1) между дивизионами
         <i>внутри</i> RFFM (обычная ladder ascenso/descenso, описанная в каждой карточке) и (2) границу между
         RFFM и RFEF &mdash; когда чемпион верхнего RFFM-дивизиона какой-то категории поднимается в соревнование,
         которое организует уже не RFFM, а испанская федерация целиком (Tercera RFEF, Liga Nacional Juvenil,
@@ -732,23 +906,23 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
         но право повышения/понижения из них принадлежит уже RFEF, а не RFFM. Именно поэтому в тарифной таблице
         <code>DIVISIONS.md</code> для LIGA NACIONAL стоит замечание «не путать с региональным уровнем» &mdash;
         это фактически низ национальной пирамиды, а не верх региональной.</p>
-      <p><b>«Новая Primera División Autonómica» 2025/2026.</b> Для Juvenil, Cadete и Infantil официальный circular
+      <p data-i18n="how_p2"><b>«Новая Primera División Autonómica» 2025/2026.</b> Для Juvenil, Cadete и Infantil официальный circular
         явно вводит новый дивизион между Preferente и следующим уровнем начиная с этого сезона &mdash; поэтому
         часть переходов в 2025/2026 идёт не по обычной вертикальной цепочке, а через play-off между чемпионами
         групп Primera и нижней частью таблицы Preferente. Это разовая переходная механика сезона запуска, а не
         постоянное правило.</p>
-      <p><b>Почему в календаре снизу бывает две фазы.</b> Многие дивизионы (особенно Fútbol Sala младших
+      <p data-i18n="how_p3"><b>Почему в календаре снизу бывает две фазы.</b> Многие дивизионы (особенно Fútbol Sala младших
         категорий и Primera Fútbol-11 Aficionado) физически играют два разных турнира подряд в рамках одного
         сезона: 1-я фаза &mdash; обычная лига (часто по территориальной близости, без учёта силы), 2-я фаза
         &mdash; клубы перегруппированы по итоговому коэффициенту 1-й фазы в новые группы, где и разыгрываются
         и титул, и путёвки на повышение; очки первой фазы <i>не переносятся</i>. Это не два отдельных
         соревнования &mdash; это одна лестница, поделённая на два тайма сезона.</p>
-      <p><b>Плей-офф / Torneo de Campeones — отдельно от ladder.</b> После регулярного чемпионата многие дивизионы
+      <p data-i18n="how_p4"><b>Плей-офф / Torneo de Campeones — отдельно от ladder.</b> После регулярного чемпионата многие дивизионы
         разыгрывают короткий плей-офф между призёрами групп (иногда прямо называется «Torneo de Campeones» /
         «Copa de Campeones»), но по регламенту он не двигает команду вверх или вниз по пирамиде &mdash; это отдельный
         трофей поверх уже определившихся ascenso/descenso. Именно этот паттерн стоит за пропавшей из вида
         «Copa de Campeones de Autonómica Juvenil»: см. <code>DIVISIONS.md</code>, раздел «The post-season phase pattern».</p>
-      <p><b>Источники.</b> Промо/вылет по каждой пирамиде &mdash; из официальных документов RFFM: «Bases de Ascensos
+      <p data-i18n="how_p5"><b>Источники.</b> Промо/вылет по каждой пирамиде &mdash; из официальных документов RFFM: «Bases de Ascensos
         y Descensos Competición Fútbol-11, temporada 2025-2026» (утв. 10.07.2025), «Bases de Ascensos y Descensos
         Competición Fútbol-7» (утв. 23.12.2024) и «Bases de Ascensos y Descensos Competición Fútbol Sala»
         (утв. 23.12.2024), rffm.es. Календарь фаз &mdash; посчитан из
@@ -759,16 +933,16 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   </section>
 
   <section>
-    <div class="section-h"><h2>Насколько строги правила перехода</h2>
-      <span class="n">механика между сезонами, а не общие принципы</span></div>
+    <div class="section-h"><h2 data-i18n="h_strict">Насколько строги правила перехода</h2>
+      <span class="n" data-i18n="h_strict_n">механика между сезонами, а не общие принципы</span></div>
     <div class="info-panel">
-      <p><b>Право на повышение теряется только по одной причине &mdash; «filialidad/dependencia».</b> Клуб не может
+      <p data-i18n="strict_p1"><b>Право на повышение теряется только по одной причине &mdash; «filialidad/dependencia».</b> Клуб не может
         держать два своих состава в одном дивизионе (для младших возрастов правила мягче &mdash; в Primera
         Benjamín/Prebenjamín допускается больше одной команды клуба в группе, см. «Disposiciones comunes» каждого
         документа). Если победившая команда не может подняться из-за этого, право автоматически переходит к
         следующей по итоговой таблице команде <i>того же дивизиона</i>, у которой такого препятствия нет &mdash;
         вакансия не «сгорает», а сдвигается вниз по таблице.</p>
-      <p><b>Порядок разрешения равенства &mdash; жёсткий, не на усмотрение комитета.</b> Когда несколько команд
+      <p data-i18n="strict_p2"><b>Порядок разрешения равенства &mdash; жёсткий, не на усмотрение комитета.</b> Когда несколько команд
         претендуют на одну и ту же путёвку (например, вакансию в дивизионе выше, открывшуюся после 30 июня), решение
         всегда идёт по одной и той же формализованной цепочке: 1) место в итоговой таблице своей группы; 2)
         коэффициент очков (очки / сыгранные матчи &mdash; важно, если группы играли разное число туров);
@@ -776,18 +950,18 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
         голов, если группы разного размера); и только если ничего из этого не развело команды &mdash; очная
         переигровка на нейтральном поле в дату, которую назначит федерация. Ни один документ не оставляет здесь
         пространства для дискреции.</p>
-      <p><b>Если у клуба сразу два состава заслужили повышение, а слот один</b> &mdash; поднимается тот, что показал
+      <p data-i18n="strict_p3"><b>Если у клуба сразу два состава заслужили повышение, а слот один</b> &mdash; поднимается тот, что показал
         лучший спортивный результат по той же цепочке (коэффициент очков → разница мячей → голы забитые), и с
         начала следующего сезона буквы «A»/«B» у команд этого клуба переприсваиваются: та, что поднялась,
         становится «A».</p>
-      <p><b>«Arrastre» &mdash; эффект вытягивания вниз по всей цепочке.</b> Объявленное число вылетающих команд в
+      <p data-i18n="strict_p4"><b>«Arrastre» &mdash; эффект вытягивания вниз по всей цепочке.</b> Объявленное число вылетающих команд в
         каждом дивизионе &mdash; это <i>минимум</i>, а не окончательная цифра. Если сверху (вплоть до RFEF &mdash;
         например, из-за плохого сезона мадридских клубов в Segunda RFEF или Segunda Federación Femenina) вылетело
         больше команд, чем гарантированно предусмотрено, избыток «утягивает» на один дивизион ниже ровно на столько
         же команд больше заявленного, и так далее вниз по всей пирамиде &mdash; вплоть до Preferente/Primera. Команды,
         вылетевшие именно из-за arrastre, а не по итогам своей таблицы, получают приоритетное право занять вакансии
         в своём прежнем дивизионе в следующем сезоне, если такие откроются.</p>
-      <p><b>Транзитный сезон 2025/2026 &mdash; новые дивизионы создаются «с нуля» внутри уже существующей пирамиды.</b>
+      <p data-i18n="strict_p5"><b>Транзитный сезон 2025/2026 &mdash; новые дивизионы создаются «с нуля» внутри уже существующей пирамиды.</b>
         Для Juvenil/Cadete/Infantil (Fútbol-11 и Sala) и Benjamín/Prebenjamín (Fútbol-7) РФФМ прямо в этом сезоне
         вставляет новую верхнюю ступень (напр. «1ª División Autonómica» или «División de Honor») между уже
         существующими дивизионами. Из-за этого часть переходов 2025/2026 &mdash; разовые: например, в новую
@@ -795,7 +969,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
         2024/2025 плюс 4 лучших седьмых места по коэффициенту &mdash; вместо обычных «только чемпион» или
         «плей-офф 1-2 места». Такие переходные правила отмечены в карточках отдельной пометкой курсивом; со
         следующего сезона они, как правило, заменяются на постоянную формулу «N лучших мест напрямую».</p>
-      <p><b>Формат «sede» против «local-visitante».</b> В верхних дивизионах (Honor/Autonómica/Preferente) матчи
+      <p data-i18n="strict_p6"><b>Формат «sede» против «local-visitante».</b> В верхних дивизионах (Honor/Autonómica/Preferente) матчи
         почти всегда играются классическим «дома-в гостях»; в Primera и ниже многие младшие категории играют в
         формате «sede» &mdash; несколько клубов по очереди принимают весь тур целиком на одном поле. На ascenso/
         descenso это не влияет, но объясняет, почему в <code>club_division_map.html</code> у одного клуба часто
@@ -803,7 +977,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     </div>
   </section>
 
-  <footer class="note">Построено из <code>output/processed/rffm/{competitions,matches}.csv</code> (календарь фаз) и
+  <footer class="note" data-i18n="footer">Построено из <code>output/processed/rffm/{competitions,matches}.csv</code> (календарь фаз) и
     официальных circular RFFM (структура ascenso/descenso, вручную сверена — не парсится автоматически из сайта).
     См. <code>analysis_scripts/competition_structure.py</code>.</footer>
 </div>
@@ -830,6 +1004,11 @@ PYRAMID_GROUPS.forEach(([key, label]) => {
   });
   panel.appendChild(btn);
 });
+
+(function () {
+  var I18N_ES = %I18N_ES_JSON%;
+  %LANG_SWITCH_JS%
+})();
 </script>
 <style>.hidden{display:none !important;}</style>
 %THEME_SWITCH_JS_TAG%
@@ -840,7 +1019,8 @@ PYRAMID_GROUPS.forEach(([key, label]) => {
 
 def build_html(season: str) -> str:
     timing = compute_timing(season)
-    pyramid_html = "".join(pyramid_card_html(p, timing) for p in ALL_PYRAMIDS)
+    examples_idx = build_examples_index(season)
+    pyramid_html = "".join(pyramid_card_html(p, timing, examples_idx, season) for p in ALL_PYRAMIDS)
     single_html = "".join(
         single_division_card_html(cat, title, scope, timing, "fsm", is_fem=False)
         for cat, title, scope in SINGLE_DIVISION_FS
@@ -856,6 +1036,8 @@ def build_html(season: str) -> str:
             .replace("%PYRAMID_GROUPS_JSON%", json.dumps(GROUP_LABELS, ensure_ascii=False))
             .replace("%PYRAMID_HTML_JSON%", json.dumps(pyramid_html, ensure_ascii=False))
             .replace("%SINGLE_HTML_JSON%", json.dumps(single_html, ensure_ascii=False))
+            .replace("%I18N_ES_JSON%", json.dumps(I18N_ES, ensure_ascii=False))
+            .replace("%LANG_SWITCH_JS%", LANG_SWITCH_JS)
             .replace("%THEME_SWITCH_JS_TAG%", theme_switch_tag))
 
 

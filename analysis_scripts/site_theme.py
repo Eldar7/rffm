@@ -295,6 +295,36 @@ CSS = """
 """
 
 
+def club_slug_map(club_names: list[str]) -> dict[str, str]:
+    """Deterministic club_name_raw -> URL-safe slug, stable across scripts
+    that need to agree on the same file name for the same club without
+    sharing any other state (club_division_map.py picks the slug a team-card
+    link points at; team_cards.py picks the slug it writes the file under).
+    Input order doesn't matter — collisions are broken by sorting the
+    colliding names themselves, not by iteration order."""
+    import re
+    import unicodedata
+
+    def base_slug(name: str) -> str:
+        s = unicodedata.normalize("NFKD", name)
+        s = "".join(c for c in s if not unicodedata.combining(c))
+        s = re.sub(r"[^a-zA-Z0-9]+", "-", s).strip("-").lower()
+        return s or "club"
+
+    by_base: dict[str, list[str]] = {}
+    for name in club_names:
+        by_base.setdefault(base_slug(name), []).append(name)
+
+    out: dict[str, str] = {}
+    for base, names in by_base.items():
+        if len(names) == 1:
+            out[names[0]] = base
+        else:
+            for i, name in enumerate(sorted(set(names)), start=1):
+                out[name] = base if i == 1 else f"{base}-{i}"
+    return out
+
+
 def lang_switch_html(active: str = "ru") -> str:
     """The RU/ES toggle buttons; drop into the masthead's .scope-block."""
     ru_active = "is-active" if active == "ru" else ""

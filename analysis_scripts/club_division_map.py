@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
+from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -157,6 +157,21 @@ def load_data(season: str) -> dict:
         ["category_base", "division_level", "game_type", "game_type_id", "phase_label"]]
 
     standings = standings.join(comp_facet, on="competition_id")
+
+    # ── position lookup, keyed by (team_id, competition_id, group_id) — built
+    # from the FULL standings (before the CATEGORIES filter below), since
+    # club_all_comps below covers every competition a team appeared in,
+    # including cups/"OTHER" categories that never earn a matrix column.
+    pos_all = standings.copy()
+    pos_all["tid"] = pos_all["team_id"].map(norm_id)
+    pos_all["position_num"] = pd.to_numeric(pos_all["position"], errors="coerce")
+    group_size_all = pos_all.groupby("group_id").size().to_dict()
+    pos_lookup: dict[tuple, dict] = {}
+    for _, r in pos_all.dropna(subset=["position_num"]).iterrows():
+        pos_lookup[(r["tid"], clean(r["competition_id"]), clean(r["group_id"]))] = {
+            "pos": int(r["position_num"]), "size": int(group_size_all.get(r["group_id"], 0)),
+        }
+
     # Only real, known age categories get a "cat" badge in the UI (CAT_LABEL_*
     # lookups below would KeyError on anything else) — but do NOT filter by
     # division_level here, or every club whose only presence is a tier outside
@@ -214,7 +229,7 @@ def load_data(season: str) -> dict:
     matches["hid"] = matches["home_team_id"].map(norm_id)
     matches["aid"] = matches["away_team_id"].map(norm_id)
     app_cols = ["competition_id", "group_id", "group", "game_type", "game_type_id",
-                "season_id", "phase_label", "competition"]
+                "season_id", "phase_label", "competition", "match_date"]
     appearances = pd.concat([
         matches[["hid"] + app_cols].rename(columns={"hid": "tid"}),
         matches[["aid"] + app_cols].rename(columns={"aid": "tid"}),
@@ -225,25 +240,44 @@ def load_data(season: str) -> dict:
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
     appearances = appearances.join(comp_meta, on="competition_id")
     appearances["team_name"] = appearances["tid"].map(tid_to_name).fillna(appearances["tid"])
+    appearances["match_date"] = pd.to_datetime(appearances["match_date"], errors="coerce")
 
     club_all_comps: dict[str, list] = {}
     grouped = appearances.groupby(["club", "competition_id", "group_id"], dropna=False)
     for (club, comp_id, group_id), g in grouped:
         first = g.iloc[0]
         div = first["division_level"] or "OTHER"
+        date_min = g["match_date"].min()
+        # one team can, in principle, be duplicated across appearance rows
+        # (home leg + away leg of the same group) — dedupe by tid, keep the
+        # club's own team order stable (alphabetical by name)
+        team_by_tid: dict[str, str] = {}
+        for _, row in g.iterrows():
+            t = clean(row["tid"])
+            if t and t not in team_by_tid:
+                team_by_tid[t] = clean(tid_to_name.get(t)) or t
+        team_entries = []
+        for t, name in sorted(team_by_tid.items(), key=lambda kv: kv[1] or ""):
+            p = pos_lookup.get((t, clean(comp_id), clean(group_id)))
+            team_entries.append({
+                "tid": t, "name": name,
+                "pos": p["pos"] if p else None, "size": p["size"] if p else None,
+            })
         club_all_comps.setdefault(club, []).append({
             "comp": clean(first["competition"]), "cat": clean(first["category_base"]) or "OTHER",
             "div": clean(div) or "OTHER", "gt": clean(first["game_type"]),
             "phase": clean(first["phase_label"]), "grp": clean(first["group"]),
             "season_id": clean(first["season_id"]), "comp_id": clean(comp_id),
             "group_id": clean(group_id), "gt_id": clean(first["game_type_id"]),
-            "teams": sorted({clean(t) for t in g["team_name"] if clean(t)}),
+            "teams": team_entries,
             "tier": TIER_OF.get(div),
+            "date_min": date_min.strftime("%Y-%m-%d") if pd.notna(date_min) else None,
         })
     for club, lst in club_all_comps.items():
-        lst.sort(key=lambda r: (r["tier"] if r["tier"] is not None else 99,
-                                 CATEGORIES.index(r["cat"]) if r["cat"] in CATEGORIES else 99,
-                                 r["comp"] or ""))
+        # earliest match on top, per the user's explicit ask — a group's
+        # regular season always starts before its own play-off/final, so this
+        # naturally puts "1ª FASE" before "FINAL" within the same competition
+        lst.sort(key=lambda r: (r["date_min"] or "9999-99-99", r["comp"] or ""))
 
     # ── venues: EVERY real home ground per club (exact lat/lon from venues.csv), not one guess ──
     relevant_tids = set(standings["tid"].dropna().unique())
@@ -299,9 +333,13 @@ def load_data(season: str) -> dict:
     if not cells.empty:
         all_club_names |= set(cells["club"])
     cells_by_club = {club: grp for club, grp in cells.groupby("club")} if not cells.empty else {}
+    # Every team-card link (this page and team_cards.py, independently) needs
+    # to agree on the same file name for the same club — see club_slug_map()'s
+    # docstring for why this can't just be computed ad hoc in JS.
+    slug_by_club = club_slug_map(sorted(all_club_names))
     clubs_out = []
     for club in all_club_names:
-        rec = {"club": club}
+        rec = {"club": club, "slug": slug_by_club[club]}
         cells_dict = {}
         for _, r in cells_by_club.get(club, pd.DataFrame()).iterrows():
             key = f"{r['cat']}_{DIV_CODE[r['div']]}_{r['gtc']}"
@@ -509,7 +547,9 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
 .comp-row-main{ font-size:0.85rem; color:var(--ink); display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
 .comp-row-sub{ margin-top:0.25rem; display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap; font-size:0.74rem; color:var(--ink-soft); }
 .comp-gt, .comp-grp{ white-space:nowrap; }
-.comp-teams{ color:var(--ink-faint); font-style:italic; }
+.comp-teams{ display:inline-flex; flex-wrap:wrap; gap:0.5rem; }
+.comp-team{ display:inline-flex; align-items:center; gap:0.3rem; color:var(--ink-soft); }
+.comp-team a{ font-style:normal; }
 .tier-chip{ display:inline-flex; align-items:center; padding:0.12rem 0.5rem; border-radius:999px;
   font-size:0.7rem; font-weight:700; white-space:nowrap; }
 .tier-top{ background:var(--gold-soft); color:var(--gold); box-shadow:inset 0 0 0 1.5px var(--gold); }
@@ -765,6 +805,7 @@ function posBand(pos, size) {
   return 'pos-red';
 }
 function posBadgeHtml(pos, size) {
+  if (pos === null || pos === undefined || !size) return '';
   return `<span class="pos-badge ${posBand(pos, size)}">${pos}<span class="of">/${size}</span></span>`;
 }
 
@@ -894,8 +935,11 @@ function natCompare(a, b) {
   return (groupNum(a) - groupNum(b)) || fullNatCompare(a, b);
 }
 
-function teamCardLink(tid, name) {
-  return tid ? `<a href="https://www.rffm.es/fichaequipo/${tid}" target="_blank" rel="noopener">${name}</a>` : name;
+function teamCardLink(tid, name, clubSlug) {
+  if (!tid || !clubSlug) return name;
+  const season = document.getElementById('seasonSelect').value;
+  const url = `team_card.html?season=${encodeURIComponent(season)}&club=${encodeURIComponent(clubSlug)}&team=${encodeURIComponent(tid)}`;
+  return `<a href="${url}">${name}</a>`;
 }
 function groupCalLink(t) {
   const text = esc(t.grp || '');
@@ -937,8 +981,10 @@ function compCalLink(c) {
 }
 
 // Every Competición any of the club's teams played this season — not just
-// the ones that made it into the tiered matrix — grouped by age category
-// then sorted strongest tier first, so nothing is silently hidden.
+// the ones that made it into the tiered matrix — grouped by age category,
+// then sorted earliest-match-first within each category (so a group stage
+// always lands above its own play-off/final instead of the alphabetical/
+// tier order that used to interleave them unpredictably).
 function allCompsHtml(club) {
   const comps = club.all_comps || [];
   if (!comps.length) return '';
@@ -952,13 +998,19 @@ function allCompsHtml(club) {
   let html = '';
   catsSorted.forEach(cat => {
     html += `<div class="modal-group-h">${esc(catLabel(cat))}</div>`;
+    // date_min already carries the season's own chronology; entries with no
+    // known date (shouldn't happen once a competition has any match at all)
+    // sort last rather than disappearing.
     const rows = byCat.get(cat).slice().sort((a, b) =>
-      (a.tier ?? 99) - (b.tier ?? 99) || (a.comp || '').localeCompare(b.comp || ''));
+      (a.date_min || '9999-99-99').localeCompare(b.date_min || '9999-99-99') ||
+      (a.comp || '').localeCompare(b.comp || ''));
     rows.forEach(c => {
-      const teams = (c.teams || []).join(', ');
+      const teams = (c.teams || []).map(t =>
+        `<span class="comp-team">${teamCardLink(t.tid, esc(t.name), club.slug)}${posBadgeHtml(t.pos, t.size)}</span>`
+      ).join('');
       html += `<div class="comp-row">
         <div class="comp-row-main">${compCalLink(c)}${phaseChip(c.phase)}</div>
-        <div class="comp-row-sub">${tierChip(c)}${c.gt ? `<span class="comp-gt">${esc(c.gt)}</span>` : ''}${c.grp ? `<span class="comp-grp">${esc(c.grp)}</span>` : ''}<span class="comp-teams">${esc(teams)}</span></div>
+        <div class="comp-row-sub">${tierChip(c)}${c.gt ? `<span class="comp-gt">${esc(c.gt)}</span>` : ''}${c.grp ? `<span class="comp-grp">${esc(c.grp)}</span>` : ''}<span class="comp-teams">${teams}</span></div>
       </div>`;
     });
   });
@@ -1004,7 +1056,7 @@ function openClubModal(club) {
       const rows = byDiv.get(div).slice().sort((a, b) =>
         natCompare(a.grp || '', b.grp || '') || String(a.team).localeCompare(String(b.team)));
       teamsHtml += rows.map(t =>
-        `<div class="modal-team-row"><span>${teamCardLink(t.tid, esc(t.team))} <span style="color:var(--ink-faint)">&middot; ${groupCalLink(t)} &middot; ${t.gt}</span></span>${posBadgeHtml(t.pos, t.size)}</div>`
+        `<div class="modal-team-row"><span>${teamCardLink(t.tid, esc(t.team), club.slug)} <span style="color:var(--ink-faint)">&middot; ${groupCalLink(t)} &middot; ${t.gt}</span></span>${posBadgeHtml(t.pos, t.size)}</div>`
       ).join('');
     });
   });
