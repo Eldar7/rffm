@@ -293,6 +293,7 @@ async function main() {
   const params = new URLSearchParams(location.search);
   CUR_PID = params.get('player');
   CUR_SEASON = params.get('season') || SEASONS[SEASONS.length - 1];
+  document.getElementById('allSeasonsBox').checked = params.get('all') === '1';
   if (!CUR_PID) {
     document.getElementById('regBody').innerHTML =
       `<tr><td class="empty-state" colspan="5">${LANG[CURLANG].notFound}</td></tr>`;
@@ -301,7 +302,12 @@ async function main() {
   await render();
 }
 
-document.getElementById('allSeasonsBox').addEventListener('change', render);
+document.getElementById('allSeasonsBox').addEventListener('change', function () {
+  const params = new URLSearchParams(location.search);
+  if (this.checked) params.set('all', '1'); else params.delete('all');
+  history.replaceState(null, '', location.pathname + '?' + params.toString());
+  render();
+});
 
 (function () {
   var I18N_ES = %I18N_ES_JSON%;

@@ -684,6 +684,38 @@ const STATE = { cats: new Set(), divs: new Set(), gts: new Set(), seeded: false 
 let TIER = {};
 let CAT_START_KEYS = new Set();
 let sortKey = '__total', sortDir = -1;
+let ALL_CATS = new Set(), ALL_DIVS = new Set(), ALL_GTS = new Set();
+
+// URL sync — every filter/sort/search/season/open-club change is reflected
+// in the query string (replaceState, no back-stack spam) so a link can be
+// shared to reproduce the exact view; opening a club card pushState's
+// instead (a real "navigation", so Back closes it) — see openClubModal().
+let OPEN_CLUB_SLUG = null, MODAL_PUSHED_BY_US = false, RESTORING = false;
+
+function setsEqual(a, b) { return a.size === b.size && [...a].every(x => b.has(x)); }
+function defaultCatsSet() { return new Set(DEFAULT_CATS.filter(c => ALL_CATS.has(c))); }
+
+function currentStateParams() {
+  const params = new URLSearchParams();
+  const season = document.getElementById('seasonSelect').value;
+  if (season && season !== SEASONS[SEASONS.length - 1]) params.set('season', season);
+  const q = document.getElementById('searchBox').value.trim();
+  if (q) params.set('q', q);
+  if (!setsEqual(STATE.cats, defaultCatsSet())) params.set('cats', [...STATE.cats].sort().join(','));
+  if (!setsEqual(STATE.divs, ALL_DIVS)) params.set('divs', [...STATE.divs].sort().join(','));
+  if (!setsEqual(STATE.gts, ALL_GTS)) params.set('gts', [...STATE.gts].sort().join(','));
+  if (sortKey !== '__total' || sortDir !== -1) { params.set('sort', sortKey); params.set('dir', sortDir === 1 ? 'asc' : 'desc'); }
+  if (document.getElementById('presentToggle').classList.contains('active')) params.set('present', '1');
+  if (OPEN_CLUB_SLUG) params.set('club', OPEN_CLUB_SLUG);
+  return params;
+}
+function syncUrl(push) {
+  if (RESTORING) return;
+  const qs = currentStateParams().toString();
+  const url = location.pathname + (qs ? '?' + qs : '');
+  if (push) history.pushState({ rffm: true }, '', url);
+  else history.replaceState({ rffm: true }, '', url);
+}
 
 function esc(s) {
   if (s === null || s === undefined) return '';
@@ -708,6 +740,7 @@ function buildChipRow(containerId, kind, items, labelFn) {
       chip.classList.toggle('active', STATE[kind].has(val));
       buildHead();
       render();
+      syncUrl(false);
     });
     el.appendChild(chip);
   });
@@ -731,6 +764,7 @@ function quickSelect(kind, containerId, action) {
   [...document.getElementById(containerId).children].forEach((chip, i) => chip.classList.toggle('active', STATE[kind].has(cols[i])));
   buildHead();
   render();
+  syncUrl(false);
 }
 document.getElementById('catsAll').addEventListener('click', () => quickSelect('cats', 'chips-cats', 'all'));
 document.getElementById('catsNone').addEventListener('click', () => quickSelect('cats', 'chips-cats', 'none'));
@@ -791,6 +825,7 @@ function sortBy(key) {
   sortDir = (sortKey === key) ? -sortDir : -1;
   sortKey = key;
   render();
+  syncUrl(false);
 }
 
 // 1st place = gold; the rest split into 4 flat (non-gradient) bands by
@@ -1017,7 +1052,8 @@ function allCompsHtml(club) {
   return html;
 }
 
-function openClubModal(club) {
+function openClubModal(club, opts) {
+  opts = opts || {};
   const L = CURLANG;
   const info = club.info;
   const crestHtml = info && info.crest
@@ -1075,11 +1111,24 @@ function openClubModal(club) {
     <div class="modal-section"><h3>${allCompsTitle}</h3>${allCompsBody}</div>
   `;
   document.getElementById('modalBackdrop').classList.remove('hidden');
+  OPEN_CLUB_SLUG = club.slug;
+  if (!opts.fromRestore) {
+    MODAL_PUSHED_BY_US = true;
+    syncUrl(true);
+  }
 }
-function closeModal() { document.getElementById('modalBackdrop').classList.add('hidden'); }
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.add('hidden');
+  OPEN_CLUB_SLUG = null;
+  if (RESTORING) return;
+  if (MODAL_PUSHED_BY_US) { MODAL_PUSHED_BY_US = false; history.back(); }
+  else syncUrl(false);
+}
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalBackdrop').addEventListener('click', e => { if (e.target.id === 'modalBackdrop') closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !document.getElementById('modalBackdrop').classList.contains('hidden')) closeModal();
+});
 
 async function loadSeason(season) {
   document.getElementById('tbody').innerHTML = `<tr><td class="empty-state">${LANG[CURLANG].loading}</td></tr>`;
@@ -1088,21 +1137,21 @@ async function loadSeason(season) {
   COLUMNS = DATA.columns;
   CLUBS = DATA.clubs;
 
-  const allCats = new Set(COLUMNS.map(c => c.cat));
-  const allDivs = new Set(COLUMNS.map(c => c.div));
-  const allGts = new Set(COLUMNS.map(c => c.gt));
+  ALL_CATS = new Set(COLUMNS.map(c => c.cat));
+  ALL_DIVS = new Set(COLUMNS.map(c => c.div));
+  ALL_GTS = new Set(COLUMNS.map(c => c.gt));
   if (!STATE.seeded) {
-    DEFAULT_CATS.forEach(c => { if (allCats.has(c)) STATE.cats.add(c); });
-    allDivs.forEach(d => STATE.divs.add(d));
-    allGts.forEach(g => STATE.gts.add(g));
+    DEFAULT_CATS.forEach(c => { if (ALL_CATS.has(c)) STATE.cats.add(c); });
+    ALL_DIVS.forEach(d => STATE.divs.add(d));
+    ALL_GTS.forEach(g => STATE.gts.add(g));
     STATE.seeded = true;
   } else {
-    STATE.cats = new Set([...STATE.cats].filter(c => allCats.has(c)));
-    STATE.divs = new Set([...STATE.divs].filter(d => allDivs.has(d)));
-    STATE.gts = new Set([...STATE.gts].filter(g => allGts.has(g)));
-    if (!STATE.cats.size) allCats.forEach(c => STATE.cats.add(c));
-    if (!STATE.divs.size) allDivs.forEach(d => STATE.divs.add(d));
-    if (!STATE.gts.size) allGts.forEach(g => STATE.gts.add(g));
+    STATE.cats = new Set([...STATE.cats].filter(c => ALL_CATS.has(c)));
+    STATE.divs = new Set([...STATE.divs].filter(d => ALL_DIVS.has(d)));
+    STATE.gts = new Set([...STATE.gts].filter(g => ALL_GTS.has(g)));
+    if (!STATE.cats.size) ALL_CATS.forEach(c => STATE.cats.add(c));
+    if (!STATE.divs.size) ALL_DIVS.forEach(d => STATE.divs.add(d));
+    if (!STATE.gts.size) ALL_GTS.forEach(g => STATE.gts.add(g));
   }
 
   buildFilterChips();
@@ -1113,13 +1162,67 @@ async function loadSeason(season) {
 
 document.getElementById('seasonSelect').innerHTML = SEASONS.map(s => `<option value="${s}">${s}</option>`).join('');
 document.getElementById('seasonSelect').value = SEASONS[SEASONS.length - 1];
-document.getElementById('seasonSelect').addEventListener('change', function () { loadSeason(this.value); });
+document.getElementById('seasonSelect').addEventListener('change', function () {
+  // A club open from the old season may not exist (same slug) in the new
+  // one's data — reopen it if it does, close silently (no history entry,
+  // syncUrl below already omits `club`) if it doesn't.
+  const reopenSlug = OPEN_CLUB_SLUG;
+  loadSeason(this.value).then(() => {
+    if (reopenSlug) {
+      const club = CLUBS.find(c => c.slug === reopenSlug);
+      if (club) openClubModal(club, { fromRestore: true });
+      else { document.getElementById('modalBackdrop').classList.add('hidden'); OPEN_CLUB_SLUG = null; MODAL_PUSHED_BY_US = false; }
+    }
+    syncUrl(false);
+  });
+});
 
-document.getElementById('searchBox').addEventListener('input', render);
+document.getElementById('searchBox').addEventListener('input', function () { render(); syncUrl(false); });
 document.getElementById('presentToggle').addEventListener('click', function () {
   this.classList.toggle('active');
   render();
+  syncUrl(false);
 });
+
+// Restore season/filters/sort/search/open-club from the URL (deep link or
+// Back/Forward) — see syncUrl() above for what gets written back out.
+function applyStateFromUrl() {
+  RESTORING = true;
+  const params = new URLSearchParams(location.search);
+  const wantSeason = (params.get('season') && SEASONS.includes(params.get('season')))
+    ? params.get('season') : SEASONS[SEASONS.length - 1];
+  const needLoad = !DATA || document.getElementById('seasonSelect').value !== wantSeason;
+  document.getElementById('seasonSelect').value = wantSeason;
+
+  const finish = () => {
+    document.getElementById('searchBox').value = params.get('q') || '';
+
+    STATE.cats = params.has('cats') ? new Set(params.get('cats').split(',').filter(Boolean)) : defaultCatsSet();
+    STATE.divs = params.has('divs') ? new Set(params.get('divs').split(',').filter(Boolean)) : new Set(ALL_DIVS);
+    STATE.gts = params.has('gts') ? new Set(params.get('gts').split(',').filter(Boolean)) : new Set(ALL_GTS);
+    STATE.seeded = true;
+
+    sortKey = params.get('sort') || '__total';
+    sortDir = params.get('dir') === 'asc' ? 1 : -1;
+
+    document.getElementById('presentToggle').classList.toggle('active', params.get('present') === '1');
+
+    buildFilterChips();
+    buildHead();
+    renderStats();
+    render();
+
+    const clubSlug = params.get('club');
+    const club = clubSlug ? CLUBS.find(c => c.slug === clubSlug) : null;
+    if (club) openClubModal(club, { fromRestore: true });
+    else closeModal();
+    RESTORING = false;
+  };
+
+  if (needLoad) loadSeason(wantSeason).then(finish);
+  else finish();
+}
+window.addEventListener('popstate', applyStateFromUrl);
 
 const I18N_ES = %I18N_ES_JSON%;
 document.querySelectorAll('.lang-opt').forEach(function (btn) {
@@ -1142,7 +1245,7 @@ document.querySelectorAll('.lang-opt').forEach(function (btn) {
 
 %THEME_SWITCH_JS%
 
-loadSeason(SEASONS[SEASONS.length - 1]);
+applyStateFromUrl();
 </script>
 </body>
 </html>
