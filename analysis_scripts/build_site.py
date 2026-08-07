@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import season_comparison
 import club_division_map
 import weird_scores_report
-from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, lang_switch_html
+from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -56,6 +56,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RFFM data — футбол Мадрида, {SEASON_RANGE}</title>
 %FONT_LINKS%
+%THEME_INIT%
 <style>%CSS%
 .page{ max-width:1000px; }
 h2{ font-size:clamp(20px, 3vw, 26px); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:18px; }
@@ -74,7 +75,7 @@ code{ font-family: 'JetBrains Mono', monospace; font-size:0.86em; background:var
       <h1><span data-i18n="h1">Футбол Мадрида —<br>данные RFFM</span></h1>
     </div>
     <div class="scope-block">
-      %LANG_SWITCH%
+      %SWITCH_ROW%
       <div class="scope">
         <span data-i18n="scope1">Сезоны <b>{SEASON_RANGE}</b></span>
       </div>
@@ -117,6 +118,7 @@ code{ font-family: 'JetBrains Mono', monospace; font-size:0.86em; background:var
   var I18N_ES = %I18N_ES_JSON%;
   %LANG_JS%
 })();
+%THEME_SWITCH_JS%
 </script>
 </body>
 </html>
@@ -147,7 +149,7 @@ CARDS_RU = [
     {
         "href": "club_division_map.html",
         "title": "Карта клубов по дивизионам",
-        "desc": "Матрица турнирных позиций клубов Бенхамин/Пребенхамин с самой частой домашней площадкой.",
+        "desc": "Матрица турнирных позиций клубов по всем возрастам и дивизионам, с реальными площадками и гербами клубов.",
     },
     {
         "href": "season_comparison.html",
@@ -159,7 +161,7 @@ CARDS_ES = [
     "Marcadores extraños, dominadores y colistas",
     "Las goleadas más grandes, empates a cero y la mejor/peor diferencia de goles de equipos y clubes.",
     "Mapa de clubes por división",
-    "Matriz de posiciones de clubes Benjamín/Prebenjamín con su sede más frecuente.",
+    "Matriz de posiciones de clubes en todas las edades y divisiones, con sedes reales y escudos de los clubes.",
     "Comparación entre temporadas",
     "Partidos, clubes, goles y competiciones por temporada, filtrables por edad / división / tipo de juego.",
 ]
@@ -204,8 +206,10 @@ def build_index(seasons: list[str], coverage: list[dict]) -> str:
             .replace("{CARDS}", cards_html)
             .replace("{COVERAGE_ROWS}", rows_html)
             .replace("%FONT_LINKS%", FONT_LINKS)
+            .replace("%THEME_INIT%", THEME_INIT_JS)
+            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
             .replace("%CSS%", CSS)
-            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%SWITCH_ROW%", switch_row_html())
             .replace("%LANG_JS%", LANG_SWITCH_JS)
             .replace("%I18N_ES_JSON%", json.dumps(i18n_es, ensure_ascii=False)))
 

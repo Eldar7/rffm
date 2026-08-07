@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from site_theme import FONT_LINKS, lang_switch_html
+from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 SEASONS = sorted(
@@ -188,6 +188,7 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.27.0/plotly.min.js"></script>
 %FONT_LINKS%
+%THEME_INIT%
 <style>
 :root{
   --bg:#f5f6f8; --surface:#ffffff; --ink:#1a1d23; --ink-soft:#5a6270; --ink-faint:#8b93a3;
@@ -220,12 +221,17 @@ body { font-family: 'PT Sans', system-ui, sans-serif; max-width: 1160px; margin:
 h1 { font-family: 'Oswald', system-ui, sans-serif; font-weight: 700; text-transform: uppercase; font-size: 1.7rem; margin: 1.2rem 0 .3rem; }
 h2 { font-family: 'Oswald', system-ui, sans-serif; font-weight: 700; text-transform: uppercase; font-size: 1.1rem; margin: 2rem 0 .6rem; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
 small { color: var(--ink-faint); font-weight: normal; }
+a{ color:var(--accent); text-decoration:none; }
+a:visited{ color:var(--accent); }
+a:hover{ text-decoration:underline; }
 a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 .masthead-row{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;}
-.lang-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; margin-top:1.1rem; }
-.lang-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
+.lang-switch, .theme-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; margin-top:1.1rem; }
+.lang-opt, .theme-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
   padding:4px 12px; background:var(--surface); color:var(--ink-soft); border:none; cursor:pointer; }
-.lang-opt.is-active{background:var(--accent); color:#fff;}
+.lang-opt.is-active, .theme-opt.is-active{background:var(--accent); color:#fff;}
+.theme-opt{font-size:13px; padding:3px 10px;}
+.switch-row{display:flex; gap:0.5rem;}
 
 /* ── filter panel ── */
 .filter-panel {
@@ -298,7 +304,7 @@ tr:nth-child(even) td { background: var(--row-hover); }
       <span data-i18n="datalede">Данные: <code>output/processed/rffm/*/</code> &nbsp;|&nbsp; Сезоны:</span> <span id="seasons-list"></span>
     </p>
   </div>
-  %LANG_SWITCH%
+  %SWITCH_ROW%
 </div>
 
 <div class="filter-panel">
@@ -800,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { saved = localStorage.getItem('rffm_lang'); } catch (e) {}
   if (saved === 'es') document.querySelector('[data-lang-btn="es"]').click();
 });
+%THEME_SWITCH_JS%
 </script>
 </body>
 </html>
@@ -840,7 +847,9 @@ def build_html(data: dict) -> str:
     return (HTML
             .replace("%DATA_JSON%", data_json)
             .replace("%FONT_LINKS%", FONT_LINKS)
-            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%THEME_INIT%", THEME_INIT_JS)
+            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
+            .replace("%SWITCH_ROW%", switch_row_html())
             .replace("%I18N_ES_JSON%", json.dumps(I18N_ES, ensure_ascii=False)))
 
 

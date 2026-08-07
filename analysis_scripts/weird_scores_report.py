@@ -30,7 +30,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from site_theme import CSS, FONT_LINKS, lang_switch_html
+from site_theme import CSS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -273,6 +273,7 @@ HTML = r"""<!DOCTYPE html>
 <title>RFFM — странные счета, доминаторы и аутсайдеры</title>
 <a class="back" href="index.html" style="display:inline-block;margin:16px 0 0 20px">&larr; RFFM data</a>
 %FONT_LINKS%
+%THEME_INIT%
 <style>%CSS%
 .filter-panel{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:0.9rem 1.1rem;
   box-shadow:var(--shadow); display:flex; flex-direction:column; gap:0.6rem; margin:18px 0 0; }
@@ -302,7 +303,7 @@ select#seasonSelect{ font-family:'JetBrains Mono',monospace; font-size:0.85rem; 
       <h1><span id="txt-h1"></span></h1>
     </div>
     <div class="scope-block">
-      %LANG_SWITCH%
+      %SWITCH_ROW%
       <div class="scope">
         <span id="txt-scope1"></span><br>
         <span id="txt-scope2"></span><br>
@@ -928,6 +929,7 @@ document.querySelectorAll('.lang-opt').forEach(function (btn) {
     renderAll();
   });
 });
+%THEME_SWITCH_JS%
 
 loadSeason(CURSEASON);
 </script>
@@ -939,8 +941,10 @@ loadSeason(CURSEASON);
 def build_html(seasons: list[str]) -> str:
     return (HTML
             .replace("%FONT_LINKS%", FONT_LINKS)
+            .replace("%THEME_INIT%", THEME_INIT_JS)
+            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
             .replace("%CSS%", CSS)
-            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%SWITCH_ROW%", switch_row_html())
             .replace("%SEASONS_JSON%", json.dumps(seasons))
             .replace("%DEFAULT_CATS_JSON%", json.dumps(sorted(DEFAULT_CATEGORIES)))
             .replace("%CAT_ORDER_JSON%", json.dumps(CATEGORIES))

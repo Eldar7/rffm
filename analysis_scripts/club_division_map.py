@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from site_theme import FONT_LINKS, lang_switch_html
+from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -245,6 +245,7 @@ HTML = r"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RFFM — карта клубов по дивизионам</title>
 %FONT_LINKS%
+%THEME_INIT%
 <style>
 :root{
   --bg:#eef0ea; --surface:#ffffff; --ink:#1b2a1f; --ink-soft:#516155; --ink-faint:#8b9a8e;
@@ -283,6 +284,9 @@ body{
   font-family: 'PT Sans', ui-sans-serif, "Helvetica Neue", Arial, sans-serif;
   line-height:1.5; -webkit-font-smoothing:antialiased;
 }
+a{ color:var(--accent); text-decoration:none; }
+a:visited{ color:var(--accent); }
+a:hover{ text-decoration:underline; }
 .page{ max-width:1400px; margin:0 auto; padding:2.25rem 1.25rem 4rem; display:flex; flex-direction:column; gap:1.5rem; }
 h1{ font-family: 'Oswald', ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight:700;
   text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.4rem,2.8vw,1.9rem); line-height:1.2; }
@@ -291,7 +295,7 @@ header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3
 .masthead p{margin:0; color:var(--ink-soft); font-size:0.95rem; max-width:70ch;}
 a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 a.back:hover{text-decoration:underline;}
-.masthead .lang-switch{position:absolute; top:0; right:0;}
+.masthead .switch-row{position:absolute; top:0; right:0; display:flex; gap:0.5rem;}
 
 .stats{display:flex; flex-wrap:wrap; gap:0.75rem;}
 .stat{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:0.7rem 1rem;
@@ -314,10 +318,11 @@ button.toggle.active{background:var(--accent-soft); color:var(--accent); border-
 select#seasonSelect{ font-family:'JetBrains Mono',monospace; font-size:0.82rem; font-weight:700; color:var(--ink);
   background:var(--surface); border:1px solid var(--line-strong); border-radius:6px; padding:0.4rem 0.6rem; cursor:pointer; }
 
-.lang-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; }
-.lang-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
+.lang-switch, .theme-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; }
+.lang-opt, .theme-opt{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.04em;
   padding:4px 12px; background:var(--surface); color:var(--ink-soft); border:none; cursor:pointer; }
-.lang-opt.is-active{background:var(--accent); color:#fff;}
+.lang-opt.is-active, .theme-opt.is-active{background:var(--accent); color:#fff;}
+.theme-opt{font-size:13px; padding:3px 10px;}
 
 /* ── filter panel ── */
 .filter-panel{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.9rem 1.1rem; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:0.6rem; }
@@ -422,7 +427,7 @@ td.cell .chip2.pos-gold{box-shadow: inset 0 0 0 1.5px var(--gold);}
 
 <div class="page">
   <header class="masthead">
-    %LANG_SWITCH%
+    %SWITCH_ROW%
     <a class="back" href="index.html">&larr; RFFM data</a>
     <span class="eyebrow"><span data-i18n="eyebrow">RFFM (Мадрид) &middot; клубы по дивизионам</span></span>
     <h1><span data-i18n="h1">Карта клубов по дивизионам</span></h1>
@@ -742,7 +747,7 @@ function renderStats() {
 }
 
 // "Grupo 2" before "Grupo 10" — plain string sort would put "10" before "2".
-function natCompare(a, b) {
+function fullNatCompare(a, b) {
   const re = /(\d+)|(\D+)/g;
   const ax = [], bx = [];
   let m;
@@ -756,6 +761,17 @@ function natCompare(a, b) {
     if (cmp) return cmp;
   }
   return 0;
+}
+// Group by the group's own number first ("Grupo 3" and "Subgrupo 3 B" both
+// stay together as group 3) — comparing the raw strings token-by-token put
+// "Grupo 3" before "Subgrupo 3 A/B" *only when the prefixes tied*, so a
+// later "Grupo 4"/"Subgrupo 4" would sort in between and split group 3 up.
+function groupNum(s) {
+  const m = /\d+/.exec(s);
+  return m ? parseInt(m[0], 10) : Infinity;
+}
+function natCompare(a, b) {
+  return (groupNum(a) - groupNum(b)) || fullNatCompare(a, b);
 }
 
 function teamCardLink(tid, name) {
@@ -886,6 +902,8 @@ document.querySelectorAll('.lang-opt').forEach(function (btn) {
   });
 });
 
+%THEME_SWITCH_JS%
+
 loadSeason(SEASONS[SEASONS.length - 1]);
 </script>
 </body>
@@ -918,7 +936,9 @@ def build_html(seasons: list[str]) -> str:
     i18n_es = I18N_ES
     return (HTML
             .replace("%FONT_LINKS%", FONT_LINKS)
-            .replace("%LANG_SWITCH%", lang_switch_html())
+            .replace("%THEME_INIT%", THEME_INIT_JS)
+            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
+            .replace("%SWITCH_ROW%", switch_row_html())
             .replace("%SEASONS_JSON%", json.dumps(seasons))
             .replace("%DEFAULT_CATS_JSON%", json.dumps(sorted(DEFAULT_CATEGORIES)))
             .replace("%CAT_ORDER_JSON%", json.dumps(CATEGORIES))

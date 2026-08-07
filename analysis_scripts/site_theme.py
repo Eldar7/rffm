@@ -128,14 +128,16 @@ CSS = """
   .masthead .scope b { color: var(--ink); font-weight: 700; }
   .scope-block { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 
-  .lang-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
-  .lang-opt {
+  .switch-row { display: flex; gap: 8px; align-items: center; }
+  .lang-switch, .theme-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .lang-opt, .theme-opt {
     font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; padding: 4px 12px; background: var(--surface);
-    color: var(--ink-muted); border: none; cursor: pointer;
+    color: var(--ink-muted); border: none; cursor: pointer; line-height: 1.4;
   }
-  .lang-opt.is-active { background: var(--accent); color: var(--accent-ink); }
-  .lang-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .lang-opt.is-active, .theme-opt.is-active { background: var(--accent); color: var(--accent-ink); }
+  .lang-opt:focus-visible, .theme-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .theme-opt { font-size: 13px; padding: 3px 10px; }
 
   .stat-strip {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
@@ -305,6 +307,21 @@ def lang_switch_html(active: str = "ru") -> str:
     )
 
 
+def theme_switch_html() -> str:
+    """Light/dark toggle buttons; drop next to lang_switch_html() output."""
+    return (
+        '<div class="theme-switch" role="group" aria-label="Theme / Tema">'
+        '<button type="button" class="theme-opt" data-theme-btn="light" title="Light / Claro">&#9728;</button>'
+        '<button type="button" class="theme-opt" data-theme-btn="dark" title="Dark / Oscuro">&#9790;</button>'
+        "</div>"
+    )
+
+
+def switch_row_html(active_lang: str = "ru") -> str:
+    """lang_switch_html() + theme_switch_html() side by side in one row."""
+    return f'<div class="switch-row">{lang_switch_html(active_lang)}{theme_switch_html()}</div>'
+
+
 # Drop-in JS that wires up [data-i18n] spans against an `I18N_ES` dict
 # (RU text is read from the DOM itself, matching the artifact's approach —
 # no separate RU dict needed since the markup already *is* Russian).
@@ -332,4 +349,38 @@ LANG_SWITCH_JS = r"""
   var saved = null;
   try { saved = localStorage.getItem('rffm_lang'); } catch (e) {}
   if (saved === 'es') apply('es');
+"""
+
+# Placed early in <head> (right after FONT_LINKS) so the saved theme applies
+# before first paint — avoids a flash of the wrong theme on load.
+THEME_INIT_JS = r"""<script>
+(function () {
+  try {
+    var t = localStorage.getItem('rffm_theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+})();
+</script>"""
+
+# Button wiring; drop anywhere after theme_switch_html()'s markup exists in the DOM.
+THEME_SWITCH_JS = r"""
+  function rffmApplyTheme(theme) {
+    if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+    else delete document.documentElement.dataset.theme;
+    document.querySelectorAll('.theme-opt').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.getAttribute('data-theme-btn') === theme);
+    });
+    try { localStorage.setItem('rffm_theme', theme); } catch (e) {}
+  }
+  document.querySelectorAll('.theme-opt').forEach(function (btn) {
+    btn.addEventListener('click', function () { rffmApplyTheme(btn.getAttribute('data-theme-btn')); });
+  });
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('rffm_theme'); } catch (e) {}
+    var current = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.querySelectorAll('.theme-opt').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.getAttribute('data-theme-btn') === current);
+    });
+  })();
 """
