@@ -741,6 +741,23 @@ function renderStats() {
   ).join('');
 }
 
+// "Grupo 2" before "Grupo 10" — plain string sort would put "10" before "2".
+function natCompare(a, b) {
+  const re = /(\d+)|(\D+)/g;
+  const ax = [], bx = [];
+  let m;
+  while ((m = re.exec(a))) ax.push(m[1] ? [parseInt(m[1], 10), ''] : [-1, m[2]]);
+  re.lastIndex = 0;
+  while ((m = re.exec(b))) bx.push(m[1] ? [parseInt(m[1], 10), ''] : [-1, m[2]]);
+  const len = Math.max(ax.length, bx.length);
+  for (let i = 0; i < len; i++) {
+    const an = ax[i] || [-1, ''], bn = bx[i] || [-1, ''];
+    const cmp = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+    if (cmp) return cmp;
+  }
+  return 0;
+}
+
 function teamCardLink(tid, name) {
   return tid ? `<a href="https://www.rffm.es/fichaequipo/${tid}" target="_blank" rel="noopener">${name}</a>` : name;
 }
@@ -786,7 +803,9 @@ function openClubModal(club) {
     const divsSorted = [...byDiv.keys()].sort((a, b) => DIV_ORDER_JS.indexOf(a) - DIV_ORDER_JS.indexOf(b));
     divsSorted.forEach(div => {
       teamsHtml += `<div class="modal-div-h">${divLabel(div)}</div>`;
-      teamsHtml += byDiv.get(div).map(t =>
+      const rows = byDiv.get(div).slice().sort((a, b) =>
+        natCompare(a.grp || '', b.grp || '') || String(a.team).localeCompare(String(b.team)));
+      teamsHtml += rows.map(t =>
         `<div class="modal-team-row"><span>${teamCardLink(t.tid, esc(t.team))} <span style="color:var(--ink-faint)">&middot; ${groupCalLink(t)} &middot; ${t.gt}</span></span>${posBadgeHtml(t.pos, t.size)}</div>`
       ).join('');
     });
