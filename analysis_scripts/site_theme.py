@@ -294,6 +294,259 @@ CSS = """
   }
 """
 
+# Excel-style column sort + autofilter for any <table class="dtable"> with
+# data-key/data-type on its <th>s and matching data-col/data-v/data-label
+# on its <td>s. Self-contained (no deps), reusable across report pages —
+# see rffmInitDataTable()'s docstring-equivalent comment in DATATABLE_JS for
+# the markup contract. Token names (--line-strong, --ink-faint) fall back to
+# this module's base tokens (--line, --ink-muted) for pages that don't
+# define the finer-grained set team_cards.py's own <style> block uses.
+DATATABLE_CSS = """
+  table.dtable thead th[data-key] { position: relative; padding-right: 1.7rem; }
+  table.dtable thead th[data-key] .dt-btn {
+    position: absolute; right: 0.15rem; top: 50%; transform: translateY(-50%);
+    width: 1.15rem; height: 1.15rem; border: none; background: transparent; cursor: pointer;
+    color: var(--ink-faint, var(--ink-muted)); font-size: 0.62rem; border-radius: 3px; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0;
+  }
+  table.dtable thead th[data-key] .dt-btn:hover { background: var(--accent-soft, var(--surface-2)); color: var(--accent); }
+  table.dtable thead th[data-key] .dt-btn::after { content: "\\25BE"; }
+  table.dtable thead th[data-key].dt-sorted-asc .dt-btn::after { content: "\\25B4"; }
+  table.dtable thead th[data-key].dt-sorted-desc .dt-btn::after { content: "\\25BE"; }
+  table.dtable thead th[data-key].dt-sorted-asc .dt-btn, table.dtable thead th[data-key].dt-sorted-desc .dt-btn { color: var(--accent); }
+  table.dtable thead th[data-key].dt-filtered .dt-btn { color: var(--accent); font-weight: 700; }
+  .dt-pop {
+    position: fixed; z-index: 1000; background: var(--surface);
+    border: 1px solid var(--line-strong, var(--line)); border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28); padding: 0.55rem; width: 15.5rem;
+    font-size: 0.8rem; color: var(--ink); display: none; font-family: inherit;
+  }
+  .dt-pop.open { display: block; }
+  .dt-pop .dt-sortrow { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; }
+  .dt-pop .dt-sortrow button {
+    flex: 1; font-family: inherit; font-size: 0.72rem; padding: 0.3rem 0.3rem; border-radius: 5px;
+    border: 1px solid var(--line-strong, var(--line)); background: var(--surface); color: var(--ink); cursor: pointer;
+  }
+  .dt-pop .dt-sortrow button:hover { border-color: var(--accent); color: var(--accent); }
+  .dt-pop input[type="search"] {
+    width: 100%; box-sizing: border-box; padding: 0.3rem 0.5rem; margin-bottom: 0.4rem; border-radius: 5px;
+    border: 1px solid var(--line-strong, var(--line)); background: var(--bg); color: var(--ink);
+    font-family: inherit; font-size: 0.78rem;
+  }
+  .dt-pop .dt-list {
+    max-height: 12rem; overflow: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 0.3rem 0; margin-bottom: 0.4rem;
+  }
+  .dt-pop .dt-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.15rem 0.1rem; cursor: pointer; }
+  .dt-pop .dt-item input { margin: 0; flex: none; }
+  .dt-pop .dt-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dt-pop .dt-actions { display: flex; justify-content: space-between; gap: 0.4rem; }
+  .dt-pop .dt-actions button {
+    font-family: inherit; font-size: 0.74rem; padding: 0.3rem 0.6rem; border-radius: 5px; cursor: pointer;
+    border: 1px solid var(--line-strong, var(--line)); background: var(--surface); color: var(--ink);
+  }
+  .dt-pop .dt-actions button.dt-apply { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
+  .dt-count { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.78rem; font-weight: 700; }
+"""
+
+# rffmInitDataTable(table, opts) turns any <table class="dtable"> into an
+# Excel-style grid: click a header's little ▾ to get a popover with
+# sort-ascending/descending buttons and a searchable checkbox list of that
+# column's distinct values (an autofilter, not just a free-text filter —
+# matches what "как в Excel" actually means). Markup contract:
+#   <table class="dtable"><thead><tr>
+#     <th data-key="goals" data-type="number"><span>Голы</span></th>
+#   </tr></thead><tbody>
+#     <tr><td data-col="goals" data-v="3">3</td></tr>
+#   </tbody></table>
+# data-type is "number" (parseFloat + numeric compare, NaN sorts last) or
+# "text" (locale compare). data-v is the sort/filter value; falls back to
+# the cell's textContent when absent. data-label overrides the text shown
+# in the filter checkbox list (defaults to data-v/textContent too) — use it
+# when a column's filter should group by something coarser than its literal
+# display text (e.g. grouping a "3:2" score cell's checkbox under "Win").
+# The header text must live in a child element (e.g. a <span data-i18n=...>)
+# rather than directly in the <th>, otherwise this project's language
+# switcher (LANG_SWITCH_JS, which does el.innerHTML = ... on [data-i18n]
+# elements) will wipe out the appended ▾ button on every RU/ES toggle.
+# Re-calling this on the same <table> (e.g. after re-rendering its rows)
+# safely tears down the previous instance first via table._rffmDt.destroy().
+DATATABLE_JS = r"""
+function rffmInitDataTable(table, opts) {
+  if (!table) return null;
+  if (table._rffmDt) table._rffmDt.destroy();
+  opts = opts || {};
+  var labels = Object.assign({
+    asc: '▲ A→Z', desc: '▼ Z→A', selectAll: '(все)',
+    search: '...', apply: 'OK', clear: '✕', empty: '(пусто)'
+  }, opts.labels || {});
+  var thead = table.tHead, tbody = table.tBodies[0];
+  if (!thead || !tbody) return null;
+  var ths = Array.prototype.slice.call(thead.querySelectorAll('th[data-key]'));
+  var state = { sortKey: null, sortDir: 1, filters: {} };
+  var pop = document.createElement('div');
+  pop.className = 'dt-pop';
+  document.body.appendChild(pop);
+  var openKey = null;
+
+  function colCell(tr, key) { return tr.querySelector('[data-col="' + key + '"]'); }
+  function cellVal(tr, key) {
+    var td = colCell(tr, key);
+    if (!td) return '';
+    var v = td.getAttribute('data-v');
+    return v === null ? td.textContent.trim() : v;
+  }
+  function cellLabel(tr, key) {
+    var td = colCell(tr, key);
+    if (!td) return '';
+    var l = td.getAttribute('data-label');
+    return l !== null ? l : cellVal(tr, key);
+  }
+  function rows() { return Array.prototype.slice.call(tbody.rows); }
+  function closePop() { pop.classList.remove('open'); openKey = null; }
+
+  function distinct(key) {
+    var map = new Map();
+    rows().forEach(function (tr) {
+      var v = cellVal(tr, key), l = cellLabel(tr, key);
+      if (!map.has(v)) map.set(v, l);
+    });
+    return map;
+  }
+
+  function apply() {
+    var rs = rows();
+    rs.forEach(function (tr) {
+      var visible = true;
+      for (var key in state.filters) {
+        var allowed = state.filters[key];
+        if (!allowed) continue;
+        if (!allowed.has(cellVal(tr, key))) { visible = false; break; }
+      }
+      tr.style.display = visible ? '' : 'none';
+    });
+    if (state.sortKey) {
+      var th = ths.filter(function (t) { return t.dataset.key === state.sortKey; })[0];
+      var type = th ? th.dataset.type : 'text';
+      rs.sort(function (a, b) {
+        var av = cellVal(a, state.sortKey), bv = cellVal(b, state.sortKey), cmp;
+        if (type === 'number') {
+          var an = parseFloat(av), bn = parseFloat(bv);
+          var aNaN = isNaN(an), bNaN = isNaN(bn);
+          cmp = (aNaN && bNaN) ? 0 : aNaN ? 1 : bNaN ? -1 : (an - bn);
+        } else {
+          cmp = String(av).localeCompare(String(bv), 'ru');
+        }
+        return cmp * state.sortDir;
+      });
+      rs.forEach(function (tr) { tbody.appendChild(tr); });
+    }
+    ths.forEach(function (th) {
+      var key = th.dataset.key;
+      th.classList.toggle('dt-sorted-asc', state.sortKey === key && state.sortDir === 1);
+      th.classList.toggle('dt-sorted-desc', state.sortKey === key && state.sortDir === -1);
+      th.classList.toggle('dt-filtered', !!state.filters[key]);
+    });
+    if (opts.onChange) {
+      var visible = rs.filter(function (tr) { return tr.style.display !== 'none'; }).length;
+      opts.onChange(visible, rs.length);
+    }
+  }
+
+  function openPopover(th) {
+    var key = th.dataset.key, type = th.dataset.type || 'text';
+    openKey = key;
+    var values = distinct(key);
+    var entries = Array.from(values.entries());
+    entries.sort(function (a, b) {
+      if (type === 'number') return parseFloat(a[0]) - parseFloat(b[0]);
+      return String(a[1]).localeCompare(String(b[1]), 'ru');
+    });
+    var active = state.filters[key];
+    var html = '<div class="dt-sortrow">'
+      + '<button type="button" data-act="asc">' + labels.asc + '</button>'
+      + '<button type="button" data-act="desc">' + labels.desc + '</button></div>'
+      + '<input type="search" placeholder="' + labels.search + '">'
+      + '<div class="dt-list">'
+      + '<label class="dt-item"><input type="checkbox" data-all checked><span><b>' + labels.selectAll + '</b></span></label>'
+      + entries.map(function (e) {
+          var checked = !active || active.has(e[0]);
+          var label = e[1] === '' ? labels.empty : e[1];
+          return '<label class="dt-item" data-val="' + String(e[0]).replace(/"/g, '&quot;') + '">'
+            + '<input type="checkbox" ' + (checked ? 'checked' : '') + '><span>' + label + '</span></label>';
+        }).join('')
+      + '</div>'
+      + '<div class="dt-actions"><button type="button" data-act="clear">' + labels.clear + '</button>'
+      + '<button type="button" class="dt-apply" data-act="apply">' + labels.apply + '</button></div>';
+    pop.innerHTML = html;
+    var r = th.getBoundingClientRect();
+    pop.style.left = Math.max(4, Math.min(r.left, window.innerWidth - 260)) + 'px';
+    pop.style.top = (r.bottom + 4) + 'px';
+    pop.classList.add('open');
+
+    pop.querySelector('input[type="search"]').addEventListener('input', function (e) {
+      var q = e.target.value.toLowerCase();
+      pop.querySelectorAll('.dt-list .dt-item[data-val]').forEach(function (el) {
+        el.style.display = el.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : '';
+      });
+    });
+    pop.querySelector('[data-all]').addEventListener('change', function (e) {
+      pop.querySelectorAll('.dt-list .dt-item[data-val] input').forEach(function (cb) { cb.checked = e.target.checked; });
+    });
+    pop.querySelectorAll('.dt-sortrow button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.sortKey = key; state.sortDir = btn.dataset.act === 'asc' ? 1 : -1;
+        apply(); closePop();
+      });
+    });
+    pop.querySelector('[data-act="clear"]').addEventListener('click', function () {
+      delete state.filters[key]; apply(); closePop();
+    });
+    pop.querySelector('[data-act="apply"]').addEventListener('click', function () {
+      var checked = new Set(); var anyUnchecked = false;
+      pop.querySelectorAll('.dt-list .dt-item[data-val]').forEach(function (el) {
+        var cb = el.querySelector('input');
+        if (cb.checked) checked.add(el.getAttribute('data-val')); else anyUnchecked = true;
+      });
+      state.filters[key] = anyUnchecked ? checked : null;
+      apply(); closePop();
+    });
+  }
+
+  var btns = [];
+  ths.forEach(function (th) {
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'dt-btn';
+    var handler = function (e) {
+      e.stopPropagation();
+      if (openKey === th.dataset.key) closePop(); else openPopover(th);
+    };
+    btn.addEventListener('click', handler);
+    th.appendChild(btn);
+    btns.push({ btn: btn, handler: handler });
+  });
+
+  function onDocClick(e) { if (openKey && !pop.contains(e.target)) closePop(); }
+  function onScroll() { if (openKey) closePop(); }
+  document.addEventListener('click', onDocClick);
+  window.addEventListener('scroll', onScroll, true);
+
+  apply();
+
+  var instance = {
+    refresh: apply,
+    destroy: function () {
+      document.removeEventListener('click', onDocClick);
+      window.removeEventListener('scroll', onScroll, true);
+      btns.forEach(function (o) { o.btn.removeEventListener('click', o.handler); o.btn.remove(); });
+      pop.remove();
+    }
+  };
+  table._rffmDt = instance;
+  return instance;
+}
+"""
+
 
 def club_slug_map(club_names: list[str]) -> dict[str, str]:
     """Deterministic club_name_raw -> URL-safe slug, stable across scripts

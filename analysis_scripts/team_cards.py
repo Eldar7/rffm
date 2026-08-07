@@ -33,7 +33,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from site_theme import FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
+from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
+                         THEME_SWITCH_JS, club_slug_map, switch_row_html)
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -133,6 +134,13 @@ I18N_ES = {
     "h_roster": "Plantilla por partido",
     "roster_p": "Filas — jugadores, columnas — partidos de la temporada. Círculo relleno — titular, círculo hueco — "
                 "suplente que entró, borde dorado — capitán, número al lado — goles marcados, barra — tarjeta.",
+    "h_summary": "Resumen por jugador",
+    "summary_p": "Calculado a partir de las convocatorias (sin datos de minutos jugados ni asistencias, que la "
+                 "fuente no registra). “Partidos” cuenta partidos ya finalizados. Haz clic en ▾ de "
+                 "cualquier columna para ordenar o filtrar, como en Excel.",
+    "sh_jersey": "Nº", "sh_name": "Jugador", "sh_apps": "Partidos", "sh_starts": "Titular", "sh_sub": "Suplente",
+    "sh_goals": "Goles", "sh_gpa": "Goles/partido", "sh_y": "A", "sh_r": "R", "sh_dy": "2A",
+    "sh_cap": "Capitán", "sh_gk": "Portero", "sh_cs": "Imbatido", "sh_ppg": "Puntos/partido",
     "footer": 'Construido a partir de <code>output/processed/rffm/matches.csv</code> y '
               '<code>match_lineups/match_goals/match_cards</code>. Ver <code>analysis_scripts/team_cards.py</code>, '
               '<code>analysis_scripts/team_rosters.py</code>.',
@@ -256,6 +264,10 @@ td.cell-mark{text-align:center;}
 .mark-card.roja{background:var(--loss);}
 .mark-card.doble-amarilla{background:linear-gradient(180deg, var(--draw) 50%, var(--loss) 50%);}
 .matrix-loading, .matrix-empty{padding:1.5rem; text-align:center; color:var(--ink-faint);}
+.summary-scroll{overflow:auto;}
+table.dtable{font-size:0.82rem;}
+table.dtable td{white-space:nowrap;}
+%DATATABLE_CSS%
 </style>
 </head>
 <body>
@@ -274,15 +286,15 @@ td.cell-mark{text-align:center;}
   </div>
 
   <section class="tab-pane active" id="paneMatches">
-    <div class="section-h"><h2 data-i18n="h_matches">Матчи сезона</h2><span class="n" id="matchCount"></span></div>
+    <div class="section-h"><h2 data-i18n="h_matches">Матчи сезона</h2><span class="n dt-count" id="matchCount"></span></div>
     <div class="table-shell">
-      <table id="matchTable">
+      <table id="matchTable" class="dtable">
         <thead><tr>
-          <th data-i18n="th_date">Дата</th>
-          <th data-i18n="th_ha">Д/В</th>
-          <th data-i18n="th_opp">Соперник</th>
-          <th data-i18n="th_score">Результат</th>
-          <th data-i18n="th_comp">Соревнование</th>
+          <th data-key="date" data-type="text"><span data-i18n="th_date">Дата</span></th>
+          <th data-key="ha" data-type="text"><span data-i18n="th_ha">Д/В</span></th>
+          <th data-key="opp" data-type="text"><span data-i18n="th_opp">Соперник</span></th>
+          <th data-key="score" data-type="number"><span data-i18n="th_score">Результат</span></th>
+          <th data-key="comp" data-type="text"><span data-i18n="th_comp">Соревнование</span></th>
         </tr></thead>
         <tbody id="matchBody"><tr><td class="empty-state" colspan="5" data-i18n="loading">Загрузка…</td></tr></tbody>
       </table>
@@ -290,7 +302,37 @@ td.cell-mark{text-align:center;}
   </section>
 
   <section class="tab-pane" id="paneRoster">
-    <div class="section-h"><h2 data-i18n="h_roster">Состав по матчам</h2><span class="n" id="rosterCount"></span></div>
+    <div class="section-h"><h2 data-i18n="h_summary">Итоги по игрокам</h2><span class="n dt-count" id="summaryCount"></span></div>
+    <p style="color:var(--ink-soft); font-size:0.82rem; max-width:70ch; margin:0 0 0.8rem;" data-i18n="summary_p">
+      Считается по количеству выходов на поле (без игрового времени и передач — в источнике их нет).
+      «Явка» учитывает только уже сыгранные матчи. Клик по ▾ в заголовке любой колонки — сортировка и
+      фильтр по значениям, как в Excel.
+    </p>
+    <div class="table-shell">
+      <div class="summary-scroll">
+        <table id="summaryTable" class="dtable">
+          <thead><tr>
+            <th data-key="jersey" data-type="number"><span data-i18n="sh_jersey">№</span></th>
+            <th data-key="name" data-type="text"><span data-i18n="sh_name">Игрок</span></th>
+            <th data-key="apps" data-type="number"><span data-i18n="sh_apps">Явка</span></th>
+            <th data-key="starts" data-type="number"><span data-i18n="sh_starts">Старт</span></th>
+            <th data-key="subapps" data-type="number"><span data-i18n="sh_sub">Скамейка</span></th>
+            <th data-key="goals" data-type="number"><span data-i18n="sh_goals">Голы</span></th>
+            <th data-key="goalsperapp" data-type="number"><span data-i18n="sh_gpa">Гол/явка</span></th>
+            <th data-key="yellow" data-type="number" title="Жёлтые карточки"><span data-i18n="sh_y">Ж</span></th>
+            <th data-key="red" data-type="number" title="Красные карточки"><span data-i18n="sh_r">К</span></th>
+            <th data-key="dy" data-type="number" title="Вторые жёлтые"><span data-i18n="sh_dy">2Ж</span></th>
+            <th data-key="cap" data-type="number"><span data-i18n="sh_cap">Капитан</span></th>
+            <th data-key="gkapps" data-type="number"><span data-i18n="sh_gk">На воротах</span></th>
+            <th data-key="cs" data-type="number"><span data-i18n="sh_cs">Сухие</span></th>
+            <th data-key="ppg" data-type="number"><span data-i18n="sh_ppg">Очки/игру</span></th>
+          </tr></thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-h" style="margin-top:1.6rem;"><h2 data-i18n="h_roster">Состав по матчам</h2><span class="n" id="rosterCount"></span></div>
     <p style="color:var(--ink-soft); font-size:0.82rem; max-width:70ch; margin:0 0 0.8rem;" data-i18n="roster_p">
       Строки — игроки, столбцы — матчи сезона. Закрашенный кружок — в старте, пустой — вышел на замену,
       золотая обводка — капитан, число рядом — забитые голы, полоска — карточка.
@@ -309,15 +351,23 @@ td.cell-mark{text-align:center;}
 <script>
 const LANG = {
   ru: { loading: 'Загрузка…', notFound: 'Нет данных об этой команде в этом сезоне.',
-        home: 'Дома', away: 'В гостях', scheduled: 'ещё не сыгран' },
+        home: 'Дома', away: 'В гостях', scheduled: 'ещё не сыгран',
+        win: 'Победа', draw: 'Ничья', loss: 'Поражение' },
   es: { loading: 'Cargando…', notFound: 'No se encontraron datos para este equipo en esta temporada.',
-        home: 'Local', away: 'Visitante', scheduled: 'por jugar' },
+        home: 'Local', away: 'Visitante', scheduled: 'por jugar',
+        win: 'Victoria', draw: 'Empate', loss: 'Derrota' },
+};
+const DT_LABELS = {
+  ru: { asc: '▲ по возрастанию', desc: '▼ по убыванию', selectAll: '(все)', search: 'Поиск…', apply: 'Применить', clear: 'Сбросить', empty: '(пусто)' },
+  es: { asc: '▲ ascendente', desc: '▼ descendente', selectAll: '(todos)', search: 'Buscar…', apply: 'Aplicar', clear: 'Restablecer', empty: '(vacío)' },
 };
 let CURLANG = 'ru';
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
+
+%DATATABLE_JS%
 
 function groupCalUrl(m) {
   if (!(m.season_id && m.comp_id && m.group_id && m.gt_id)) return null;
@@ -336,9 +386,20 @@ function scoreCellHtml(m) {
   return `<span class="score-badge ${cls}">${fmtGoals(m.sf)} : ${fmtGoals(m.sa)}</span>`;
 }
 
+// Numeric rank so the "Результат" column can be sorted/filtered by outcome
+// (Win/Draw/Loss/pending) rather than by literal, mostly-unique score text.
+function resultRank(m) {
+  if (m.status !== 'finished' || !m.result) return -1;
+  return m.result === 'W' ? 3 : m.result === 'D' ? 1 : 0;
+}
+function resultLabel(m) {
+  if (m.status !== 'finished' || !m.result) return LANG[CURLANG].scheduled;
+  return { W: LANG[CURLANG].win, D: LANG[CURLANG].draw, L: LANG[CURLANG].loss }[m.result];
+}
+
 function renderMatches(team) {
-  document.getElementById('matchCount').textContent = team.matches.length;
   if (!team.matches.length) {
+    document.getElementById('matchCount').textContent = '0';
     document.getElementById('matchBody').innerHTML =
       `<tr><td class="empty-state" colspan="5">${LANG[CURLANG].notFound}</td></tr>`;
     return;
@@ -349,14 +410,21 @@ function renderMatches(team) {
       ? `<a href="${url}" target="_blank" rel="noopener" class="comp-name">${esc(m.comp || m.grp || '')}</a>`
       : `<span class="comp-name">${esc(m.comp || m.grp || '')}</span>`;
     const meta = [m.grp, m.gt].filter(Boolean).map(esc).join(' &middot; ');
+    const compText = m.comp || m.grp || '';
     return `<tr>
-      <td class="date-cell">${esc(m.date || '—')}</td>
-      <td><span class="ha-badge">${m.home ? LANG[CURLANG].home : LANG[CURLANG].away}</span></td>
-      <td>${esc(m.opp || '—')}</td>
-      <td class="score-cell">${scoreCellHtml(m)}</td>
-      <td class="comp-cell">${compHtml}${meta ? `<span class="comp-meta">${meta}</span>` : ''}</td>
+      <td class="date-cell" data-col="date" data-v="${esc(m.date || '')}">${esc(m.date || '—')}</td>
+      <td data-col="ha" data-v="${m.home ? 'H' : 'A'}"><span class="ha-badge">${m.home ? LANG[CURLANG].home : LANG[CURLANG].away}</span></td>
+      <td data-col="opp" data-v="${esc(m.opp || '')}">${esc(m.opp || '—')}</td>
+      <td class="score-cell" data-col="score" data-v="${resultRank(m)}" data-label="${esc(resultLabel(m))}">${scoreCellHtml(m)}</td>
+      <td class="comp-cell" data-col="comp" data-v="${esc(compText)}">${compHtml}${meta ? `<span class="comp-meta">${meta}</span>` : ''}</td>
     </tr>`;
   }).join('');
+  rffmInitDataTable(document.getElementById('matchTable'), {
+    labels: DT_LABELS[CURLANG],
+    onChange: (visible, total) => {
+      document.getElementById('matchCount').textContent = visible === total ? String(total) : `${visible}/${total}`;
+    },
+  });
 }
 
 let CUR_SEASON = null, CUR_TEAM_ID = null, CUR_TEAM = null, ROSTER_PAYLOAD = null, ROSTER_LOADING = false;
@@ -371,6 +439,86 @@ function cardClass(label) {
   if (label === 'roja') return 'roja';
   if (label === 'doble amarilla' || label === 'doble_amarilla') return 'doble-amarilla';
   return 'amarilla';
+}
+
+// Per-player aggregates for the summary table, derived entirely from the
+// already-loaded match list + roster/lineups matrix (no extra fetch). Only
+// counts matches with status === 'finished' as "played" — a scheduled
+// fixture can't contribute to anyone's appearance tally. Appearance and
+// starter/sub numbers come straight from is_starter/is_substitute in the
+// source acta (mutually exclusive & always set — verified against the
+// 2025-2026 crawl), but there is no minutes-played or assist data anywhere
+// in the pipeline, so "goals/явка" is deliberately per-appearance, not
+// per-90 — see DATA_DICTIONARY.md's "Known gaps" section.
+function computeStats(pid, matches, lineups) {
+  const played = matches.filter(m => m.status === 'finished');
+  let starts = 0, goals = 0, yellow = 0, red = 0, dy = 0, cap = 0, gkapps = 0, cs = 0, points = 0, resultsN = 0, apps = 0;
+  played.forEach(m => {
+    const cell = (lineups[m.match_id] || {})[pid];
+    if (!cell) return;
+    apps++;
+    if (cell.start) starts++;
+    goals += cell.goals || 0;
+    (cell.cards || []).forEach(c => {
+      if (c === 'roja') red++; else if (c === 'doble amarilla' || c === 'doble_amarilla') dy++; else yellow++;
+    });
+    if (cell.cap) cap++;
+    if (cell.gk) {
+      gkapps++;
+      const sa = m.sa !== null && m.sa !== undefined ? Number(m.sa) : null;
+      if (sa !== null && !isNaN(sa) && sa === 0) cs++;
+    }
+    if (m.result) { points += m.result === 'W' ? 3 : (m.result === 'D' ? 1 : 0); resultsN++; }
+  });
+  return {
+    apps, played: played.length, starts, subapps: apps - starts,
+    appsPct: played.length ? apps / played.length : null,
+    goals, goalsPerApp: apps ? goals / apps : null,
+    yellow, red, dy, cap, gkapps, cs,
+    ppg: resultsN ? points / resultsN : null,
+  };
+}
+
+function renderPlayerSummary() {
+  const tbody = document.getElementById('summaryBody');
+  const roster = Object.entries((ROSTER_PAYLOAD && ROSTER_PAYLOAD.roster) || {});
+  const lineups = (ROSTER_PAYLOAD && ROSTER_PAYLOAD.lineups) || {};
+  const matches = (CUR_TEAM && CUR_TEAM.matches) || [];
+  if (!roster.length) {
+    tbody.innerHTML = '';
+    document.getElementById('summaryCount').textContent = '';
+    return;
+  }
+  const fmt2 = v => v === null ? '—' : v.toFixed(2);
+  tbody.innerHTML = roster.map(([pid, p]) => {
+    const s = computeStats(pid, matches, lineups);
+    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}`;
+    const appsDisplay = s.played
+      ? `${s.apps}/${s.played} (${Math.round((s.appsPct || 0) * 100)}%)`
+      : `${s.apps}/0`;
+    return `<tr>
+      <td data-col="jersey" data-v="${p.jersey ? parseInt(p.jersey, 10) : ''}">${p.jersey ? esc(p.jersey) : '—'}</td>
+      <td data-col="name" data-v="${esc(p.name)}"><a href="${nameUrl}">${esc(p.name)}</a></td>
+      <td data-col="apps" data-v="${s.apps}" data-label="${esc(appsDisplay)}">${appsDisplay}</td>
+      <td data-col="starts" data-v="${s.starts}">${s.starts}</td>
+      <td data-col="subapps" data-v="${s.subapps}">${s.subapps}</td>
+      <td data-col="goals" data-v="${s.goals}">${s.goals}</td>
+      <td data-col="goalsperapp" data-v="${s.goalsPerApp === null ? '' : s.goalsPerApp}">${fmt2(s.goalsPerApp)}</td>
+      <td data-col="yellow" data-v="${s.yellow}">${s.yellow || '—'}</td>
+      <td data-col="red" data-v="${s.red}">${s.red || '—'}</td>
+      <td data-col="dy" data-v="${s.dy}">${s.dy || '—'}</td>
+      <td data-col="cap" data-v="${s.cap}">${s.cap || '—'}</td>
+      <td data-col="gkapps" data-v="${s.gkapps}">${s.gkapps || '—'}</td>
+      <td data-col="cs" data-v="${s.gkapps ? s.cs : ''}">${s.gkapps ? s.cs : '—'}</td>
+      <td data-col="ppg" data-v="${s.ppg === null ? '' : s.ppg}">${fmt2(s.ppg)}</td>
+    </tr>`;
+  }).join('');
+  rffmInitDataTable(document.getElementById('summaryTable'), {
+    labels: DT_LABELS[CURLANG],
+    onChange: (visible, total) => {
+      document.getElementById('summaryCount').textContent = visible === total ? String(total) : `${visible}/${total}`;
+    },
+  });
 }
 
 function renderMatrix() {
@@ -422,7 +570,7 @@ function renderMatrix() {
 }
 
 async function loadRoster() {
-  if (ROSTER_PAYLOAD || ROSTER_LOADING) { renderMatrix(); return; }
+  if (ROSTER_PAYLOAD || ROSTER_LOADING) { renderMatrix(); renderPlayerSummary(); return; }
   ROSTER_LOADING = true;
   const status = document.getElementById('matrixStatus');
   status.textContent = LANG[CURLANG].loading;
@@ -436,6 +584,7 @@ async function loadRoster() {
   }
   ROSTER_LOADING = false;
   renderMatrix();
+  renderPlayerSummary();
 }
 
 document.getElementById('tabBtnMatches').addEventListener('click', function () {
@@ -484,7 +633,7 @@ async function main() {
   document.title = `${team.name} — RFFM`;
   CUR_TEAM = team;
   renderMatches(team);
-  if (document.getElementById('paneRoster').classList.contains('active')) renderMatrix();
+  if (document.getElementById('paneRoster').classList.contains('active')) { renderMatrix(); renderPlayerSummary(); }
 }
 
 (function () {
@@ -513,7 +662,9 @@ def build_html() -> str:
             .replace("%SWITCH_ROW%", switch_row_html())
             .replace("%I18N_ES_JSON%", json.dumps(I18N_ES, ensure_ascii=False))
             .replace("%LANG_SWITCH_JS%", LANG_SWITCH_JS)
-            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS))
+            .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
+            .replace("%DATATABLE_CSS%", DATATABLE_CSS)
+            .replace("%DATATABLE_JS%", DATATABLE_JS))
 
 
 def main():
