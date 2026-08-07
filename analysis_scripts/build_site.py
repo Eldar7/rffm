@@ -23,6 +23,7 @@ import season_comparison
 import club_division_map
 import weird_scores_report
 import competition_structure
+import team_cards
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -236,6 +237,9 @@ def main():
 
     print("Building club_division_map.html...")
     club_division_map.build_all(out_dir)
+
+    print("Building team_card.html...")
+    team_cards.build_all(out_dir)
 
     print("Building competition_structure.html...")
     competition_structure.build_all(out_dir)
