@@ -20364,3 +20364,953 @@ match_id,official_kind,official_id,official_name,role_raw,source_url,scraped_at
 1838731,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838731,2026-08-07T07:20:13.457788+00:00
 1838738,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1838738,2026-08-07T07:20:13.728349+00:00
 1838738,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1838738,2026-08-07T07:20:13.728349+00:00
+1838743,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1838743,2026-08-07T07:20:13.866615+00:00
+1838743,referee,5231666,"MUÑOZ NUÑEZ, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1838743,2026-08-07T07:20:13.866615+00:00
+1838733,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1838733,2026-08-07T07:20:13.886471+00:00
+1838733,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838733,2026-08-07T07:20:13.886471+00:00
+1838739,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838739,2026-08-07T07:20:13.988634+00:00
+1838739,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838739,2026-08-07T07:20:13.988634+00:00
+1838741,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838741,2026-08-07T07:20:14.346339+00:00
+1838741,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838741,2026-08-07T07:20:14.346339+00:00
+1838742,referee,5194621,"VICENTE BUTRAGUEÑO, LUIS JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838742,2026-08-07T07:20:14.347421+00:00
+1838742,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838742,2026-08-07T07:20:14.347421+00:00
+1838737,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838737,2026-08-07T07:20:14.864449+00:00
+1838737,referee,5231892,"MUÑOZ LOPEZ, FRANCISCO",Arbitro asistente,https://www.rffm.es/acta-partido/1838737,2026-08-07T07:20:14.864449+00:00
+1838750,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1838750,2026-08-07T07:20:14.875878+00:00
+1838750,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838750,2026-08-07T07:20:14.875878+00:00
+1838747,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838747,2026-08-07T07:20:15.033786+00:00
+1838747,referee,5001961,"MUÑOZ MONTIJANO, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1838747,2026-08-07T07:20:15.033786+00:00
+1838746,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838746,2026-08-07T07:20:15.113404+00:00
+1838746,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1838746,2026-08-07T07:20:15.113404+00:00
+1838748,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1838748,2026-08-07T07:20:15.212046+00:00
+1838748,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838748,2026-08-07T07:20:15.212046+00:00
+1838740,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838740,2026-08-07T07:20:15.212339+00:00
+1838740,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838740,2026-08-07T07:20:15.212339+00:00
+1838744,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838744,2026-08-07T07:20:15.255999+00:00
+1838744,referee,5237304,"MURESAN, SERGIU LAURIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1838744,2026-08-07T07:20:15.255999+00:00
+1838745,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838745,2026-08-07T07:20:15.663499+00:00
+1838745,referee,5256049,"DIAZ DE ANDRES, CLAUDIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838745,2026-08-07T07:20:15.663499+00:00
+1838752,referee,5001870,"ARAGON GONZALEZ, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838752,2026-08-07T07:20:16.003184+00:00
+1838752,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1838752,2026-08-07T07:20:16.003184+00:00
+1838749,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838749,2026-08-07T07:20:16.029472+00:00
+1838749,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838749,2026-08-07T07:20:16.029472+00:00
+1838751,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838751,2026-08-07T07:20:16.104647+00:00
+1838751,referee,5236655,"LOZANO CEBADA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838751,2026-08-07T07:20:16.104647+00:00
+1838753,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1838753,2026-08-07T07:20:16.312767+00:00
+1838753,referee,5249556,"MORENO CUELLAR, JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1838753,2026-08-07T07:20:16.312767+00:00
+1838756,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1838756,2026-08-07T07:20:16.363714+00:00
+1838756,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838756,2026-08-07T07:20:16.363714+00:00
+1838754,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838754,2026-08-07T07:20:16.633659+00:00
+1838754,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838754,2026-08-07T07:20:16.633659+00:00
+1838757,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838757,2026-08-07T07:20:16.667716+00:00
+1838757,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838757,2026-08-07T07:20:16.667716+00:00
+1838755,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838755,2026-08-07T07:20:16.738692+00:00
+1838755,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838755,2026-08-07T07:20:16.738692+00:00
+1838759,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838759,2026-08-07T07:20:17.434484+00:00
+1838759,referee,5266471,"CASTRO ARROYO, JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1838759,2026-08-07T07:20:17.434484+00:00
+1838758,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838758,2026-08-07T07:20:17.442972+00:00
+1838758,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838758,2026-08-07T07:20:17.442972+00:00
+1838764,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1838764,2026-08-07T07:20:17.445358+00:00
+1838764,referee,5171918,"BANCU , GEORGIANA ALINA",Arbitro asistente,https://www.rffm.es/acta-partido/1838764,2026-08-07T07:20:17.445358+00:00
+1838763,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838763,2026-08-07T07:20:17.573277+00:00
+1838763,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1838763,2026-08-07T07:20:17.573277+00:00
+1838761,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838761,2026-08-07T07:20:17.838851+00:00
+1838761,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1838761,2026-08-07T07:20:17.838851+00:00
+1838762,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838762,2026-08-07T07:20:17.843679+00:00
+1838762,referee,5266471,"CASTRO ARROYO, JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1838762,2026-08-07T07:20:17.843679+00:00
+1838760,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838760,2026-08-07T07:20:18.297361+00:00
+1838760,referee,5237304,"MURESAN, SERGIU LAURIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1838760,2026-08-07T07:20:18.297361+00:00
+1838769,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838769,2026-08-07T07:20:18.840142+00:00
+1838769,referee,5237304,"MURESAN, SERGIU LAURIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1838769,2026-08-07T07:20:18.840142+00:00
+1838767,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1838767,2026-08-07T07:20:18.871136+00:00
+1838767,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838767,2026-08-07T07:20:18.871136+00:00
+1838765,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838765,2026-08-07T07:20:19.035897+00:00
+1838765,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838765,2026-08-07T07:20:19.035897+00:00
+1838770,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1838770,2026-08-07T07:20:19.042534+00:00
+1838770,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1838770,2026-08-07T07:20:19.042534+00:00
+1838776,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838776,2026-08-07T07:20:19.050242+00:00
+1838776,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838776,2026-08-07T07:20:19.050242+00:00
+1838771,referee,5083541,"CELADOR HERNANDEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1838771,2026-08-07T07:20:19.080053+00:00
+1838771,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838771,2026-08-07T07:20:19.080053+00:00
+1838768,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838768,2026-08-07T07:20:19.395037+00:00
+1838768,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838768,2026-08-07T07:20:19.395037+00:00
+1838766,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838766,2026-08-07T07:20:19.425646+00:00
+1838766,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838766,2026-08-07T07:20:19.425646+00:00
+1838775,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838775,2026-08-07T07:20:19.717205+00:00
+1838775,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1838775,2026-08-07T07:20:19.717205+00:00
+1838774,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1838774,2026-08-07T07:20:19.753524+00:00
+1838774,referee,5266477,"BONET RODRIGUEZ, SAMUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838774,2026-08-07T07:20:19.753524+00:00
+1838780,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838780,2026-08-07T07:20:19.902229+00:00
+1838780,referee,5266477,"BONET RODRIGUEZ, SAMUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838780,2026-08-07T07:20:19.902229+00:00
+1838784,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838784,2026-08-07T07:20:19.906942+00:00
+1838784,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838784,2026-08-07T07:20:19.906942+00:00
+1838777,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838777,2026-08-07T07:20:20.035719+00:00
+1838777,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838777,2026-08-07T07:20:20.035719+00:00
+1838772,referee,5002513,"ORTIZ MARQUEZ, GABRIEL",Arbitro principal,https://www.rffm.es/acta-partido/1838772,2026-08-07T07:20:20.075154+00:00
+1838772,referee,5249690,"PEREZ HITA, LUIS MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838772,2026-08-07T07:20:20.075154+00:00
+1838773,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838773,2026-08-07T07:20:20.140634+00:00
+1838773,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838773,2026-08-07T07:20:20.140634+00:00
+1838778,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838778,2026-08-07T07:20:20.209578+00:00
+1838778,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838778,2026-08-07T07:20:20.209578+00:00
+1838783,referee,5000866,"ARANCE GARCIA, JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838783,2026-08-07T07:20:20.898371+00:00
+1838783,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1838783,2026-08-07T07:20:20.898371+00:00
+1838782,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838782,2026-08-07T07:20:20.998690+00:00
+1838782,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838782,2026-08-07T07:20:20.998690+00:00
+1838781,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1838781,2026-08-07T07:20:21.166957+00:00
+1838781,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838781,2026-08-07T07:20:21.166957+00:00
+1838779,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838779,2026-08-07T07:20:21.170994+00:00
+1838779,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838779,2026-08-07T07:20:21.170994+00:00
+1838787,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1838787,2026-08-07T07:20:21.560287+00:00
+1838787,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838787,2026-08-07T07:20:21.560287+00:00
+1838791,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838791,2026-08-07T07:20:21.627338+00:00
+1838791,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838791,2026-08-07T07:20:21.627338+00:00
+1838792,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838792,2026-08-07T07:20:21.681053+00:00
+1838792,referee,5266401,"VENTURA VERDERICO, AUGUSTO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838792,2026-08-07T07:20:21.681053+00:00
+1838785,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838785,2026-08-07T07:20:21.836931+00:00
+1838785,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1838785,2026-08-07T07:20:21.836931+00:00
+1838788,referee,5083541,"CELADOR HERNANDEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1838788,2026-08-07T07:20:22.297399+00:00
+1838788,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1838788,2026-08-07T07:20:22.297399+00:00
+1838799,referee,5113231,"LOPEZ SERNA, MIGUEL ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838799,2026-08-07T07:20:22.678208+00:00
+1838799,referee,5249493,"RODRIGUEZ GUERRERO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838799,2026-08-07T07:20:22.678208+00:00
+1838798,referee,5144762,"GARRO CASTRO, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838798,2026-08-07T07:20:22.694254+00:00
+1838798,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838798,2026-08-07T07:20:22.694254+00:00
+1838789,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1838789,2026-08-07T07:20:22.730280+00:00
+1838789,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838789,2026-08-07T07:20:22.730280+00:00
+1838786,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1838786,2026-08-07T07:20:22.790965+00:00
+1838786,referee,5266394,"VENTURA VERDERICO, ADRIANO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838786,2026-08-07T07:20:22.790965+00:00
+1838794,referee,5144979,"OLMOS VILLALBA, PEDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838794,2026-08-07T07:20:22.826878+00:00
+1838794,referee,5002292,"SAN ROMAN DE LOS LLANOS, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838794,2026-08-07T07:20:22.826878+00:00
+1838793,referee,5173583,"GALÁN VELASCO, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838793,2026-08-07T07:20:22.865227+00:00
+1838793,referee,5000400,"SANCHEZ BOMBIN, ANA",Arbitro asistente,https://www.rffm.es/acta-partido/1838793,2026-08-07T07:20:22.865227+00:00
+1838790,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838790,2026-08-07T07:20:23.027848+00:00
+1838790,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838790,2026-08-07T07:20:23.027848+00:00
+1838797,referee,5245145,"ALMAGRO SANCHEZ, ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838797,2026-08-07T07:20:23.349498+00:00
+1838797,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1838797,2026-08-07T07:20:23.349498+00:00
+1838806,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1838806,2026-08-07T07:20:23.418284+00:00
+1838806,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1838806,2026-08-07T07:20:23.418284+00:00
+1838800,referee,5001863,"MAYO LOPEZ, HECTOR",Arbitro principal,https://www.rffm.es/acta-partido/1838800,2026-08-07T07:20:23.611736+00:00
+1838800,referee,5194778,"BAEZ PERANDONES, RUTH",Arbitro asistente,https://www.rffm.es/acta-partido/1838800,2026-08-07T07:20:23.611736+00:00
+1838802,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1838802,2026-08-07T07:20:23.616150+00:00
+1838802,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838802,2026-08-07T07:20:23.616150+00:00
+1838801,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838801,2026-08-07T07:20:23.756207+00:00
+1838801,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838801,2026-08-07T07:20:23.756207+00:00
+1838795,referee,5000598,"DEL OLMO MARTINEZ, IGNACIO",Arbitro principal,https://www.rffm.es/acta-partido/1838795,2026-08-07T07:20:23.849538+00:00
+1838795,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1838795,2026-08-07T07:20:23.849538+00:00
+1838796,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1838796,2026-08-07T07:20:23.910646+00:00
+1838796,referee,5237502,"DE BLAS CASTAÑO, ELENA",Arbitro asistente,https://www.rffm.es/acta-partido/1838796,2026-08-07T07:20:23.910646+00:00
+1838805,referee,5090380,"RIVAS MARTINEZ, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1838805,2026-08-07T07:20:23.942387+00:00
+1838805,referee,5266008,"IRALA CALVO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838805,2026-08-07T07:20:23.942387+00:00
+1838804,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838804,2026-08-07T07:20:24.682763+00:00
+1838804,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838804,2026-08-07T07:20:24.682763+00:00
+1838803,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838803,2026-08-07T07:20:24.708568+00:00
+1838803,referee,5202707,"JIMENEZ SALVADOR, CESAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838803,2026-08-07T07:20:24.708568+00:00
+1838809,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1838809,2026-08-07T07:20:24.865734+00:00
+1838809,referee,5266394,"VENTURA VERDERICO, ADRIANO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838809,2026-08-07T07:20:24.865734+00:00
+1838812,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838812,2026-08-07T07:20:24.959160+00:00
+1838812,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838812,2026-08-07T07:20:24.959160+00:00
+1838808,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838808,2026-08-07T07:20:25.181844+00:00
+1838808,referee,5265429,"NAVARRO MORALES, JESUS",Arbitro asistente,https://www.rffm.es/acta-partido/1838808,2026-08-07T07:20:25.181844+00:00
+1838810,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838810,2026-08-07T07:20:25.368827+00:00
+1838810,referee,5266401,"VENTURA VERDERICO, AUGUSTO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838810,2026-08-07T07:20:25.368827+00:00
+1838813,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838813,2026-08-07T07:20:25.372368+00:00
+1838813,referee,5266008,"IRALA CALVO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838813,2026-08-07T07:20:25.372368+00:00
+1838811,referee,5002642,"SARASUA ALVAREZ, DIEGO",Arbitro principal,https://www.rffm.es/acta-partido/1838811,2026-08-07T07:20:25.376848+00:00
+1838811,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1838811,2026-08-07T07:20:25.376848+00:00
+1838815,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838815,2026-08-07T07:20:25.910063+00:00
+1838815,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838815,2026-08-07T07:20:25.910063+00:00
+1838819,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1838819,2026-08-07T07:20:26.081467+00:00
+1838819,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1838819,2026-08-07T07:20:26.081467+00:00
+1838816,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1838816,2026-08-07T07:20:26.086064+00:00
+1838816,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838816,2026-08-07T07:20:26.086064+00:00
+1838817,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1838817,2026-08-07T07:20:26.487229+00:00
+1838817,referee,5002011,"MARTIN BELCHI, ALEJANDRO LUIS",Arbitro asistente,https://www.rffm.es/acta-partido/1838817,2026-08-07T07:20:26.487229+00:00
+1838820,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838820,2026-08-07T07:20:26.583491+00:00
+1838820,referee,5266394,"VENTURA VERDERICO, ADRIANO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838820,2026-08-07T07:20:26.583491+00:00
+1838814,referee,5226010,"VILLAFRANCA LORENTE, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838814,2026-08-07T07:20:26.642337+00:00
+1838814,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838814,2026-08-07T07:20:26.642337+00:00
+1838818,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838818,2026-08-07T07:20:26.719779+00:00
+1838818,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1838818,2026-08-07T07:20:26.719779+00:00
+1838807,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838807,2026-08-07T07:20:27.023824+00:00
+1838807,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838807,2026-08-07T07:20:27.023824+00:00
+1838825,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838825,2026-08-07T07:20:27.201386+00:00
+1838825,referee,5265419,"DE SALA ARROYO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838825,2026-08-07T07:20:27.201386+00:00
+1838821,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838821,2026-08-07T07:20:27.328116+00:00
+1838821,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838821,2026-08-07T07:20:27.328116+00:00
+1838829,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838829,2026-08-07T07:20:27.501043+00:00
+1838829,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838829,2026-08-07T07:20:27.501043+00:00
+1838826,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838826,2026-08-07T07:20:27.768192+00:00
+1838826,referee,5266429,"CALVENTE FERNANDEZ, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838826,2026-08-07T07:20:27.768192+00:00
+1838823,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838823,2026-08-07T07:20:27.772423+00:00
+1838823,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838823,2026-08-07T07:20:27.772423+00:00
+1838824,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838824,2026-08-07T07:20:27.900922+00:00
+1838824,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838824,2026-08-07T07:20:27.900922+00:00
+1838827,referee,5194621,"VICENTE BUTRAGUEÑO, LUIS JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838827,2026-08-07T07:20:28.057783+00:00
+1838827,referee,5001961,"MUÑOZ MONTIJANO, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1838827,2026-08-07T07:20:28.057783+00:00
+1838822,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838822,2026-08-07T07:20:28.374829+00:00
+1838822,referee,5237304,"MURESAN, SERGIU LAURIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1838822,2026-08-07T07:20:28.374829+00:00
+1838833,referee,5002001,"SANCHEZ MARTIN, MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838833,2026-08-07T07:20:28.479391+00:00
+1838833,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1838833,2026-08-07T07:20:28.479391+00:00
+1838828,referee,5000598,"DEL OLMO MARTINEZ, IGNACIO",Arbitro principal,https://www.rffm.es/acta-partido/1838828,2026-08-07T07:20:28.789782+00:00
+1838828,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838828,2026-08-07T07:20:28.789782+00:00
+1838831,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1838831,2026-08-07T07:20:28.900762+00:00
+1838831,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838831,2026-08-07T07:20:28.900762+00:00
+1838834,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro principal,https://www.rffm.es/acta-partido/1838834,2026-08-07T07:20:28.925268+00:00
+1838834,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838834,2026-08-07T07:20:28.925268+00:00
+1838830,referee,5001848,"LANCHAS RODRIGUEZ, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838830,2026-08-07T07:20:28.972108+00:00
+1838830,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1838830,2026-08-07T07:20:28.972108+00:00
+1838839,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838839,2026-08-07T07:20:29.041235+00:00
+1838839,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838839,2026-08-07T07:20:29.041235+00:00
+1838840,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838840,2026-08-07T07:20:29.128124+00:00
+1838840,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838840,2026-08-07T07:20:29.128124+00:00
+1838832,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1838832,2026-08-07T07:20:29.130656+00:00
+1838832,referee,5002715,"ORTEGA RODRIGUEZ, VICENTE",Arbitro asistente,https://www.rffm.es/acta-partido/1838832,2026-08-07T07:20:29.130656+00:00
+1838835,referee,5000741,"ALMAGRO MEJIAS, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838835,2026-08-07T07:20:29.754416+00:00
+1838835,referee,5109139,"GARCIA OLEGARIO, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1838835,2026-08-07T07:20:29.754416+00:00
+1838841,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838841,2026-08-07T07:20:30.019070+00:00
+1838841,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1838841,2026-08-07T07:20:30.019070+00:00
+1838836,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838836,2026-08-07T07:20:30.027966+00:00
+1838836,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1838836,2026-08-07T07:20:30.027966+00:00
+1838838,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838838,2026-08-07T07:20:30.217529+00:00
+1838838,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838838,2026-08-07T07:20:30.217529+00:00
+1838846,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838846,2026-08-07T07:20:30.296554+00:00
+1838846,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1838846,2026-08-07T07:20:30.296554+00:00
+1838842,referee,5001731,"RODRIGUEZ BLANCO, FELIPE",Arbitro principal,https://www.rffm.es/acta-partido/1838842,2026-08-07T07:20:30.356535+00:00
+1838842,referee,5276270,"CASTRO GAMONAL, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1838842,2026-08-07T07:20:30.356535+00:00
+1838843,referee,5002317,"OTERO GARCIA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838843,2026-08-07T07:20:30.437897+00:00
+1838843,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1838843,2026-08-07T07:20:30.437897+00:00
+1838837,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838837,2026-08-07T07:20:31.131410+00:00
+1838837,referee,5002307,"ASENJO GARCIA, JULIO ALBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1838837,2026-08-07T07:20:31.131410+00:00
+1838848,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1838848,2026-08-07T07:20:31.199229+00:00
+1838848,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro asistente,https://www.rffm.es/acta-partido/1838848,2026-08-07T07:20:31.199229+00:00
+1838854,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838854,2026-08-07T07:20:31.205087+00:00
+1838854,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1838854,2026-08-07T07:20:31.205087+00:00
+1838845,referee,5125200,"VILLAVERDE LUJAN, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838845,2026-08-07T07:20:31.312251+00:00
+1838845,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1838845,2026-08-07T07:20:31.312251+00:00
+1838844,referee,5001840,"SANCHEZ HERREROS, ROBERTO MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838844,2026-08-07T07:20:31.411412+00:00
+1838844,referee,5266471,"CASTRO ARROYO, JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1838844,2026-08-07T07:20:31.411412+00:00
+1838847,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838847,2026-08-07T07:20:31.487781+00:00
+1838847,referee,5231706,"GOMEZ DO VALE, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838847,2026-08-07T07:20:31.487781+00:00
+1838851,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1838851,2026-08-07T07:20:31.504658+00:00
+1838851,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838851,2026-08-07T07:20:31.504658+00:00
+1838855,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1838855,2026-08-07T07:20:31.650190+00:00
+1838855,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838855,2026-08-07T07:20:31.650190+00:00
+1838850,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1838850,2026-08-07T07:20:31.657793+00:00
+1838850,referee,5236892,"REDONDO JUAREZ, GUILLERMO",Arbitro asistente,https://www.rffm.es/acta-partido/1838850,2026-08-07T07:20:31.657793+00:00
+1838857,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838857,2026-08-07T07:20:32.282367+00:00
+1838857,referee,5266435,"CEBALLOS GUERRA, JOSE MARIA",Arbitro asistente,https://www.rffm.es/acta-partido/1838857,2026-08-07T07:20:32.282367+00:00
+1838852,referee,5002317,"OTERO GARCIA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838852,2026-08-07T07:20:32.469804+00:00
+1838852,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1838852,2026-08-07T07:20:32.469804+00:00
+1838849,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838849,2026-08-07T07:20:32.509629+00:00
+1838849,referee,5236892,"REDONDO JUAREZ, GUILLERMO",Arbitro asistente,https://www.rffm.es/acta-partido/1838849,2026-08-07T07:20:32.509629+00:00
+1838858,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838858,2026-08-07T07:20:32.579398+00:00
+1838858,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro asistente,https://www.rffm.es/acta-partido/1838858,2026-08-07T07:20:32.579398+00:00
+1838856,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1838856,2026-08-07T07:20:32.743716+00:00
+1838856,referee,5265419,"DE SALA ARROYO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838856,2026-08-07T07:20:32.743716+00:00
+1838853,referee,5001037,"GARRIDO ESTEBAN, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838853,2026-08-07T07:20:32.903543+00:00
+1838853,referee,5002026,"VAZQUEZ OLEGARIO, EDUARDO",Arbitro asistente,https://www.rffm.es/acta-partido/1838853,2026-08-07T07:20:32.903543+00:00
+1838862,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838862,2026-08-07T07:20:32.918254+00:00
+1838862,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1838862,2026-08-07T07:20:32.918254+00:00
+1838860,referee,5194621,"VICENTE BUTRAGUEÑO, LUIS JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838860,2026-08-07T07:20:33.196261+00:00
+1838860,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1838860,2026-08-07T07:20:33.196261+00:00
+1838861,referee,5000741,"ALMAGRO MEJIAS, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1838861,2026-08-07T07:20:33.406353+00:00
+1838861,referee,5001037,"GARRIDO ESTEBAN, ROBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1838861,2026-08-07T07:20:33.406353+00:00
+1838869,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838869,2026-08-07T07:20:33.627462+00:00
+1838869,referee,5266394,"VENTURA VERDERICO, ADRIANO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838869,2026-08-07T07:20:33.627462+00:00
+1838859,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1838859,2026-08-07T07:20:33.715997+00:00
+1838859,referee,5002307,"ASENJO GARCIA, JULIO ALBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1838859,2026-08-07T07:20:33.715997+00:00
+1838867,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1838867,2026-08-07T07:20:33.729460+00:00
+1838867,referee,5266394,"VENTURA VERDERICO, ADRIANO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838867,2026-08-07T07:20:33.729460+00:00
+1838863,referee,5144762,"GARRO CASTRO, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1838863,2026-08-07T07:20:34.575735+00:00
+1838863,referee,5231706,"GOMEZ DO VALE, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838863,2026-08-07T07:20:34.575735+00:00
+1838866,referee,5001037,"GARRIDO ESTEBAN, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838866,2026-08-07T07:20:35.119279+00:00
+1838866,referee,5001848,"LANCHAS RODRIGUEZ, ROBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1838866,2026-08-07T07:20:35.119279+00:00
+1838873,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838873,2026-08-07T07:20:35.154040+00:00
+1838873,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838873,2026-08-07T07:20:35.154040+00:00
+1838864,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro principal,https://www.rffm.es/acta-partido/1838864,2026-08-07T07:20:35.158220+00:00
+1838864,referee,5201760,"VALERO DIAZ, JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838864,2026-08-07T07:20:35.158220+00:00
+1838874,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838874,2026-08-07T07:20:35.188882+00:00
+1838874,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1838874,2026-08-07T07:20:35.188882+00:00
+1838865,referee,5265990,"DE ROJAS RAMÓN, JUAN",Arbitro principal,https://www.rffm.es/acta-partido/1838865,2026-08-07T07:20:35.191148+00:00
+1838865,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1838865,2026-08-07T07:20:35.191148+00:00
+1838868,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838868,2026-08-07T07:20:35.312707+00:00
+1838868,referee,5266401,"VENTURA VERDERICO, AUGUSTO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838868,2026-08-07T07:20:35.312707+00:00
+1838876,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838876,2026-08-07T07:20:35.339841+00:00
+1838876,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1838876,2026-08-07T07:20:35.339841+00:00
+1838870,referee,5099523,"DE MIGUEL BALLESTEROS, MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838870,2026-08-07T07:20:35.443935+00:00
+1838870,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838870,2026-08-07T07:20:35.443935+00:00
+1838871,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1838871,2026-08-07T07:20:35.707377+00:00
+1838871,referee,5231666,"MUÑOZ NUÑEZ, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1838871,2026-08-07T07:20:35.707377+00:00
+1838875,referee,5099523,"DE MIGUEL BALLESTEROS, MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1838875,2026-08-07T07:20:35.977321+00:00
+1838875,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838875,2026-08-07T07:20:35.977321+00:00
+1838881,referee,5001848,"LANCHAS RODRIGUEZ, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838881,2026-08-07T07:20:36.129699+00:00
+1838881,referee,5109139,"GARCIA OLEGARIO, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1838881,2026-08-07T07:20:36.129699+00:00
+1838878,referee,5014458,"CABELLO RUIZ-BURRUECOS, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838878,2026-08-07T07:20:36.194607+00:00
+1838878,referee,5276339,"MORERA ZABALA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1838878,2026-08-07T07:20:36.194607+00:00
+1838872,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1838872,2026-08-07T07:20:36.301755+00:00
+1838872,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1838872,2026-08-07T07:20:36.301755+00:00
+1838877,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1838877,2026-08-07T07:20:36.314200+00:00
+1838877,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1838877,2026-08-07T07:20:36.314200+00:00
+1838879,referee,5001037,"GARRIDO ESTEBAN, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1838879,2026-08-07T07:20:36.318522+00:00
+1838879,referee,5000741,"ALMAGRO MEJIAS, FRANCISCO JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1838879,2026-08-07T07:20:36.318522+00:00
+1838883,referee,5173583,"GALÁN VELASCO, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1838883,2026-08-07T07:20:36.602552+00:00
+1838883,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1838883,2026-08-07T07:20:36.602552+00:00
+1838882,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1838882,2026-08-07T07:20:36.989086+00:00
+1838882,referee,5266401,"VENTURA VERDERICO, AUGUSTO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1838882,2026-08-07T07:20:36.989086+00:00
+1842539,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1842539,2026-08-07T07:20:37.814399+00:00
+1842539,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1842539,2026-08-07T07:20:37.814399+00:00
+1842537,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1842537,2026-08-07T07:20:37.835739+00:00
+1842537,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1842537,2026-08-07T07:20:37.835739+00:00
+1842538,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1842538,2026-08-07T07:20:37.839832+00:00
+1842538,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1842538,2026-08-07T07:20:37.839832+00:00
+1842535,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1842535,2026-08-07T07:20:37.910059+00:00
+1842535,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1842535,2026-08-07T07:20:37.910059+00:00
+1838880,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1838880,2026-08-07T07:20:37.989828+00:00
+1838880,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1838880,2026-08-07T07:20:37.989828+00:00
+1842536,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1842536,2026-08-07T07:20:37.994810+00:00
+1842536,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1842536,2026-08-07T07:20:37.994810+00:00
+1842540,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1842540,2026-08-07T07:20:38.248458+00:00
+1842540,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1842540,2026-08-07T07:20:38.248458+00:00
+1842541,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1842541,2026-08-07T07:20:38.309744+00:00
+1842541,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1842541,2026-08-07T07:20:38.309744+00:00
+1842545,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1842545,2026-08-07T07:20:38.390212+00:00
+1842545,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1842545,2026-08-07T07:20:38.390212+00:00
+1842546,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1842546,2026-08-07T07:20:38.602604+00:00
+1842546,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1842546,2026-08-07T07:20:38.602604+00:00
+1842547,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1842547,2026-08-07T07:20:38.640728+00:00
+1842547,referee,5172089,"GONZALEZ RUBIO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1842547,2026-08-07T07:20:38.640728+00:00
+1842543,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1842543,2026-08-07T07:20:38.809190+00:00
+1842543,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1842543,2026-08-07T07:20:38.809190+00:00
+1842544,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1842544,2026-08-07T07:20:38.842670+00:00
+1842544,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1842544,2026-08-07T07:20:38.842670+00:00
+1842542,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1842542,2026-08-07T07:20:38.853077+00:00
+1842542,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1842542,2026-08-07T07:20:38.853077+00:00
+1842548,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1842548,2026-08-07T07:20:39.110881+00:00
+1842548,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1842548,2026-08-07T07:20:39.110881+00:00
+1842549,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1842549,2026-08-07T07:20:39.359702+00:00
+1842549,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1842549,2026-08-07T07:20:39.359702+00:00
+1839905,referee,5000660,"MORENO DURAN, JORGE",Arbitro principal,https://www.rffm.es/acta-partido/1839905,2026-08-07T07:20:39.927669+00:00
+1839905,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1839905,2026-08-07T07:20:39.927669+00:00
+1839901,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839901,2026-08-07T07:20:39.993472+00:00
+1839901,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839901,2026-08-07T07:20:39.993472+00:00
+1839906,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839906,2026-08-07T07:20:40.028918+00:00
+1839906,referee,5002496,"JARQUE RUIZ, MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839906,2026-08-07T07:20:40.028918+00:00
+1839903,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1839903,2026-08-07T07:20:40.078948+00:00
+1839903,referee,5001840,"SANCHEZ HERREROS, ROBERTO MANUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839903,2026-08-07T07:20:40.078948+00:00
+1839904,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839904,2026-08-07T07:20:40.101931+00:00
+1839904,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1839904,2026-08-07T07:20:40.101931+00:00
+1839902,referee,5002001,"SANCHEZ MARTIN, MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1839902,2026-08-07T07:20:40.153801+00:00
+1839902,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1839902,2026-08-07T07:20:40.153801+00:00
+1839908,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1839908,2026-08-07T07:20:40.289033+00:00
+1839908,referee,5002503,"POZO LUENGO, LUIS",Arbitro asistente,https://www.rffm.es/acta-partido/1839908,2026-08-07T07:20:40.289033+00:00
+1839907,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839907,2026-08-07T07:20:41.010827+00:00
+1839907,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839907,2026-08-07T07:20:41.010827+00:00
+1839916,referee,5030356,"ALVAREZ GARCIA, JUAN CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1839916,2026-08-07T07:20:41.015418+00:00
+1839916,referee,5002496,"JARQUE RUIZ, MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839916,2026-08-07T07:20:41.015418+00:00
+1839909,referee,5001840,"SANCHEZ HERREROS, ROBERTO MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1839909,2026-08-07T07:20:41.137557+00:00
+1839909,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839909,2026-08-07T07:20:41.137557+00:00
+1839912,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1839912,2026-08-07T07:20:41.143763+00:00
+1839912,referee,5059629,"CAÑADAS ALONSO, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1839912,2026-08-07T07:20:41.143763+00:00
+1839915,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839915,2026-08-07T07:20:41.146024+00:00
+1839915,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1839915,2026-08-07T07:20:41.146024+00:00
+1839910,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839910,2026-08-07T07:20:41.191889+00:00
+1839910,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839910,2026-08-07T07:20:41.191889+00:00
+1839911,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839911,2026-08-07T07:20:41.321322+00:00
+1839911,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839911,2026-08-07T07:20:41.321322+00:00
+1839913,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839913,2026-08-07T07:20:41.529693+00:00
+1839913,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1839913,2026-08-07T07:20:41.529693+00:00
+1839914,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1839914,2026-08-07T07:20:41.983386+00:00
+1839914,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839914,2026-08-07T07:20:41.983386+00:00
+1839923,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1839923,2026-08-07T07:20:42.071758+00:00
+1839923,referee,5256114,"ILIUT, DUMITRU-ALEXANDRU",Arbitro asistente,https://www.rffm.es/acta-partido/1839923,2026-08-07T07:20:42.071758+00:00
+1839919,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839919,2026-08-07T07:20:42.118364+00:00
+1839919,referee,5002011,"MARTIN BELCHI, ALEJANDRO LUIS",Arbitro asistente,https://www.rffm.es/acta-partido/1839919,2026-08-07T07:20:42.118364+00:00
+1839918,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1839918,2026-08-07T07:20:42.322207+00:00
+1839918,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1839918,2026-08-07T07:20:42.322207+00:00
+1839921,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839921,2026-08-07T07:20:43.115947+00:00
+1839921,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1839921,2026-08-07T07:20:43.115947+00:00
+1839920,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839920,2026-08-07T07:20:43.118376+00:00
+1839920,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839920,2026-08-07T07:20:43.118376+00:00
+1839922,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839922,2026-08-07T07:20:43.191167+00:00
+1839922,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1839922,2026-08-07T07:20:43.191167+00:00
+1839924,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1839924,2026-08-07T07:20:43.418404+00:00
+1839924,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839924,2026-08-07T07:20:43.418404+00:00
+1839925,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1839925,2026-08-07T07:20:43.488393+00:00
+1839925,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839925,2026-08-07T07:20:43.488393+00:00
+1839917,referee,5090380,"RIVAS MARTINEZ, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1839917,2026-08-07T07:20:43.525642+00:00
+1839917,referee,5002292,"SAN ROMAN DE LOS LLANOS, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839917,2026-08-07T07:20:43.525642+00:00
+1839926,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839926,2026-08-07T07:20:43.660432+00:00
+1839926,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839926,2026-08-07T07:20:43.660432+00:00
+1839928,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839928,2026-08-07T07:20:43.664355+00:00
+1839928,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839928,2026-08-07T07:20:43.664355+00:00
+1839929,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839929,2026-08-07T07:20:43.814196+00:00
+1839929,referee,5249562,"ANTON DE LA PARTE, JOSE DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839929,2026-08-07T07:20:43.814196+00:00
+1839933,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1839933,2026-08-07T07:20:43.902386+00:00
+1839933,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1839933,2026-08-07T07:20:43.902386+00:00
+1839931,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839931,2026-08-07T07:20:44.038768+00:00
+1839931,referee,5236655,"LOZANO CEBADA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839931,2026-08-07T07:20:44.038768+00:00
+1839930,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839930,2026-08-07T07:20:44.193677+00:00
+1839930,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1839930,2026-08-07T07:20:44.193677+00:00
+1839927,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1839927,2026-08-07T07:20:44.338455+00:00
+1839927,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1839927,2026-08-07T07:20:44.338455+00:00
+1839935,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1839935,2026-08-07T07:20:44.628633+00:00
+1839935,referee,5256049,"DIAZ DE ANDRES, CLAUDIA",Arbitro asistente,https://www.rffm.es/acta-partido/1839935,2026-08-07T07:20:44.628633+00:00
+1839932,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839932,2026-08-07T07:20:44.827708+00:00
+1839932,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1839932,2026-08-07T07:20:44.827708+00:00
+1839934,referee,5000554,"GUZON TORRIJOS, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1839934,2026-08-07T07:20:44.978678+00:00
+1839934,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1839934,2026-08-07T07:20:44.978678+00:00
+1839936,referee,5173583,"GALÁN VELASCO, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1839936,2026-08-07T07:20:45.018066+00:00
+1839936,referee,5256099,"RIVERA GONZALEZ, FRANCISCO",Arbitro asistente,https://www.rffm.es/acta-partido/1839936,2026-08-07T07:20:45.018066+00:00
+1839937,referee,5002518,"BAEZ PERANDONES, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839937,2026-08-07T07:20:45.029562+00:00
+1839937,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839937,2026-08-07T07:20:45.029562+00:00
+1839939,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1839939,2026-08-07T07:20:45.278467+00:00
+1839939,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1839939,2026-08-07T07:20:45.278467+00:00
+1839941,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839941,2026-08-07T07:20:45.316998+00:00
+1839941,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1839941,2026-08-07T07:20:45.316998+00:00
+1839940,referee,5232013,"TALIDI EL HANNACH, MOUNA",Arbitro principal,https://www.rffm.es/acta-partido/1839940,2026-08-07T07:20:45.621114+00:00
+1839940,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1839940,2026-08-07T07:20:45.621114+00:00
+1839947,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1839947,2026-08-07T07:20:46.037697+00:00
+1839947,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1839947,2026-08-07T07:20:46.037697+00:00
+1839938,referee,5125200,"VILLAVERDE LUJAN, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839938,2026-08-07T07:20:46.088505+00:00
+1839938,referee,5265998,"SERNA FERNANDEZ, ALBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1839938,2026-08-07T07:20:46.088505+00:00
+1839944,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839944,2026-08-07T07:20:46.182321+00:00
+1839944,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839944,2026-08-07T07:20:46.182321+00:00
+1839942,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1839942,2026-08-07T07:20:46.627399+00:00
+1839942,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1839942,2026-08-07T07:20:46.627399+00:00
+1839945,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839945,2026-08-07T07:20:47.077674+00:00
+1839945,referee,5002496,"JARQUE RUIZ, MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839945,2026-08-07T07:20:47.077674+00:00
+1839950,referee,5139594,"LARRUBIA PAJARES, JAIME",Arbitro principal,https://www.rffm.es/acta-partido/1839950,2026-08-07T07:20:47.162768+00:00
+1839950,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1839950,2026-08-07T07:20:47.162768+00:00
+1839951,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1839951,2026-08-07T07:20:47.228071+00:00
+1839951,referee,5265965,"JAQUETE ESTRADA, IGNACIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839951,2026-08-07T07:20:47.228071+00:00
+1839946,referee,5002518,"BAEZ PERANDONES, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839946,2026-08-07T07:20:47.326134+00:00
+1839946,referee,5236655,"LOZANO CEBADA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839946,2026-08-07T07:20:47.326134+00:00
+1839943,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839943,2026-08-07T07:20:47.372883+00:00
+1839943,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839943,2026-08-07T07:20:47.372883+00:00
+1839948,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839948,2026-08-07T07:20:47.395395+00:00
+1839948,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1839948,2026-08-07T07:20:47.395395+00:00
+1839953,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1839953,2026-08-07T07:20:47.497825+00:00
+1839953,referee,5099523,"DE MIGUEL BALLESTEROS, MANUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839953,2026-08-07T07:20:47.497825+00:00
+1839949,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1839949,2026-08-07T07:20:47.923843+00:00
+1839949,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839949,2026-08-07T07:20:47.923843+00:00
+1839958,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839958,2026-08-07T07:20:48.056341+00:00
+1839958,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1839958,2026-08-07T07:20:48.056341+00:00
+1839957,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1839957,2026-08-07T07:20:48.151483+00:00
+1839957,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839957,2026-08-07T07:20:48.151483+00:00
+1839954,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839954,2026-08-07T07:20:48.152667+00:00
+1839954,referee,5172089,"GONZALEZ RUBIO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1839954,2026-08-07T07:20:48.152667+00:00
+1839959,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1839959,2026-08-07T07:20:48.700355+00:00
+1839959,referee,5265965,"JAQUETE ESTRADA, IGNACIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839959,2026-08-07T07:20:48.700355+00:00
+1839960,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839960,2026-08-07T07:20:48.828698+00:00
+1839960,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839960,2026-08-07T07:20:48.828698+00:00
+1839956,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1839956,2026-08-07T07:20:48.862246+00:00
+1839956,referee,5256114,"ILIUT, DUMITRU-ALEXANDRU",Arbitro asistente,https://www.rffm.es/acta-partido/1839956,2026-08-07T07:20:48.862246+00:00
+1839955,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1839955,2026-08-07T07:20:48.869510+00:00
+1839955,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1839955,2026-08-07T07:20:48.869510+00:00
+1839952,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1839952,2026-08-07T07:20:49.008584+00:00
+1839952,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1839952,2026-08-07T07:20:49.008584+00:00
+1839964,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839964,2026-08-07T07:20:49.241166+00:00
+1839964,referee,5265429,"NAVARRO MORALES, JESUS",Arbitro asistente,https://www.rffm.es/acta-partido/1839964,2026-08-07T07:20:49.241166+00:00
+1839963,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839963,2026-08-07T07:20:49.245922+00:00
+1839963,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839963,2026-08-07T07:20:49.245922+00:00
+1839961,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1839961,2026-08-07T07:20:49.380713+00:00
+1839961,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1839961,2026-08-07T07:20:49.380713+00:00
+1839966,referee,5175643,"LIU, ZHOUQI",Arbitro principal,https://www.rffm.es/acta-partido/1839966,2026-08-07T07:20:49.678144+00:00
+1839966,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1839966,2026-08-07T07:20:49.678144+00:00
+1839962,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1839962,2026-08-07T07:20:49.826196+00:00
+1839962,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1839962,2026-08-07T07:20:49.826196+00:00
+1839968,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1839968,2026-08-07T07:20:50.046161+00:00
+1839968,referee,5201760,"VALERO DIAZ, JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839968,2026-08-07T07:20:50.046161+00:00
+1839965,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1839965,2026-08-07T07:20:50.104632+00:00
+1839965,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1839965,2026-08-07T07:20:50.104632+00:00
+1839969,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1839969,2026-08-07T07:20:50.112781+00:00
+1839969,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1839969,2026-08-07T07:20:50.112781+00:00
+1839972,referee,5002720,"CABEZAS CASQUERO, IGNACIO",Arbitro principal,https://www.rffm.es/acta-partido/1839972,2026-08-07T07:20:50.396628+00:00
+1839972,referee,5248215,"ESTRADA ROCHA, JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1839972,2026-08-07T07:20:50.396628+00:00
+1839973,referee,5000866,"ARANCE GARCIA, JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1839973,2026-08-07T07:20:50.492150+00:00
+1839973,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839973,2026-08-07T07:20:50.492150+00:00
+1839967,referee,5250094,"GONZALEZ MORETA, JORGE",Arbitro principal,https://www.rffm.es/acta-partido/1839967,2026-08-07T07:20:50.558347+00:00
+1839967,referee,5201760,"VALERO DIAZ, JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839967,2026-08-07T07:20:50.558347+00:00
+1839974,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1839974,2026-08-07T07:20:50.800421+00:00
+1839974,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1839974,2026-08-07T07:20:50.800421+00:00
+1839970,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1839970,2026-08-07T07:20:50.862973+00:00
+1839970,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839970,2026-08-07T07:20:50.862973+00:00
+1839971,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1839971,2026-08-07T07:20:50.937663+00:00
+1839971,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1839971,2026-08-07T07:20:50.937663+00:00
+1839977,referee,5194335,"CARRERO SIMON, GONZALO",Arbitro principal,https://www.rffm.es/acta-partido/1839977,2026-08-07T07:20:51.039973+00:00
+1839977,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1839977,2026-08-07T07:20:51.039973+00:00
+1839975,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1839975,2026-08-07T07:20:51.107877+00:00
+1839975,referee,5250065,"IBAÑEZ GARCIA, FRANCISCO JAVIER",Arbitro asistente,https://www.rffm.es/acta-partido/1839975,2026-08-07T07:20:51.107877+00:00
+1839976,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839976,2026-08-07T07:20:51.447544+00:00
+1839976,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839976,2026-08-07T07:20:51.447544+00:00
+1839979,referee,5002642,"SARASUA ALVAREZ, DIEGO",Arbitro principal,https://www.rffm.es/acta-partido/1839979,2026-08-07T07:20:51.533274+00:00
+1839979,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1839979,2026-08-07T07:20:51.533274+00:00
+1839978,referee,5001730,"RODRIGUEZ BLANCO, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1839978,2026-08-07T07:20:51.797020+00:00
+1839978,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1839978,2026-08-07T07:20:51.797020+00:00
+1839981,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1839981,2026-08-07T07:20:51.918959+00:00
+1839981,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839981,2026-08-07T07:20:51.918959+00:00
+1839983,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839983,2026-08-07T07:20:52.058203+00:00
+1839983,referee,5231706,"GOMEZ DO VALE, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839983,2026-08-07T07:20:52.058203+00:00
+1839982,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839982,2026-08-07T07:20:52.192003+00:00
+1839982,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1839982,2026-08-07T07:20:52.192003+00:00
+1839988,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1839988,2026-08-07T07:20:52.759572+00:00
+1839988,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1839988,2026-08-07T07:20:52.759572+00:00
+1839990,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839990,2026-08-07T07:20:52.784901+00:00
+1839990,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839990,2026-08-07T07:20:52.784901+00:00
+1839986,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1839986,2026-08-07T07:20:53.030804+00:00
+1839986,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839986,2026-08-07T07:20:53.030804+00:00
+1839987,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839987,2026-08-07T07:20:53.069880+00:00
+1839987,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1839987,2026-08-07T07:20:53.069880+00:00
+1839980,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839980,2026-08-07T07:20:53.184813+00:00
+1839980,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1839980,2026-08-07T07:20:53.184813+00:00
+1839984,referee,5125205,"PUERTO DIEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1839984,2026-08-07T07:20:53.194073+00:00
+1839984,referee,5172089,"GONZALEZ RUBIO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1839984,2026-08-07T07:20:53.194073+00:00
+1839989,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839989,2026-08-07T07:20:53.333595+00:00
+1839989,referee,5059629,"CAÑADAS ALONSO, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1839989,2026-08-07T07:20:53.333595+00:00
+1839985,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1839985,2026-08-07T07:20:53.451217+00:00
+1839985,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1839985,2026-08-07T07:20:53.451217+00:00
+1839993,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839993,2026-08-07T07:20:53.607369+00:00
+1839993,referee,5254825,"VAZQUEZ ABAD, CAMILO",Arbitro asistente,https://www.rffm.es/acta-partido/1839993,2026-08-07T07:20:53.607369+00:00
+1839996,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1839996,2026-08-07T07:20:53.611876+00:00
+1839996,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1839996,2026-08-07T07:20:53.611876+00:00
+1839994,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1839994,2026-08-07T07:20:53.937997+00:00
+1839994,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1839994,2026-08-07T07:20:53.937997+00:00
+1839992,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1839992,2026-08-07T07:20:54.039029+00:00
+1839992,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1839992,2026-08-07T07:20:54.039029+00:00
+1839991,referee,5194621,"VICENTE BUTRAGUEÑO, LUIS JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839991,2026-08-07T07:20:54.248938+00:00
+1839991,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1839991,2026-08-07T07:20:54.248938+00:00
+1839995,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1839995,2026-08-07T07:20:54.280540+00:00
+1839995,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1839995,2026-08-07T07:20:54.280540+00:00
+1840002,referee,5002513,"ORTIZ MARQUEZ, GABRIEL",Arbitro principal,https://www.rffm.es/acta-partido/1840002,2026-08-07T07:20:54.556398+00:00
+1840002,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1840002,2026-08-07T07:20:54.556398+00:00
+1840001,referee,5083541,"CELADOR HERNANDEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1840001,2026-08-07T07:20:54.692709+00:00
+1840001,referee,5059629,"CAÑADAS ALONSO, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1840001,2026-08-07T07:20:54.692709+00:00
+1839997,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1839997,2026-08-07T07:20:54.883644+00:00
+1839997,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1839997,2026-08-07T07:20:54.883644+00:00
+1839999,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1839999,2026-08-07T07:20:54.888114+00:00
+1839999,referee,5254825,"VAZQUEZ ABAD, CAMILO",Arbitro asistente,https://www.rffm.es/acta-partido/1839999,2026-08-07T07:20:54.888114+00:00
+1840000,referee,5002317,"OTERO GARCIA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1840000,2026-08-07T07:20:55.255448+00:00
+1840000,referee,5237225,"SANCHEZ POLO, JAIME",Arbitro asistente,https://www.rffm.es/acta-partido/1840000,2026-08-07T07:20:55.255448+00:00
+1839998,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1839998,2026-08-07T07:20:55.316683+00:00
+1839998,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1839998,2026-08-07T07:20:55.316683+00:00
+1840008,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1840008,2026-08-07T07:20:55.681510+00:00
+1840008,referee,5172089,"GONZALEZ RUBIO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1840008,2026-08-07T07:20:55.681510+00:00
+1840005,referee,5014458,"CABELLO RUIZ-BURRUECOS, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1840005,2026-08-07T07:20:55.699208+00:00
+1840005,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1840005,2026-08-07T07:20:55.699208+00:00
+1840004,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1840004,2026-08-07T07:20:55.838193+00:00
+1840004,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1840004,2026-08-07T07:20:55.838193+00:00
+1840007,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1840007,2026-08-07T07:20:56.162703+00:00
+1840007,referee,5256049,"DIAZ DE ANDRES, CLAUDIA",Arbitro asistente,https://www.rffm.es/acta-partido/1840007,2026-08-07T07:20:56.162703+00:00
+1840014,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1840014,2026-08-07T07:20:56.679256+00:00
+1840014,referee,5250030,"GARCIA REIMUNDO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1840014,2026-08-07T07:20:56.679256+00:00
+1840006,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1840006,2026-08-07T07:20:56.833072+00:00
+1840006,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1840006,2026-08-07T07:20:56.833072+00:00
+1840010,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1840010,2026-08-07T07:20:56.837631+00:00
+1840010,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1840010,2026-08-07T07:20:56.837631+00:00
+1840003,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1840003,2026-08-07T07:20:57.032220+00:00
+1840003,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1840003,2026-08-07T07:20:57.032220+00:00
+1840012,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1840012,2026-08-07T07:20:57.077927+00:00
+1840012,referee,5256114,"ILIUT, DUMITRU-ALEXANDRU",Arbitro asistente,https://www.rffm.es/acta-partido/1840012,2026-08-07T07:20:57.077927+00:00
+1840009,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1840009,2026-08-07T07:20:57.228435+00:00
+1840009,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1840009,2026-08-07T07:20:57.228435+00:00
+1840018,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1840018,2026-08-07T07:20:57.362998+00:00
+1840018,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1840018,2026-08-07T07:20:57.362998+00:00
+1840016,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1840016,2026-08-07T07:20:57.461109+00:00
+1840016,referee,5231706,"GOMEZ DO VALE, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1840016,2026-08-07T07:20:57.461109+00:00
+1840013,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1840013,2026-08-07T07:20:57.473677+00:00
+1840013,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1840013,2026-08-07T07:20:57.473677+00:00
+1840011,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1840011,2026-08-07T07:20:57.532726+00:00
+1840011,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1840011,2026-08-07T07:20:57.532726+00:00
+1840020,referee,5001731,"RODRIGUEZ BLANCO, FELIPE",Arbitro principal,https://www.rffm.es/acta-partido/1840020,2026-08-07T07:20:57.735450+00:00
+1840020,referee,5237502,"DE BLAS CASTAÑO, ELENA",Arbitro asistente,https://www.rffm.es/acta-partido/1840020,2026-08-07T07:20:57.735450+00:00
+1840026,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1840026,2026-08-07T07:20:57.913425+00:00
+1840026,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1840026,2026-08-07T07:20:57.913425+00:00
+1840017,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1840017,2026-08-07T07:20:57.999343+00:00
+1840017,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1840017,2026-08-07T07:20:57.999343+00:00
+1840019,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1840019,2026-08-07T07:20:58.058068+00:00
+1840019,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1840019,2026-08-07T07:20:58.058068+00:00
+1840025,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1840025,2026-08-07T07:20:58.432700+00:00
+1840025,referee,5250030,"GARCIA REIMUNDO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1840025,2026-08-07T07:20:58.432700+00:00
+1840015,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1840015,2026-08-07T07:20:58.477690+00:00
+1840015,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1840015,2026-08-07T07:20:58.477690+00:00
+1840021,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1840021,2026-08-07T07:20:58.609979+00:00
+1840021,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1840021,2026-08-07T07:20:58.609979+00:00
+1840024,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1840024,2026-08-07T07:20:58.783089+00:00
+1840024,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1840024,2026-08-07T07:20:58.783089+00:00
+1840022,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1840022,2026-08-07T07:20:59.036902+00:00
+1840022,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1840022,2026-08-07T07:20:59.036902+00:00
+1845229,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1845229,2026-08-07T07:20:59.170762+00:00
+1845229,referee,5232013,"TALIDI EL HANNACH, MOUNA",Arbitro asistente,https://www.rffm.es/acta-partido/1845229,2026-08-07T07:20:59.170762+00:00
+1840032,referee,5175643,"LIU, ZHOUQI",Arbitro principal,https://www.rffm.es/acta-partido/1840032,2026-08-07T07:20:59.553723+00:00
+1840032,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1840032,2026-08-07T07:20:59.553723+00:00
+1840031,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1840031,2026-08-07T07:20:59.662098+00:00
+1840031,referee,5000241,"HERNANDEZ HERNAN, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1840031,2026-08-07T07:20:59.662098+00:00
+1840027,referee,5000866,"ARANCE GARCIA, JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1840027,2026-08-07T07:20:59.694239+00:00
+1840027,referee,5059629,"CAÑADAS ALONSO, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1840027,2026-08-07T07:20:59.694239+00:00
+1840028,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1840028,2026-08-07T07:20:59.987535+00:00
+1840028,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1840028,2026-08-07T07:20:59.987535+00:00
+1840030,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1840030,2026-08-07T07:21:00.224344+00:00
+1840030,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1840030,2026-08-07T07:21:00.224344+00:00
+1846134,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846134,2026-08-07T07:21:00.397095+00:00
+1846134,referee,5265998,"SERNA FERNANDEZ, ALBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1846134,2026-08-07T07:21:00.397095+00:00
+1840029,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1840029,2026-08-07T07:21:00.542922+00:00
+1840029,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1840029,2026-08-07T07:21:00.542922+00:00
+1846135,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846135,2026-08-07T07:21:00.549757+00:00
+1846135,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1846135,2026-08-07T07:21:00.549757+00:00
+1846133,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1846133,2026-08-07T07:21:00.681726+00:00
+1846133,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1846133,2026-08-07T07:21:00.681726+00:00
+1846136,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846136,2026-08-07T07:21:00.874346+00:00
+1846136,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1846136,2026-08-07T07:21:00.874346+00:00
+1846139,referee,5171918,"BANCU , GEORGIANA ALINA",Arbitro principal,https://www.rffm.es/acta-partido/1846139,2026-08-07T07:21:00.970172+00:00
+1846139,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846139,2026-08-07T07:21:00.970172+00:00
+1846143,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846143,2026-08-07T07:21:00.977618+00:00
+1846143,referee,5265965,"JAQUETE ESTRADA, IGNACIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846143,2026-08-07T07:21:00.977618+00:00
+1846137,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846137,2026-08-07T07:21:01.164231+00:00
+1846137,referee,5236892,"REDONDO JUAREZ, GUILLERMO",Arbitro asistente,https://www.rffm.es/acta-partido/1846137,2026-08-07T07:21:01.164231+00:00
+1846138,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846138,2026-08-07T07:21:01.194598+00:00
+1846138,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846138,2026-08-07T07:21:01.194598+00:00
+1846140,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846140,2026-08-07T07:21:01.461238+00:00
+1846140,referee,5249493,"RODRIGUEZ GUERRERO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846140,2026-08-07T07:21:01.461238+00:00
+1846142,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846142,2026-08-07T07:21:01.805710+00:00
+1846142,referee,5266483,"LARHDOULI, ANOUAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846142,2026-08-07T07:21:01.805710+00:00
+1846149,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846149,2026-08-07T07:21:03.412614+00:00
+1846149,referee,5236655,"LOZANO CEBADA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846149,2026-08-07T07:21:03.412614+00:00
+1846150,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1846150,2026-08-07T07:21:03.497347+00:00
+1846150,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1846150,2026-08-07T07:21:03.497347+00:00
+1846146,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846146,2026-08-07T07:21:03.708520+00:00
+1846146,referee,5266462,"BARNES, LUCAS",Arbitro asistente,https://www.rffm.es/acta-partido/1846146,2026-08-07T07:21:03.708520+00:00
+1846144,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1846144,2026-08-07T07:21:03.723679+00:00
+1846144,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846144,2026-08-07T07:21:03.723679+00:00
+1846148,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846148,2026-08-07T07:21:03.955135+00:00
+1846148,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846148,2026-08-07T07:21:03.955135+00:00
+1846147,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846147,2026-08-07T07:21:03.956187+00:00
+1846147,referee,5256114,"ILIUT, DUMITRU-ALEXANDRU",Arbitro asistente,https://www.rffm.es/acta-partido/1846147,2026-08-07T07:21:03.956187+00:00
+1846141,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846141,2026-08-07T07:21:04.013896+00:00
+1846141,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846141,2026-08-07T07:21:04.013896+00:00
+1846152,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1846152,2026-08-07T07:21:04.031227+00:00
+1846152,referee,5202707,"JIMENEZ SALVADOR, CESAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846152,2026-08-07T07:21:04.031227+00:00
+1846145,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846145,2026-08-07T07:21:04.036202+00:00
+1846145,referee,5266401,"VENTURA VERDERICO, AUGUSTO GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846145,2026-08-07T07:21:04.036202+00:00
+1846153,referee,5125205,"PUERTO DIEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1846153,2026-08-07T07:21:04.415238+00:00
+1846153,referee,5266435,"CEBALLOS GUERRA, JOSE MARIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846153,2026-08-07T07:21:04.415238+00:00
+1846154,referee,5168572,"LARA MUÑOZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1846154,2026-08-07T07:21:04.495810+00:00
+1846154,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846154,2026-08-07T07:21:04.495810+00:00
+1846151,referee,5194335,"CARRERO SIMON, GONZALO",Arbitro principal,https://www.rffm.es/acta-partido/1846151,2026-08-07T07:21:04.504325+00:00
+1846151,referee,5200681,"CASADO MOTA, ALVARO",Arbitro asistente,https://www.rffm.es/acta-partido/1846151,2026-08-07T07:21:04.504325+00:00
+1846160,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846160,2026-08-07T07:21:04.674898+00:00
+1846160,referee,5276270,"CASTRO GAMONAL, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1846160,2026-08-07T07:21:04.674898+00:00
+1846158,referee,5125586,"DE SEBASTIAN PECHARROMAN, RUBEN",Arbitro principal,https://www.rffm.es/acta-partido/1846158,2026-08-07T07:21:04.680894+00:00
+1846158,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846158,2026-08-07T07:21:04.680894+00:00
+1846156,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846156,2026-08-07T07:21:05.008094+00:00
+1846156,referee,5256231,"VALERO MANZANARES, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846156,2026-08-07T07:21:05.008094+00:00
+1846155,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846155,2026-08-07T07:21:05.085088+00:00
+1846155,referee,5276298,"GÓMEZ AYUSO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846155,2026-08-07T07:21:05.085088+00:00
+1846159,referee,5090380,"RIVAS MARTINEZ, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1846159,2026-08-07T07:21:05.225316+00:00
+1846159,referee,5002011,"MARTIN BELCHI, ALEJANDRO LUIS",Arbitro asistente,https://www.rffm.es/acta-partido/1846159,2026-08-07T07:21:05.225316+00:00
+1846163,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1846163,2026-08-07T07:21:05.387285+00:00
+1846163,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846163,2026-08-07T07:21:05.387285+00:00
+1846162,referee,5002513,"ORTIZ MARQUEZ, GABRIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846162,2026-08-07T07:21:05.473059+00:00
+1846162,referee,5265990,"DE ROJAS RAMÓN, JUAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846162,2026-08-07T07:21:05.473059+00:00
+1846157,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846157,2026-08-07T07:21:05.479581+00:00
+1846157,referee,5276349,"PEREZ CUDERO, RUBÉN",Arbitro asistente,https://www.rffm.es/acta-partido/1846157,2026-08-07T07:21:05.479581+00:00
+1846168,referee,5125205,"PUERTO DIEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1846168,2026-08-07T07:21:05.676169+00:00
+1846168,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1846168,2026-08-07T07:21:05.676169+00:00
+1846167,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846167,2026-08-07T07:21:05.753269+00:00
+1846167,referee,5002632,"GUTIERREZ SERNA, ELENA",Arbitro asistente,https://www.rffm.es/acta-partido/1846167,2026-08-07T07:21:05.753269+00:00
+1846161,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846161,2026-08-07T07:21:05.789940+00:00
+1846161,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1846161,2026-08-07T07:21:05.789940+00:00
+1846164,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846164,2026-08-07T07:21:05.794834+00:00
+1846164,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846164,2026-08-07T07:21:05.794834+00:00
+1846165,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1846165,2026-08-07T07:21:06.688346+00:00
+1846165,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846165,2026-08-07T07:21:06.688346+00:00
+1846169,referee,5250094,"GONZALEZ MORETA, JORGE",Arbitro principal,https://www.rffm.es/acta-partido/1846169,2026-08-07T07:21:06.734569+00:00
+1846169,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846169,2026-08-07T07:21:06.734569+00:00
+1846721,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846721,2026-08-07T07:21:06.836319+00:00
+1846721,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846721,2026-08-07T07:21:06.836319+00:00
+1846171,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846171,2026-08-07T07:21:06.980477+00:00
+1846171,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846171,2026-08-07T07:21:06.980477+00:00
+1846172,referee,5002513,"ORTIZ MARQUEZ, GABRIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846172,2026-08-07T07:21:07.006937+00:00
+1846172,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1846172,2026-08-07T07:21:07.006937+00:00
+1846176,referee,5000213,"CASTRO MERINO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846176,2026-08-07T07:21:07.020491+00:00
+1846176,referee,5000400,"SANCHEZ BOMBIN, ANA",Arbitro asistente,https://www.rffm.es/acta-partido/1846176,2026-08-07T07:21:07.020491+00:00
+1846175,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846175,2026-08-07T07:21:07.148934+00:00
+1846175,referee,5276293,"GARCIA CALVO, HUGO",Arbitro asistente,https://www.rffm.es/acta-partido/1846175,2026-08-07T07:21:07.148934+00:00
+1846170,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1846170,2026-08-07T07:21:07.181813+00:00
+1846170,referee,5266435,"CEBALLOS GUERRA, JOSE MARIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846170,2026-08-07T07:21:07.181813+00:00
+1846177,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846177,2026-08-07T07:21:07.724574+00:00
+1846177,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846177,2026-08-07T07:21:07.724574+00:00
+1846173,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846173,2026-08-07T07:21:08.087386+00:00
+1846173,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846173,2026-08-07T07:21:08.087386+00:00
+1846776,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1846776,2026-08-07T07:21:08.097157+00:00
+1846776,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846776,2026-08-07T07:21:08.097157+00:00
+1846183,referee,5175643,"LIU, ZHOUQI",Arbitro principal,https://www.rffm.es/acta-partido/1846183,2026-08-07T07:21:08.131167+00:00
+1846183,referee,5276359,"TORDABLE HERNANDEZ, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846183,2026-08-07T07:21:08.131167+00:00
+1846178,referee,5000254,"CAMPOS QUESADA, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846178,2026-08-07T07:21:08.365607+00:00
+1846178,referee,5000727,"LOPEZ ORTIGÜELA, MARIANO ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846178,2026-08-07T07:21:08.365607+00:00
+1846180,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846180,2026-08-07T07:21:08.370160+00:00
+1846180,referee,5002632,"GUTIERREZ SERNA, ELENA",Arbitro asistente,https://www.rffm.es/acta-partido/1846180,2026-08-07T07:21:08.370160+00:00
+1846179,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846179,2026-08-07T07:21:08.375692+00:00
+1846179,referee,5276298,"GÓMEZ AYUSO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846179,2026-08-07T07:21:08.375692+00:00
+1846182,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846182,2026-08-07T07:21:08.386244+00:00
+1846182,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846182,2026-08-07T07:21:08.386244+00:00
+1846184,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1846184,2026-08-07T07:21:09.001671+00:00
+1846184,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846184,2026-08-07T07:21:09.001671+00:00
+1846186,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1846186,2026-08-07T07:21:09.189976+00:00
+1846186,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846186,2026-08-07T07:21:09.189976+00:00
+1846187,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1846187,2026-08-07T07:21:09.195482+00:00
+1846187,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846187,2026-08-07T07:21:09.195482+00:00
+1846185,referee,5000254,"CAMPOS QUESADA, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846185,2026-08-07T07:21:09.359659+00:00
+1846185,referee,5002317,"OTERO GARCIA, ALVARO",Arbitro asistente,https://www.rffm.es/acta-partido/1846185,2026-08-07T07:21:09.359659+00:00
+1846181,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846181,2026-08-07T07:21:09.571600+00:00
+1846181,referee,5266586,"DE LA TORRE REVENGA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1846181,2026-08-07T07:21:09.571600+00:00
+1846191,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1846191,2026-08-07T07:21:09.587689+00:00
+1846191,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846191,2026-08-07T07:21:09.587689+00:00
+1846189,referee,5115352,"PASCUAL CABILLAS, JOSE ENRIQUE",Arbitro principal,https://www.rffm.es/acta-partido/1846189,2026-08-07T07:21:09.738597+00:00
+1846189,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846189,2026-08-07T07:21:09.738597+00:00
+1846188,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846188,2026-08-07T07:21:10.286144+00:00
+1846188,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846188,2026-08-07T07:21:10.286144+00:00
+1846192,referee,5100073,"VEGA HURTADO, RUBEN",Arbitro principal,https://www.rffm.es/acta-partido/1846192,2026-08-07T07:21:10.293619+00:00
+1846192,referee,5254825,"VAZQUEZ ABAD, CAMILO",Arbitro asistente,https://www.rffm.es/acta-partido/1846192,2026-08-07T07:21:10.293619+00:00
+1846190,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846190,2026-08-07T07:21:10.456148+00:00
+1846190,referee,5266756,"GONZALEZ PINTADO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846190,2026-08-07T07:21:10.456148+00:00
+1846196,referee,5100073,"VEGA HURTADO, RUBEN",Arbitro principal,https://www.rffm.es/acta-partido/1846196,2026-08-07T07:21:10.479561+00:00
+1846196,referee,5250030,"GARCIA REIMUNDO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846196,2026-08-07T07:21:10.479561+00:00
+1846195,referee,5144762,"GARRO CASTRO, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846195,2026-08-07T07:21:10.678719+00:00
+1846195,referee,5265511,"PASCUAL LOPEZ-ALCOROCHO, ANDRES",Arbitro asistente,https://www.rffm.es/acta-partido/1846195,2026-08-07T07:21:10.678719+00:00
+1846198,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1846198,2026-08-07T07:21:10.948535+00:00
+1846198,referee,5090407,"GOMEZ-BRAVO PUERTA, ANTONIO DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846198,2026-08-07T07:21:10.948535+00:00
+1846200,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846200,2026-08-07T07:21:10.952044+00:00
+1846200,referee,5000911,"ALONSO ARRANZ, SHEILA",Arbitro asistente,https://www.rffm.es/acta-partido/1846200,2026-08-07T07:21:10.952044+00:00
+1846193,referee,5000554,"GUZON TORRIJOS, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846193,2026-08-07T07:21:10.957938+00:00
+1846193,referee,5266477,"BONET RODRIGUEZ, SAMUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846193,2026-08-07T07:21:10.957938+00:00
+1846194,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846194,2026-08-07T07:21:10.991439+00:00
+1846194,referee,5194778,"BAEZ PERANDONES, RUTH",Arbitro asistente,https://www.rffm.es/acta-partido/1846194,2026-08-07T07:21:10.991439+00:00
+1846199,referee,5246309,"LOPEZ LOPEZ, FERNANDO",Arbitro principal,https://www.rffm.es/acta-partido/1846199,2026-08-07T07:21:11.458482+00:00
+1846199,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846199,2026-08-07T07:21:11.458482+00:00
+1846197,referee,5001595,"GARVALENA CRESPO, MARTA",Arbitro principal,https://www.rffm.es/acta-partido/1846197,2026-08-07T07:21:11.784480+00:00
+1846197,referee,5266756,"GONZALEZ PINTADO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846197,2026-08-07T07:21:11.784480+00:00
+1846204,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846204,2026-08-07T07:21:11.864235+00:00
+1846204,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846204,2026-08-07T07:21:11.864235+00:00
+1846205,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846205,2026-08-07T07:21:11.959494+00:00
+1846205,referee,5202707,"JIMENEZ SALVADOR, CESAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846205,2026-08-07T07:21:11.959494+00:00
+1846203,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1846203,2026-08-07T07:21:12.062113+00:00
+1846203,referee,5194371,"CELIZ MORALES, VICTOR JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846203,2026-08-07T07:21:12.062113+00:00
+1846201,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846201,2026-08-07T07:21:12.125585+00:00
+1846201,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846201,2026-08-07T07:21:12.125585+00:00
+1846202,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846202,2026-08-07T07:21:12.129797+00:00
+1846202,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846202,2026-08-07T07:21:12.129797+00:00
+1846208,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1846208,2026-08-07T07:21:12.657738+00:00
+1846208,referee,5194335,"CARRERO SIMON, GONZALO",Arbitro asistente,https://www.rffm.es/acta-partido/1846208,2026-08-07T07:21:12.657738+00:00
+1846206,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846206,2026-08-07T07:21:13.005075+00:00
+1846206,referee,5276270,"CASTRO GAMONAL, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1846206,2026-08-07T07:21:13.005075+00:00
+1846209,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846209,2026-08-07T07:21:13.030418+00:00
+1846209,referee,5077533,"TORRES DE LA TORRE, MARIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846209,2026-08-07T07:21:13.030418+00:00
+1846211,referee,5232006,"FRIMPONG CUESTA, NART",Arbitro principal,https://www.rffm.es/acta-partido/1846211,2026-08-07T07:21:13.144387+00:00
+1846211,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1846211,2026-08-07T07:21:13.144387+00:00
+1846212,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1846212,2026-08-07T07:21:13.516092+00:00
+1846212,referee,5002299,"SANCHEZ PRADOS, DAVID",Arbitro asistente,https://www.rffm.es/acta-partido/1846212,2026-08-07T07:21:13.516092+00:00
+1846214,referee,5266483,"LARHDOULI, ANOUAR",Arbitro principal,https://www.rffm.es/acta-partido/1846214,2026-08-07T07:21:13.523980+00:00
+1846214,referee,5276309,"GOMEZ TEIXEIRA, SAMUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846214,2026-08-07T07:21:13.523980+00:00
+1846210,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846210,2026-08-07T07:21:13.570070+00:00
+1846210,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846210,2026-08-07T07:21:13.570070+00:00
+1846207,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846207,2026-08-07T07:21:13.984654+00:00
+1846207,referee,5276270,"CASTRO GAMONAL, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1846207,2026-08-07T07:21:13.984654+00:00
+1846216,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846216,2026-08-07T07:21:13.989774+00:00
+1846216,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846216,2026-08-07T07:21:13.989774+00:00
+1846215,referee,5002722,"PINTADO MAS, CARLOS",Arbitro principal,https://www.rffm.es/acta-partido/1846215,2026-08-07T07:21:14.215272+00:00
+1846215,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1846215,2026-08-07T07:21:14.215272+00:00
+1846213,referee,5226010,"VILLAFRANCA LORENTE, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846213,2026-08-07T07:21:14.224508+00:00
+1846213,referee,5002574,"VILLEGAS OCAÑA, ALBA MARÍA",Arbitro asistente,https://www.rffm.es/acta-partido/1846213,2026-08-07T07:21:14.224508+00:00
+1846218,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846218,2026-08-07T07:21:14.578504+00:00
+1846218,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1846218,2026-08-07T07:21:14.578504+00:00
+1846221,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846221,2026-08-07T07:21:14.631993+00:00
+1846221,referee,5000400,"SANCHEZ BOMBIN, ANA",Arbitro asistente,https://www.rffm.es/acta-partido/1846221,2026-08-07T07:21:14.631993+00:00
+1846217,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846217,2026-08-07T07:21:14.773542+00:00
+1846217,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846217,2026-08-07T07:21:14.773542+00:00
+1846219,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846219,2026-08-07T07:21:14.781608+00:00
+1846219,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846219,2026-08-07T07:21:14.781608+00:00
+1846220,referee,5001637,"CUBERO GARCIA, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846220,2026-08-07T07:21:14.784926+00:00
+1846220,referee,5250030,"GARCIA REIMUNDO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846220,2026-08-07T07:21:14.784926+00:00
+1846224,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1846224,2026-08-07T07:21:14.825605+00:00
+1846224,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846224,2026-08-07T07:21:14.825605+00:00
+1846222,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1846222,2026-08-07T07:21:15.486698+00:00
+1846222,referee,5237345,"CORREIA PUEBLA, PAULA PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846222,2026-08-07T07:21:15.486698+00:00
+1846223,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846223,2026-08-07T07:21:15.551727+00:00
+1846223,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1846223,2026-08-07T07:21:15.551727+00:00
+1846228,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846228,2026-08-07T07:21:15.556265+00:00
+1846228,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846228,2026-08-07T07:21:15.556265+00:00
+1846229,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846229,2026-08-07T07:21:15.730717+00:00
+1846229,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846229,2026-08-07T07:21:15.730717+00:00
+1846225,referee,5000741,"ALMAGRO MEJIAS, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846225,2026-08-07T07:21:15.768763+00:00
+1846225,referee,5109139,"GARCIA OLEGARIO, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1846225,2026-08-07T07:21:15.768763+00:00
+1846227,referee,5000254,"CAMPOS QUESADA, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846227,2026-08-07T07:21:16.302759+00:00
+1846227,referee,5207234,"VALLES CUENCA, ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846227,2026-08-07T07:21:16.302759+00:00
+1846226,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846226,2026-08-07T07:21:16.330909+00:00
+1846226,referee,5255551,"MATA SEGURADO, ADRIÁN",Arbitro asistente,https://www.rffm.es/acta-partido/1846226,2026-08-07T07:21:16.330909+00:00
+1846230,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846230,2026-08-07T07:21:16.696512+00:00
+1846230,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro asistente,https://www.rffm.es/acta-partido/1846230,2026-08-07T07:21:16.696512+00:00
+1846232,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846232,2026-08-07T07:21:16.724958+00:00
+1846232,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846232,2026-08-07T07:21:16.724958+00:00
+1846235,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846235,2026-08-07T07:21:16.739443+00:00
+1846235,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846235,2026-08-07T07:21:16.739443+00:00
+1846233,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1846233,2026-08-07T07:21:16.907352+00:00
+1846233,referee,5266483,"LARHDOULI, ANOUAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846233,2026-08-07T07:21:16.907352+00:00
+1846236,referee,5231843,"VARA GONZALEZ, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846236,2026-08-07T07:21:17.084914+00:00
+1846236,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846236,2026-08-07T07:21:17.084914+00:00
+1846231,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846231,2026-08-07T07:21:17.118360+00:00
+1846231,referee,5265419,"DE SALA ARROYO, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846231,2026-08-07T07:21:17.118360+00:00
+1846234,referee,5249493,"RODRIGUEZ GUERRERO, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846234,2026-08-07T07:21:17.130700+00:00
+1846234,referee,5276270,"CASTRO GAMONAL, MARTA",Arbitro asistente,https://www.rffm.es/acta-partido/1846234,2026-08-07T07:21:17.130700+00:00
+1846238,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846238,2026-08-07T07:21:17.384423+00:00
+1846238,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1846238,2026-08-07T07:21:17.384423+00:00
+1846239,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846239,2026-08-07T07:21:18.001988+00:00
+1846239,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846239,2026-08-07T07:21:18.001988+00:00
+1846243,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846243,2026-08-07T07:21:18.334033+00:00
+1846243,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro asistente,https://www.rffm.es/acta-partido/1846243,2026-08-07T07:21:18.334033+00:00
+1846241,referee,5002317,"OTERO GARCIA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846241,2026-08-07T07:21:18.334564+00:00
+1846241,referee,5265990,"DE ROJAS RAMÓN, JUAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846241,2026-08-07T07:21:18.334564+00:00
+1846246,referee,5167576,"PANTOJA ZAPATERO, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846246,2026-08-07T07:21:18.347257+00:00
+1846246,referee,5265429,"NAVARRO MORALES, JESUS",Arbitro asistente,https://www.rffm.es/acta-partido/1846246,2026-08-07T07:21:18.347257+00:00
+1846240,referee,5002518,"BAEZ PERANDONES, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846240,2026-08-07T07:21:18.612581+00:00
+1846240,referee,5276339,"MORERA ZABALA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846240,2026-08-07T07:21:18.612581+00:00
+1846242,referee,5245145,"ALMAGRO SANCHEZ, ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846242,2026-08-07T07:21:18.619583+00:00
+1846242,referee,5236735,"SANCHEZ SUAREZ, CRISTIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1846242,2026-08-07T07:21:18.619583+00:00
+1846244,referee,5002491,"MARTIN RODILLA, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846244,2026-08-07T07:21:18.794781+00:00
+1846244,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846244,2026-08-07T07:21:18.794781+00:00
+1846245,referee,5002298,"ALONSO ABAD, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846245,2026-08-07T07:21:18.850376+00:00
+1846245,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1846245,2026-08-07T07:21:18.850376+00:00
+1846237,referee,5194621,"VICENTE BUTRAGUEÑO, LUIS JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846237,2026-08-07T07:21:18.851147+00:00
+1846237,referee,5249523,"DE LA FUENTE GOMEZ, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1846237,2026-08-07T07:21:18.851147+00:00
+1846248,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846248,2026-08-07T07:21:19.220367+00:00
+1846248,referee,5001961,"MUÑOZ MONTIJANO, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1846248,2026-08-07T07:21:19.220367+00:00
+1846252,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1846252,2026-08-07T07:21:19.226655+00:00
+1846252,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846252,2026-08-07T07:21:19.226655+00:00
+1846256,referee,5002296,"ALONSO ABAD, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846256,2026-08-07T07:21:19.244754+00:00
+1846256,referee,5231661,"RODRIGUEZ HUETE, MARCOS",Arbitro asistente,https://www.rffm.es/acta-partido/1846256,2026-08-07T07:21:19.244754+00:00
+1846249,referee,5125200,"VILLAVERDE LUJAN, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846249,2026-08-07T07:21:19.395733+00:00
+1846249,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846249,2026-08-07T07:21:19.395733+00:00
+1846251,referee,5000409,"PELAEZ RODRIGUEZ, LUIS MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846251,2026-08-07T07:21:19.568925+00:00
+1846251,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846251,2026-08-07T07:21:19.568925+00:00
+1846247,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846247,2026-08-07T07:21:19.586782+00:00
+1846247,referee,5266756,"GONZALEZ PINTADO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846247,2026-08-07T07:21:19.586782+00:00
+1846250,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846250,2026-08-07T07:21:19.624982+00:00
+1846250,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846250,2026-08-07T07:21:19.624982+00:00
+1846255,referee,5000213,"CASTRO MERINO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846255,2026-08-07T07:21:20.045873+00:00
+1846255,referee,5221706,"YZAGUIRRE SAAVEDRA, LUCÍA VICTORIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846255,2026-08-07T07:21:20.045873+00:00
+1846253,referee,5000598,"DEL OLMO MARTINEZ, IGNACIO",Arbitro principal,https://www.rffm.es/acta-partido/1846253,2026-08-07T07:21:20.444339+00:00
+1846253,referee,5236787,"PAJUELO GARCIA, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1846253,2026-08-07T07:21:20.444339+00:00
+1846254,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846254,2026-08-07T07:21:20.450718+00:00
+1846254,referee,5256114,"ILIUT, DUMITRU-ALEXANDRU",Arbitro asistente,https://www.rffm.es/acta-partido/1846254,2026-08-07T07:21:20.450718+00:00
+1846258,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846258,2026-08-07T07:21:21.182874+00:00
+1846258,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846258,2026-08-07T07:21:21.182874+00:00
+1846260,referee,5002513,"ORTIZ MARQUEZ, GABRIEL",Arbitro principal,https://www.rffm.es/acta-partido/1846260,2026-08-07T07:21:21.350909+00:00
+1846260,referee,5249695,"EL YABOURY LKHLOF, IBRAHIM",Arbitro asistente,https://www.rffm.es/acta-partido/1846260,2026-08-07T07:21:21.350909+00:00
+1846262,referee,5000492,"JIMENEZ DE ORY, SANTIAGO",Arbitro principal,https://www.rffm.es/acta-partido/1846262,2026-08-07T07:21:21.354372+00:00
+1846262,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846262,2026-08-07T07:21:21.354372+00:00
+1846264,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846264,2026-08-07T07:21:21.358503+00:00
+1846264,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846264,2026-08-07T07:21:21.358503+00:00
+1846261,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846261,2026-08-07T07:21:21.634972+00:00
+1846261,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846261,2026-08-07T07:21:21.634972+00:00
+1846257,referee,5125205,"PUERTO DIEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1846257,2026-08-07T07:21:21.715188+00:00
+1846257,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846257,2026-08-07T07:21:21.715188+00:00
+1846266,referee,5099482,"BELHADJ EL BOUTROUKI, YOUSSEF",Arbitro principal,https://www.rffm.es/acta-partido/1846266,2026-08-07T07:21:21.893563+00:00
+1846266,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846266,2026-08-07T07:21:21.893563+00:00
+1846265,referee,5195021,"YAGÜE HERRERA, ADRIAN",Arbitro principal,https://www.rffm.es/acta-partido/1846265,2026-08-07T07:21:22.043116+00:00
+1846265,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846265,2026-08-07T07:21:22.043116+00:00
+1846263,referee,5139594,"LARRUBIA PAJARES, JAIME",Arbitro principal,https://www.rffm.es/acta-partido/1846263,2026-08-07T07:21:22.279107+00:00
+1846263,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro asistente,https://www.rffm.es/acta-partido/1846263,2026-08-07T07:21:22.279107+00:00
+1846271,referee,5001037,"GARRIDO ESTEBAN, ROBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846271,2026-08-07T07:21:22.283012+00:00
+1846271,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846271,2026-08-07T07:21:22.283012+00:00
+1846259,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846259,2026-08-07T07:21:22.288853+00:00
+1846259,referee,5266477,"BONET RODRIGUEZ, SAMUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846259,2026-08-07T07:21:22.288853+00:00
+1846268,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846268,2026-08-07T07:21:22.430512+00:00
+1846268,referee,5000400,"SANCHEZ BOMBIN, ANA",Arbitro asistente,https://www.rffm.es/acta-partido/1846268,2026-08-07T07:21:22.430512+00:00
+1846276,referee,5001135,"MONTERO FERNANDEZ, JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846276,2026-08-07T07:21:22.742006+00:00
+1846276,referee,5002292,"SAN ROMAN DE LOS LLANOS, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846276,2026-08-07T07:21:22.742006+00:00
+1846273,referee,5245145,"ALMAGRO SANCHEZ, ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846273,2026-08-07T07:21:22.916191+00:00
+1846273,referee,5195008,"MOLINA PEÑA, MARCO",Arbitro asistente,https://www.rffm.es/acta-partido/1846273,2026-08-07T07:21:22.916191+00:00
+1846267,referee,5217365,"PAREDES DE MIGUEL, RODRIGO",Arbitro principal,https://www.rffm.es/acta-partido/1846267,2026-08-07T07:21:22.922226+00:00
+1846267,referee,5250045,"LOPEZ ABAD, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846267,2026-08-07T07:21:22.922226+00:00
+1846270,referee,5125205,"PUERTO DIEZ, SERGIO",Arbitro principal,https://www.rffm.es/acta-partido/1846270,2026-08-07T07:21:23.050885+00:00
+1846270,referee,5000267,"DOMINGUEZ SANCHEZ, MIGUEL ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846270,2026-08-07T07:21:23.050885+00:00
+1846272,referee,5173583,"GALÁN VELASCO, ÁLVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846272,2026-08-07T07:21:23.188370+00:00
+1846272,referee,5266756,"GONZALEZ PINTADO, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846272,2026-08-07T07:21:23.188370+00:00
+1846269,referee,5000833,"TOLEDO FERNANDEZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846269,2026-08-07T07:21:23.516340+00:00
+1846269,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846269,2026-08-07T07:21:23.516340+00:00
+1846274,referee,5099523,"DE MIGUEL BALLESTEROS, MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846274,2026-08-07T07:21:23.736999+00:00
+1846274,referee,5198448,"IGLESIAS OTERO, IKER",Arbitro asistente,https://www.rffm.es/acta-partido/1846274,2026-08-07T07:21:23.736999+00:00
+1846275,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846275,2026-08-07T07:21:23.824184+00:00
+1846275,referee,5175501,"DUQUE GUEVARA, PABLO",Arbitro asistente,https://www.rffm.es/acta-partido/1846275,2026-08-07T07:21:23.824184+00:00
+1846277,referee,5000254,"CAMPOS QUESADA, JOSE LUIS",Arbitro principal,https://www.rffm.es/acta-partido/1846277,2026-08-07T07:21:23.828259+00:00
+1846277,referee,5195040,"HERNANDEZ PINTO, ALEJANDRO",Arbitro asistente,https://www.rffm.es/acta-partido/1846277,2026-08-07T07:21:23.828259+00:00
+1846279,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846279,2026-08-07T07:21:23.965804+00:00
+1846279,referee,5000830,"ARJONA ESCALONA, MANUEL JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846279,2026-08-07T07:21:23.965804+00:00
+1846284,referee,5099840,"MUÑOZ GORDO, JESUS",Arbitro principal,https://www.rffm.es/acta-partido/1846284,2026-08-07T07:21:24.134074+00:00
+1846284,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846284,2026-08-07T07:21:24.134074+00:00
+1846280,referee,5167652,"GARCIA LASA, ALVARO",Arbitro principal,https://www.rffm.es/acta-partido/1846280,2026-08-07T07:21:24.281953+00:00
+1846280,referee,5147139,"LOPEZ DIAZ, OSCAR",Arbitro asistente,https://www.rffm.es/acta-partido/1846280,2026-08-07T07:21:24.281953+00:00
+1846278,referee,5001840,"SANCHEZ HERREROS, ROBERTO MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846278,2026-08-07T07:21:24.503859+00:00
+1846278,referee,5201760,"VALERO DIAZ, JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846278,2026-08-07T07:21:24.503859+00:00
+1846283,referee,5000296,"DIAZ-HEREDERO HERNANDEZ, RAUL",Arbitro principal,https://www.rffm.es/acta-partido/1846283,2026-08-07T07:21:24.555736+00:00
+1846283,referee,5093547,"MUÑOZ MARTIN, ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846283,2026-08-07T07:21:24.555736+00:00
+1846281,referee,5113231,"LOPEZ SERNA, MIGUEL ANGEL",Arbitro principal,https://www.rffm.es/acta-partido/1846281,2026-08-07T07:21:24.671180+00:00
+1846281,referee,5249551,"MARQUEZ JORGE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846281,2026-08-07T07:21:24.671180+00:00
+1846282,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846282,2026-08-07T07:21:24.698497+00:00
+1846282,referee,5249904,"DE CARVALHO, LUCAS HENRIQUE",Arbitro asistente,https://www.rffm.es/acta-partido/1846282,2026-08-07T07:21:24.698497+00:00
+1846288,referee,5000286,"CASTRO MERINO, OSCAR",Arbitro principal,https://www.rffm.es/acta-partido/1846288,2026-08-07T07:21:25.006702+00:00
+1846288,referee,5099539,"FIGUEROA RIAZA, JOSE IGNACIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846288,2026-08-07T07:21:25.006702+00:00
+1846285,referee,5000516,"GONZALEZ VELEDO, JOSE ALBERTO",Arbitro principal,https://www.rffm.es/acta-partido/1846285,2026-08-07T07:21:25.210385+00:00
+1846285,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1846285,2026-08-07T07:21:25.210385+00:00
+1846291,referee,5014458,"CABELLO RUIZ-BURRUECOS, ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1846291,2026-08-07T07:21:25.392498+00:00
+1846291,referee,5194807,"GARCIA PEÑA, SERGIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846291,2026-08-07T07:21:25.392498+00:00
+1846290,referee,5001170,"RECIO FREIRE, JOSE ANTONIO",Arbitro principal,https://www.rffm.es/acta-partido/1846290,2026-08-07T07:21:25.685702+00:00
+1846290,referee,5255695,"JARAMILLO ACUÑA, MATTHEW FELIPE",Arbitro asistente,https://www.rffm.es/acta-partido/1846290,2026-08-07T07:21:25.685702+00:00
+1846286,referee,5001180,"JARQUE RUIZ, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846286,2026-08-07T07:21:25.706186+00:00
+1846286,referee,5236892,"REDONDO JUAREZ, GUILLERMO",Arbitro asistente,https://www.rffm.es/acta-partido/1846286,2026-08-07T07:21:25.706186+00:00
+1846292,referee,5099523,"DE MIGUEL BALLESTEROS, MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846292,2026-08-07T07:21:25.718229+00:00
+1846292,referee,5113328,"PEREZ PEREZ, VICTOR GABRIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846292,2026-08-07T07:21:25.718229+00:00
+1846289,referee,5144974,"SANZ MAÑAS, EDUARDO",Arbitro principal,https://www.rffm.es/acta-partido/1846289,2026-08-07T07:21:25.920767+00:00
+1846289,referee,5266412,"DIEZ CALVENTE, RAFAEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846289,2026-08-07T07:21:25.920767+00:00
+1846287,referee,5001731,"RODRIGUEZ BLANCO, FELIPE",Arbitro principal,https://www.rffm.es/acta-partido/1846287,2026-08-07T07:21:26.038914+00:00
+1846287,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1846287,2026-08-07T07:21:26.038914+00:00
+1846296,referee,5001281,"SANCHEZ GARCIA, PEDRO JOSE",Arbitro principal,https://www.rffm.es/acta-partido/1846296,2026-08-07T07:21:26.274584+00:00
+1846296,referee,5002508,"CARLERO SANCHEZ, MANUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846296,2026-08-07T07:21:26.274584+00:00
+1846295,referee,5194335,"CARRERO SIMON, GONZALO",Arbitro principal,https://www.rffm.es/acta-partido/1846295,2026-08-07T07:21:26.479869+00:00
+1846295,referee,5222499,"LAHOZ MORENO, HUGO",Arbitro asistente,https://www.rffm.es/acta-partido/1846295,2026-08-07T07:21:26.479869+00:00
+1846293,referee,5090439,"BOADA MARTINEZ, FRANCISCO JAVIER",Arbitro principal,https://www.rffm.es/acta-partido/1846293,2026-08-07T07:21:26.671629+00:00
+1846293,referee,5201760,"VALERO DIAZ, JOSE",Arbitro asistente,https://www.rffm.es/acta-partido/1846293,2026-08-07T07:21:26.671629+00:00
+1846298,referee,5249517,"FERNANDEZ VALLE, ALBA",Arbitro principal,https://www.rffm.es/acta-partido/1846298,2026-08-07T07:21:27.145786+00:00
+1846298,referee,5001938,"LOPEZ MORENO, ANGEL",Arbitro asistente,https://www.rffm.es/acta-partido/1846298,2026-08-07T07:21:27.145786+00:00
+1846294,referee,5125200,"VILLAVERDE LUJAN, ALEJANDRO",Arbitro principal,https://www.rffm.es/acta-partido/1846294,2026-08-07T07:21:27.215619+00:00
+1846294,referee,5000727,"LOPEZ ORTIGÜELA, MARIANO ANTONIO",Arbitro asistente,https://www.rffm.es/acta-partido/1846294,2026-08-07T07:21:27.215619+00:00
+1846299,referee,5002496,"JARQUE RUIZ, MIGUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846299,2026-08-07T07:21:27.328755+00:00
+1846299,referee,5113365,"SEDANO GOMEZ, JOSE MARIA",Arbitro asistente,https://www.rffm.es/acta-partido/1846299,2026-08-07T07:21:27.328755+00:00
+1701324,referee,1174587,"DE OSES BUMEDIEN, FRANCISCO",Arbitro principal,https://www.rffm.es/acta-partido/1701324,2026-08-07T07:21:27.668446+00:00
+1701324,referee,1112375,"SANCHEZ INFANTE, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1701324,2026-08-07T07:21:27.668446+00:00
+1701324,referee,1147298,"RAZA FERNÁNDEZ, ALEJANDRA",Arbitro asistente,https://www.rffm.es/acta-partido/1701324,2026-08-07T07:21:27.668446+00:00
+1701324,referee,1877821,"LOPEZ GARCIA, ADRIAN",,https://www.rffm.es/acta-partido/1701324,2026-08-07T07:21:27.668446+00:00
+1846300,referee,5002508,"CARLERO SANCHEZ, MANUEL",Arbitro principal,https://www.rffm.es/acta-partido/1846300,2026-08-07T07:21:27.782475+00:00
+1846300,referee,5249567,"ORTEGA SANCHEZ, YENENE",Arbitro asistente,https://www.rffm.es/acta-partido/1846300,2026-08-07T07:21:27.782475+00:00
+1701337,referee,1174587,"DE OSES BUMEDIEN, FRANCISCO",Arbitro principal,https://www.rffm.es/acta-partido/1701337,2026-08-07T07:21:27.826406+00:00
+1701337,referee,645721,"DIAZ RODRIGUEZ, LUIS MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1701337,2026-08-07T07:21:27.826406+00:00
+1701337,referee,636256,"LOPEZ MONTALBAN, DANIEL",Arbitro asistente,https://www.rffm.es/acta-partido/1701337,2026-08-07T07:21:27.826406+00:00
+1701337,referee,877467,"CARRASCOSA VÁZQUEZ, CRISTIAN JOSÉ",,https://www.rffm.es/acta-partido/1701337,2026-08-07T07:21:27.826406+00:00
+1701328,referee,1147298,"RAZA FERNÁNDEZ, ALEJANDRA",Arbitro principal,https://www.rffm.es/acta-partido/1701328,2026-08-07T07:21:27.946716+00:00
+1701328,referee,1877821,"LOPEZ GARCIA, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1701328,2026-08-07T07:21:27.946716+00:00
+1701328,referee,877948,"CERRO SANTOS, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1701328,2026-08-07T07:21:27.946716+00:00
+1701328,referee,1112375,"SANCHEZ INFANTE, FERNANDO",,https://www.rffm.es/acta-partido/1701328,2026-08-07T07:21:27.946716+00:00
+1561637,referee,964660,"ESPINOSA RIOS, ALICIA",Arbitro principal,https://www.rffm.es/acta-partido/1561637,2026-08-07T07:21:27.959789+00:00
+1561637,referee,718574,"GOMEZ GOMEZ, PATRICIA",Arbitro asistente,https://www.rffm.es/acta-partido/1561637,2026-08-07T07:21:27.959789+00:00
+1561637,referee,1701491,"LOPEZ GARCIA, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1561637,2026-08-07T07:21:27.959789+00:00
+1561637,referee,877467,"CARRASCOSA VÁZQUEZ, CRISTIAN JOSÉ",,https://www.rffm.es/acta-partido/1561637,2026-08-07T07:21:27.959789+00:00
+1701338,referee,636256,"LOPEZ MONTALBAN, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1701338,2026-08-07T07:21:27.980491+00:00
+1701338,referee,877467,"CARRASCOSA VÁZQUEZ, CRISTIAN JOSÉ",Arbitro asistente,https://www.rffm.es/acta-partido/1701338,2026-08-07T07:21:27.980491+00:00
+1701338,referee,1112375,"SANCHEZ INFANTE, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1701338,2026-08-07T07:21:27.980491+00:00
+1701338,referee,645721,"DIAZ RODRIGUEZ, LUIS MIGUEL",,https://www.rffm.es/acta-partido/1701338,2026-08-07T07:21:27.980491+00:00
+1701339,referee,636256,"LOPEZ MONTALBAN, DANIEL",Arbitro principal,https://www.rffm.es/acta-partido/1701339,2026-08-07T07:21:28.473451+00:00
+1701339,referee,645721,"DIAZ RODRIGUEZ, LUIS MIGUEL",Arbitro asistente,https://www.rffm.es/acta-partido/1701339,2026-08-07T07:21:28.473451+00:00
+1701339,referee,1112375,"SANCHEZ INFANTE, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1701339,2026-08-07T07:21:28.473451+00:00
+1701339,referee,877948,"CERRO SANTOS, ADRIAN",,https://www.rffm.es/acta-partido/1701339,2026-08-07T07:21:28.473451+00:00
+1701333,referee,1147298,"RAZA FERNÁNDEZ, ALEJANDRA",Arbitro principal,https://www.rffm.es/acta-partido/1701333,2026-08-07T07:21:28.560821+00:00
+1701333,referee,1112375,"SANCHEZ INFANTE, FERNANDO",Arbitro asistente,https://www.rffm.es/acta-partido/1701333,2026-08-07T07:21:28.560821+00:00
+1701333,referee,877948,"CERRO SANTOS, ADRIAN",Arbitro asistente,https://www.rffm.es/acta-partido/1701333,2026-08-07T07:21:28.560821+00:00
+1701333,referee,1877821,"LOPEZ GARCIA, ADRIAN",,https://www.rffm.es/acta-partido/1701333,2026-08-07T07:21:28.560821+00:00
