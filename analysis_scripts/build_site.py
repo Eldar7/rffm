@@ -223,14 +223,10 @@ def main():
     (out_dir / "season_comparison.html").write_text(season_comparison.build_html(sc_data), encoding="utf-8")
 
     print("Building club_division_map.html...")
-    cm_season = club_division_map.latest_core_season()
-    cm_data = club_division_map.load_data(cm_season)
-    (out_dir / "club_division_map.html").write_text(club_division_map.build_html(cm_data), encoding="utf-8")
+    club_division_map.build_all(out_dir)
 
     print("Building weird_scores.html...")
-    ws_season = weird_scores_report.latest_core_season()
-    ws_data = weird_scores_report.load_data(ws_season)
-    (out_dir / "weird_scores.html").write_text(weird_scores_report.build_html(ws_data), encoding="utf-8")
+    weird_scores_report.build_all(out_dir)
 
     print("Building index.html...")
     coverage = coverage_rows()
