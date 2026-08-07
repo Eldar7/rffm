@@ -49,20 +49,48 @@ CAT_LABEL_ES = {
 }
 CAT_LABEL_RU = CAT_LABEL_ES
 
-# Ordered strongest-to-weakest, matching CLAUDE.md/DATA_DICTIONARY.md tier ordering.
+# Ordered strongest-to-weakest, matching DIVISIONS.md tier ordering. Previously
+# this list only held the 6 "common" tiers, which silently dropped every club
+# whose only presence was in SUPERLIGA / LIGA NACIONAL / TERCERA FEDERACION /
+# SEGUNDA DIVISION B / the university tracks from the matrix AND from the
+# per-club row list entirely (e.g. LIGA NACIONAL is "Nacional Juvenil" — the
+# actual top tier for JUVENIL, not a rare edge case). See DIVISIONS.md's tier
+# table for the source of truth this must stay in sync with.
 DIV_ORDER = [
-    "DIVISION DE HONOR", "PRIMERA DIVISION AUTONOMICA", "PREFERENTE",
-    "PRIMERA", "SEGUNDA", "TERCERA",
+    "SUPERLIGA", "LIGA NACIONAL", "DIVISION DE HONOR", "PRIMERA DIVISION AUTONOMICA",
+    "PREFERENTE", "SEGUNDA DIVISION B", "TERCERA FEDERACION", "PRIMERA", "SEGUNDA",
+    "TERCERA", "CAMPEONATO UNIVERSITARIO", "LIGA UNIVERSITARIA",
 ]
 DIV_CODE = {
-    "DIVISION DE HONOR": "DH", "PRIMERA DIVISION AUTONOMICA": "PDA", "PREFERENTE": "PREF",
+    "SUPERLIGA": "SL", "LIGA NACIONAL": "LN", "DIVISION DE HONOR": "DH",
+    "PRIMERA DIVISION AUTONOMICA": "PDA", "PREFERENTE": "PREF",
+    "SEGUNDA DIVISION B": "2B", "TERCERA FEDERACION": "3F",
     "PRIMERA": "PRIM", "SEGUNDA": "SEG", "TERCERA": "TER",
+    "CAMPEONATO UNIVERSITARIO": "CU", "LIGA UNIVERSITARIA": "LU",
 }
 DIV_LABEL_ES = {
+    "SUPERLIGA": "Superliga", "LIGA NACIONAL": "Liga Nacional",
     "DIVISION DE HONOR": "División de Honor", "PRIMERA DIVISION AUTONOMICA": "1ª Div. Autonómica",
-    "PREFERENTE": "Preferente", "PRIMERA": "1ª División", "SEGUNDA": "2ª División", "TERCERA": "3ª División",
+    "PREFERENTE": "Preferente", "SEGUNDA DIVISION B": "2ª División B",
+    "TERCERA FEDERACION": "Tercera Federación",
+    "PRIMERA": "1ª División", "SEGUNDA": "2ª División", "TERCERA": "3ª División",
+    "CAMPEONATO UNIVERSITARIO": "Campeonato Universitario", "LIGA UNIVERSITARIA": "Liga Universitaria",
 }
 DIV_LABEL_RU = DIV_LABEL_ES
+
+# Tier rank per DIVISIONS.md's tier table (lower = stronger); None for
+# divisions that sit outside the main pyramid (FASE ZONAL, OTHER) or whose
+# tier is not numerically comparable (university track). Used to badge every
+# competition a club's teams appear in, even ones that don't get a matrix
+# column (cups, playoffs, zonal phases, "OTHER" leagues).
+TIER_OF = {
+    "SUPERLIGA": 1, "LIGA NACIONAL": 1, "DIVISION DE HONOR": 2,
+    "PRIMERA DIVISION AUTONOMICA": 3, "PREFERENTE": 4,
+    "SEGUNDA DIVISION B": 5, "TERCERA FEDERACION": 5,
+    "PRIMERA": 6, "SEGUNDA": 7, "TERCERA": 8,
+    "FASE ZONAL": None, "CAMPEONATO UNIVERSITARIO": None, "LIGA UNIVERSITARIA": None,
+    "OTHER": None,
+}
 
 GT_CODE = {"Futbol-7": "F7", "Fútbol Sala": "FS", "Futbol-11": "F11", "Fútbol-5": "F5"}
 GT_SHORT = {"Futbol-7": "F-7", "Fútbol Sala": "Sala", "Futbol-11": "F-11", "Fútbol-5": "F-5"}
@@ -125,11 +153,16 @@ def load_data(season: str) -> dict:
 
     comps["category_base"] = comps["category_base"].fillna("OTHER")
     comps["division_level"] = comps["division_level"].fillna("OTHER")
-    comp_facet = comps.set_index("competition_id")[["category_base", "division_level", "game_type", "game_type_id"]]
+    comp_facet = comps.set_index("competition_id")[
+        ["category_base", "division_level", "game_type", "game_type_id", "phase_label"]]
 
     standings = standings.join(comp_facet, on="competition_id")
+    # Only real, known age categories get a "cat" badge in the UI (CAT_LABEL_*
+    # lookups below would KeyError on anything else) — but do NOT filter by
+    # division_level here, or every club whose only presence is a tier outside
+    # the matrix's DIV_ORDER (a cup, a zonal phase, an "OTHER" league) silently
+    # disappears from the whole page, not just from one column.
     standings = standings[standings["category_base"].isin(CATEGORIES) &
-                           standings["division_level"].isin(DIV_ORDER) &
                            standings["game_type"].notna()].copy()
     standings["position"] = pd.to_numeric(standings["position"], errors="coerce")
     standings["tid"] = standings["team_id"].map(norm_id)
@@ -142,9 +175,14 @@ def load_data(season: str) -> dict:
 
     group_size = standings.groupby("group_id").size().to_dict()
 
-    # ── matrix cells: one row per (club, cat, div, gt) ──
+    # ── matrix cells: one row per (club, cat, div, gt) — restricted to the
+    # tiered league columns (DIV_ORDER) and to regular-season phases, so cup/
+    # playoff/"torneo de campeones" phases of the same league don't fork off
+    # extra matrix columns. Those still show up in full in club_all_comps below.
+    standings_matrix = standings[standings["division_level"].isin(DIV_ORDER) &
+                                  (standings["phase_label"] == "regular_season")]
     cell_rows = []
-    for (club, cat, div, gtc), grp in standings.groupby(["club", "category_base", "division_level", "gt_code"]):
+    for (club, cat, div, gtc), grp in standings_matrix.groupby(["club", "category_base", "division_level", "gt_code"]):
         best = grp.loc[grp["position"].idxmin()]
         cell_rows.append({
             "club": club, "cat": cat, "div": div, "gtc": gtc,
@@ -155,7 +193,8 @@ def load_data(season: str) -> dict:
         })
     cells = pd.DataFrame(cell_rows)
 
-    # ── per-club team list (for the detail panel) ──
+    # ── per-club team list (for the detail panel) — every division/phase a
+    # team of theirs stood in a table for, not just the matrix-eligible ones ──
     teams_by_club: dict[str, list] = {}
     for _, r in standings.iterrows():
         teams_by_club.setdefault(r["club"], []).append({
@@ -167,6 +206,44 @@ def load_data(season: str) -> dict:
             "season_id": clean(r["season_id"]), "comp_id": clean(r["competition_id"]),
             "group_id": clean(r["group_id"]), "gt_id": clean(r["game_type_id"]),
         })
+
+    # ── full competition list per club, sourced from matches.csv (not
+    # standings.csv) so single-elimination cups/finals that never got a table
+    # still show up — every Competición any of the club's teams played in,
+    # not only the ones with a tiered matrix column. ──
+    matches["hid"] = matches["home_team_id"].map(norm_id)
+    matches["aid"] = matches["away_team_id"].map(norm_id)
+    app_cols = ["competition_id", "group_id", "group", "game_type", "game_type_id",
+                "season_id", "phase_label", "competition"]
+    appearances = pd.concat([
+        matches[["hid"] + app_cols].rename(columns={"hid": "tid"}),
+        matches[["aid"] + app_cols].rename(columns={"aid": "tid"}),
+    ], ignore_index=True)
+    appearances = appearances.dropna(subset=["tid", "competition_id"])
+    appearances["club"] = appearances["tid"].map(tid_to_club)
+    appearances = appearances.dropna(subset=["club"])
+    comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
+    appearances = appearances.join(comp_meta, on="competition_id")
+    appearances["team_name"] = appearances["tid"].map(tid_to_name).fillna(appearances["tid"])
+
+    club_all_comps: dict[str, list] = {}
+    grouped = appearances.groupby(["club", "competition_id", "group_id"], dropna=False)
+    for (club, comp_id, group_id), g in grouped:
+        first = g.iloc[0]
+        div = first["division_level"] or "OTHER"
+        club_all_comps.setdefault(club, []).append({
+            "comp": clean(first["competition"]), "cat": clean(first["category_base"]) or "OTHER",
+            "div": clean(div) or "OTHER", "gt": clean(first["game_type"]),
+            "phase": clean(first["phase_label"]), "grp": clean(first["group"]),
+            "season_id": clean(first["season_id"]), "comp_id": clean(comp_id),
+            "group_id": clean(group_id), "gt_id": clean(first["game_type_id"]),
+            "teams": sorted({clean(t) for t in g["team_name"] if clean(t)}),
+            "tier": TIER_OF.get(div),
+        })
+    for club, lst in club_all_comps.items():
+        lst.sort(key=lambda r: (r["tier"] if r["tier"] is not None else 99,
+                                 CATEGORIES.index(r["cat"]) if r["cat"] in CATEGORIES else 99,
+                                 r["comp"] or ""))
 
     # ── venues: EVERY real home ground per club (exact lat/lon from venues.csv), not one guess ──
     relevant_tids = set(standings["tid"].dropna().unique())
@@ -196,6 +273,7 @@ def load_data(season: str) -> dict:
     if clubs_df is not None:
         for _, r in clubs_df.iterrows():
             club_info_by_name[r["club_name_raw"]] = {
+                "club_id": clean(r.get("club_id")),
                 "crest": abs_crest_url(clean(r.get("crest_url"))),
                 "web": clean(r.get("portal_web")),
                 "address": clean(r.get("correspondence_address")),
@@ -204,17 +282,25 @@ def load_data(season: str) -> dict:
                 "reptid": clean(r.get("representative_team_id")),
             }
 
-    # ── assemble per-club records ──
+    # ── assemble per-club records — union of every source, so a club whose
+    # teams sit entirely outside the tiered matrix (cup-only, Superliga/Liga
+    # Nacional, femenino "OTHER" leagues, ...) still gets a row instead of
+    # vanishing from the page. ──
+    all_club_names = set(teams_by_club) | set(venues_by_club) | set(club_all_comps)
+    if not cells.empty:
+        all_club_names |= set(cells["club"])
+    cells_by_club = {club: grp for club, grp in cells.groupby("club")} if not cells.empty else {}
     clubs_out = []
-    for club, grp in cells.groupby("club"):
+    for club in all_club_names:
         rec = {"club": club}
         cells_dict = {}
-        for _, r in grp.iterrows():
+        for _, r in cells_by_club.get(club, pd.DataFrame()).iterrows():
             key = f"{r['cat']}_{DIV_CODE[r['div']]}_{r['gtc']}"
             cells_dict[key] = {"n": int(r["n"]), "pos": int(r["pos"]), "size": int(r["size"]), "grp": r["grp"]}
         rec["cells"] = cells_dict
         rec["teams"] = sorted(teams_by_club.get(club, []), key=lambda t: (t["cat"], t["div"], t["pos"]))
         rec["venues"] = sorted(venues_by_club.get(club, []), key=lambda v: -v["n"])
+        rec["all_comps"] = club_all_comps.get(club, [])
         rec["info"] = club_info_by_name.get(club)
         clubs_out.append(rec)
     clubs_out.sort(key=lambda r: r["club"])
@@ -357,6 +443,8 @@ thead tr.lvl-row th:hover{color:var(--accent);}
 thead tr.lvl-row th.club-head{ position:sticky; left:0; z-index:4; background:var(--surface);
   border-right:1px solid var(--line-strong); min-width:15rem; cursor:default; }
 thead tr.lvl-row th.total-head{min-width:8rem;}
+/* separates one age category's block of columns from the next, in both header rows and the body */
+thead tr.cat-row th.cat-divider, thead tr.lvl-row th.cat-divider, tbody td.cat-divider{ border-left:2px solid var(--line-strong); }
 tbody td{ border-bottom:1px solid var(--line); padding:0.4rem 0.55rem; vertical-align:middle; white-space:nowrap; }
 tbody tr:hover td{background:var(--row-hover);}
 tbody td.club-cell{ position:sticky; left:0; z-index:2; background:var(--surface);
@@ -405,6 +493,24 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
   letter-spacing:0.05em; color:var(--ink-soft); margin:0.7rem 0 0.15rem; padding-top:0.5rem; border-top:1px solid var(--line);}
 .modal-group-h:first-child{border-top:none; margin-top:0; padding-top:0;}
 .modal-div-h{font-size:0.72rem; font-weight:700; color:var(--ink); margin:0.3rem 0 0.1rem;}
+
+/* ---------- "all competitions" per-club list ---------- */
+.comp-row{ padding:0.4rem 0; border-bottom:1px solid var(--line); }
+.comp-row:last-child{border-bottom:none;}
+.comp-row-main{ font-size:0.85rem; color:var(--ink); display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
+.comp-row-sub{ margin-top:0.25rem; display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap; font-size:0.74rem; color:var(--ink-soft); }
+.comp-gt, .comp-grp{ white-space:nowrap; }
+.comp-teams{ color:var(--ink-faint); font-style:italic; }
+.tier-chip{ display:inline-flex; align-items:center; padding:0.12rem 0.5rem; border-radius:999px;
+  font-size:0.7rem; font-weight:700; white-space:nowrap; }
+.tier-top{ background:var(--gold-soft); color:var(--gold); box-shadow:inset 0 0 0 1.5px var(--gold); }
+.tier-mid{ background:var(--accent-soft); color:var(--accent); }
+.tier-low{ background:var(--teal-soft); color:var(--teal); }
+.tier-bottom{ background:var(--line); color:var(--ink-soft); }
+.tier-other{ background:var(--bg); color:var(--ink-faint); box-shadow:inset 0 0 0 1px var(--line-strong); }
+.phase-chip{ display:inline-flex; align-items:center; padding:0.1rem 0.45rem; border-radius:4px;
+  font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;
+  background:var(--pos-red-soft); color:var(--pos-red); }
 
 /* ---------- position badges: gold=1st, then 4 flat, non-gradient bands by proximity to top/bottom ---------- */
 .pos-badge{ display:inline-flex; align-items:baseline; gap:0.15rem; padding:0.1rem 0.45rem; border-radius:999px;
@@ -527,14 +633,15 @@ let CURLANG = 'ru';
 let DATA = null, COLUMNS = [], CLUBS = [];
 const STATE = { cats: new Set(), divs: new Set(), gts: new Set(), seeded: false };
 let TIER = {};
+let CAT_START_KEYS = new Set();
 let sortKey = '__total', sortDir = -1;
 
 function esc(s) {
   if (s === null || s === undefined) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function catLabel(c) { return CURLANG === 'ru' ? CAT_LABEL_RU[c] : CAT_LABEL_ES[c]; }
-function divLabel(d) { return CURLANG === 'ru' ? DIV_LABEL_RU[d] : DIV_LABEL_ES[d]; }
+function catLabel(c) { return (CURLANG === 'ru' ? CAT_LABEL_RU : CAT_LABEL_ES)[c] || c; }
+function divLabel(d) { return (CURLANG === 'ru' ? DIV_LABEL_RU : DIV_LABEL_ES)[d] || d; }
 
 function activeColumns() {
   return COLUMNS.filter(c => STATE.cats.has(c.cat) && STATE.divs.has(c.div) && STATE.gts.has(c.gt));
@@ -594,8 +701,9 @@ function buildHead() {
   corner.textContent = LANG[CURLANG].club;
   headRow.appendChild(corner);
 
-  let lastCat = null, span = 0, catTh = null;
+  let lastCat = null, span = 0, catTh = null, first = true;
   const catThs = [];
+  CAT_START_KEYS = new Set();
   cols.forEach(col => {
     if (col.cat !== lastCat) {
       if (catTh) catThs.push([catTh, span]);
@@ -603,16 +711,19 @@ function buildHead() {
       catTh.textContent = catLabel(col.cat);
       lastCat = col.cat;
       span = 0;
+      if (!first) CAT_START_KEYS.add(col.key);
+      first = false;
     }
     span++;
     const th = document.createElement('th');
     th.textContent = divLabel(col.div) + ' · ' + col.gt_short;
     th.dataset.key = col.key;
+    if (CAT_START_KEYS.has(col.key)) th.classList.add('cat-divider');
     th.addEventListener('click', () => sortBy(col.key));
     headRow.appendChild(th);
   });
   if (catTh) catThs.push([catTh, span]);
-  catThs.forEach(([th, span]) => { th.colSpan = span; catRow.appendChild(th); });
+  catThs.forEach(([th, span], i) => { th.colSpan = span; if (i > 0) th.classList.add('cat-divider'); catRow.appendChild(th); });
 
   const totalTh = document.createElement('th');
   totalTh.className = 'total-head';
@@ -706,7 +817,7 @@ function render() {
 
     cols.forEach(col => {
       const td = document.createElement('td');
-      td.className = 'cell lvl-' + TIER[col.key];
+      td.className = 'cell lvl-' + TIER[col.key] + (CAT_START_KEYS.has(col.key) ? ' cat-divider' : '');
       const v = club.cells[col.key];
       if (v) {
         const chip = document.createElement('span');
@@ -784,13 +895,74 @@ function groupCalLink(t) {
   return `<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
 }
 
+const PHASE_LABEL = {
+  ru: { regular_season: 'Регулярный чемпионат', 'phase fase final': 'Финал', playoff: 'Плей-офф',
+        'phase segunda fase': '2-й этап', 'playoff FASE FINAL': 'Финал плей-офф',
+        'phase 7 fase': 'Доп. этап', 'playoff 7 FASE': 'Плей-офф (доп.)' },
+  es: { regular_season: 'Liga regular', 'phase fase final': 'Final', playoff: 'Playoff',
+        'phase segunda fase': '2ª fase', 'playoff FASE FINAL': 'Final de playoff',
+        'phase 7 fase': 'Fase adicional', 'playoff 7 FASE': 'Playoff (adicional)' },
+};
+function phaseChip(phase) {
+  const label = (PHASE_LABEL[CURLANG] || {})[phase];
+  if (!label || phase === 'regular_season') return '';
+  return `<span class="phase-chip">${esc(label)}</span>`;
+}
+
+function tierClass(tier) {
+  if (tier === null || tier === undefined) return 'tier-other';
+  if (tier <= 2) return 'tier-top';
+  if (tier <= 4) return 'tier-mid';
+  if (tier <= 6) return 'tier-low';
+  return 'tier-bottom';
+}
+function tierChip(c) {
+  return `<span class="tier-chip ${tierClass(c.tier)}">${esc(divLabel(c.div))}</span>`;
+}
+
+function compCalLink(c) {
+  const text = esc(c.comp || c.grp || '');
+  if (!(c.season_id && c.comp_id && c.group_id && c.gt_id)) return text;
+  const url = `https://www.rffm.es/competicion/calendario?temporada=${c.season_id}&competicion=${c.comp_id}&grupo=${c.group_id}&jornada=1&tipojuego=${c.gt_id}`;
+  return `<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
+}
+
+// Every Competición any of the club's teams played this season — not just
+// the ones that made it into the tiered matrix — grouped by age category
+// then sorted strongest tier first, so nothing is silently hidden.
+function allCompsHtml(club) {
+  const comps = club.all_comps || [];
+  if (!comps.length) return '';
+  const byCat = new Map();
+  comps.forEach(c => {
+    if (!byCat.has(c.cat)) byCat.set(c.cat, []);
+    byCat.get(c.cat).push(c);
+  });
+  const catRank = c => { const i = CAT_ORDER.indexOf(c); return i === -1 ? 999 : i; };
+  const catsSorted = [...byCat.keys()].sort((a, b) => catRank(a) - catRank(b) || a.localeCompare(b));
+  let html = '';
+  catsSorted.forEach(cat => {
+    html += `<div class="modal-group-h">${esc(catLabel(cat))}</div>`;
+    const rows = byCat.get(cat).slice().sort((a, b) =>
+      (a.tier ?? 99) - (b.tier ?? 99) || (a.comp || '').localeCompare(b.comp || ''));
+    rows.forEach(c => {
+      const teams = (c.teams || []).join(', ');
+      html += `<div class="comp-row">
+        <div class="comp-row-main">${compCalLink(c)}${phaseChip(c.phase)}</div>
+        <div class="comp-row-sub">${tierChip(c)}${c.gt ? `<span class="comp-gt">${esc(c.gt)}</span>` : ''}${c.grp ? `<span class="comp-grp">${esc(c.grp)}</span>` : ''}<span class="comp-teams">${esc(teams)}</span></div>
+      </div>`;
+    });
+  });
+  return html;
+}
+
 function openClubModal(club) {
   const L = CURLANG;
   const info = club.info;
   const crestHtml = info && info.crest
     ? `<img class="modal-crest" src="${info.crest}" alt="" onerror="this.style.display='none'">` : '';
-  const clubNameHtml = (info && info.reptid)
-    ? `<a href="https://www.rffm.es/fichaequipo/${info.reptid}" target="_blank" rel="noopener">${esc(club.club)}</a>` : esc(club.club);
+  const clubNameHtml = (info && info.club_id)
+    ? `<a href="https://www.rffm.es/fichaclub/${info.club_id}" target="_blank" rel="noopener">${esc(club.club)}</a>` : esc(club.club);
   const webRaw = info && info.web;
   const webHref = webRaw ? (webRaw.startsWith('http') ? webRaw : 'https://' + webRaw) : null;
   const webHtml = webHref ? `<div><a href="${webHref}" target="_blank" rel="noopener">${esc(webRaw)}</a></div>` : '';
@@ -816,7 +988,8 @@ function openClubModal(club) {
   catsSorted.forEach(cat => {
     teamsHtml += `<div class="modal-group-h">${catLabel(cat)}</div>`;
     const byDiv = byCat.get(cat);
-    const divsSorted = [...byDiv.keys()].sort((a, b) => DIV_ORDER_JS.indexOf(a) - DIV_ORDER_JS.indexOf(b));
+    const divRank = d => { const i = DIV_ORDER_JS.indexOf(d); return i === -1 ? 999 : i; };
+    const divsSorted = [...byDiv.keys()].sort((a, b) => divRank(a) - divRank(b) || a.localeCompare(b));
     divsSorted.forEach(div => {
       teamsHtml += `<div class="modal-div-h">${divLabel(div)}</div>`;
       const rows = byDiv.get(div).slice().sort((a, b) =>
@@ -830,11 +1003,15 @@ function openClubModal(club) {
 
   const venuesTitle = L === 'ru' ? 'Реальные площадки (из БД)' : 'Sedes reales (de la BD)';
   const teamsTitle = L === 'ru' ? 'Команды и дивизионы' : 'Equipos y divisiones';
+  const allCompsTitle = L === 'ru' ? 'Все соревнования клуба' : 'Todas las competiciones del club';
+  const allCompsBody = allCompsHtml(club) ||
+    `<div class="modal-note">${L === 'ru' ? 'Нет данных о матчах.' : 'Sin datos de partidos.'}</div>`;
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}</div></div>
     ${addrHtml}
     <div class="modal-section"><h3>${venuesTitle}</h3>${venuesHtml}</div>
     <div class="modal-section"><h3>${teamsTitle}</h3>${teamsHtml}</div>
+    <div class="modal-section"><h3>${allCompsTitle}</h3>${allCompsBody}</div>
   `;
   document.getElementById('modalBackdrop').classList.remove('hidden');
 }
