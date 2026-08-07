@@ -56,7 +56,7 @@ PYRAMIDS_F11 = [
     {
         "id": "f11_m_aficionado", "group": "f11m", "cat": "AFICIONADO",
         "title_es": "Aficionado / Sénior — masculino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("AFICIONADO", "Futbol-11"),
+        "timing_key": ("AFICIONADO", "Futbol-11", False),
         "tiers": [
             tier("SEGUNDA RFEF", "RFEF", "grupo nacional",
                   note="Fuera del ámbito RFFM — el club ya no aparece en datos de esta federación."),
@@ -79,7 +79,7 @@ PYRAMIDS_F11 = [
     {
         "id": "f11_m_juvenil", "group": "f11m", "cat": "JUVENIL",
         "title_es": "Juvenil — masculino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("JUVENIL", "Futbol-11"),
+        "timing_key": ("JUVENIL", "Futbol-11", False),
         "tiers": [
             tier("DIVISIÓN DE HONOR JUVENIL", "RFEF", "grupos nacionales",
                  note="Organizada exclusivamente por la RFEF; no la administra RFFM."),
@@ -105,7 +105,7 @@ PYRAMIDS_F11 = [
     {
         "id": "f11_m_cadete", "group": "f11m", "cat": "CADETE",
         "title_es": "Cadete — masculino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("CADETE", "Futbol-11"),
+        "timing_key": ("CADETE", "Futbol-11", False),
         "tiers": [
             tier("SUPERLIGA", "RFFM", "1 grupo × 16",
                  asc="— (tope de la pirámide)",
@@ -129,7 +129,7 @@ PYRAMIDS_F11 = [
     {
         "id": "f11_m_infantil", "group": "f11m", "cat": "INFANTIL",
         "title_es": "Infantil — masculino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("INFANTIL", "Futbol-11"),
+        "timing_key": ("INFANTIL", "Futbol-11", False),
         "tiers": [
             tier("SUPERLIGA", "RFFM", "1 grupo × 16",
                  asc="— (tope de la pirámide)",
@@ -153,7 +153,7 @@ PYRAMIDS_F11 = [
     {
         "id": "f11_m_alevin", "group": "f11m", "cat": "ALEVIN",
         "title_es": "Alevín — masculino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("ALEVIN", "Futbol-11"),
+        "timing_key": ("ALEVIN", "Futbol-11", False),
         "tiers": [
             tier("SUPERLIGA", "RFFM", "1 grupo × 16",
                  asc="— (tope de la pirámide)",
@@ -182,7 +182,7 @@ PYRAMIDS_F11_FEM = [
     {
         "id": "f11_f_aficionado", "group": "f11f", "cat": "AFICIONADO",
         "title_es": "Aficionado — femenino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("OTHER", "Futbol-11"),
+        "timing_key": ("OTHER", "Futbol-11", True),
         "tiers": [
             tier("SEGUNDA FEDERACIÓN FEMENINA", "RFEF", "grupo nacional",
                  note="Fuera del ámbito RFFM."),
@@ -203,7 +203,7 @@ PYRAMIDS_F11_FEM = [
     {
         "id": "f11_f_juvenil", "group": "f11f", "cat": "JUVENIL",
         "title_es": "Juvenil — femenino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("JUVENIL", "Futbol-11"),
+        "timing_key": ("JUVENIL", "Futbol-11", True),
         "tiers": [
             tier("PRIMERA DIVISIÓN AUTONÓMICA FEMENINO", "RFFM", "1 grupo × 16",
                  asc="— (tope de la categoría; Juvenil Femenino no conecta con RFEF)",
@@ -218,7 +218,7 @@ PYRAMIDS_F11_FEM = [
     {
         "id": "f11_f_cadete", "group": "f11f", "cat": "CADETE",
         "title_es": "Cadete — femenino, Fútbol-11", "source": SRC_F11,
-        "timing_key": ("CADETE", "Futbol-11"),
+        "timing_key": ("CADETE", "Futbol-11", True),
         "tiers": [
             tier("PRIMERA DIVISIÓN AUTONÓMICA FEMENINO", "RFFM", "1 grupo × 16",
                  asc="— (tope de la categoría)",
@@ -237,7 +237,7 @@ PYRAMIDS_FS = [
     {
         "id": "fs_m_aficionado", "group": "fsm", "cat": "AFICIONADO",
         "title_es": "Aficionado / Sénior — masculino, Fútbol Sala", "source": SRC_FS,
-        "timing_key": ("AFICIONADO", "Fútbol Sala"),
+        "timing_key": ("AFICIONADO", "Fútbol Sala", False),
         "tiers": [
             tier("SEGUNDA DIVISIÓN “B”", "RFEF", "grupo nacional", note="Fuera del ámbito RFFM."),
             tier("TERCERA DIVISIÓN", "RFEF", "2 grupos × 16", admin="RFFM",
@@ -258,7 +258,7 @@ PYRAMIDS_FS = [
     {
         "id": "fs_m_juvenil", "group": "fsm", "cat": "JUVENIL",
         "title_es": "Juvenil — masculino, Fútbol Sala", "source": SRC_FS,
-        "timing_key": ("JUVENIL", "Fútbol Sala"),
+        "timing_key": ("JUVENIL", "Fútbol Sala", False),
         "tiers": [
             tier("DIVISIÓN DE HONOR JUVENIL FS", "RFEF", "grupos nacionales",
                  note="Organizada exclusivamente por la RFEF."),
@@ -275,7 +275,7 @@ PYRAMIDS_FS = [
     {
         "id": "fs_m_cadete", "group": "fsm", "cat": "CADETE",
         "title_es": "Cadete — masculino, Fútbol Sala", "source": SRC_FS,
-        "timing_key": ("CADETE", "Fútbol Sala"),
+        "timing_key": ("CADETE", "Fútbol Sala", False),
         "tiers": [
             tier("PREFERENTE CADETE", "RFFM", "1 grupo × 14",
                  asc="1º-8º → nueva 1ª Div. Autonómica (creada en 2025/26); 9º-14º juegan play-off "
@@ -289,7 +289,7 @@ PYRAMIDS_FS = [
     {
         "id": "fs_m_infantil", "group": "fsm", "cat": "INFANTIL",
         "title_es": "Infantil — masculino, Fútbol Sala", "source": SRC_FS,
-        "timing_key": ("INFANTIL", "Fútbol Sala"),
+        "timing_key": ("INFANTIL", "Fútbol Sala", False),
         "tiers": [
             tier("PREFERENTE INFANTIL", "RFFM", "1 grupo × 14",
                  asc="1º-9º → nueva 1ª Div. Autonómica (creada en 2025/26); 10º-14º juegan play-off "
@@ -321,7 +321,7 @@ SINGLE_DIVISION_FS_FEM = [
 PYRAMID_FS_FEM_AFICIONADO = {
     "id": "fs_f_aficionado", "group": "fsf", "cat": "AFICIONADO",
     "title_es": "Aficionado — femenino, Fútbol Sala", "source": SRC_FS,
-    "timing_key": ("OTHER", "Fútbol Sala"),
+    "timing_key": ("OTHER", "Fútbol Sala", True),
     "tiers": [
         tier("SEGUNDA FEDERACIÓN FUTSAL FEMENINA", "RFEF", "grupo nacional", note="Fuera del ámbito RFFM."),
         tier("PRIMERA DIVISIÓN AUTONÓMICA FEMENINA", "RFFM", "1 grupo × 14",
@@ -334,23 +334,131 @@ PYRAMID_FS_FEM_AFICIONADO = {
     ],
 }
 
-# The Prebenjamín/Benjamín/lower-Alevín *outdoor* Fútbol-7 pyramid has its
-# own RFFM bases document ("Bases de Ascensos y Descensos F-7 y F-5") that
-# was not fetched for this build — the note below is instead grounded in
-# this project's own crawled data (DIVISIONS.md's tier table,
-# TOURNAMENT_NAMING_VARIANTS.md) rather than the official circular text
-# used for the pyramids above.
-F7_NOTE_ES = (
-    "Prebenjamín, Benjamín y el tramo inferior de Alevín juegan Fútbol-7 al aire libre bajo una "
-    "pirámide propia (1ª Div. Autonómica → Preferente → Primera, sin división por debajo de Primera) "
-    "que este informe no transcribe de la circular oficial de la RFFM — se documenta empíricamente a "
-    "partir de los datos rastreados: cada división cierra con una fase de play-off (“Torneo de "
-    "Campeones”) entre los primeros de cada grupo, y aparte existen “Fases Zonales” "
-    "(reagrupación geográfica de fin de temporada para equipos de mitad de tabla) que no forman parte "
-    "de la pirámide de ascenso. Ver DIVISIONS.md y TOURNAMENT_NAMING_VARIANTS.md en el repositorio."
-)
+# ─────────────────────────── Fútbol-7 pyramids ─────────────────────────────
+# Source: BASES DE ASCENSOS Y DESCENSOS COMPETICIÓN FÚTBOL-7 (RFFM, aprobadas
+# por la Comisión Delegada el 23/12/2024) — this circular governs 2024/2025's
+# own ascensos AND explicitly creates two new top tiers for 2025/2026
+# (DIVISIÓN DE HONOR Benjamín, PRIMERA DIVISIÓN AUTONÓMICA Prebenjamín),
+# already populated with real teams in this project's 2025-2026 crawl (e.g.
+# ARAVACA C.F. - CEIBA 'A' sits in the new División de Honor Benjamín F-7
+# after winning its Primera Autonómica group in 2024/2025).
+SRC_F7 = ("BASES DE ASCENSOS Y DESCENSOS COMPETICIÓN FÚTBOL-7 (RFFM, aprobadas por la "
+          "Comisión Delegada el 23/12/2024) — describe los ascensos de 2024/2025 que crean "
+          "las nuevas División de Honor Benjamín y 1ª Div. Autonómica Prebenjamín para 2025/2026")
 
-ALL_PYRAMIDS = PYRAMIDS_F11 + PYRAMIDS_F11_FEM + PYRAMIDS_FS + [PYRAMID_FS_FEM_AFICIONADO]
+PYRAMIDS_F7 = [
+    {
+        "id": "f7_m_alevin", "group": "f7m", "cat": "ALEVIN",
+        "title_es": "Alevín — masculino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("ALEVIN", "Futbol-7", False),
+        "tiers": [
+            tier("DIVISIÓN DE HONOR", "RFFM", "2 grupos × 14",
+                 asc="— (tope de la pirámide)",
+                 desc="4 de cada grupo (carácter fijo) → 1ª Div. Autonómica"),
+            tier("PRIMERA DIVISIÓN AUTONÓMICA", "RFFM", "4 grupos × 14",
+                 asc="2 de cada grupo → División de Honor",
+                 desc="4 de cada grupo → Preferente"),
+            tier("PREFERENTE", "RFFM", "8 grupos × 14",
+                 asc="2 de cada grupo → 1ª Div. Autonómica",
+                 desc="4 de cada grupo → Primera"),
+            tier("PRIMERA", "RFFM", "16 grupos × 13",
+                 asc="2 de cada grupo → Preferente",
+                 desc="3 de cada grupo (11ª-13ª) + los 3 peores coeficientes de los 10ºs → Segunda"),
+            tier("SEGUNDA", "RFFM", "51 grupos / 653 equipos",
+                 asc="1º de cada grupo → Primera", desc="— (última división)"),
+        ],
+    },
+    {
+        "id": "f7_m_benjamin", "group": "f7m", "cat": "BENJAMIN",
+        "title_es": "Benjamín — masculino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("BENJAMIN", "Futbol-7", False),
+        "tiers": [
+            tier("DIVISIÓN DE HONOR", "RFFM", "4 grupos × 13 (nueva en 2025/26)",
+                 asc="— (tope de la pirámide)", desc="— (no hay descensos a 1ª Div. Autonómica)",
+                 note="Creada para 2025/2026: suben los seis (6) primeros de cada grupo de 1ª Div. "
+                      "Autonómica 2024/2025, más los 4 mejores séptimos por coeficiente."),
+            tier("PRIMERA DIVISIÓN AUTONÓMICA", "RFFM", "8 grupos × 13",
+                 asc="1º-6º de cada grupo → División de Honor (temporada de creación); "
+                     "en años normales: 1º-3º + mejores 4os cuartos por coeficiente → Preferente arriba",
+                 desc="— (no baja a Preferente)"),
+            tier("PREFERENTE", "RFFM", "16 grupos × 13",
+                 asc="1º-3º de cada grupo + los 4 mejores cuartos por coeficiente → 1ª Div. Autonómica",
+                 desc="13º de cada grupo (fijo) + los 10 peores 12ºs por coeficiente → Primera"),
+            tier("PRIMERA", "RFFM", "78 grupos / 958 equipos",
+                 asc="1º de cada grupo → Preferente", desc="— (última división)"),
+        ],
+    },
+    {
+        "id": "f7_m_prebenjamin", "group": "f7m", "cat": "PREBENJAMIN",
+        "title_es": "Prebenjamín — masculino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("PREBENJAMIN", "Futbol-7", False),
+        "tiers": [
+            tier("PRIMERA DIVISIÓN AUTONÓMICA", "RFFM", "8 grupos × 12 (nueva en 2025/26)",
+                 asc="— (tope de la pirámide)", desc="— (no hay descensos a Preferente)",
+                 note="Creada para 2025/2026: suben todos los equipos que jugaron el Subgrupo «A» "
+                      "de Preferente en 2024/2025, más los del Subgrupo «B» necesarios para completar plazas."),
+            tier("PREFERENTE", "RFFM", "16 grupos × 12",
+                 asc="Subgrupo «A» (2ª fase, top-6 de la 1ª fase) juega por el ascenso; en la temporada "
+                     "de creación asciende en bloque a la nueva 1ª Div. Autonómica",
+                 desc="— (no baja a Primera)"),
+            tier("PRIMERA", "RFFM", "53 grupos / 593 equipos",
+                 asc="1º de cada Subgrupo «A» + los 43 mejores segundos de Subgrupo «A» por coeficiente → Preferente",
+                 desc="— (última división)"),
+        ],
+    },
+]
+
+# Femenino Alevín/Infantil F-7 have real ladders (unlike the equivalent
+# Fútbol Sala femenino categories, which are single-division) — Benjamín
+# Femenino F-7 already has its new PREFERENTE created for 2025/2026 live in
+# this project's crawled data.
+PYRAMIDS_F7_FEM = [
+    {
+        "id": "f7_f_infantil", "group": "f7f", "cat": "INFANTIL",
+        "title_es": "Infantil — femenino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("INFANTIL", "Futbol-7", True),
+        "tiers": [
+            tier("PRIMERA DIVISIÓN AUTONÓMICA", "RFFM", "1 grupo × 14",
+                 asc="— (tope de la pirámide)", desc="4 (11ª-14ª) → Preferente"),
+            tier("PREFERENTE", "RFFM", "2 grupos × 14 (3 grupos desde 2025/26)",
+                 asc="2 de cada grupo → 1ª Div. Autonómica", desc="4 de cada grupo (11ª-14ª) → Primera"),
+            tier("PRIMERA", "RFFM", "16 grupos / 193 equipos",
+                 asc="1º de cada grupo + los 6 mejores segundos por coeficiente → Preferente",
+                 desc="— (última división)"),
+        ],
+    },
+    {
+        "id": "f7_f_alevin", "group": "f7f", "cat": "ALEVIN",
+        "title_es": "Alevín — femenino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("ALEVIN", "Futbol-7", True),
+        "tiers": [
+            tier("PRIMERA DIVISIÓN AUTONÓMICA", "RFFM", "1 grupo × 14",
+                 asc="— (tope de la pirámide)", desc="4 (11ª-14ª) → Preferente"),
+            tier("PREFERENTE", "RFFM", "2 grupos × 14 (3 grupos desde 2025/26)",
+                 asc="2 de cada grupo → 1ª Div. Autonómica", desc="4 de cada grupo (11ª-14ª) → Primera"),
+            tier("PRIMERA", "RFFM", "10 grupos / 119 equipos",
+                 asc="1º y 2º de cada grupo + los 2 mejores terceros por coeficiente → Preferente",
+                 desc="— (última división)"),
+        ],
+    },
+    {
+        "id": "f7_f_benjamin", "group": "f7f", "cat": "BENJAMIN",
+        "title_es": "Benjamín — femenino, Fútbol-7", "source": SRC_F7,
+        "timing_key": ("BENJAMIN", "Futbol-7", True),
+        "tiers": [
+            tier("PREFERENTE", "RFFM", "1 grupo × 12 (nueva en 2025/26)",
+                 asc="— (tope de la pirámide)", desc="— (no hay descensos)",
+                 note="Creada para 2025/2026: absorbe tantos equipos de Primera 2024/2025 como haga "
+                      "falta para completar un grupo de doce (12)."),
+            tier("PRIMERA", "RFFM", "4 grupos / 39 equipos",
+                 asc="tantos como haga falta para completar Preferente (12 equipos)",
+                 desc="— (última división)"),
+        ],
+    },
+]
+
+ALL_PYRAMIDS = (PYRAMIDS_F11 + PYRAMIDS_F11_FEM + PYRAMIDS_F7 + PYRAMIDS_F7_FEM
+                 + PYRAMIDS_FS + [PYRAMID_FS_FEM_AFICIONADO])
 
 PHASE_BUCKET = {
     "regular_season": "liga",
@@ -377,22 +485,23 @@ def list_seasons() -> list[str]:
 
 
 def compute_timing(season: str) -> dict:
-    """(category_base, game_type) -> list of {bucket, start_m, end_m, n} spans,
-    computed straight from this season's real match dates — not hand-authored,
-    so it stays correct as new seasons get crawled."""
+    """(category_base, game_type, is_femenino) -> list of {bucket, start_m,
+    end_m, n} spans, computed straight from this season's real match dates —
+    not hand-authored, so it stays correct as new seasons get crawled."""
     d = BASE / season
     matches = pd.read_csv(d / "matches.csv", dtype=str)
     comps = pd.read_csv(d / "competitions.csv", dtype=str)
     matches["match_date"] = pd.to_datetime(matches["match_date"], errors="coerce")
-    comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
+    comp_meta = comps.set_index("competition_id")[["category_base", "division_level", "is_femenino"]]
     matches = matches.join(comp_meta, on="competition_id")
     matches = matches.dropna(subset=["match_date"])
     matches["bucket"] = matches["phase_label"].map(PHASE_BUCKET).fillna("playoff")
+    matches["is_fem"] = matches["is_femenino"].eq("True")
 
     out: dict[tuple, list] = {}
-    for (cat, gt, bucket), grp in matches.groupby(["category_base", "game_type", "bucket"]):
+    for (cat, gt, is_fem, bucket), grp in matches.groupby(["category_base", "game_type", "is_fem", "bucket"]):
         start, end = grp["match_date"].min(), grp["match_date"].max()
-        out.setdefault((cat, gt), []).append({
+        out.setdefault((cat, gt, is_fem), []).append({
             "bucket": bucket, "start_m": month_index(start), "end_m": month_index(end),
             "start": start.strftime("%d.%m"), "end": end.strftime("%d.%m"), "n": int(len(grp)),
         })
@@ -441,8 +550,9 @@ def pyramid_card_html(p: dict, timing: dict) -> str:
     </div>'''
 
 
-def single_division_card_html(cat: str, title: str, scope: str, timing: dict, group: str) -> str:
-    key = (cat, "Fútbol Sala")
+def single_division_card_html(cat: str, title: str, scope: str, timing: dict, group: str,
+                               is_fem: bool, game_type: str = "Fútbol Sala", source: str = SRC_FS) -> str:
+    key = (cat, game_type, is_fem)
     spans = timing.get(key, [])
     tl = timeline_html(spans)
     return f'''<div class="pyramid-card single" data-group="{group}">
@@ -452,12 +562,13 @@ def single_division_card_html(cat: str, title: str, scope: str, timing: dict, gr
       de proximidad geográfica y una segunda fase que reagrupa a los equipos por nivel
       (coeficiente de la primera fase) para jugar el título y el resto de puestos.</div>
       <div class="pyramid-timing"><div class="tl-months">{"".join(f'<span>{m}</span>' for m in MONTHS_ES)}</div>{tl}</div>
-      <div class="pyramid-src">{SRC_FS}</div>
+      <div class="pyramid-src">{source}</div>
     </div>'''
 
 
 GROUP_LABELS = [
     ("f11m", "Fútbol-11 · Masculino"), ("f11f", "Fútbol-11 · Femenino"),
+    ("f7m", "Fútbol-7 · Masculino"), ("f7f", "Fútbol-7 · Femenino"),
     ("fsm", "Fútbol Sala · Masculino"), ("fsf", "Fútbol Sala · Femenino"),
 ]
 
@@ -638,11 +749,57 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
         трофей поверх уже определившихся ascenso/descenso. Именно этот паттерн стоит за пропавшей из вида
         «Copa de Campeones de Autonómica Juvenil»: см. <code>DIVISIONS.md</code>, раздел «The post-season phase pattern».</p>
       <p><b>Источники.</b> Промо/вылет по каждой пирамиде &mdash; из официальных документов RFFM: «Bases de Ascensos
-        y Descensos Competición Fútbol-11, temporada 2025-2026» (утв. 10.07.2025) и «Bases de Ascensos y Descensos
-        Competición Fútbol Sala» (утв. 23.12.2024), rffm.es. Календарь фаз &mdash; посчитан из
+        y Descensos Competición Fútbol-11, temporada 2025-2026» (утв. 10.07.2025), «Bases de Ascensos y Descensos
+        Competición Fútbol-7» (утв. 23.12.2024) и «Bases de Ascensos y Descensos Competición Fútbol Sala»
+        (утв. 23.12.2024), rffm.es. Календарь фаз &mdash; посчитан из
         <code>matches.csv</code> собранного этим проектом сезона; см. <code>DIVISIONS.md</code> для полной
         тарифной таблицы <code>division_level</code> и <code>club_division_map.html</code> для того, кто конкретно
         где играет.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-h"><h2>Насколько строги правила перехода</h2>
+      <span class="n">механика между сезонами, а не общие принципы</span></div>
+    <div class="info-panel">
+      <p><b>Право на повышение теряется только по одной причине &mdash; «filialidad/dependencia».</b> Клуб не может
+        держать два своих состава в одном дивизионе (для младших возрастов правила мягче &mdash; в Primera
+        Benjamín/Prebenjamín допускается больше одной команды клуба в группе, см. «Disposiciones comunes» каждого
+        документа). Если победившая команда не может подняться из-за этого, право автоматически переходит к
+        следующей по итоговой таблице команде <i>того же дивизиона</i>, у которой такого препятствия нет &mdash;
+        вакансия не «сгорает», а сдвигается вниз по таблице.</p>
+      <p><b>Порядок разрешения равенства &mdash; жёсткий, не на усмотрение комитета.</b> Когда несколько команд
+        претендуют на одну и ту же путёвку (например, вакансию в дивизионе выше, открывшуюся после 30 июня), решение
+        всегда идёт по одной и той же формализованной цепочке: 1) место в итоговой таблице своей группы; 2)
+        коэффициент очков (очки / сыгранные матчи &mdash; важно, если группы играли разное число туров);
+        3) общая разница мячей по всем матчам своей группы; 4) число забитых мячей (или коэффициент забитых
+        голов, если группы разного размера); и только если ничего из этого не развело команды &mdash; очная
+        переигровка на нейтральном поле в дату, которую назначит федерация. Ни один документ не оставляет здесь
+        пространства для дискреции.</p>
+      <p><b>Если у клуба сразу два состава заслужили повышение, а слот один</b> &mdash; поднимается тот, что показал
+        лучший спортивный результат по той же цепочке (коэффициент очков → разница мячей → голы забитые), и с
+        начала следующего сезона буквы «A»/«B» у команд этого клуба переприсваиваются: та, что поднялась,
+        становится «A».</p>
+      <p><b>«Arrastre» &mdash; эффект вытягивания вниз по всей цепочке.</b> Объявленное число вылетающих команд в
+        каждом дивизионе &mdash; это <i>минимум</i>, а не окончательная цифра. Если сверху (вплоть до RFEF &mdash;
+        например, из-за плохого сезона мадридских клубов в Segunda RFEF или Segunda Federación Femenina) вылетело
+        больше команд, чем гарантированно предусмотрено, избыток «утягивает» на один дивизион ниже ровно на столько
+        же команд больше заявленного, и так далее вниз по всей пирамиде &mdash; вплоть до Preferente/Primera. Команды,
+        вылетевшие именно из-за arrastre, а не по итогам своей таблицы, получают приоритетное право занять вакансии
+        в своём прежнем дивизионе в следующем сезоне, если такие откроются.</p>
+      <p><b>Транзитный сезон 2025/2026 &mdash; новые дивизионы создаются «с нуля» внутри уже существующей пирамиды.</b>
+        Для Juvenil/Cadete/Infantil (Fútbol-11 и Sala) и Benjamín/Prebenjamín (Fútbol-7) РФФМ прямо в этом сезоне
+        вставляет новую верхнюю ступень (напр. «1ª División Autonómica» или «División de Honor») между уже
+        существующими дивизионами. Из-за этого часть переходов 2025/2026 &mdash; разовые: например, в новую
+        División de Honor Benjamín целиком поднялись команды с 1-го по 6-е места каждой группы Primera Autonómica
+        2024/2025 плюс 4 лучших седьмых места по коэффициенту &mdash; вместо обычных «только чемпион» или
+        «плей-офф 1-2 места». Такие переходные правила отмечены в карточках отдельной пометкой курсивом; со
+        следующего сезона они, как правило, заменяются на постоянную формулу «N лучших мест напрямую».</p>
+      <p><b>Формат «sede» против «local-visitante».</b> В верхних дивизионах (Honor/Autonómica/Preferente) матчи
+        почти всегда играются классическим «дома-в гостях»; в Primera и ниже многие младшие категории играют в
+        формате «sede» &mdash; несколько клубов по очереди принимают весь тур целиком на одном поле. На ascenso/
+        descenso это не влияет, но объясняет, почему в <code>club_division_map.html</code> у одного клуба часто
+        оказывается несколько разных «домашних» площадок вместо одной.</p>
     </div>
   </section>
 
@@ -685,10 +842,10 @@ def build_html(season: str) -> str:
     timing = compute_timing(season)
     pyramid_html = "".join(pyramid_card_html(p, timing) for p in ALL_PYRAMIDS)
     single_html = "".join(
-        single_division_card_html(cat, title, scope, timing, "fsm")
+        single_division_card_html(cat, title, scope, timing, "fsm", is_fem=False)
         for cat, title, scope in SINGLE_DIVISION_FS
     ) + "".join(
-        single_division_card_html(cat, title, scope, timing, "fsf")
+        single_division_card_html(cat, title, scope, timing, "fsf", is_fem=True)
         for cat, title, scope in SINGLE_DIVISION_FS_FEM
     )
     theme_switch_tag = f"<script>{THEME_SWITCH_JS}</script>"

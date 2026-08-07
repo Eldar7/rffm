@@ -269,10 +269,19 @@ def load_data(season: str) -> dict:
         venues_by_club[club] = out
 
     # ── club identity (crest, website, correspondence address) — opt-in, may be absent ──
+    # Keyed by the *representative team's* club_name_raw from teams.csv, not
+    # clubs.csv's own club_name_raw column: enrich_clubs.py's crawl of the
+    # fichaequipo page frequently captures a differently-formatted name for
+    # the same club (e.g. clubs.csv "ARAVACA C.F." vs. teams.csv "ARAVACA
+    # C.F. - CEIBA" for club_id 1011) — keying by clubs.csv's own string
+    # silently dropped crest/website/address/fichaclub-link for 161 of 674
+    # clubs in 2025-2026 alone. representative_team_id always resolves in
+    # teams.csv with no collisions (checked across every crawled season).
     club_info_by_name = {}
     if clubs_df is not None:
         for _, r in clubs_df.iterrows():
-            club_info_by_name[r["club_name_raw"]] = {
+            key = tid_to_club.get(norm_id(r.get("representative_team_id"))) or r["club_name_raw"]
+            club_info_by_name[key] = {
                 "club_id": clean(r.get("club_id")),
                 "crest": abs_crest_url(clean(r.get("crest_url"))),
                 "web": clean(r.get("portal_web")),
