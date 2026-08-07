@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import season_comparison
 import club_division_map
 import weird_scores_report
+import competition_structure
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -152,6 +153,11 @@ CARDS_RU = [
         "desc": "Матрица турнирных позиций клубов по всем возрастам и дивизионам, с реальными площадками и гербами клубов.",
     },
     {
+        "href": "competition_structure.html",
+        "title": "Пирамида лиг RFFM",
+        "desc": "Для каждого возраста/пола/типа игры — полная лестница дивизионов, переходы вверх/вниз, выход в RFEF и календарь фаз сезона.",
+    },
+    {
         "href": "season_comparison.html",
         "title": "Сравнение сезонов",
         "desc": "Матчи, клубы, голы и соревнования по сезонам с фильтрами по возрасту / дивизиону / типу игры.",
@@ -162,6 +168,8 @@ CARDS_ES = [
     "Las goleadas más grandes, empates a cero y la mejor/peor diferencia de goles de equipos y clubes.",
     "Mapa de clubes por división",
     "Matriz de posiciones de clubes en todas las edades y divisiones, con sedes reales y escudos de los clubes.",
+    "Pirámide de ligas de la RFFM",
+    "Para cada edad/sexo/tipo de juego: la escalera completa de divisiones, ascensos/descensos, la salida a la RFEF y el calendario de fases de la temporada.",
     "Comparación entre temporadas",
     "Partidos, clubes, goles y competiciones por temporada, filtrables por edad / división / tipo de juego.",
 ]
@@ -228,6 +236,9 @@ def main():
 
     print("Building club_division_map.html...")
     club_division_map.build_all(out_dir)
+
+    print("Building competition_structure.html...")
+    competition_structure.build_all(out_dir)
 
     print("Building weird_scores.html...")
     weird_scores_report.build_all(out_dir)
