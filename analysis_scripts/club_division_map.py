@@ -38,18 +38,16 @@ CATEGORIES = [
     "JUVENIL", "AFICIONADO", "SENIOR", "UNIVERSITARIO", "VETERANOS",
 ]
 DEFAULT_CATEGORIES = {"BENJAMIN", "PREBENJAMIN"}
-CAT_LABEL_RU = {
-    "DEBUTANTE": "Дебютанте", "PREBENJAMIN": "Пребенхамин", "BENJAMIN": "Бенхамин",
-    "ALEVIN": "Алевин", "INFANTIL": "Инфантиль", "CADETE": "Кадете", "JUVENIL": "Хувениль",
-    "AFICIONADO": "Афисионадо", "SENIOR": "Сеньор", "UNIVERSITARIO": "Университарио",
-    "VETERANOS": "Ветераны",
-}
+# Category/division names are the federation's own Spanish terms (Alevín,
+# Preferente, ...) — kept as-is in both RU and ES chrome. Transliterating
+# them into Russian ("Алевин", "Преференте") reads as wrong, not translated.
 CAT_LABEL_ES = {
     "DEBUTANTE": "Debutante", "PREBENJAMIN": "Prebenjamín", "BENJAMIN": "Benjamín",
     "ALEVIN": "Alevín", "INFANTIL": "Infantil", "CADETE": "Cadete", "JUVENIL": "Juvenil",
     "AFICIONADO": "Aficionado", "SENIOR": "Sénior", "UNIVERSITARIO": "Universitario",
     "VETERANOS": "Veteranos",
 }
+CAT_LABEL_RU = CAT_LABEL_ES
 
 # Ordered strongest-to-weakest, matching CLAUDE.md/DATA_DICTIONARY.md tier ordering.
 DIV_ORDER = [
@@ -64,10 +62,7 @@ DIV_LABEL_ES = {
     "DIVISION DE HONOR": "División de Honor", "PRIMERA DIVISION AUTONOMICA": "1ª Div. Autonómica",
     "PREFERENTE": "Preferente", "PRIMERA": "1ª División", "SEGUNDA": "2ª División", "TERCERA": "3ª División",
 }
-DIV_LABEL_RU = {
-    "DIVISION DE HONOR": "Дивизион чести", "PRIMERA DIVISION AUTONOMICA": "1-й авт. дивизион",
-    "PREFERENTE": "Преференте", "PRIMERA": "1-й дивизион", "SEGUNDA": "2-й дивизион", "TERCERA": "3-й дивизион",
-}
+DIV_LABEL_RU = DIV_LABEL_ES
 
 GT_CODE = {"Futbol-7": "F7", "Fútbol Sala": "FS", "Futbol-11": "F11", "Fútbol-5": "F5"}
 GT_SHORT = {"Futbol-7": "F-7", "Fútbol Sala": "Sala", "Futbol-11": "F-11", "Fútbol-5": "F-5"}
@@ -130,7 +125,7 @@ def load_data(season: str) -> dict:
 
     comps["category_base"] = comps["category_base"].fillna("OTHER")
     comps["division_level"] = comps["division_level"].fillna("OTHER")
-    comp_facet = comps.set_index("competition_id")[["category_base", "division_level", "game_type"]]
+    comp_facet = comps.set_index("competition_id")[["category_base", "division_level", "game_type", "game_type_id"]]
 
     standings = standings.join(comp_facet, on="competition_id")
     standings = standings[standings["category_base"].isin(CATEGORIES) &
@@ -165,9 +160,12 @@ def load_data(season: str) -> dict:
     for _, r in standings.iterrows():
         teams_by_club.setdefault(r["club"], []).append({
             "team": clean(tid_to_name.get(r["tid"])) or clean(r["team"]) or r["tid"],
+            "tid": r["tid"],
             "cat": r["category_base"], "div": r["division_level"], "gt": r["game_type"],
             "grp": clean(r["group"]), "pos": int(r["position"]),
             "size": int(group_size.get(r["group_id"], 1)),
+            "season_id": clean(r["season_id"]), "comp_id": clean(r["competition_id"]),
+            "group_id": clean(r["group_id"]), "gt_id": clean(r["game_type_id"]),
         })
 
     # ── venues: EVERY real home ground per club (exact lat/lon from venues.csv), not one guess ──
@@ -203,6 +201,7 @@ def load_data(season: str) -> dict:
                 "address": clean(r.get("correspondence_address")),
                 "locality": clean(r.get("locality")),
                 "province": clean(r.get("province")),
+                "reptid": clean(r.get("representative_team_id")),
             }
 
     # ── assemble per-club records ──
@@ -252,6 +251,7 @@ HTML = r"""<!DOCTYPE html>
   --accent:#2f6b3c; --accent-soft:#dce8dd; --gold:#8a6a12; --gold-soft:#f3e7c4;
   --line:#d7ddd2; --line-strong:#b9c4bb; --shadow: 0 1px 2px rgba(27,42,31,0.06);
   --tier-1:#c3dcc7; --tier-2:#d6e6d8; --tier-3:#e6efe6; --tier-4:#f2f5f1; --row-hover:#f4f7f2;
+  --teal:#1a6b7a; --teal-soft:#d8eef1; --pos-red:#a03327; --pos-red-soft:#f5ddd6;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -259,6 +259,7 @@ HTML = r"""<!DOCTYPE html>
     --accent:#74c47f; --accent-soft:#20301f; --gold:#d9b64a; --gold-soft:#332a10;
     --line:#2a352a; --line-strong:#3a473a; --shadow: 0 1px 3px rgba(0,0,0,0.4);
     --tier-1:#294a30; --tier-2:#213b27; --tier-3:#1c2f21; --tier-4:#18241b; --row-hover:#1c2619;
+    --teal:#5fc3d6; --teal-soft:#12313a; --pos-red:#e2685a; --pos-red-soft:#33201d;
   }
 }
 :root[data-theme="dark"]{
@@ -266,12 +267,14 @@ HTML = r"""<!DOCTYPE html>
   --accent:#74c47f; --accent-soft:#20301f; --gold:#d9b64a; --gold-soft:#332a10;
   --line:#2a352a; --line-strong:#3a473a; --shadow: 0 1px 3px rgba(0,0,0,0.4);
   --tier-1:#294a30; --tier-2:#213b27; --tier-3:#1c2f21; --tier-4:#18241b; --row-hover:#1c2619;
+  --teal:#5fc3d6; --teal-soft:#12313a; --pos-red:#e2685a; --pos-red-soft:#33201d;
 }
 :root[data-theme="light"]{
   --bg:#eef0ea; --surface:#ffffff; --ink:#1b2a1f; --ink-soft:#516155; --ink-faint:#8b9a8e;
   --accent:#2f6b3c; --accent-soft:#dce8dd; --gold:#8a6a12; --gold-soft:#f3e7c4;
   --line:#d7ddd2; --line-strong:#b9c4bb; --shadow: 0 1px 2px rgba(27,42,31,0.06);
   --tier-1:#c3dcc7; --tier-2:#d6e6d8; --tier-3:#e6efe6; --tier-4:#f2f5f1; --row-hover:#f4f7f2;
+  --teal:#1a6b7a; --teal-soft:#d8eef1; --pos-red:#a03327; --pos-red-soft:#f5ddd6;
 }
 *{box-sizing:border-box;}
 html,body{margin:0; height:100%;}
@@ -368,8 +371,6 @@ td.cell .chip2{ display:inline-flex; flex-direction:column; align-items:center; 
   gap:0.05rem; border-radius:6px; padding:0.28rem 0.5rem; min-width:3.6rem; font-variant-numeric: tabular-nums; cursor:default; }
 td.cell .chip2 .n{font-size:0.78rem; font-weight:700; color:var(--accent);}
 td.cell .chip2 .p{font-size:0.68rem; color:var(--ink-soft);}
-td.cell .chip2.leader{box-shadow: inset 0 0 0 1.5px var(--gold);}
-td.cell .chip2.leader .n{color:var(--gold);}
 td.cell .empty{color:var(--ink-faint); font-size:0.8rem;}
 td.cell.lvl-0{background:var(--tier-1);} td.cell.lvl-1{background:var(--tier-2);}
 td.cell.lvl-2{background:var(--tier-3);} td.cell.lvl-3{background:var(--tier-4);}
@@ -391,10 +392,30 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
 .modal-note{font-size:0.8rem; color:var(--ink-soft); background:var(--accent-soft); border-radius:6px; padding:0.5rem 0.7rem; margin-top:0.4rem;}
 .modal-section{margin-top:1.1rem;}
 .modal-section h3{font-family:'JetBrains Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin:0 0 0.5rem;}
-.modal-venue,.modal-team-row{display:flex; justify-content:space-between; gap:0.6rem; padding:0.35rem 0; border-bottom:1px solid var(--line); font-size:0.82rem;}
+.modal-venue,.modal-team-row{display:flex; justify-content:space-between; align-items:center; gap:0.6rem; padding:0.35rem 0; border-bottom:1px solid var(--line); font-size:0.82rem;}
 .modal-venue:last-child,.modal-team-row:last-child{border-bottom:none;}
 .modal-venue .v-name{color:var(--ink);}
 .modal-venue .v-stat{color:var(--ink-soft); white-space:nowrap; text-align:right;}
+.modal-group-h{font-family:'JetBrains Mono',monospace; font-size:0.68rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.05em; color:var(--ink-soft); margin:0.7rem 0 0.15rem; padding-top:0.5rem; border-top:1px solid var(--line);}
+.modal-group-h:first-child{border-top:none; margin-top:0; padding-top:0;}
+.modal-div-h{font-size:0.72rem; font-weight:700; color:var(--ink); margin:0.3rem 0 0.1rem;}
+
+/* ---------- position badges: gold=1st, then 4 flat, non-gradient bands by proximity to top/bottom ---------- */
+.pos-badge{ display:inline-flex; align-items:baseline; gap:0.15rem; padding:0.1rem 0.45rem; border-radius:999px;
+  font-family:ui-monospace,monospace; font-size:0.76rem; font-weight:700; white-space:nowrap; }
+.pos-badge .of{opacity:0.7; font-weight:400;}
+.pos-gold{ background:var(--gold-soft); color:var(--gold-ink,var(--gold)); box-shadow:inset 0 0 0 1.5px var(--gold); }
+.pos-green{ background:var(--accent-soft); color:var(--accent); }
+.pos-teal{ background:var(--teal-soft); color:var(--teal); }
+.pos-grey{ background:var(--line); color:var(--ink-soft); }
+.pos-red{ background:var(--pos-red-soft); color:var(--pos-red); }
+td.cell .chip2.pos-gold .n{color:var(--gold);}
+td.cell .chip2.pos-green .n{color:var(--accent);}
+td.cell .chip2.pos-teal .n{color:var(--teal);}
+td.cell .chip2.pos-grey .n{color:var(--ink-soft);}
+td.cell .chip2.pos-red .n{color:var(--pos-red);}
+td.cell .chip2.pos-gold{box-shadow: inset 0 0 0 1.5px var(--gold);}
 </style>
 </head>
 <body>
@@ -503,6 +524,10 @@ const STATE = { cats: new Set(), divs: new Set(), gts: new Set(), seeded: false 
 let TIER = {};
 let sortKey = '__total', sortDir = -1;
 
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function catLabel(c) { return CURLANG === 'ru' ? CAT_LABEL_RU[c] : CAT_LABEL_ES[c]; }
 function divLabel(d) { return CURLANG === 'ru' ? DIV_LABEL_RU[d] : DIV_LABEL_ES[d]; }
 
@@ -603,6 +628,21 @@ function sortBy(key) {
   render();
 }
 
+// 1st place = gold; the rest split into 4 flat (non-gradient) bands by
+// how close the position is to the top vs. the bottom of the group.
+function posBand(pos, size) {
+  if (pos === 1) return 'pos-gold';
+  if (size <= 1) return 'pos-gold';
+  const pct = (pos - 1) / (size - 1);
+  if (pct <= 0.25) return 'pos-green';
+  if (pct <= 0.5) return 'pos-teal';
+  if (pct <= 0.75) return 'pos-grey';
+  return 'pos-red';
+}
+function posBadgeHtml(pos, size) {
+  return `<span class="pos-badge ${posBand(pos, size)}">${pos}<span class="of">/${size}</span></span>`;
+}
+
 function render() {
   const cols = activeColumns();
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
@@ -665,7 +705,7 @@ function render() {
       const v = club.cells[col.key];
       if (v) {
         const chip = document.createElement('span');
-        chip.className = 'chip2' + (v.pos === 1 ? ' leader' : '');
+        chip.className = 'chip2 ' + posBand(v.pos, v.size);
         chip.title = v.grp || '';
         chip.innerHTML = `<span class="n">${v.n}&times;</span><span class="p">${v.pos}/${v.size}</span>`;
         td.appendChild(chip);
@@ -701,29 +741,62 @@ function renderStats() {
   ).join('');
 }
 
+function teamCardLink(tid, name) {
+  return tid ? `<a href="https://www.rffm.es/fichaequipo/${tid}" target="_blank" rel="noopener">${name}</a>` : name;
+}
+function groupCalLink(t) {
+  const text = esc(t.grp || '');
+  if (!(t.season_id && t.comp_id && t.group_id && t.gt_id)) return text;
+  const url = `https://www.rffm.es/competicion/calendario?temporada=${t.season_id}&competicion=${t.comp_id}&grupo=${t.group_id}&jornada=1&tipojuego=${t.gt_id}`;
+  return `<a href="${url}" target="_blank" rel="noopener">${text}</a>`;
+}
+
 function openClubModal(club) {
   const L = CURLANG;
   const info = club.info;
   const crestHtml = info && info.crest
     ? `<img class="modal-crest" src="${info.crest}" alt="" onerror="this.style.display='none'">` : '';
+  const clubNameHtml = (info && info.reptid)
+    ? `<a href="https://www.rffm.es/fichaequipo/${info.reptid}" target="_blank" rel="noopener">${esc(club.club)}</a>` : esc(club.club);
   const webRaw = info && info.web;
   const webHref = webRaw ? (webRaw.startsWith('http') ? webRaw : 'https://' + webRaw) : null;
-  const webHtml = webHref ? `<div><a href="${webHref}" target="_blank" rel="noopener">${webRaw}</a></div>` : '';
+  const webHtml = webHref ? `<div><a href="${webHref}" target="_blank" rel="noopener">${esc(webRaw)}</a></div>` : '';
   const addrLabel = L === 'ru' ? 'Юридический/контактный адрес клуба (не адрес поля)' : 'Dirección de correspondencia del club (no es la dirección del campo)';
   const addrHtml = info && info.address
-    ? `<div class="modal-note">${addrLabel}: ${info.address}${info.locality ? ', ' + info.locality : ''}</div>` : '';
+    ? `<div class="modal-note">${addrLabel}: ${esc(info.address)}${info.locality ? ', ' + esc(info.locality) : ''}</div>` : '';
   const venueMapLabel = L === 'ru' ? 'карта' : 'mapa';
   const venuesHtml = (club.venues && club.venues.length)
-    ? club.venues.map(v => `<div class="modal-venue"><span class="v-name">${v.venue}${v.address ? ' — ' + v.address : ''}</span>` +
+    ? club.venues.map(v => `<div class="modal-venue"><span class="v-name">${esc(v.venue)}${v.address ? ' — ' + esc(v.address) : ''}</span>` +
         `<span class="v-stat">${v.n}/${v.total} (${v.pct}%)${v.maps ? ` &middot; <a href="${v.maps}" target="_blank" rel="noopener">${venueMapLabel}</a>` : ''}</span></div>`).join('')
     : `<div class="modal-note">${L === 'ru' ? 'Нет данных о домашних площадках.' : 'Sin datos de sedes locales.'}</div>`;
-  const teamsHtml = (club.teams || []).map(t =>
-    `<div class="modal-team-row"><span>${t.team} — ${catLabel(t.cat)}, ${divLabel(t.div)} (${t.gt})</span><span>${t.pos}/${t.size} &middot; ${t.grp}</span></div>`
-  ).join('');
+
+  // group by age category (youngest → oldest) then division (strongest → weakest)
+  const byCat = new Map();
+  (club.teams || []).forEach(t => {
+    if (!byCat.has(t.cat)) byCat.set(t.cat, new Map());
+    const byDiv = byCat.get(t.cat);
+    if (!byDiv.has(t.div)) byDiv.set(t.div, []);
+    byDiv.get(t.div).push(t);
+  });
+  const catsSorted = [...byCat.keys()].sort((a, b) => CAT_ORDER.indexOf(a) - CAT_ORDER.indexOf(b));
+  let teamsHtml = '';
+  catsSorted.forEach(cat => {
+    teamsHtml += `<div class="modal-group-h">${catLabel(cat)}</div>`;
+    const byDiv = byCat.get(cat);
+    const divsSorted = [...byDiv.keys()].sort((a, b) => DIV_ORDER_JS.indexOf(a) - DIV_ORDER_JS.indexOf(b));
+    divsSorted.forEach(div => {
+      teamsHtml += `<div class="modal-div-h">${divLabel(div)}</div>`;
+      teamsHtml += byDiv.get(div).map(t =>
+        `<div class="modal-team-row"><span>${teamCardLink(t.tid, esc(t.team))} <span style="color:var(--ink-faint)">&middot; ${groupCalLink(t)} &middot; ${t.gt}</span></span>${posBadgeHtml(t.pos, t.size)}</div>`
+      ).join('');
+    });
+  });
+  if (!teamsHtml) teamsHtml = `<div class="modal-note">${L === 'ru' ? 'Нет данных о командах.' : 'Sin datos de equipos.'}</div>`;
+
   const venuesTitle = L === 'ru' ? 'Реальные площадки (из БД)' : 'Sedes reales (de la BD)';
   const teamsTitle = L === 'ru' ? 'Команды и дивизионы' : 'Equipos y divisiones';
   document.getElementById('modalContent').innerHTML = `
-    <div class="modal-head">${crestHtml}<div><h2>${club.club}</h2>${webHtml}</div></div>
+    <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}</div></div>
     ${addrHtml}
     <div class="modal-section"><h3>${venuesTitle}</h3>${venuesHtml}</div>
     <div class="modal-section"><h3>${teamsTitle}</h3>${teamsHtml}</div>

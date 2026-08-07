@@ -40,18 +40,16 @@ CATEGORIES = [
     "JUVENIL", "AFICIONADO", "SENIOR", "UNIVERSITARIO", "VETERANOS",
 ]
 DEFAULT_CATEGORIES = {"BENJAMIN", "PREBENJAMIN"}
-CAT_LABEL_RU = {
-    "DEBUTANTE": "Дебютанте", "PREBENJAMIN": "Пребенхамин", "BENJAMIN": "Бенхамин",
-    "ALEVIN": "Алевин", "INFANTIL": "Инфантиль", "CADETE": "Кадете", "JUVENIL": "Хувениль",
-    "AFICIONADO": "Афисионадо", "SENIOR": "Сеньор", "UNIVERSITARIO": "Университарио",
-    "VETERANOS": "Ветераны",
-}
+# Category/division names are the federation's own Spanish terms (Alevín,
+# Preferente, ...) — kept as-is in both RU and ES chrome. Transliterating
+# them into Russian ("Алевин", "Преференте") reads as wrong, not translated.
 CAT_LABEL_ES = {
     "DEBUTANTE": "Debutante", "PREBENJAMIN": "Prebenjamín", "BENJAMIN": "Benjamín",
     "ALEVIN": "Alevín", "INFANTIL": "Infantil", "CADETE": "Cadete", "JUVENIL": "Juvenil",
     "AFICIONADO": "Aficionado", "SENIOR": "Sénior", "UNIVERSITARIO": "Universitario",
     "VETERANOS": "Veteranos",
 }
+CAT_LABEL_RU = CAT_LABEL_ES
 
 DIV_ORDER = [
     "DIVISION DE HONOR", "PRIMERA DIVISION AUTONOMICA", "PREFERENTE",
@@ -61,14 +59,11 @@ DIV_CODE = {
     "DIVISION DE HONOR": "DH", "PRIMERA DIVISION AUTONOMICA": "PDA", "PREFERENTE": "PREF",
     "PRIMERA": "PRIM", "SEGUNDA": "SEG", "TERCERA": "TER",
 }
-DIV_LABEL_RU = {
-    "DH": "Дивизион чести", "PDA": "1-й авт. дивизион", "PREF": "Преференте",
-    "PRIM": "1-й дивизион", "SEG": "2-й дивизион", "TER": "3-й дивизион",
-}
 DIV_LABEL_ES = {
     "DH": "División de Honor", "PDA": "1ª Div. Autonómica", "PREF": "Preferente",
     "PRIM": "1ª División", "SEG": "2ª División", "TER": "3ª División",
 }
+DIV_LABEL_RU = DIV_LABEL_ES
 
 GT_CODE = {"Futbol-7": "F7", "Fútbol Sala": "FS", "Futbol-11": "F11", "Fútbol-5": "F5"}
 GT_SHORT = {"F7": "F-7", "FS": "Sala", "F11": "F-11", "F5": "F-5"}
