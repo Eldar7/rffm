@@ -1,0 +1,13 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+1205271,304710,8146126,"TIRADAS GIL, PABLO",34,34,100,amarilla,False,https://www.rffm.es/acta-partido/1205271,2026-08-08T23:19:37.754144+00:00
+1205330,1035740,10305774,"OLMEDA MARTIN, VICTOR",13,13,100,amarilla,False,https://www.rffm.es/acta-partido/1205330,2026-08-08T23:19:44.235162+00:00
+1205428,2994,10300490,"MOLINA PEDRAZA, JUAN CARLOS ",37,37,101,roja,False,https://www.rffm.es/acta-partido/1205428,2026-08-08T23:19:51.038879+00:00
+1262682,2280231,13411187,"ARRIBAS ROYO, IVAN ",28,28,100,amarilla,False,https://www.rffm.es/acta-partido/1262682,2026-08-08T23:20:03.296109+00:00
+1262682,2280231,13411187,"ARRIBAS ROYO, IVAN ",40,40,100,amarilla,True,https://www.rffm.es/acta-partido/1262682,2026-08-08T23:20:03.296109+00:00
+1210103,1985,8791484,"ARIAS RICO, ALVARO",38,38,101,roja,False,https://www.rffm.es/acta-partido/1210103,2026-08-08T23:20:27.255017+00:00
+1256466,2246,5947326,"PRIETO ARENAS, MARIO",16,16,100,amarilla,False,https://www.rffm.es/acta-partido/1256466,2026-08-08T23:20:59.737198+00:00
+1256466,2246,5947326,"PRIETO ARENAS, MARIO",16,16,100,amarilla,False,https://www.rffm.es/acta-partido/1256466,2026-08-08T23:20:59.737198+00:00
+1206722,382,11793496,"MONTEALEGRE LOPEZ, PABLO",24,24,101,roja,False,https://www.rffm.es/acta-partido/1206722,2026-08-08T23:21:34.058971+00:00
+1263857,8944327,730554,"GONZALEZ CAMACHO, AGUSTIN",12,12,101,roja,False,https://www.rffm.es/acta-partido/1263857,2026-08-08T23:21:50.996159+00:00
+1263940,2732,6374527,"MARTÍNEZ HERNÁNDEZ, MARÍA ISABEL",17,17,100,amarilla,False,https://www.rffm.es/acta-partido/1263940,2026-08-08T23:21:57.536875+00:00
+1263940,2732,6374527,"MARTÍNEZ HERNÁNDEZ, MARÍA ISABEL",17,17,100,amarilla,False,https://www.rffm.es/acta-partido/1263940,2026-08-08T23:21:57.536875+00:00
