@@ -1,0 +1,9 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+1826258,18730392,2795262,"ANGULLO DE LA TORRE, AITOR",12,12,100,amarilla,False,https://www.rffm.es/acta-partido/1826258,2026-08-08T11:24:59.015510+00:00
+1826258,18809740,2795026,"BISQUERT DE ARCE, JUAN",19,19,100,amarilla,False,https://www.rffm.es/acta-partido/1826258,2026-08-08T11:24:59.015510+00:00
+1826262,18378836,2803807,"UCEDA DUQUE, ALEJANDRO",49,49,100,amarilla,False,https://www.rffm.es/acta-partido/1826262,2026-08-08T11:24:59.212037+00:00
+1826260,18619473,2803319,"PÉREZ GÓMEZ, PABLO",5,5,100,amarilla,False,https://www.rffm.es/acta-partido/1826260,2026-08-08T11:24:59.219096+00:00
+1826018,18406019,2796792,"RUIZ RUFO, GONZALO",48,48,100,amarilla,False,https://www.rffm.es/acta-partido/1826018,2026-08-08T11:25:01.101393+00:00
+1824810,18619473,2803319,"PÉREZ GÓMEZ, PABLO",12,12,100,amarilla,False,https://www.rffm.es/acta-partido/1824810,2026-08-08T11:25:04.055950+00:00
+1824802,18809740,2795026,"BISQUERT DE ARCE, JUAN",45,45,100,amarilla,False,https://www.rffm.es/acta-partido/1824802,2026-08-08T11:25:04.374541+00:00
+1824826,18378836,2794707,"BARRIGUETE VELLISCA, ARITZ",9,9,100,amarilla,False,https://www.rffm.es/acta-partido/1824826,2026-08-08T11:25:05.415858+00:00
