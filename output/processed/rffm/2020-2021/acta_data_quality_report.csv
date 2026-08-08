@@ -1,2 +1,1 @@
-check_name,severity,entity_type,entity_id,group_id,competition_id,details
-acta_lineup_coverage_gap,warning,match,1826285,,,match was in scope but yielded zero lineup rows (fetch failure or empty page)
+
