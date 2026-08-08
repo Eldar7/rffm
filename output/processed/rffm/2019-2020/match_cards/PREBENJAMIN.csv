@@ -1,0 +1,8 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+1813821,18346139,2793994,"GEORGIEV PETROV, ALEKSANDAR",45,45,100,amarilla,False,https://www.rffm.es/acta-partido/1813821,2026-08-08T22:59:50.766845+00:00
+1813823,17145625,2803042,"MANCHEÑO LOPEZ, ADRIAN",15,15,100,amarilla,False,https://www.rffm.es/acta-partido/1813823,2026-08-08T22:59:51.362540+00:00
+1813847,18310553,2791051,"COLLADO ALBARRAN, ADRIAN",42,42,100,amarilla,False,https://www.rffm.es/acta-partido/1813847,2026-08-08T22:59:54.293812+00:00
+1813859,18346139,2793175,"MARTINEZ HERNANDEZ, ALVARO",47,47,100,amarilla,False,https://www.rffm.es/acta-partido/1813859,2026-08-08T22:59:56.555856+00:00
+1813886,18310479,2803243,"LEDESMA REDONDO, ALVARO",20,20,100,amarilla,False,https://www.rffm.es/acta-partido/1813886,2026-08-08T23:00:00.584320+00:00
+1813886,18619473,2793013,"CIRBIAN LILLO, CHLOÉ",48,48,100,amarilla,False,https://www.rffm.es/acta-partido/1813886,2026-08-08T23:00:00.584320+00:00
+1813893,18597737,2793443,"ORTEGA FERNANDEZ, RAUL",21,21,100,amarilla,False,https://www.rffm.es/acta-partido/1813893,2026-08-08T23:00:01.946238+00:00
