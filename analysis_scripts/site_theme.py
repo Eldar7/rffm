@@ -302,7 +302,11 @@ CSS = """
 # this module's base tokens (--line, --ink-muted) for pages that don't
 # define the finer-grained set team_cards.py's own <style> block uses.
 DATATABLE_CSS = """
-  table.dtable thead th[data-key] { position: relative; padding-right: 1.7rem; }
+  table.dtable thead th[data-key] { position: relative; padding-right: 1.7rem; cursor: pointer; user-select: none; }
+  table.dtable thead th[data-key]:hover { color: var(--accent); }
+  table.dtable thead th[data-key] .dt-sort-ic {
+    display: inline-block; margin-left: 0.3rem; font-size: 0.62rem; color: var(--accent); min-width: 0.6em;
+  }
   table.dtable thead th[data-key] .dt-btn {
     position: absolute; right: 0.15rem; top: 50%; transform: translateY(-50%);
     width: 1.15rem; height: 1.15rem; border: none; background: transparent; cursor: pointer;
@@ -311,9 +315,6 @@ DATATABLE_CSS = """
   }
   table.dtable thead th[data-key] .dt-btn:hover { background: var(--accent-soft, var(--surface-2)); color: var(--accent); }
   table.dtable thead th[data-key] .dt-btn::after { content: "\\25BE"; }
-  table.dtable thead th[data-key].dt-sorted-asc .dt-btn::after { content: "\\25B4"; }
-  table.dtable thead th[data-key].dt-sorted-desc .dt-btn::after { content: "\\25BE"; }
-  table.dtable thead th[data-key].dt-sorted-asc .dt-btn, table.dtable thead th[data-key].dt-sorted-desc .dt-btn { color: var(--accent); }
   table.dtable thead th[data-key].dt-filtered .dt-btn { color: var(--accent); font-weight: 700; }
   .dt-pop {
     position: fixed; z-index: 1000; background: var(--surface);
@@ -350,10 +351,14 @@ DATATABLE_CSS = """
 """
 
 # rffmInitDataTable(table, opts) turns any <table class="dtable"> into an
-# Excel-style grid: click a header's little ▾ to get a popover with
-# sort-ascending/descending buttons and a searchable checkbox list of that
-# column's distinct values (an autofilter, not just a free-text filter —
-# matches what "как в Excel" actually means). Markup contract:
+# Excel-style grid: click anywhere on a header to cycle its sort state —
+# unsorted -> ascending -> descending -> unsorted, a small ▲/▼ appears next
+# to the label while it's the active sort column (single-column sort; a
+# click on a different header replaces it, doesn't add a second key) —
+# separately, click the little ▾ button for a popover with a searchable
+# checkbox list of that column's distinct values (an autofilter, not just a
+# free-text filter — matches what "как в Excel" actually means). Markup
+# contract:
 #   <table class="dtable"><thead><tr>
 #     <th data-key="goals" data-type="number"><span>Голы</span></th>
 #   </tr></thead><tbody>
@@ -368,22 +373,25 @@ DATATABLE_CSS = """
 # The header text must live in a child element (e.g. a <span data-i18n=...>)
 # rather than directly in the <th>, otherwise this project's language
 # switcher (LANG_SWITCH_JS, which does el.innerHTML = ... on [data-i18n]
-# elements) will wipe out the appended ▾ button on every RU/ES toggle.
-# Re-calling this on the same <table> (e.g. after re-rendering its rows)
-# safely tears down the previous instance first via table._rffmDt.destroy().
+# elements) will wipe out the appended sort icon/▾ button on every RU/ES
+# toggle. Re-calling this on the same <table> (e.g. after re-rendering its
+# rows) safely tears down the previous instance first via table._rffmDt.destroy().
 DATATABLE_JS = r"""
 function rffmInitDataTable(table, opts) {
   if (!table) return null;
   if (table._rffmDt) table._rffmDt.destroy();
   opts = opts || {};
   var labels = Object.assign({
-    asc: '▲ A→Z', desc: '▼ Z→A', selectAll: '(все)',
-    search: '...', apply: 'OK', clear: '✕', empty: '(пусто)'
+    selectAll: '(все)', search: '...', apply: 'OK', clear: '✕', empty: '(пусто)'
   }, opts.labels || {});
   var thead = table.tHead, tbody = table.tBodies[0];
   if (!thead || !tbody) return null;
   var ths = Array.prototype.slice.call(thead.querySelectorAll('th[data-key]'));
   var state = { sortKey: null, sortDir: 1, filters: {} };
+  // Captured once, before any sort/filter runs, so the third click-cycle
+  // state ("unsorted") restores this render's original row order instead
+  // of just freezing wherever the last active sort left it.
+  var originalOrder = Array.prototype.slice.call(tbody.rows);
   var pop = document.createElement('div');
   pop.className = 'dt-pop';
   document.body.appendChild(pop);
@@ -440,9 +448,13 @@ function rffmInitDataTable(table, opts) {
         return cmp * state.sortDir;
       });
       rs.forEach(function (tr) { tbody.appendChild(tr); });
+    } else {
+      originalOrder.forEach(function (tr) { tbody.appendChild(tr); });
     }
     ths.forEach(function (th) {
       var key = th.dataset.key;
+      var ic = th.querySelector('.dt-sort-ic');
+      if (ic) ic.textContent = state.sortKey === key ? (state.sortDir === 1 ? '▲' : '▼') : '';
       th.classList.toggle('dt-sorted-asc', state.sortKey === key && state.sortDir === 1);
       th.classList.toggle('dt-sorted-desc', state.sortKey === key && state.sortDir === -1);
       th.classList.toggle('dt-filtered', !!state.filters[key]);
@@ -463,10 +475,7 @@ function rffmInitDataTable(table, opts) {
       return String(a[1]).localeCompare(String(b[1]), 'ru');
     });
     var active = state.filters[key];
-    var html = '<div class="dt-sortrow">'
-      + '<button type="button" data-act="asc">' + labels.asc + '</button>'
-      + '<button type="button" data-act="desc">' + labels.desc + '</button></div>'
-      + '<input type="search" placeholder="' + labels.search + '">'
+    var html = '<input type="search" placeholder="' + labels.search + '">'
       + '<div class="dt-list">'
       + '<label class="dt-item"><input type="checkbox" data-all checked><span><b>' + labels.selectAll + '</b></span></label>'
       + entries.map(function (e) {
@@ -493,12 +502,6 @@ function rffmInitDataTable(table, opts) {
     pop.querySelector('[data-all]').addEventListener('change', function (e) {
       pop.querySelectorAll('.dt-list .dt-item[data-val] input').forEach(function (cb) { cb.checked = e.target.checked; });
     });
-    pop.querySelectorAll('.dt-sortrow button').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.sortKey = key; state.sortDir = btn.dataset.act === 'asc' ? 1 : -1;
-        apply(); closePop();
-      });
-    });
     pop.querySelector('[data-act="clear"]').addEventListener('click', function () {
       delete state.filters[key]; apply(); closePop();
     });
@@ -513,17 +516,39 @@ function rffmInitDataTable(table, opts) {
     });
   }
 
-  var btns = [];
+  var cleanups = [];
   ths.forEach(function (th) {
+    var ic = document.createElement('span');
+    ic.className = 'dt-sort-ic';
+    th.appendChild(ic);
+
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'dt-btn';
-    var handler = function (e) {
+    var onFilterClick = function (e) {
       e.stopPropagation();
       if (openKey === th.dataset.key) closePop(); else openPopover(th);
     };
-    btn.addEventListener('click', handler);
+    btn.addEventListener('click', onFilterClick);
     th.appendChild(btn);
-    btns.push({ btn: btn, handler: handler });
+
+    // Whole header is the sort trigger (three states: unsorted -> asc ->
+    // desc -> unsorted) — the filter button's own listener stops
+    // propagation so this never double-fires on a ▾ click.
+    var onHeaderClick = function () {
+      var key = th.dataset.key;
+      if (state.sortKey !== key) { state.sortKey = key; state.sortDir = 1; }
+      else if (state.sortDir === 1) { state.sortDir = -1; }
+      else { state.sortKey = null; }
+      apply();
+    };
+    th.addEventListener('click', onHeaderClick);
+
+    cleanups.push(function () {
+      th.removeEventListener('click', onHeaderClick);
+      btn.removeEventListener('click', onFilterClick);
+      btn.remove();
+      ic.remove();
+    });
   });
 
   function onDocClick(e) { if (openKey && !pop.contains(e.target)) closePop(); }
@@ -538,7 +563,7 @@ function rffmInitDataTable(table, opts) {
     destroy: function () {
       document.removeEventListener('click', onDocClick);
       window.removeEventListener('scroll', onScroll, true);
-      btns.forEach(function (o) { o.btn.removeEventListener('click', o.handler); o.btn.remove(); });
+      cleanups.forEach(function (fn) { fn(); });
       pop.remove();
     }
   };

@@ -487,6 +487,7 @@ thead tr.cat-row th.corner{background:var(--surface); position:sticky; left:0; z
 thead tr.lvl-row th{ padding:0.5rem 0.6rem; font-size:0.72rem; font-weight:700; color:var(--ink);
   border-right:1px solid var(--line); cursor:pointer; user-select:none; white-space:nowrap; }
 thead tr.lvl-row th:hover{color:var(--accent);}
+thead tr.lvl-row th .sort-ic{display:inline-block; margin-left:0.25rem; font-size:0.62rem; color:var(--accent); min-width:0.6em;}
 thead tr.lvl-row th.club-head{ position:sticky; left:0; z-index:4; background:var(--surface);
   border-right:1px solid var(--line-strong); min-width:15rem; cursor:default; }
 thead tr.lvl-row th.total-head{min-width:8rem;}
@@ -704,7 +705,7 @@ function currentStateParams() {
   if (!setsEqual(STATE.cats, defaultCatsSet())) params.set('cats', [...STATE.cats].sort().join(','));
   if (!setsEqual(STATE.divs, ALL_DIVS)) params.set('divs', [...STATE.divs].sort().join(','));
   if (!setsEqual(STATE.gts, ALL_GTS)) params.set('gts', [...STATE.gts].sort().join(','));
-  if (sortKey !== '__total' || sortDir !== -1) { params.set('sort', sortKey); params.set('dir', sortDir === 1 ? 'asc' : 'desc'); }
+  if (sortKey !== '__total' || sortDir !== -1) { params.set('sort', sortKey === null ? 'none' : sortKey); params.set('dir', sortDir === 1 ? 'asc' : 'desc'); }
   if (document.getElementById('presentToggle').classList.contains('active')) params.set('present', '1');
   if (OPEN_CLUB_SLUG) params.set('club', OPEN_CLUB_SLUG);
   return params;
@@ -799,7 +800,7 @@ function buildHead() {
     }
     span++;
     const th = document.createElement('th');
-    th.textContent = divLabel(col.div) + ' · ' + col.gt_short;
+    th.innerHTML = `<span class="col-label">${esc(divLabel(col.div) + ' · ' + col.gt_short)}</span><span class="sort-ic"></span>`;
     th.dataset.key = col.key;
     if (CAT_START_KEYS.has(col.key)) th.classList.add('cat-divider');
     th.addEventListener('click', () => sortBy(col.key));
@@ -810,7 +811,7 @@ function buildHead() {
 
   const totalTh = document.createElement('th');
   totalTh.className = 'total-head';
-  totalTh.textContent = LANG[CURLANG].total;
+  totalTh.innerHTML = `<span class="col-label">${esc(LANG[CURLANG].total)}</span><span class="sort-ic"></span>`;
   totalTh.dataset.key = '__total';
   totalTh.addEventListener('click', () => sortBy('__total'));
   headRow.appendChild(totalTh);
@@ -821,11 +822,24 @@ function buildHead() {
   Object.values(byCat).forEach(keys => keys.forEach((k, i) => { TIER[k] = Math.min(i, 3); }));
 }
 
+// Three states per column, cycled by clicking its header: descending (first
+// click — most useful default for a "how many teams" count) -> ascending ->
+// unsorted (back to plain alphabetical-by-club, via valFor's sortKey===null
+// case in render()).
 function sortBy(key) {
-  sortDir = (sortKey === key) ? -sortDir : -1;
-  sortKey = key;
+  if (sortKey !== key) { sortKey = key; sortDir = -1; }
+  else if (sortDir === -1) { sortDir = 1; }
+  else { sortKey = null; sortDir = -1; }
   render();
   syncUrl(false);
+}
+
+function updateSortIcons() {
+  document.querySelectorAll('#headRow th[data-key]').forEach(th => {
+    const ic = th.querySelector('.sort-ic');
+    if (!ic) return;
+    ic.textContent = sortKey === th.dataset.key ? (sortDir === -1 ? '▼' : '▲') : '';
+  });
 }
 
 // 1st place = gold; the rest split into 4 flat (non-gradient) bands by
@@ -854,10 +868,11 @@ function render() {
 
   let rows = CLUBS.filter(c => !q || c.club.toLowerCase().includes(q));
   if (onlyPresent) rows = rows.filter(c => totalFor(c) > 0);
-  const valFor = c => sortKey === '__total' ? totalFor(c) : (c.cells[sortKey] ? c.cells[sortKey].n : 0);
+  const valFor = c => sortKey === null ? 0 : sortKey === '__total' ? totalFor(c) : (c.cells[sortKey] ? c.cells[sortKey].n : 0);
   rows = rows.slice().sort((a, b) => sortDir * (valFor(a) - valFor(b)) || a.club.localeCompare(b.club));
 
   document.getElementById('resultCount').textContent = rows.length.toLocaleString() + ' ' + LANG[CURLANG].clubsWord;
+  updateSortIcons();
 
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
@@ -1202,7 +1217,8 @@ function applyStateFromUrl() {
     STATE.gts = params.has('gts') ? new Set(params.get('gts').split(',').filter(Boolean)) : new Set(ALL_GTS);
     STATE.seeded = true;
 
-    sortKey = params.get('sort') || '__total';
+    const sortParam = params.get('sort');
+    sortKey = sortParam === 'none' ? null : (sortParam || '__total');
     sortDir = params.get('dir') === 'asc' ? 1 : -1;
 
     document.getElementById('presentToggle').classList.toggle('active', params.get('present') === '1');
