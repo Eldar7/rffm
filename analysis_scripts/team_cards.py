@@ -33,6 +33,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
                          THEME_SWITCH_JS, club_slug_map, switch_row_html)
 
@@ -64,14 +65,39 @@ def clean(v) -> str | None:
 
 
 def build_club_team_cards(season: str) -> dict[str, dict]:
-    """club_name_raw -> {team_id: {name, matches: [...]}}, one entry per
-    team the club fielded, sorted chronologically within each team."""
+    """club_name_raw -> {team_id: {name, matches: [...], competitions: {...}}},
+    one entry per team the club fielded, sorted chronologically within each
+    team. `competitions` is keyed by f"{comp_id}_{group_id}" — a team can be
+    registered in more than one competition/group the same season (regular
+    league + cup + playoff group, ...) — see team_group_membership.csv;
+    each entry carries the static per-competition facts matches.csv repeats
+    on every row (division, phase, game type) plus a standings.csv snapshot
+    (position/played/W-D-L/goals/points), for the Team Card's per-competition
+    summary panel."""
     d = BASE / season
     teams = pd.read_csv(d / "teams.csv", dtype=str)
     matches = pd.read_csv(d / "matches.csv", dtype=str)
+    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    standings = pd.read_csv(d / "standings.csv", dtype=str)
 
     tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
+    comp_id_to_division = dict(zip(comps["competition_id"], comps["division_level"]))
+
+    group_size = standings.groupby(standings["group_id"].map(norm_id))["team_id"].nunique().to_dict()
+
+    standing_by_team_group: dict[tuple[str, str], dict] = {}
+    for s in standings.itertuples(index=False):
+        key = (norm_id(s.team_id), norm_id(s.group_id))
+        if key[0] is None or key[1] is None:
+            continue
+        standing_by_team_group[key] = {
+            "position": clean(s.position), "played": clean(s.played),
+            "wins": clean(s.wins), "draws": clean(s.draws), "losses": clean(s.losses),
+            "gf": clean(s.goals_for), "ga": clean(s.goals_against),
+            "gd": clean(s.goal_diff), "points": clean(s.points),
+            "size": int(group_size.get(key[1], 0)) or None,
+        }
 
     matches["hid"] = matches["home_team_id"].map(norm_id)
     matches["aid"] = matches["away_team_id"].map(norm_id)
@@ -109,13 +135,42 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
                 "season_id": clean(r["season_id"]),
             }
             team_rec = club_teams.setdefault(club, {}).setdefault(tid, {
-                "name": clean(tid_to_name.get(tid)) or tid, "matches": [],
+                "name": clean(tid_to_name.get(tid)) or tid, "matches": [], "competitions": {},
             })
             team_rec["matches"].append(entry)
+
+            # Keyed by competition_id alone, not competition_id+group_id: a
+            # knockout cup runs its rounds (1/16, cuartos, ...) as *separate
+            # group_ids under the same competition_id* (a real example in
+            # 2025-2026: one AFICIONADO team has 6 different group_ids all
+            # under competition_id 26067232, "COPA DE AFICIONADOS") — to a
+            # user that's one competition, not six, so this rolls every
+            # round up into a single card with a combined record. `grp` is
+            # only kept when the team stayed in one single group all season
+            # (the common league case) — multiple distinct groups (the cup
+            # case) means no one `grp` label is representative, so it's
+            # nulled out; group-level detail (incl. the calendar link) still
+            # lives on each individual match entry in `matches`.
+            comp_id = entry["comp_id"]
+            comp_rec = team_rec["competitions"].setdefault(comp_id, {
+                "comp": entry["comp"], "comp_id": comp_id,
+                "grp": entry["grp"], "gt": entry["gt"], "gt_id": entry["gt_id"],
+                "phase": entry["phase"], "season_id": entry["season_id"],
+                "division_level": clean(comp_id_to_division.get(comp_id)),
+                "standing": standing_by_team_group.get((tid, entry["group_id"])),
+                "_group_ids": set(),
+            })
+            if comp_rec["_group_ids"] and entry["group_id"] not in comp_rec["_group_ids"]:
+                comp_rec["grp"] = None
+            comp_rec["_group_ids"].add(entry["group_id"])
+            if comp_rec["standing"] is None:
+                comp_rec["standing"] = standing_by_team_group.get((tid, entry["group_id"]))
 
     for teams_of_club in club_teams.values():
         for team_rec in teams_of_club.values():
             team_rec["matches"].sort(key=lambda x: (x["date"] or "9999-99-99", x["time"] or ""))
+            for comp_rec in team_rec["competitions"].values():
+                comp_rec.pop("_group_ids", None)
 
     return club_teams
 
@@ -130,10 +185,14 @@ I18N_ES = {
     "th_date": "Fecha", "th_comp": "Competición", "th_opp": "Rival", "th_score": "Resultado", "th_ha": "L/V",
     "home": "Local", "away": "Visitante",
     "scheduled": "por jugar",
+    "h_comps": "Competiciones",
+    "comps_p": "Haz clic en una tarjeta de competición para activarla/desactivarla — los partidos, el resumen "
+               "por jugador y el once inicial de abajo se recalculan solo con las competiciones activas.",
     "tab_matches": "Partidos", "tab_roster": "Plantilla",
     "h_roster": "Plantilla por partido",
     "roster_p": "Filas — jugadores, columnas — partidos de la temporada. Círculo relleno — titular, círculo hueco — "
-                "suplente que entró, borde dorado — capitán, número al lado — goles marcados, barra — tarjeta.",
+                "suplente que entró, borde dorado — capitán, borde azul — jugó de portero ese partido, número al "
+                "lado — goles marcados, barra — tarjeta.",
     "h_summary": "Resumen por jugador",
     "summary_p": "Calculado a partir de las convocatorias (sin datos de minutos jugados ni asistencias, que la "
                  "fuente no registra). “Partidos” cuenta partidos ya finalizados. Haz clic en ▾ de "
@@ -160,6 +219,7 @@ HTML = r"""<!DOCTYPE html>
   --accent:#2f6b3c; --accent-soft:#dce8dd; --gold:#8a6a12; --gold-soft:#f3e7c4;
   --line:#d7ddd2; --line-strong:#b9c4bb; --shadow: 0 1px 2px rgba(27,42,31,0.06);
   --win:#2f6b3c; --win-soft:#dce8dd; --loss:#a03327; --loss-soft:#f5ddd6; --draw:#8a6a12; --draw-soft:#f3e7c4;
+  --gk:#3068a8;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -167,6 +227,7 @@ HTML = r"""<!DOCTYPE html>
     --accent:#74c47f; --accent-soft:#20301f; --gold:#d9b64a; --gold-soft:#332a10;
     --line:#2a352a; --line-strong:#3a473a; --shadow: 0 1px 3px rgba(0,0,0,0.4);
     --win:#74c47f; --win-soft:#20301f; --loss:#e2685a; --loss-soft:#33201d; --draw:#d9b64a; --draw-soft:#332a10;
+    --gk:#6ca6e0;
   }
 }
 :root[data-theme="dark"]{
@@ -174,12 +235,14 @@ HTML = r"""<!DOCTYPE html>
   --accent:#74c47f; --accent-soft:#20301f; --gold:#d9b64a; --gold-soft:#332a10;
   --line:#2a352a; --line-strong:#3a473a; --shadow: 0 1px 3px rgba(0,0,0,0.4);
   --win:#74c47f; --win-soft:#20301f; --loss:#e2685a; --loss-soft:#33201d; --draw:#d9b64a; --draw-soft:#332a10;
+  --gk:#6ca6e0;
 }
 :root[data-theme="light"]{
   --bg:#eef0ea; --surface:#ffffff; --ink:#1b2a1f; --ink-soft:#516155; --ink-faint:#8b9a8e;
   --accent:#2f6b3c; --accent-soft:#dce8dd; --gold:#8a6a12; --gold-soft:#f3e7c4;
   --line:#d7ddd2; --line-strong:#b9c4bb; --shadow: 0 1px 2px rgba(27,42,31,0.06);
   --win:#2f6b3c; --win-soft:#dce8dd; --loss:#a03327; --loss-soft:#f5ddd6; --draw:#8a6a12; --draw-soft:#f3e7c4;
+  --gk:#3068a8;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;}
@@ -191,7 +254,9 @@ h1{ font-family:'Oswald', ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial
   text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.3rem,2.6vw,1.8rem); line-height:1.2; }
 header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3px solid var(--ink); padding-bottom:1rem; position:relative;}
 .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
-.club-sub{margin:0; color:var(--ink-soft); font-size:0.95rem;}
+.club-sub{margin:0; color:var(--ink-soft); font-size:0.95rem; display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;}
+.season-badge{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:700; letter-spacing:0.03em;
+  background:var(--accent-soft); color:var(--accent); border-radius:999px; padding:0.12rem 0.6rem; }
 a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 a.back:hover{text-decoration:underline;}
 .masthead .switch-row{position:absolute; top:0; right:0; display:flex; gap:0.5rem;}
@@ -204,6 +269,27 @@ a.back:hover{text-decoration:underline;}
 .section-h{ display:flex; align-items:baseline; gap:0.6rem; }
 .section-h h2{ font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:1.1rem; color:var(--ink); margin:0; }
 .section-h .n{ font-family:'JetBrains Mono',monospace; color:var(--accent); font-size:0.78rem; font-weight:700; }
+
+.comps-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(15.5rem, 1fr)); gap:0.6rem; }
+.comp-card{ text-align:left; font-family:inherit; cursor:pointer; background:var(--surface); border:1.5px solid var(--line-strong);
+  border-radius:8px; padding:0.6rem 0.75rem; display:flex; flex-direction:column; gap:0.3rem; opacity:0.5; transition:opacity 0.1s, border-color 0.1s; }
+.comp-card:hover{border-color:var(--accent);}
+.comp-card.active{opacity:1; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent);}
+.comp-card .cc-top{display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;}
+.comp-div-badge{ font-family:'JetBrains Mono',monospace; font-size:0.62rem; font-weight:700; letter-spacing:0.03em;
+  background:var(--accent-soft); color:var(--accent); border-radius:4px; padding:0.08rem 0.4rem; white-space:nowrap; }
+.comp-phase-badge{ font-family:'JetBrains Mono',monospace; font-size:0.62rem; font-weight:700;
+  background:var(--gold-soft); color:var(--gold); border-radius:4px; padding:0.08rem 0.4rem; white-space:nowrap; }
+.comp-card .cc-name{font-weight:700; font-size:0.85rem; color:var(--ink); line-height:1.25;}
+.comp-card .cc-record{font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--ink-soft);}
+.comp-card .cc-standing{font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--ink-faint);}
+.stats-strip{ display:grid; grid-template-columns:repeat(auto-fit, minmax(6.5rem, 1fr)); }
+.stats-strip .stat-cell{ padding:0.7rem 0.8rem; border-right:1px solid var(--line); }
+.stats-strip .stat-cell:last-child{border-right:none;}
+.stats-strip .stat-cell .num{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.3rem; color:var(--ink); font-variant-numeric:tabular-nums; }
+.stats-strip .stat-cell .lbl{font-size:0.68rem; color:var(--ink-soft); margin-top:0.15rem;}
+.stats-strip .stat-cell.win .num{color:var(--win);}
+.stats-strip .stat-cell.loss .num{color:var(--loss);}
 
 .table-shell{ background:var(--surface); border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow); overflow:hidden; }
 table{border-collapse:separate; border-spacing:0; font-size:0.85rem; width:100%;}
@@ -257,6 +343,8 @@ td.cell-mark{text-align:center;}
 .mark-start{background:var(--accent);}
 .mark-sub{background:transparent; border:1.5px solid var(--accent);}
 .mark-cap{box-shadow:0 0 0 2px var(--gold);}
+.mark-gk{box-shadow:0 0 0 2px var(--gk);}
+.mark-cap.mark-gk{box-shadow:0 0 0 2px var(--gold), 0 0 0 4px var(--gk);}
 .mark-goals{ display:inline-block; margin-left:0.2rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
   font-weight:700; color:var(--win); vertical-align:middle; }
 .mark-card{display:inline-block; width:0.45rem; height:0.62rem; border-radius:1px; margin-left:0.15rem; vertical-align:middle;}
@@ -277,8 +365,22 @@ table.dtable td{white-space:nowrap;}
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <span class="eyebrow" data-i18n="eyebrow">RFFM (Мадрид) &middot; карточка команды</span>
     <h1 id="teamName">…</h1>
-    <p class="club-sub" id="clubName"></p>
+    <p class="club-sub">
+      <span id="clubName"></span>
+      <span class="season-badge" id="seasonBadge"></span>
+    </p>
   </header>
+
+  <section id="compsSection">
+    <div class="section-h"><h2 data-i18n="h_comps">Соревнования</h2><span class="n" id="compsCount"></span></div>
+    <p style="color:var(--ink-soft); font-size:0.82rem; max-width:70ch; margin:0 0 0.8rem;" data-i18n="comps_p">
+      Нажмите на карточку соревнования, чтобы включить/выключить его — матчи, сводка по игрокам и состав
+      ниже пересчитываются только по выбранным.
+    </p>
+    <div class="comps-grid" id="compsGrid"></div>
+  </section>
+
+  <div class="table-shell stats-strip" id="teamStatsStrip"></div>
 
   <div class="tabs">
     <button type="button" class="tab-btn active" id="tabBtnMatches" data-i18n="tab_matches">Матчи</button>
@@ -335,8 +437,9 @@ table.dtable td{white-space:nowrap;}
     <div class="section-h" style="margin-top:1.6rem;"><h2 data-i18n="h_roster">Состав по матчам</h2><span class="n" id="rosterCount"></span></div>
     <p style="color:var(--ink-soft); font-size:0.82rem; max-width:70ch; margin:0 0 0.8rem;" data-i18n="roster_p">
       Строки — игроки, столбцы — матчи сезона. Закрашенный кружок — в старте, пустой — вышел на замену,
-      золотая обводка — капитан, число рядом — забитые голы, полоска — карточка.
+      золотая обводка — капитан, синяя обводка — играл вратарём в этом матче, число рядом — забитые голы, полоска — карточка.
     </p>
+    <div class="table-shell stats-strip" id="rosterStatsStrip" style="margin-bottom:0.8rem;"></div>
     <div class="table-shell">
       <div class="matrix-scroll" id="matrixScroll">
         <div class="matrix-loading" id="matrixStatus" data-i18n="loading">Загрузка…</div>
@@ -352,11 +455,31 @@ table.dtable td{white-space:nowrap;}
 const LANG = {
   ru: { loading: 'Загрузка…', notFound: 'Нет данных об этой команде в этом сезоне.',
         home: 'Дома', away: 'В гостях', scheduled: 'ещё не сыгран',
-        win: 'Победа', draw: 'Ничья', loss: 'Поражение' },
+        win: 'Победа', draw: 'Ничья', loss: 'Поражение',
+        stPlayed: 'Матчи', stWins: 'Победы', stDraws: 'Ничьи', stLosses: 'Поражения',
+        stWinPct: '% побед', stGoals: 'Голы (з:п)', stGd: 'Разница', stPpg: 'Очков/игру',
+        stStability: 'Стабильность состава', stStabilityHint: 'Среднее пересечение стартового состава с предыдущим сыгранным матчем',
+        noComps: 'Нет данных о соревнованиях.', standingPos: 'место', of: 'из' },
   es: { loading: 'Cargando…', notFound: 'No se encontraron datos para este equipo en esta temporada.',
         home: 'Local', away: 'Visitante', scheduled: 'por jugar',
-        win: 'Victoria', draw: 'Empate', loss: 'Derrota' },
+        win: 'Victoria', draw: 'Empate', loss: 'Derrota',
+        stPlayed: 'Partidos', stWins: 'Victorias', stDraws: 'Empates', stLosses: 'Derrotas',
+        stWinPct: '% victorias', stGoals: 'Goles (f:c)', stGd: 'Diferencia', stPpg: 'Puntos/partido',
+        stStability: 'Estabilidad del once', stStabilityHint: 'Solapamiento medio del once inicial respecto al partido anterior jugado',
+        noComps: 'Sin datos de competiciones.', standingPos: 'puesto', of: 'de' },
 };
+const PHASE_LABEL = {
+  ru: { regular_season: 'Регулярный чемпионат', 'phase fase final': 'Финал', playoff: 'Плей-офф',
+        'phase segunda fase': '2-й этап', 'playoff FASE FINAL': 'Финал плей-офф',
+        'phase 7 fase': 'Доп. этап', 'playoff 7 FASE': 'Плей-офф (доп.)' },
+  es: { regular_season: 'Liga regular', 'phase fase final': 'Final', playoff: 'Playoff',
+        'phase segunda fase': '2ª fase', 'playoff FASE FINAL': 'Final de playoff',
+        'phase 7 fase': 'Fase adicional', 'playoff 7 FASE': 'Playoff (adicional)' },
+};
+const DIV_LABEL_RU = %DIV_LABEL_RU_JSON%;
+const DIV_LABEL_ES = %DIV_LABEL_ES_JSON%;
+const DIV_ORDER = %DIV_ORDER_JSON%;
+function divLabel(d) { return (CURLANG === 'ru' ? DIV_LABEL_RU : DIV_LABEL_ES)[d] || d || ''; }
 const DT_LABELS = {
   ru: { asc: '▲ по возрастанию', desc: '▼ по убыванию', selectAll: '(все)', search: 'Поиск…', apply: 'Применить', clear: 'Сбросить', empty: '(пусто)' },
   es: { asc: '▲ ascendente', desc: '▼ descendente', selectAll: '(todos)', search: 'Buscar…', apply: 'Aplicar', clear: 'Restablecer', empty: '(vacío)' },
@@ -397,14 +520,120 @@ function resultLabel(m) {
   return { W: LANG[CURLANG].win, D: LANG[CURLANG].draw, L: LANG[CURLANG].loss }[m.result];
 }
 
-function renderMatches(team) {
-  if (!team.matches.length) {
+function divRank(div) {
+  const i = DIV_ORDER.indexOf(div);
+  return i === -1 ? 999 : i;
+}
+function phaseLabel(phase) {
+  const label = (PHASE_LABEL[CURLANG] || {})[phase];
+  if (!label || phase === 'regular_season') return '';
+  return label;
+}
+function compDateMin(compId) {
+  let min = null;
+  ((CUR_TEAM && CUR_TEAM.matches) || []).forEach(m => {
+    if (m.comp_id !== compId) return;
+    if (m.date && (!min || m.date < min)) min = m.date;
+  });
+  return min || '9999-99-99';
+}
+function compRecord(compId) {
+  const ms = ((CUR_TEAM && CUR_TEAM.matches) || []).filter(m => m.comp_id === compId && m.status === 'finished');
+  let w = 0, d = 0, l = 0, gf = 0, ga = 0;
+  ms.forEach(m => {
+    if (m.result === 'W') w++; else if (m.result === 'D') d++; else if (m.result === 'L') l++;
+    const sf = Number(m.sf), sa = Number(m.sa);
+    if (!isNaN(sf)) gf += sf;
+    if (!isNaN(sa)) ga += sa;
+  });
+  return { played: ms.length, w, d, l, gf, ga };
+}
+
+// One card per competition_id (see build_club_team_cards()'s docstring for
+// why a cup's rounds collapse into a single card here) — click toggles it
+// in/out of ACTIVE_COMP_KEYS and re-renders everything downstream through
+// refreshAll(). Rebuilt wholesale on every toggle rather than patched in
+// place — cheap at the scale of "how many competitions can one team be in"
+// (single digits, even for a cup-running side) and much simpler than
+// tracking partial DOM updates.
+function renderCompetitionsPanel() {
+  const grid = document.getElementById('compsGrid');
+  const entries = Object.entries((CUR_TEAM && CUR_TEAM.competitions) || {});
+  document.getElementById('compsCount').textContent = entries.length || '';
+  if (!entries.length) {
+    grid.innerHTML = `<div class="empty-state">${LANG[CURLANG].noComps}</div>`;
+    return;
+  }
+  entries.sort((a, b) => divRank(a[1].division_level) - divRank(b[1].division_level) || compDateMin(a[0]).localeCompare(compDateMin(b[0])));
+  grid.innerHTML = entries.map(([compId, c]) => {
+    const rec = compRecord(compId);
+    const active = ACTIVE_COMP_KEYS.has(compId);
+    const divBadge = c.division_level ? `<span class="comp-div-badge">${esc(divLabel(c.division_level))}</span>` : '';
+    const pl = phaseLabel(c.phase);
+    const phaseBadge = pl ? `<span class="comp-phase-badge">${esc(pl)}</span>` : '';
+    const recordText = rec.played ? `${rec.w}-${rec.d}-${rec.l} &middot; ${rec.gf}:${rec.ga}` : '';
+    let standingText = '';
+    if (c.standing && c.standing.position) {
+      standingText = c.standing.size
+        ? `${esc(c.standing.position)} ${esc(LANG[CURLANG].of)} ${esc(c.standing.size)} &middot; ${esc(c.standing.points)} pts`
+        : `${esc(c.standing.position)}. &middot; ${esc(c.standing.points)} pts`;
+    }
+    return `<button type="button" class="comp-card${active ? ' active' : ''}" data-comp="${esc(compId)}">
+      <div class="cc-top">${divBadge}${phaseBadge}</div>
+      <div class="cc-name">${esc(c.comp || '')}${c.grp ? ` <span style="font-weight:400; color:var(--ink-faint);">&middot; ${esc(c.grp)}</span>` : ''}</div>
+      <div class="cc-record">${recordText}</div>
+      ${standingText ? `<div class="cc-standing">${standingText}</div>` : ''}
+    </button>`;
+  }).join('');
+  grid.querySelectorAll('.comp-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-comp');
+      if (ACTIVE_COMP_KEYS.has(key)) ACTIVE_COMP_KEYS.delete(key); else ACTIVE_COMP_KEYS.add(key);
+      refreshAll();
+    });
+  });
+}
+
+// Fixture-based record (W-D-L, goals, points/game) over whichever
+// competitions are currently active — cheap, since `matches` is already
+// loaded for every team card regardless of tab. Deliberately does NOT
+// include lineup-stability here: that needs match_lineups data, which is
+// lazily fetched only once the Состав tab opens (see team_rosters.py's
+// docstring) — see renderRosterStats() instead, inside that tab.
+function renderTeamStats(matches) {
+  const strip = document.getElementById('teamStatsStrip');
+  const played = matches.filter(m => m.status === 'finished');
+  if (!played.length) { strip.innerHTML = ''; return; }
+  let w = 0, d = 0, l = 0, gf = 0, ga = 0, pts = 0;
+  played.forEach(m => {
+    if (m.result === 'W') { w++; pts += 3; } else if (m.result === 'D') { d++; pts += 1; } else if (m.result === 'L') l++;
+    const sf = Number(m.sf), sa = Number(m.sa);
+    if (!isNaN(sf)) gf += sf;
+    if (!isNaN(sa)) ga += sa;
+  });
+  const winPct = Math.round((w / played.length) * 100);
+  const gd = gf - ga;
+  const ppg = (pts / played.length).toFixed(2);
+  const cell = (cls, num, lbl) => `<div class="stat-cell ${cls}"><div class="num">${num}</div><div class="lbl">${esc(lbl)}</div></div>`;
+  strip.innerHTML =
+    cell('', played.length, LANG[CURLANG].stPlayed) +
+    cell('win', w, LANG[CURLANG].stWins) +
+    cell('', d, LANG[CURLANG].stDraws) +
+    cell('loss', l, LANG[CURLANG].stLosses) +
+    cell('', `${winPct}%`, LANG[CURLANG].stWinPct) +
+    cell('', `${gf}:${ga}`, LANG[CURLANG].stGoals) +
+    cell('', (gd > 0 ? '+' : '') + gd, LANG[CURLANG].stGd) +
+    cell('', ppg, LANG[CURLANG].stPpg);
+}
+
+function renderMatches(matches) {
+  if (!matches.length) {
     document.getElementById('matchCount').textContent = '0';
     document.getElementById('matchBody').innerHTML =
       `<tr><td class="empty-state" colspan="5">${LANG[CURLANG].notFound}</td></tr>`;
     return;
   }
-  document.getElementById('matchBody').innerHTML = team.matches.map(m => {
+  document.getElementById('matchBody').innerHTML = matches.map(m => {
     const url = groupCalUrl(m);
     const compHtml = url
       ? `<a href="${url}" target="_blank" rel="noopener" class="comp-name">${esc(m.comp || m.grp || '')}</a>`
@@ -427,7 +656,18 @@ function renderMatches(team) {
   });
 }
 
-let CUR_SEASON = null, CUR_TEAM_ID = null, CUR_TEAM = null, ROSTER_PAYLOAD = null, ROSTER_LOADING = false;
+let CUR_SEASON = null, CUR_TEAM_ID = null, CUR_CLUB_SLUG = null, CUR_TEAM = null, ROSTER_PAYLOAD = null, ROSTER_LOADING = false;
+
+// Which competitions (competition_id) are "on" — toggled via the cards in
+// #compsGrid, defaults to every competition the team has. Everything below
+// (match list, player-summary table, roster matrix, stability/win-rate
+// stats) reads through visibleMatches() instead of CUR_TEAM.matches
+// directly, so one flip re-scopes the whole page.
+let ACTIVE_COMP_KEYS = new Set();
+function compKey(m) { return m.comp_id; }
+function visibleMatches() {
+  return ((CUR_TEAM && CUR_TEAM.matches) || []).filter(m => ACTIVE_COMP_KEYS.has(compKey(m)));
+}
 
 function shortDate(d) {
   if (!d) return '—';
@@ -483,7 +723,7 @@ function renderPlayerSummary() {
   const tbody = document.getElementById('summaryBody');
   const roster = Object.entries((ROSTER_PAYLOAD && ROSTER_PAYLOAD.roster) || {});
   const lineups = (ROSTER_PAYLOAD && ROSTER_PAYLOAD.lineups) || {};
-  const matches = (CUR_TEAM && CUR_TEAM.matches) || [];
+  const matches = visibleMatches();
   if (!roster.length) {
     tbody.innerHTML = '';
     document.getElementById('summaryCount').textContent = '';
@@ -492,7 +732,8 @@ function renderPlayerSummary() {
   const fmt2 = v => v === null ? '—' : v.toFixed(2);
   tbody.innerHTML = roster.map(([pid, p]) => {
     const s = computeStats(pid, matches, lineups);
-    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}`;
+    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}` +
+      `&fromTeam=${encodeURIComponent(CUR_TEAM_ID)}&fromClub=${encodeURIComponent(CUR_CLUB_SLUG)}`;
     const appsDisplay = s.played
       ? `${s.apps}/${s.played} (${Math.round((s.appsPct || 0) * 100)}%)`
       : `${s.apps}/0`;
@@ -521,16 +762,50 @@ function renderPlayerSummary() {
   });
 }
 
+// Continuity index: average Jaccard overlap (|A∩B|/|A∪B|) of the starting
+// XI between each pair of consecutive *played* matches, in chronological
+// order — the most intuitive of the stability formulas that fit what this
+// data can actually support (no minutes/subs-timing data, only who started
+// each match; see the roster_p/summary_p caveats above). 0 = a completely
+// different XI every time, 1 = the exact same eleven start every match.
+function computeStability(matches, lineups) {
+  const played = matches.filter(m => m.status === 'finished' && lineups[m.match_id]);
+  if (played.length < 2) return null;
+  let sum = 0, n = 0;
+  for (let i = 1; i < played.length; i++) {
+    const startersOf = m => new Set(Object.entries(lineups[m.match_id] || {}).filter(([, c]) => c.start).map(([pid]) => pid));
+    const prev = startersOf(played[i - 1]), cur = startersOf(played[i]);
+    if (!prev.size || !cur.size) continue;
+    let inter = 0;
+    prev.forEach(p => { if (cur.has(p)) inter++; });
+    sum += inter / (prev.size + cur.size - inter);
+    n++;
+  }
+  return n ? sum / n : null;
+}
+
+function renderRosterStats(matches, lineups) {
+  const strip = document.getElementById('rosterStatsStrip');
+  const stability = computeStability(matches, lineups);
+  const pct = stability === null ? '—' : `${Math.round(stability * 100)}%`;
+  strip.innerHTML = `<div class="stat-cell" title="${esc(LANG[CURLANG].stStabilityHint)}">
+    <div class="num">${pct}</div><div class="lbl">${esc(LANG[CURLANG].stStability)}</div>
+  </div>`;
+}
+
 function renderMatrix() {
   const status = document.getElementById('matrixStatus');
   const scroll = document.getElementById('matrixScroll');
-  if (!CUR_TEAM || !CUR_TEAM.matches.length) {
+  const matches = visibleMatches();
+  if (!matches.length) {
     scroll.innerHTML = `<div class="matrix-empty">${LANG[CURLANG].notFound}</div>`;
+    document.getElementById('rosterStatsStrip').innerHTML = '';
     return;
   }
   const roster = Object.entries((ROSTER_PAYLOAD && ROSTER_PAYLOAD.roster) || {});
   if (!roster.length) {
     scroll.innerHTML = `<div class="matrix-empty">${LANG[CURLANG].notFound}</div>`;
+    document.getElementById('rosterStatsStrip').innerHTML = '';
     return;
   }
   document.getElementById('rosterCount').textContent = roster.length;
@@ -542,7 +817,7 @@ function renderMatrix() {
     return String(a[1].name).localeCompare(String(b[1].name));
   });
   const lineups = ROSTER_PAYLOAD.lineups || {};
-  const matches = CUR_TEAM.matches;
+  renderRosterStats(matches, lineups);
 
   let head = `<th class="player-head">&nbsp;</th>` + matches.map(m => {
     const opp = m.opp || '';
@@ -558,11 +833,13 @@ function renderMatrix() {
       if (!cell) return `<td class="cell-mark">&nbsp;</td>`;
       const markCls = cell.start ? 'mark-start' : 'mark-sub';
       const capCls = cell.cap ? ' mark-cap' : '';
+      const gkCls = cell.gk ? ' mark-gk' : '';
       const goals = cell.goals ? `<span class="mark-goals">&#9917;${cell.goals}</span>` : '';
       const cards = (cell.cards || []).map(c => `<span class="mark-card ${cardClass(c)}"></span>`).join('');
-      return `<td class="cell-mark"><span class="${markCls}${capCls}"></span>${goals}${cards}</td>`;
+      return `<td class="cell-mark"><span class="${markCls}${capCls}${gkCls}"></span>${goals}${cards}</td>`;
     }).join('');
-    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}`;
+    const nameUrl = `player_card.html?season=${encodeURIComponent(CUR_SEASON)}&player=${encodeURIComponent(pid)}` +
+      `&fromTeam=${encodeURIComponent(CUR_TEAM_ID)}&fromClub=${encodeURIComponent(CUR_CLUB_SLUG)}`;
     return `<tr><td class="player-cell"><span class="player-name">${jersey}<a href="${nameUrl}">${esc(p.name)}</a></span>${gk}</td>${cells}</tr>`;
   }).join('');
 
@@ -585,6 +862,23 @@ async function loadRoster() {
   ROSTER_LOADING = false;
   renderMatrix();
   renderPlayerSummary();
+}
+
+// Single re-render entry point for anything that changes which
+// competitions are active (or, via main(), first load) — recomputes the
+// competitions panel + top stats strip + matches table always, and the
+// roster tab's own views only if that tab is the one currently open (no
+// point re-rendering a hidden matrix, and it'd force-fetch the lineup
+// data early if the tab was never opened).
+function refreshAll() {
+  const matches = visibleMatches();
+  renderCompetitionsPanel();
+  renderTeamStats(matches);
+  renderMatches(matches);
+  if (document.getElementById('paneRoster').classList.contains('active')) {
+    renderMatrix();
+    renderPlayerSummary();
+  }
 }
 
 // Which tab is open lives in the URL (?tab=roster) via replaceState — not
@@ -612,7 +906,8 @@ async function main() {
   const season = params.get('season');
   const clubSlug = params.get('club');
   const teamId = params.get('team');
-  CUR_SEASON = season; CUR_TEAM_ID = teamId;
+  CUR_SEASON = season; CUR_TEAM_ID = teamId; CUR_CLUB_SLUG = clubSlug;
+  document.getElementById('seasonBadge').textContent = season || '';
   if (!season || !clubSlug || !teamId) {
     document.getElementById('matchBody').innerHTML =
       `<tr><td class="empty-state" colspan="5">${LANG[CURLANG].notFound}</td></tr>`;
@@ -638,7 +933,8 @@ async function main() {
   document.getElementById('teamName').textContent = team.name;
   document.title = `${team.name} — RFFM`;
   CUR_TEAM = team;
-  renderMatches(team);
+  ACTIVE_COMP_KEYS = new Set(Object.keys(team.competitions || {}));
+  refreshAll();
   showTab(params.get('tab') === 'roster' ? 'roster' : 'matches', { silent: true });
 }
 
@@ -670,7 +966,10 @@ def build_html() -> str:
             .replace("%LANG_SWITCH_JS%", LANG_SWITCH_JS)
             .replace("%THEME_SWITCH_JS%", THEME_SWITCH_JS)
             .replace("%DATATABLE_CSS%", DATATABLE_CSS)
-            .replace("%DATATABLE_JS%", DATATABLE_JS))
+            .replace("%DATATABLE_JS%", DATATABLE_JS)
+            .replace("%DIV_ORDER_JSON%", json.dumps(DIV_ORDER))
+            .replace("%DIV_LABEL_RU_JSON%", json.dumps(DIV_LABEL_RU, ensure_ascii=False))
+            .replace("%DIV_LABEL_ES_JSON%", json.dumps(DIV_LABEL_ES, ensure_ascii=False)))
 
 
 def main():
