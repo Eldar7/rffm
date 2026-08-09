@@ -1,0 +1,11 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+1799695,18463724,2791903,"DEL REY MORENO, CARLOS ENREIQUE",30,30,100,amarilla,False,https://www.rffm.es/acta-partido/1799695,2026-08-09T11:47:58.453116+00:00
+1800703,18310481,2789058,"JUAREZ GARCIA, EDUARDO",18,18,100,amarilla,False,https://www.rffm.es/acta-partido/1800703,2026-08-09T11:47:58.665346+00:00
+1800703,18406019,2802559,"SANCHEZ ROJO, PABLO",16,16,100,amarilla,False,https://www.rffm.es/acta-partido/1800703,2026-08-09T11:47:58.665346+00:00
+1796455,17156065,2791755,"BELLVER CAMPO, LEO",40,40,100,amarilla,False,https://www.rffm.es/acta-partido/1796455,2026-08-09T11:48:00.085061+00:00
+1796465,18406019,2791231,"GALIANI IZQUIERDO, ALONSO",40,40,100,amarilla,False,https://www.rffm.es/acta-partido/1796465,2026-08-09T11:48:00.906272+00:00
+1796471,18310553,2791056,"MORENO CANOVAS, ERIC",38,38,100,amarilla,False,https://www.rffm.es/acta-partido/1796471,2026-08-09T11:48:03.418458+00:00
+1796496,18310553,2791054,"GARCIA SAIZ, ASIER",29,29,100,amarilla,False,https://www.rffm.es/acta-partido/1796496,2026-08-09T11:48:06.663154+00:00
+1796504,18378836,2791652,"ZAZO SUERO, EMILIO",32,32,100,amarilla,False,https://www.rffm.es/acta-partido/1796504,2026-08-09T11:48:08.554981+00:00
+1796514,18406019,2802560,"PAVON PEREZ, SERGIO",36,36,100,amarilla,False,https://www.rffm.es/acta-partido/1796514,2026-08-09T11:48:09.139359+00:00
+1796536,18378836,2805548,"GARCIA LAVIN, FRANCISCO JAVIER",45,45,101,roja,False,https://www.rffm.es/acta-partido/1796536,2026-08-09T11:48:12.847876+00:00
