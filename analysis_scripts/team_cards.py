@@ -197,7 +197,7 @@ I18N_ES = {
     "summary_p": "Calculado a partir de las convocatorias (sin datos de minutos jugados ni asistencias, que la "
                  "fuente no registra). “Partidos” cuenta partidos ya finalizados. Haz clic en ▾ de "
                  "cualquier columna para ordenar o filtrar, como en Excel.",
-    "sh_jersey": "Nº", "sh_name": "Jugador", "sh_apps": "Partidos", "sh_starts": "Titular", "sh_sub": "Suplente",
+    "sh_jersey": "Nº", "sh_name": "Jugador", "sh_seasons": "Temporadas", "sh_apps": "Partidos", "sh_starts": "Titular", "sh_sub": "Suplente",
     "sh_goals": "Goles", "sh_gpa": "Goles/partido", "sh_y": "A", "sh_r": "R", "sh_dy": "2A",
     "sh_cap": "Capitán", "sh_gk": "Portero", "sh_cs": "Imbatido", "sh_ppg": "Puntos/partido",
     "footer": 'Construido a partir de <code>output/processed/rffm/matches.csv</code> y '
@@ -287,6 +287,7 @@ a.back:hover{text-decoration:underline;}
 .stats-strip .stat-cell{ padding:0.7rem 0.8rem; border-right:1px solid var(--line); }
 .stats-strip .stat-cell:last-child{border-right:none;}
 .stats-strip .stat-cell .num{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.3rem; color:var(--ink); font-variant-numeric:tabular-nums; }
+.uncertain-mark{ color:var(--gold); font-family:ui-sans-serif; cursor:help; }
 .stats-strip .stat-cell .lbl{font-size:0.68rem; color:var(--ink-soft); margin-top:0.15rem;}
 .stats-strip .stat-cell.win .num{color:var(--win);}
 .stats-strip .stat-cell.loss .num{color:var(--loss);}
@@ -416,6 +417,7 @@ table.dtable td{white-space:nowrap;}
           <thead><tr>
             <th data-key="jersey" data-type="number"><span data-i18n="sh_jersey">№</span></th>
             <th data-key="name" data-type="text"><span data-i18n="sh_name">Игрок</span></th>
+            <th data-key="seasons" data-type="number" title="Сыграно сезонов из тех, на которые игрок проходит по возрасту"><span data-i18n="sh_seasons">Сезонов</span></th>
             <th data-key="apps" data-type="number"><span data-i18n="sh_apps">Явка</span></th>
             <th data-key="starts" data-type="number"><span data-i18n="sh_starts">Старт</span></th>
             <th data-key="subapps" data-type="number"><span data-i18n="sh_sub">Скамейка</span></th>
@@ -459,6 +461,7 @@ const LANG = {
         stPlayed: 'Матчи', stWins: 'Победы', stDraws: 'Ничьи', stLosses: 'Поражения',
         stWinPct: '% побед', stGoals: 'Голы (з:п)', stGd: 'Разница', stPpg: 'Очков/игру',
         stStability: 'Стабильность состава', stStabilityHint: 'Среднее пересечение стартового состава с предыдущим сыгранным матчем',
+        seasonsUncertain: 'Не все сезоны в этом окне полностью докачаны — реальное число может отличаться',
         noComps: 'Нет данных о соревнованиях.', standingPos: 'место', of: 'из' },
   es: { loading: 'Cargando…', notFound: 'No se encontraron datos para este equipo en esta temporada.',
         home: 'Local', away: 'Visitante', scheduled: 'por jugar',
@@ -466,6 +469,7 @@ const LANG = {
         stPlayed: 'Partidos', stWins: 'Victorias', stDraws: 'Empates', stLosses: 'Derrotas',
         stWinPct: '% victorias', stGoals: 'Goles (f:c)', stGd: 'Diferencia', stPpg: 'Puntos/partido',
         stStability: 'Estabilidad del once', stStabilityHint: 'Solapamiento medio del once inicial respecto al partido anterior jugado',
+        seasonsUncertain: 'No todas las temporadas de esta ventana están completamente recopiladas — el número real puede diferir',
         noComps: 'Sin datos de competiciones.', standingPos: 'puesto', of: 'de' },
 };
 const PHASE_LABEL = {
@@ -737,9 +741,19 @@ function renderPlayerSummary() {
     const appsDisplay = s.played
       ? `${s.apps}/${s.played} (${Math.round((s.appsPct || 0) * 100)}%)`
       : `${s.apps}/0`;
+    const seasons = p.seasons;
+    let seasonsDisplay = '—', seasonsSort = -1;
+    if (seasons && seasons.y !== null && seasons.y !== undefined) {
+      seasonsDisplay = `${seasons.x}/${seasons.y}` + (seasons.u ? ` <span class="uncertain-mark" title="${esc(LANG[CURLANG].seasonsUncertain)}">*</span>` : '');
+      seasonsSort = seasons.y ? seasons.x / seasons.y : seasons.x;
+    } else if (seasons) {
+      seasonsSort = seasons.x;
+      seasonsDisplay = String(seasons.x);
+    }
     return `<tr>
       <td data-col="jersey" data-v="${p.jersey ? parseInt(p.jersey, 10) : ''}">${p.jersey ? esc(p.jersey) : '—'}</td>
       <td data-col="name" data-v="${esc(p.name)}"><a href="${nameUrl}">${esc(p.name)}</a></td>
+      <td data-col="seasons" data-v="${seasonsSort}" data-label="${esc(seasonsDisplay.replace(/<[^>]+>/g, ''))}">${seasonsDisplay}</td>
       <td data-col="apps" data-v="${s.apps}" data-label="${esc(appsDisplay)}">${appsDisplay}</td>
       <td data-col="starts" data-v="${s.starts}">${s.starts}</td>
       <td data-col="subapps" data-v="${s.subapps}">${s.subapps}</td>
