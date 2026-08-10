@@ -380,3 +380,53 @@ pages - not fetch failures, see `clubs_data_quality_report.csv`). No other
 categories have acta_partido/fichajugador enrichment yet. Season 2024-2025:
 `core` complete (all categories, via the manual 24-worker run above, not
 GitHub Actions), including `venues.csv`; no enrichment stages started yet.
+
+## Fixing `complete_with_failures` — `retry_check.py`
+
+`coverage_manifest.csv` marks a stage `complete_with_failures` when some
+targets were attempted but produced no output. Two failure modes exist:
+
+**acta_partido / fichajugador** — a success=False row in the stage crawl log
+(`acta_crawl_log.csv` / `fichajugador_crawl_log.csv`). Typical cause:
+HTTP 200 but `__NEXT_DATA__` was absent or empty at fetch time (transient
+rendering issue on the site). The data is often available if you re-fetch.
+
+**clubs** — no failed log row exists. The pipeline writes success=True for
+every HTTP fetch that returned a page; `missing` is computed as
+`target_team_ids − done_ids`. Missing means the page had no `codigo_club`
+in `pageProps.team` — either a structural gap (phantom teams, university
+teams, newly registered school clubs — see `DATA_FINDINGS.md`) or a
+transient rendering issue. The distinction matters: structural gaps are
+permanent and not worth retrying.
+
+### `analysis_scripts/retry_check.py`
+
+Checks each failed/missing target live against the site and shows which are
+now retryable (data present), then optionally clears the log entries so the
+next orchestrator run re-fetches only those targets.
+
+```bash
+# Show what's retryable (read-only):
+python analysis_scripts/retry_check.py --workers 6
+
+# Only check specific stages:
+python analysis_scripts/retry_check.py --stages acta_partido fichajugador
+
+# Check and fix (prompts before writing):
+python analysis_scripts/retry_check.py --fix --workers 6
+
+# Check and fix, clubs only:
+python analysis_scripts/retry_check.py --fix --stages clubs
+```
+
+What `--fix` does per stage type:
+- **acta_partido / fichajugador**: deletes the `success=False` log rows for
+  retryable IDs → pipeline sees them as not-yet-attempted on next run.
+- **clubs**: deletes the `success=True` log rows for retryable team_ids →
+  pipeline re-fetches them (they fall out of `done_ids`).
+
+Both: reset the manifest row to `status=partial` so the orchestrator queues
+the stage again.
+
+After running `--fix`: commit the modified `*_crawl_log.csv` and
+`coverage_manifest.csv`, then trigger `crawl-all.yml` on GitHub Actions.
