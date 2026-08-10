@@ -983,13 +983,14 @@ def main():
 
 
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    # Unlike club_division_map.py (which is cheap enough to bundle every
-    # crawled season), a full team-card data set for all 8 seasons would run
-    # ~450MB+ of JSON (matches.csv alone is 28-53 MB per season) — default to
-    # just the latest season; club_division_map.py's season switcher still
-    # works for older seasons, a team-card link just degrades to "no data"
-    # there instead of shipping a half-gigabyte build artifact.
-    seasons = seasons or [list_seasons()[-1]]
+    # Every crawled season, by default — player_card.html's "show all
+    # seasons" view links into this per-season JSON for any season a player
+    # was registered in, not just the latest, so a latest-season-only build
+    # left every older-season row pointing at data that was never published
+    # (silently blank "Сводка", dead team-card links). ~450MB+ of JSON across
+    # 8 seasons (matches.csv alone is 28-53 MB per season) is the accepted
+    # cost; pass --season explicitly for a cheaper single-season build.
+    seasons = seasons or list_seasons()
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "team_card.html").write_text(build_html(), encoding="utf-8")
 

@@ -132,7 +132,7 @@ def build_team_rosters(season: str) -> dict[str, dict]:
 
 def main():
     parser = argparse.ArgumentParser(description="RFFM team roster x matches participation matrix")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: latest complete core crawl)")
+    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with match_lineups data)")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
@@ -141,10 +141,13 @@ def main():
 
 
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    # Same latest-season-only default as team_cards.py, for the same reason
-    # (this is heavier still — the raw acta_partido enrichment alone is
-    # 500+ MB/season before any trimming).
-    seasons = seasons or [list_seasons()[-1]]
+    # Every crawled season, by default — see team_cards.py's build_all() for
+    # why (player_card.html's "show all seasons" view needs this for every
+    # season a player was registered in, not just the latest). Heavier still
+    # than team_cards.py's data (the raw acta_partido enrichment alone is
+    # 500+ MB/season before any trimming); the per-season skip below already
+    # limits this to seasons that actually have match_lineups/ crawled.
+    seasons = seasons or list_seasons()
     for season in seasons:
         if not (BASE / season / "match_lineups").exists():
             print(f"Skipping team rosters for {season}: no match_lineups/ (acta_partido not crawled)")

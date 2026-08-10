@@ -32,7 +32,7 @@ import pandas as pd
 from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
                          THEME_SWITCH_JS, club_slug_map, switch_row_html)
-from team_cards import build_club_team_cards
+from team_cards import build_club_team_cards, norm_id
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -80,6 +80,25 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     club_teams = build_club_team_cards(season)
     slug_by_club = club_slug_map(sorted(club_teams.keys()))
 
+    # team_id -> (canonical club name, slug), both keyed off team_cards.py's
+    # own club universe above — NOT off this row's own club_name_raw. The
+    # fichajugador endpoint (this CSV) and the core team-listing endpoint
+    # (teams.csv, what build_club_team_cards() reads) report a club's name
+    # differently often enough to matter (sponsor suffixes like "- CEIBA"
+    # added/dropped, abbreviations, "(FS)" markers — ~20% of rows in a given
+    # season in practice): joining by that free-text name instead of by the
+    # already-known, reliable team_id silently drops the slug (None) for
+    # every row where the two sides' text doesn't match byte-for-byte,
+    # which breaks both the "Команда" link and the per-row "Сводка" fetch
+    # (both require club_slug) with no visible error.
+    tid_to_club: dict[str, str] = {}
+    tid_to_slug: dict[str, str] = {}
+    for club_name, teams_of_club in club_teams.items():
+        slug = slug_by_club.get(club_name)
+        for tid in teams_of_club:
+            tid_to_club[tid] = club_name
+            tid_to_slug[tid] = slug
+
     shards: dict[int, dict[str, dict]] = {}
     for row in part.itertuples(index=False):
         pid = row.player_id
@@ -91,10 +110,11 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
             "birth_year": clean(pid_to_birth.get(pid)),
             "rows": [],
         })
-        club = clean(row.club_name_raw)
+        tid = norm_id(row.team_id)
+        club = tid_to_club.get(tid) or clean(row.club_name_raw)
         player["rows"].append({
             "team": clean(row.team), "team_id": clean(row.team_id),
-            "club": club, "club_slug": slug_by_club.get(club),
+            "club": club, "club_slug": tid_to_slug.get(tid),
             "comp": clean(row.competition), "comp_id": clean(row.competition_id),
             "grp": clean(row.group), "group_id": clean(row.group_id),
             "cat": clean(getattr(row, "category_base", None)) or "OTHER",
