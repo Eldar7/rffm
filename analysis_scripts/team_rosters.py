@@ -29,6 +29,8 @@ from pathlib import Path
 
 import pandas as pd
 
+import player_career
+
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
 
@@ -66,10 +68,11 @@ def norm_id(v) -> str | None:
 CARD_LABEL_ES = {"amarilla": "amarilla", "roja": "roja", "doble_amarilla": "doble amarilla"}
 
 
-def build_team_rosters(season: str) -> dict[str, dict]:
+def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None) -> dict[str, dict]:
     d = BASE / season
     players = pd.read_csv(d / "players.csv", dtype=str)
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
+    career_lookup = career_lookup or {}
 
     lineups_dir = d / "match_lineups"
     categories = sorted(p.stem for p in lineups_dir.glob("*.csv")) if lineups_dir.exists() else []
@@ -94,8 +97,13 @@ def build_team_rosters(season: str) -> dict[str, dict]:
                 "cap": row.is_captain == "True", "gk": row.is_goalkeeper == "True",
                 "jersey": clean(row.jersey_number), "goals": 0, "cards": [],
             }
+            # "seasons": {x, y, u} — career-wide seasons-played/eligible from
+            # player_career.py, embedded here (not fetched separately by
+            # team_card.html) since this roster JSON is already the one
+            # network round-trip the "Итоги по игрокам" tab needs.
             ros = te["roster"].setdefault(pid, {"name": pid_to_name.get(pid) or pid,
-                                                 "gk": False, "jersey": None, "apps": 0})
+                                                 "gk": False, "jersey": None, "apps": 0,
+                                                 "seasons": career_lookup.get(pid)})
             ros["apps"] += 1
             if row.is_goalkeeper == "True":
                 ros["gk"] = True
@@ -132,7 +140,7 @@ def build_team_rosters(season: str) -> dict[str, dict]:
 
 def main():
     parser = argparse.ArgumentParser(description="RFFM team roster x matches participation matrix")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: latest complete core crawl)")
+    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with match_lineups data)")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
@@ -141,16 +149,35 @@ def main():
 
 
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    # Same latest-season-only default as team_cards.py, for the same reason
-    # (this is heavier still — the raw acta_partido enrichment alone is
-    # 500+ MB/season before any trimming).
-    seasons = seasons or [list_seasons()[-1]]
+    # Every crawled season, by default — see team_cards.py's build_all() for
+    # why (player_card.html's "show all seasons" view needs this for every
+    # season a player was registered in, not just the latest). Heavier still
+    # than team_cards.py's data (the raw acta_partido enrichment alone is
+    # 500+ MB/season before any trimming); the per-season skip below already
+    # limits this to seasons that actually have match_lineups/ crawled.
+    seasons = seasons or list_seasons()
+
+    # Career-wide seasons-played/eligible per player (player_career.py),
+    # computed once up front from every fichajugador-covered season —
+    # independent of `seasons` above, which may be a --season subset of just
+    # one roster build — and reused for every season's roster JSON below,
+    # since a player's X/Y doesn't depend on which season's team you're
+    # viewing them from.
+    print("Computing career seasons-played index...")
+    career_all_seasons = player_career.list_fichajugador_seasons()
+    career_index = player_career.compute_career_index(career_all_seasons)
+    coverage = player_career.load_fichajugador_coverage()
+    career_lookup = {
+        pid: dict(zip(("x", "y", "u"), player_career.seasons_ratio(c["birth_year"], c["seasons"], career_all_seasons, coverage)))
+        for pid, c in career_index.items()
+    }
+
     for season in seasons:
         if not (BASE / season / "match_lineups").exists():
             print(f"Skipping team rosters for {season}: no match_lineups/ (acta_partido not crawled)")
             continue
         print(f"Building team rosters for season {season}")
-        rosters = build_team_rosters(season)
+        rosters = build_team_rosters(season, career_lookup)
         data_dir = out_dir / "data" / f"team_rosters_{season}"
         data_dir.mkdir(parents=True, exist_ok=True)
         for tid, payload in rosters.items():

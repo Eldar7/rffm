@@ -29,10 +29,11 @@ from pathlib import Path
 
 import pandas as pd
 
+import player_career
 from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
                          THEME_SWITCH_JS, club_slug_map, switch_row_html)
-from team_cards import build_club_team_cards
+from team_cards import build_club_team_cards, norm_id
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -80,6 +81,25 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     club_teams = build_club_team_cards(season)
     slug_by_club = club_slug_map(sorted(club_teams.keys()))
 
+    # team_id -> (canonical club name, slug), both keyed off team_cards.py's
+    # own club universe above — NOT off this row's own club_name_raw. The
+    # fichajugador endpoint (this CSV) and the core team-listing endpoint
+    # (teams.csv, what build_club_team_cards() reads) report a club's name
+    # differently often enough to matter (sponsor suffixes like "- CEIBA"
+    # added/dropped, abbreviations, "(FS)" markers — ~20% of rows in a given
+    # season in practice): joining by that free-text name instead of by the
+    # already-known, reliable team_id silently drops the slug (None) for
+    # every row where the two sides' text doesn't match byte-for-byte,
+    # which breaks both the "Команда" link and the per-row "Сводка" fetch
+    # (both require club_slug) with no visible error.
+    tid_to_club: dict[str, str] = {}
+    tid_to_slug: dict[str, str] = {}
+    for club_name, teams_of_club in club_teams.items():
+        slug = slug_by_club.get(club_name)
+        for tid in teams_of_club:
+            tid_to_club[tid] = club_name
+            tid_to_slug[tid] = slug
+
     shards: dict[int, dict[str, dict]] = {}
     for row in part.itertuples(index=False):
         pid = row.player_id
@@ -91,10 +111,11 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
             "birth_year": clean(pid_to_birth.get(pid)),
             "rows": [],
         })
-        club = clean(row.club_name_raw)
+        tid = norm_id(row.team_id)
+        club = tid_to_club.get(tid) or clean(row.club_name_raw)
         player["rows"].append({
             "team": clean(row.team), "team_id": clean(row.team_id),
-            "club": club, "club_slug": slug_by_club.get(club),
+            "club": club, "club_slug": tid_to_slug.get(tid),
             "comp": clean(row.competition), "comp_id": clean(row.competition_id),
             "grp": clean(row.group), "group_id": clean(row.group_id),
             "cat": clean(getattr(row, "category_base", None)) or "OTHER",
@@ -121,6 +142,34 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
                 json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
                 encoding="utf-8")
         print(f"  {sum(len(p) for p in shards.values())} players across {len(shards)} shards written to {data_dir}")
+
+    print("Building player career-seasons index (X/Y seasons played)...")
+    build_career_shards(out_dir, seasons)
+
+
+def build_career_shards(out_dir: Path, seasons: list[str]) -> None:
+    """One JSON per (player_id % SHARD_MOD) under data/player_seasons/ —
+    {player_id: {"x": played, "y": eligible, "u": coverage_uncertain}} —
+    same sharding as player_participation_<season>/ above, shared by
+    player_card.html's own "Сезонов" stat and team_card.html's roster table
+    (see player_career.py; team_rosters.py computes the same numbers
+    independently rather than reading this file, since its own roster JSON
+    already needs the same values inline and a cross-fetch here would just
+    add a second network round-trip for no benefit)."""
+    career = player_career.compute_career_index(seasons)
+    coverage = player_career.load_fichajugador_coverage()
+    shards: dict[int, dict[str, dict]] = {}
+    for pid, c in career.items():
+        x, y, uncertain = player_career.seasons_ratio(c["birth_year"], c["seasons"], seasons, coverage)
+        shard = shards.setdefault(shard_of(pid), {})
+        shard[pid] = {"x": x, "y": y, "u": uncertain}
+    data_dir = out_dir / "data" / "player_seasons"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    for shard_id, payload in shards.items():
+        (data_dir / f"{shard_id}.json").write_text(
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
+            encoding="utf-8")
+    print(f"  {len(career)} players across {len(shards)} shards written to {data_dir}")
 
 
 I18N_ES = {
@@ -205,6 +254,7 @@ a.back:hover{text-decoration:underline;}
 .stats-strip .stat-cell{ padding:0.7rem 0.8rem; border-right:1px solid var(--line); }
 .stats-strip .stat-cell:last-child{border-right:none;}
 .stats-strip .stat-cell .num{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.3rem; color:var(--ink); font-variant-numeric:tabular-nums; }
+.uncertain-mark{ color:var(--gold); font-family:ui-sans-serif; cursor:help; }
 .stats-strip .stat-cell .lbl{font-size:0.68rem; color:var(--ink-soft); margin-top:0.15rem;}
 
 .section-h{ display:flex; align-items:center; gap:0.9rem; flex-wrap:wrap; }
@@ -285,9 +335,11 @@ const DIV_LABEL_ES = %DIV_LABEL_ES_JSON%;
 const LANG = {
   ru: { loading: 'Загрузка…', notFound: 'Нет данных о заявках этого игрока.', other: 'Прочее', birthLabel: 'Год рождения',
         stSeasons: 'Сезонов', stClubs: 'Клубов', stTeams: 'Команд', stApps: 'Явок (всего)', stGoals: 'Голов (всего)',
+        uncertainHint: 'Не все сезоны в этом окне полностью докачаны — реальное число может отличаться',
         nowLabel: 'Сейчас:', backTeam: '&larr; Карточка команды', back: '&larr; Карта клубов' },
   es: { loading: 'Cargando…', notFound: 'No se encontraron datos de inscripción para este jugador.', other: 'Otra', birthLabel: 'Año de nacimiento',
         stSeasons: 'Temporadas', stClubs: 'Clubes', stTeams: 'Equipos', stApps: 'Partidos (total)', stGoals: 'Goles (total)',
+        uncertainHint: 'No todas las temporadas de esta ventana están completamente recopiladas — el número real puede diferir',
         nowLabel: 'Ahora:', backTeam: '&larr; Ficha de equipo', back: '&larr; Mapa de clubes' },
 };
 const DT_LABELS = {
@@ -392,14 +444,36 @@ async function fetchTeamRosterAndMatches(season, clubSlug, teamId) {
   return TEAM_DATA_CACHE[key];
 }
 
-function renderProfileStrip(rows) {
+// data/player_seasons/<pid % SHARD_MOD>.json — {x, y, u} built once across
+// every season (player_cards.py build_career_shards()), independent of the
+// "show all seasons" checkbox: it's a career-wide stat, not a view of the
+// currently-loaded rows.
+async function fetchPlayerSeasons(pid) {
+  const shard = parseInt(pid, 10) % SHARD_MOD;
+  try {
+    const res = await fetch(`data/player_seasons/${shard}.json`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data[pid] || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function renderProfileStrip(rows, career) {
   const strip = document.getElementById('profileStrip');
   const seasons = new Set(rows.map(r => r._season));
   const clubs = new Set(rows.map(r => r.club).filter(Boolean));
   const teams = new Set(rows.map(r => r.team_id).filter(Boolean));
-  const cell = (id, num, lbl) => `<div class="stat-cell"><div class="num" id="${id}">${num}</div><div class="lbl">${esc(lbl)}</div></div>`;
+  const cell = (id, num, lbl, extra) => `<div class="stat-cell"><div class="num" id="${id}">${num}${extra || ''}</div><div class="lbl">${esc(lbl)}</div></div>`;
+  let seasonsNum = String(seasons.size);
+  let seasonsExtra = '';
+  if (career && career.y !== null && career.y !== undefined) {
+    seasonsNum = `${career.x}/${career.y}`;
+    if (career.u) seasonsExtra = ` <span class="uncertain-mark" title="${esc(LANG[CURLANG].uncertainHint)}">*</span>`;
+  }
   strip.innerHTML =
-    cell('stSeasonsNum', seasons.size, LANG[CURLANG].stSeasons) +
+    cell('stSeasonsNum', seasonsNum, LANG[CURLANG].stSeasons, seasonsExtra) +
     cell('stClubsNum', clubs.size, LANG[CURLANG].stClubs) +
     cell('stTeamsNum', teams.size, LANG[CURLANG].stTeams) +
     cell('stAppsNum', '…', LANG[CURLANG].stApps) +
@@ -501,7 +575,7 @@ async function render() {
     (a.div || '').localeCompare(b.div || '') ||
     (a.team || '').localeCompare(b.team || ''));
 
-  renderProfileStrip(rows);
+  renderProfileStrip(rows, await fetchPlayerSeasons(CUR_PID));
   renderNowBadge(rows);
 
   document.getElementById('regBody').innerHTML = rows.map((r, i) => {
