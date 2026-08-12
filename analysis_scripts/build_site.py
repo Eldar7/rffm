@@ -28,6 +28,8 @@ import team_rosters
 import player_cards
 import club_profile
 import all_players
+import all_teams
+import all_clubs
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -177,6 +179,16 @@ CARDS_RU = [
         "title": "Все игроки",
         "desc": "Явки, голы, карточки и карьерные метрики (год старта, число клубов/команд) по каждому игроку — с фильтрами по сезону/возрасту/дивизиону и сортировкой по любой колонке.",
     },
+    {
+        "href": "all_teams.html",
+        "title": "Все команды",
+        "desc": "Игры, В-Н-П, очки/игру, разница мячей, место в группе, состав и стабильность по каждой команде и соревнованию — с фильтрами по сезону/возрасту/дивизиону и сортировкой по любой колонке.",
+    },
+    {
+        "href": "all_clubs.html",
+        "title": "Все клубы",
+        "desc": "То же самое, но по клубам: сумма очков/игр всех команд клуба, взвешенные очки/игру и разница мячей, лучший дивизион, число лидирующих команд.",
+    },
 ]
 CARDS_ES = [
     "Marcadores extraños, dominadores y colistas",
@@ -191,6 +203,10 @@ CARDS_ES = [
     "Partidos, clubes, goles y competiciones por temporada, filtrables por edad / división / tipo de juego.",
     "Todos los jugadores",
     "Partidos, goles, tarjetas y métricas de carrera (año de inicio, nº de clubes/equipos) de cada jugador — con filtros por temporada/edad/división y orden por cualquier columna.",
+    "Todos los equipos",
+    "Partidos, G-E-P, puntos/partido, diferencia de goles, posición en el grupo, plantilla y estabilidad de cada equipo y competición — con filtros por temporada/edad/división y orden por cualquier columna.",
+    "Todos los clubes",
+    "Lo mismo, pero por club: suma de puntos/partidos de todos sus equipos, puntos/partido y diferencia de goles ponderados, mejor división, número de equipos líderes.",
 ]
 
 
@@ -265,6 +281,15 @@ def main():
 
     print("Building club_profile.html...")
     club_profile.build_all(out_dir)
+
+    print("Building all_players.html...")
+    all_players.build_all(out_dir)
+
+    print("Building all_teams.html...")
+    all_teams.build_all(out_dir)
+
+    print("Building all_clubs.html...")
+    all_clubs.build_all(out_dir)
 
     print("Building competition_structure.html...")
     competition_structure.build_all(out_dir)

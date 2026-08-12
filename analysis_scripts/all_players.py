@@ -321,6 +321,7 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
 I18N_ES = {
     "eyebrow": "RFFM (Madrid) &middot; todos los jugadores",
     "back": "&larr; Mapa de clubes",
+    "nav_clubs": "Todos los clubes", "nav_teams": "Todos los equipos", "nav_players": "Todos los jugadores",
     "h1": "Todos los jugadores",
     "lede": "Una fila por jugador de la temporada elegida arriba. Marca las categorías/divisiones que "
             "quieras ver — cada categoría se carga por separado, así que activar más tarda un poco más. "
@@ -405,6 +406,8 @@ header.masthead{display:flex; flex-direction:column; gap:0.5rem; border-bottom:3
 .eyebrow{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); }
 a.back{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--accent); text-decoration:none;}
 a.back:hover{text-decoration:underline;}
+.nav-row{display:flex; gap:1rem; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:0.76rem;}
+.nav-row a{color:var(--ink-soft);} .nav-row a.is-here{color:var(--accent); font-weight:700;}
 .lede{color:var(--ink-soft); font-size:0.85rem; max-width:80ch; margin:0;}
 .masthead .switch-row{position:absolute; top:0; right:0; display:flex; gap:0.5rem;}
 .lang-switch, .theme-switch{ display:inline-flex; border:1px solid var(--line-strong); border-radius:999px; overflow:hidden; }
@@ -467,6 +470,11 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
   <header class="masthead">
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
+    <nav class="nav-row">
+      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="all_teams.html" data-i18n="nav_teams">Все команды</a>
+      <a class="is-here" data-i18n="nav_players">Все игроки</a>
+    </nav>
     <span class="eyebrow" data-i18n="eyebrow">RFFM (Мадрид) &middot; все игроки</span>
     <h1 data-i18n="h1">Все игроки</h1>
     <p class="lede prose" data-i18n="lede">
