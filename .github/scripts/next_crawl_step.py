@@ -36,6 +36,8 @@ SEASONS = [
     "2020-2021",
     "2019-2020",
     "2018-2019",
+    "2017-2018",
+    "2016-2017",
 ]
 
 # Full ordered plan: for each season, the complete sequence of steps.
