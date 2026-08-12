@@ -26,6 +26,7 @@ import competition_structure
 import team_cards
 import team_rosters
 import player_cards
+import club_profile
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -156,6 +157,11 @@ CARDS_RU = [
         "desc": "Матрица турнирных позиций клубов по всем возрастам и дивизионам, с реальными площадками и гербами клубов.",
     },
     {
+        "href": "club_profile.html",
+        "title": "Профиль клуба",
+        "desc": "Выберите клуб — откуда пришли и куда уходят игроки, состав по категориям/командам, путь каждого игрока по клубам и дивизионам.",
+    },
+    {
         "href": "competition_structure.html",
         "title": "Пирамида лиг RFFM",
         "desc": "Для каждого возраста/пола/типа игры — полная лестница дивизионов, переходы вверх/вниз, выход в RFEF и календарь фаз сезона.",
@@ -171,6 +177,8 @@ CARDS_ES = [
     "Las goleadas más grandes, empates a cero y la mejor/peor diferencia de goles de equipos y clubes.",
     "Mapa de clubes por división",
     "Matriz de posiciones de clubes en todas las edades y divisiones, con sedes reales y escudos de los clubes.",
+    "Perfil de club",
+    "Elige un club: de dónde llegaron y a dónde se fueron sus jugadores, la plantilla por categoría/equipo, y el camino de cada jugador por clubes y divisiones.",
     "Pirámide de ligas de la RFFM",
     "Para cada edad/sexo/tipo de juego: la escalera completa de divisiones, ascensos/descensos, la salida a la RFEF y el calendario de fases de la temporada.",
     "Comparación entre temporadas",
@@ -246,6 +254,9 @@ def main():
 
     print("Building player_card.html...")
     player_cards.build_all(out_dir)
+
+    print("Building club_profile.html...")
+    club_profile.build_all(out_dir)
 
     print("Building competition_structure.html...")
     competition_structure.build_all(out_dir)

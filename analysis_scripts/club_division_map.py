@@ -1118,8 +1118,10 @@ function openClubModal(club, opts) {
   const allCompsTitle = L === 'ru' ? 'Все соревнования клуба' : 'Todas las competiciones del club';
   const allCompsBody = allCompsHtml(club) ||
     `<div class="modal-note">${L === 'ru' ? 'Нет данных о матчах.' : 'Sin datos de partidos.'}</div>`;
+  const profileLabel = L === 'ru' ? 'Профиль клуба (доноры, состав, путь игроков)' : 'Perfil de club (procedencia, plantilla, trayectorias)';
+  const profileHtml = `<div class="modal-note"><a href="club_profile.html?clubname=${encodeURIComponent(club.club)}">${profileLabel} &rarr;</a></div>`;
   document.getElementById('modalContent').innerHTML = `
-    <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}</div></div>
+    <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}${profileHtml}</div></div>
     ${addrHtml}
     <div class="modal-section"><h3>${venuesTitle}</h3>${venuesHtml}</div>
     <div class="modal-section"><h3>${teamsTitle}</h3>${teamsHtml}</div>

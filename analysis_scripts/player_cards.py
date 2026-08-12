@@ -274,6 +274,8 @@ tbody tr:hover td{background:var(--accent-soft);}
 .tier-chip{ display:inline-block; font-size:0.72rem; font-weight:700; padding:0.1rem 0.5rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
 .team-name{color:var(--ink); font-weight:600;}
+.club-profile-link{font-size:0.85em; color:var(--ink-faint); border-bottom:none;}
+.club-profile-link:hover{color:var(--accent);}
 .comp-meta{display:block; font-size:0.72rem; color:var(--ink-faint); margin-top:0.1rem;}
 .summary-cell{font-family:'JetBrains Mono',monospace; font-size:0.78rem; white-space:nowrap; color:var(--ink-soft);}
 .empty-state{padding:2rem; text-align:center; color:var(--ink-faint);}
@@ -581,6 +583,9 @@ async function render() {
   document.getElementById('regBody').innerHTML = rows.map((r, i) => {
     const teamUrl = teamCardUrl(r);
     const teamHtml = teamUrl ? `<a href="${teamUrl}">${esc(r.team || '—')}</a>` : esc(r.team || '—');
+    const clubProfileHtml = r.club
+      ? ` <a class="club-profile-link" href="club_profile.html?clubname=${encodeURIComponent(r.club)}" title="${CURLANG === 'ru' ? 'Профиль клуба' : 'Perfil de club'}">&rarr;</a>`
+      : '';
     const compUrl = compCalUrl(r);
     const compHtml = compUrl
       ? `<a href="${compUrl}" target="_blank" rel="noopener">${esc(r.comp || '—')}</a>`
@@ -592,7 +597,7 @@ async function render() {
       <td class="season-cell" data-col="season" data-v="${esc(r._season)}">${esc(r._season)}</td>
       <td data-col="cat" data-v="${esc(catText)}">${esc(catText)}</td>
       <td data-col="div" data-v="${esc(divText)}"><span class="tier-chip">${esc(divText)}</span></td>
-      <td class="team-name" data-col="team" data-v="${esc(r.team || '')}">${teamHtml}</td>
+      <td class="team-name" data-col="team" data-v="${esc(r.team || '')}">${teamHtml}${clubProfileHtml}</td>
       <td data-col="comp" data-v="${esc(r.comp || '')}">${compHtml}${meta ? `<span class="comp-meta">${meta}</span>` : ''}</td>
       <td class="summary-cell" data-col="summary" data-v="0" data-label="…" id="sum-${i}">…</td>
     </tr>`;

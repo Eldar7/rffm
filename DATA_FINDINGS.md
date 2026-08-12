@@ -37,3 +37,33 @@ They are not duplicates in the data — they are the same real-world club
 fielding multiple teams.
 
 ---
+
+## club_profile.html — a club renamed across seasons can show up as two clubs
+
+**Symptom:** Searching the club picker on `club_profile.html` for a club
+you know spans several seasons sometimes turns up what looks like the same
+club twice, or a club's donor/destination flows seem to "lose" a season's
+worth of players with no `transfers.csv`-style explanation.
+
+**Why:** `club_profile_data.py` has no stable cross-season club ID to key
+off — `clubs.csv` (`club_id`) is opt-in (`enrich_clubs.py`) and not
+guaranteed for every club/season (see the gap above), and `teams.csv`'s
+`club_name_raw` is known to drift ~20% season-to-season (sponsor suffixes
+added/dropped, abbreviations — see `player_cards.py`'s `tid_to_club`
+comment). So club identity here is a same-season `club_name_raw` folded
+through accent/case/punctuation normalization only (`club_profile_data.
+club_key()`) — it merges cosmetic spelling variants but **not** a genuine
+rename (sponsor change, legal-name change) between seasons; those land as
+two separate entries in the club picker. This is the same limitation every
+other cross-season club join in this project already carries, not a new
+crawl bug — don't re-investigate it as one.
+
+**Consequence for donor/destination flows:** a player's move is only ever
+reported when they have a confirmed participation row in two
+*calendar-adjacent* seasons (one at the target club, the other elsewhere) —
+a gap year with no row, or a club rename that splits one real club into two
+keys here, surfaces as "gap / unknown previous club" or "no data
+afterward," never as a fabricated transfer. That's intentional caution, not
+missing data.
+
+---

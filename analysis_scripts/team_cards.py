@@ -937,7 +937,9 @@ async function main() {
     return;
   }
   const team = (payload.teams || {})[teamId];
-  document.getElementById('clubName').textContent = payload.club || '';
+  document.getElementById('clubName').innerHTML = payload.club
+    ? `${esc(payload.club)} &middot; <a href="club_profile.html?clubname=${encodeURIComponent(payload.club)}">${CURLANG === 'ru' ? 'профиль клуба' : 'perfil de club'} &rarr;</a>`
+    : '';
   if (!team) {
     document.getElementById('teamName').textContent = payload.club || '—';
     document.getElementById('matchBody').innerHTML =

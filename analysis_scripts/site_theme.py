@@ -94,6 +94,11 @@ CSS = """
   }
   .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 80px; }
   .wrap.wide { max-width: 1280px; }
+  /* Full-bleed: for pages whose content is dense multi-panel visualization
+     (Sankey/heatmap/timeline side by side) rather than reading-width prose —
+     the centered 980/1280px strip starves those of horizontal room. Keeps a
+     little breathing margin instead of touching the viewport edge. */
+  .wrap.full { max-width: none; padding-left: clamp(16px, 3vw, 40px); padding-right: clamp(16px, 3vw, 40px); }
 
   h1, h2, h3, .disp {
     font-family: 'Oswald', system-ui, sans-serif;
