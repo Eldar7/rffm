@@ -94,11 +94,6 @@ CSS = """
   }
   .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 80px; }
   .wrap.wide { max-width: 1280px; }
-  /* Full-bleed: for pages whose content is dense multi-panel visualization
-     (Sankey/heatmap/timeline side by side) rather than reading-width prose —
-     the centered 980/1280px strip starves those of horizontal room. Keeps a
-     little breathing margin instead of touching the viewport edge. */
-  .wrap.full { max-width: none; padding-left: clamp(16px, 3vw, 40px); padding-right: clamp(16px, 3vw, 40px); }
 
   h1, h2, h3, .disp {
     font-family: 'Oswald', system-ui, sans-serif;
@@ -397,6 +392,7 @@ function rffmInitDataTable(table, opts) {
   // state ("unsorted") restores this render's original row order instead
   // of just freezing wherever the last active sort left it.
   var originalOrder = Array.prototype.slice.call(tbody.rows);
+  var everSorted = false; // skip the reorder pass entirely until a sort has actually run once
   var pop = document.createElement('div');
   pop.className = 'dt-pop';
   document.body.appendChild(pop);
@@ -438,23 +434,49 @@ function rffmInitDataTable(table, opts) {
       }
       tr.style.display = visible ? '' : 'none';
     });
+    // Reordering goes through a DocumentFragment (one DOM mutation) rather
+    // than N individual tbody.appendChild(tr) calls (N mutations, O(n) each
+    // in practice — appendChild-to-move on a table with tens of thousands
+    // of rows turned this into a multi-second, near-freezing operation on
+    // the all-players page's larger categories). The unsorted branch is
+    // additionally skipped entirely unless a sort has actually run at
+    // least once — a fresh table is already in original order, so the
+    // very first apply() (every table gets one on init) has nothing to
+    // restore.
     if (state.sortKey) {
       var th = ths.filter(function (t) { return t.dataset.key === state.sortKey; })[0];
       var type = th ? th.dataset.type : 'text';
-      rs.sort(function (a, b) {
-        var av = cellVal(a, state.sortKey), bv = cellVal(b, state.sortKey), cmp;
+      // Decorate-sort-undecorate: cellVal() does a querySelector per call,
+      // and Array.sort's comparator runs ~n*log(n) times — on a table with
+      // tens of thousands of rows that's hundreds of thousands of
+      // querySelector calls if read inside the comparator itself. Reading
+      // each row's value once up front turns that into a flat O(n) cost.
+      var decorated = rs.map(function (tr) { return [tr, cellVal(tr, state.sortKey)]; });
+      decorated.sort(function (a, b) {
+        var av = a[1], bv = b[1];
         if (type === 'number') {
           var an = parseFloat(av), bn = parseFloat(bv);
           var aNaN = isNaN(an), bNaN = isNaN(bn);
-          cmp = (aNaN && bNaN) ? 0 : aNaN ? 1 : bNaN ? -1 : (an - bn);
-        } else {
-          cmp = String(av).localeCompare(String(bv), 'ru');
+          // Empty/non-numeric cells always sort last, in *both* directions
+          // — applying sortDir to this branch too would flip "no data" to
+          // the top on a descending sort, which reads as "the biggest
+          // value" instead of "we don't know". Only real number-vs-number
+          // comparisons flip with direction.
+          if (aNaN && bNaN) return 0;
+          if (aNaN) return 1;
+          if (bNaN) return -1;
+          return (an - bn) * state.sortDir;
         }
-        return cmp * state.sortDir;
+        return String(av).localeCompare(String(bv), 'ru') * state.sortDir;
       });
-      rs.forEach(function (tr) { tbody.appendChild(tr); });
-    } else {
-      originalOrder.forEach(function (tr) { tbody.appendChild(tr); });
+      var sortFrag = document.createDocumentFragment();
+      decorated.forEach(function (d) { sortFrag.appendChild(d[0]); });
+      tbody.appendChild(sortFrag);
+      everSorted = true;
+    } else if (everSorted) {
+      var restoreFrag = document.createDocumentFragment();
+      originalOrder.forEach(function (tr) { restoreFrag.appendChild(tr); });
+      tbody.appendChild(restoreFrag);
     }
     ths.forEach(function (th) {
       var key = th.dataset.key;
