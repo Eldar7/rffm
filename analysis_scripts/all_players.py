@@ -119,14 +119,19 @@ def build_season_performance(season: str) -> dict[str, dict]:
     no per-team column, unlike team_card.html's roster, so there's no
     reason to key by team_id the way team_rosters.py does) — same source
     tables, one pass per category, matched to a lineup appearance via
-    (match_id, player_id) rather than needing team_id at all."""
+    (match_id, player_id) rather than needing team_id at all. Also keeps
+    the raw set of match_ids each player appeared in ("mids") — not
+    serialized itself, but what build_season_all_players() needs to split
+    a team's results into "matches with this player" vs "without" for the
+    result-influence columns below."""
     d = BASE / season
     lineups_dir = d / "match_lineups"
     categories = sorted(p.stem for p in lineups_dir.glob("*.csv")) if lineups_dir.exists() else []
     perf: dict[str, dict] = {}
 
     def entry(pid: str) -> dict:
-        return perf.setdefault(pid, {"apps": 0, "starts": 0, "goals": 0, "yc": 0, "rc": 0, "dyc": 0, "cap": 0, "gk": 0})
+        return perf.setdefault(pid, {"apps": 0, "starts": 0, "goals": 0, "yc": 0, "rc": 0, "dyc": 0, "cap": 0, "gk": 0,
+                                      "mids": set()})
 
     for cat in categories:
         lineup_keys: set[tuple[str, str]] = set()
@@ -137,6 +142,7 @@ def build_season_performance(season: str) -> dict[str, dict]:
                 continue
             e = entry(pid)
             e["apps"] += 1
+            e["mids"].add(mid)
             if row.is_starter == "True":
                 e["starts"] += 1
             if row.is_captain == "True":
@@ -163,6 +169,43 @@ def build_season_performance(season: str) -> dict[str, dict]:
                 if field:
                     perf[row.player_id][field] += 1
     return perf
+
+
+def _pts(result: str | None) -> int | None:
+    return {"W": 3, "D": 1, "L": 0}.get(result)
+
+
+def _is_zero(v: str | None) -> bool:
+    if v is None:
+        return False
+    try:
+        return float(v) == 0
+    except ValueError:
+        return False
+
+
+def compute_result_influence(team_matches: list[dict], played_mids: set[str]) -> dict:
+    """Plus/minus, football-style: this team's points-per-game in the
+    finished matches this player appeared in, vs. the finished matches of
+    the same team he didn't — the "does the team do better with him on the
+    pitch" question, using only presence + final score, so it works
+    identically for a striker or a holding midfielder who never touches
+    the scoresheet. `nw`/`nwo` (sample sizes) travel with the numbers on
+    purpose: a player who starts every match leaves a "without him" sample
+    of 1-2 games, and a delta computed off that is noise, not signal — the
+    page shows N alongside the number rather than hiding it. `csw` (clean
+    sheets while he played) is the same idea aimed at defensive
+    contribution specifically, since goals only capture attackers."""
+    finished = [m for m in team_matches if m.get("status") == "finished"]
+    with_ = [m for m in finished if m.get("match_id") in played_mids]
+    without = [m for m in finished if m.get("match_id") not in played_mids]
+
+    def ppg(ms: list[dict]) -> float | None:
+        vals = [p for p in (_pts(m.get("result")) for m in ms) if p is not None]
+        return round(sum(vals) / len(vals), 3) if vals else None
+
+    csw = sum(1 for m in with_ if _is_zero(m.get("sa")))
+    return {"pw": ppg(with_), "pwo": ppg(without), "nw": len(with_), "nwo": len(without), "csw": csw}
 
 
 def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons: list[str],
@@ -221,6 +264,17 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
         stats = perf.get(pid, {})
         sx, sy, su = player_career.seasons_ratio(
             prof.get("birth_year"), prof.get("seasons", set()), all_seasons, coverage)
+
+        # Result influence needs the player's *current* team's full match
+        # list (build_club_team_cards() already built it above for the
+        # club-slug lookup) split by whether match_lineups puts this player
+        # in that specific match — see compute_result_influence()'s
+        # docstring for why this, not goals, is the metric that also works
+        # for a defender/midfielder who never scores.
+        cur_tid = norm_id(cur["team_id"])
+        team_matches = club_teams.get(tid_to_club.get(cur_tid, ""), {}).get(cur_tid, {}).get("matches", [])
+        infl = compute_result_influence(team_matches, stats.get("mids", set()))
+
         rec = {
             "id": pid, "n": pid_to_name.get(pid) or pid, "by": clean(pid_to_birth.get(pid)),
             "cat": cur["cat"], "div": cur["div"],
@@ -231,6 +285,7 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
             "apps": stats.get("apps", 0), "starts": stats.get("starts", 0), "goals": stats.get("goals", 0),
             "yc": stats.get("yc", 0), "rc": stats.get("rc", 0), "dyc": stats.get("dyc", 0),
             "cap": stats.get("cap", 0), "gk": stats.get("gk", 0),
+            "pw": infl["pw"], "pwo": infl["pwo"], "nw": infl["nw"], "nwo": infl["nwo"], "csw": infl["csw"],
         }
         shards.setdefault(cur["cat"], []).append(rec)
     return shards
@@ -270,6 +325,22 @@ I18N_ES = {
     "lede": "Una fila por jugador de la temporada elegida arriba. Marca las categorías/divisiones que "
             "quieras ver — cada categoría se carga por separado, así que activar más tarda un poco más. "
             "Haz clic en ▾ de cualquier columna para ordenar/filtrar, como en Excel.",
+    "h_howto": "Cómo encontrar buenos jugadores",
+    "how1": "La categoría es obligatoria — sin ella la tabla queda vacía (las categorías grandes tienen "
+            "decenas de miles de jugadores, así que nada se carga por defecto). La división se puede "
+            "acotar de entrada a las ligas más altas.",
+    "how2": "<b>¿Buscas un goleador?</b> Acota primero «División» a las ligas más altas — los goles no "
+            "son comparables entre divisiones, el máximo goleador de una división floja no es "
+            "necesariamente bueno. Después ordena «Goles» o «Goles/partido» de mayor a menor — la "
+            "columna «Partidos» al lado muestra sobre qué muestra se calcula.",
+    "how3": "<b>¿El jugador no marca (defensa/centrocampista)?</b> Mira «Influencia (Δ)» — la diferencia "
+            "de puntos del equipo por partido con él en el campo y sin él — y «% imbatido» — con qué "
+            "frecuencia el equipo no encaja cuando juega él. Ambas cifras muestran entre paréntesis N "
+            "— partidos sin/con él; con N=1&ndash;2 la cifra es ruido, no una señal fiable.",
+    "how4": "«Capitán» es una señal adicional, no estricta: los entrenadores suelen dar el brazalete al "
+            "jugador de más confianza. «Clubes»/«Equipos» no habla de nivel directamente — mejor mirarlo "
+            "junto con la división: pasar a una división más fuerte suele decir más que el número de "
+            "cambios en sí.",
     "lbl_season": "Temporada",
     "lbl_cats": "Categoría", "btn_all1": "Todas", "btn_none1": "Ninguna",
     "lbl_divs": "División", "btn_all2": "Todas", "btn_none2": "Ninguna",
@@ -278,8 +349,9 @@ I18N_ES = {
     "th_name": "Jugador", "th_by": "Año nac.", "th_cat": "Categoría", "th_div": "División",
     "th_club": "Club", "th_team": "Equipo", "th_fs": "Año inicio", "th_fc": "Categoría inicio",
     "th_ncl": "Clubes", "th_nte": "Equipos", "th_seasons": "Temporadas",
-    "th_apps": "Partidos", "th_starts": "Titular", "th_goals": "Goles",
+    "th_apps": "Partidos", "th_starts": "Titular", "th_goals": "Goles", "th_gpa": "Goles/partido",
     "th_yc": "A", "th_rc": "R", "th_dyc": "2A", "th_cap": "Capitán", "th_gk": "Portero",
+    "th_infl": "Influencia (Δ)", "th_csr": "% imbatido",
     "footer": 'Construido a partir de <code>output/processed/rffm/{player_competition_participation,'
               'match_lineups,match_goals,match_cards}.csv</code>. Ver <code>analysis_scripts/all_players.py</code>.',
 }
@@ -320,7 +392,13 @@ html,body{margin:0;}
 body{ background:var(--bg); color:var(--ink); font-family:'PT Sans', ui-sans-serif, "Helvetica Neue", Arial, sans-serif;
   line-height:1.5; -webkit-font-smoothing:antialiased; }
 a{ color:var(--accent); text-decoration:none; } a:hover{ text-decoration:underline; }
-.page{ max-width:1400px; margin:0 auto; padding:2.25rem 1.25rem 4rem; display:flex; flex-direction:column; gap:1.25rem; }
+/* Full-width, not the ~900-1400px boxed shell the other pages use — those
+   are read-first (a report, a career table with a handful of columns);
+   this one is a dense 20+ column grid where a centered narrow column just
+   forces more horizontal scrolling for no benefit. Prose blocks (lede,
+   strategy) opt back into a readable measure via .prose. */
+.page{ max-width:none; margin:0; padding:2.25rem 1.5rem 4rem; display:flex; flex-direction:column; gap:1.25rem; }
+.prose{max-width:80ch;}
 h1{ font-family:'Oswald', ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight:700;
   text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.3rem,2.6vw,1.8rem); line-height:1.2; }
 header.masthead{display:flex; flex-direction:column; gap:0.5rem; border-bottom:3px solid var(--ink); padding-bottom:1rem; position:relative;}
@@ -343,6 +421,14 @@ a.back:hover{text-decoration:underline;}
   border-radius:999px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); }
 .search svg{position:absolute; left:0.7rem; top:50%; transform:translateY(-50%); color:var(--ink-faint); pointer-events:none;}
 .result-count{ font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent); font-weight:700; margin-left:auto; }
+
+.strategy-box{ background:var(--gold-soft); border:1px solid var(--gold); border-left:4px solid var(--gold);
+  border-radius:8px; padding:0.7rem 1rem; }
+.strategy-box summary{ cursor:pointer; font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:1rem; color:var(--ink); }
+.strategy-box[open] summary{margin-bottom:0.5rem;}
+.strategy-box ol{margin:0; padding-left:1.3rem; color:var(--ink-soft); font-size:0.85rem; display:flex; flex-direction:column; gap:0.4rem;}
+.strategy-box li b{color:var(--ink);}
 
 .filters{ display:flex; flex-direction:column; gap:0.5rem; background:var(--surface); border:1px solid var(--line);
   border-radius:8px; padding:0.7rem 0.9rem; }
@@ -370,6 +456,7 @@ td.name-cell{font-weight:600; color:var(--ink);}
 .tier-chip{ display:inline-block; font-size:0.7rem; font-weight:700; padding:0.08rem 0.45rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
 .uncertain-mark{color:var(--gold); cursor:help;}
+.n-note{color:var(--ink-faint); font-size:0.85em;}
 .empty-state{padding:2.5rem; text-align:center; color:var(--ink-faint);}
 footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
 %DATATABLE_CSS%
@@ -382,12 +469,38 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <span class="eyebrow" data-i18n="eyebrow">RFFM (Мадрид) &middot; все игроки</span>
     <h1 data-i18n="h1">Все игроки</h1>
-    <p class="lede" data-i18n="lede">
+    <p class="lede prose" data-i18n="lede">
       Одна строка — один игрок выбранного вверху сезона. Отметьте нужные категории/дивизионы — каждая
       категория грузится отдельно, поэтому включение новой займёт момент. Клик по ▾ в заголовке любой
       колонки — сортировка и фильтр, как в Excel.
     </p>
   </header>
+
+  <details class="strategy-box" open>
+    <summary data-i18n="h_howto">Как искать сильных игроков</summary>
+    <ol class="prose">
+      <li data-i18n="how1">
+        Категория обязательна — без неё таблица пуста (крупные категории — десятки тысяч игроков, поэтому
+        ничего не подгружается по умолчанию). Дивизион сразу можно сузить до топовых.
+      </li>
+      <li data-i18n="how2">
+        <b>Ищете бомбардира?</b> Сначала сузьте «Дивизион» до топовых лиг — голы не сравнимы между дивизионами,
+        лучший снайпер слабого дивизиона не обязательно силён. Затем сортируйте «Голы» или «Гол/явка» по убыванию —
+        колонка «Явок» рядом показывает, на какой выборке матчей построен результат.
+      </li>
+      <li data-i18n="how3">
+        <b>Игрок не забивает (защита/полузащита)?</b> Смотрите «Влияние (Δ)» — разница очков команды за
+        игру, когда он на поле, и когда его нет — и «% на ноль» — как часто команда не пропускает при
+        нём. У обеих цифр в скобках указано N — число матчей без него/с ним; при N=1&ndash;2 цифре
+        доверять не стоит, это шум, а не сигнал.
+      </li>
+      <li data-i18n="how4">
+        «Капитан» — дополнительный, не строгий сигнал: тренеры обычно доверяют повязку самому надёжному
+        игроку команды. «Клубов»/«Команд» — это не про силу напрямую, а про траекторию: смотрите вместе с
+        дивизионом — переход в более сильный дивизион чаще говорит о таланте, чем само число переходов.
+      </li>
+    </ol>
+  </details>
 
   <div class="controls-bar">
     <label class="filter-label" data-i18n="lbl_season" style="min-width:auto;">Сезон</label>
@@ -436,13 +549,16 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
           <th data-key="apps" data-type="number"><span data-i18n="th_apps">Явок</span></th>
           <th data-key="starts" data-type="number"><span data-i18n="th_starts">Старт</span></th>
           <th data-key="goals" data-type="number"><span data-i18n="th_goals">Голы</span></th>
+          <th data-key="gpa" data-type="number" title="Голы, делённые на явки"><span data-i18n="th_gpa">Гол/явка</span></th>
           <th data-key="yc" data-type="number" title="Жёлтые карточки"><span data-i18n="th_yc">Ж</span></th>
           <th data-key="rc" data-type="number" title="Красные карточки"><span data-i18n="th_rc">К</span></th>
           <th data-key="dyc" data-type="number" title="Вторые жёлтые"><span data-i18n="th_dyc">2Ж</span></th>
           <th data-key="cap" data-type="number"><span data-i18n="th_cap">Капитан</span></th>
           <th data-key="gk" data-type="number"><span data-i18n="th_gk">Вратарь</span></th>
+          <th data-key="infl" data-type="number" title="Очков/игру команды с игроком минус очков/игру без него (только по сыгранным матчам его текущей команды)"><span data-i18n="th_infl">Влияние (Δ)</span></th>
+          <th data-key="csr" data-type="number" title="Доля матчей без пропущенных мячей, когда этот игрок был на поле"><span data-i18n="th_csr">% на ноль</span></th>
         </tr></thead>
-        <tbody id="playersBody"><tr><td class="empty-state" colspan="18" data-i18n="pickCat">Отметьте хотя бы одну категорию выше.</td></tr></tbody>
+        <tbody id="playersBody"><tr><td class="empty-state" colspan="22" data-i18n="pickCat">Отметьте хотя бы одну категорию выше.</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -460,9 +576,11 @@ const DIV_LABEL_RU = %DIV_LABEL_RU_JSON%;
 const DIV_LABEL_ES = %DIV_LABEL_ES_JSON%;
 const LANG = {
   ru: { loading: 'Загрузка…', noResults: 'Нет результатов.', pickCat: 'Отметьте хотя бы одну категорию выше.',
-        uncertain: 'В окне сезонов есть недокрученные категории — пропуск может быть не реальным, а просто ещё не собранными данными.' },
+        uncertain: 'В окне сезонов есть недокрученные категории — пропуск может быть не реальным, а просто ещё не собранными данными.',
+        lowSample: 'Матчей без этого игрока меньше трёх — разница на такой выборке это шум, не сигнал.' },
   es: { loading: 'Cargando…', noResults: 'Sin resultados.', pickCat: 'Elige al menos una categoría arriba.',
-        uncertain: 'Alguna temporada de la ventana no está completamente recolectada — un hueco puede ser solo datos pendientes, no real.' },
+        uncertain: 'Alguna temporada de la ventana no está completamente recolectada — un hueco puede ser solo datos pendientes, no real.',
+        lowSample: 'Menos de tres partidos sin este jugador — la diferencia con esa muestra es ruido, no una señal fiable.' },
 };
 const DT_LABELS = {
   ru: { selectAll: '(все)', search: 'Поиск…', apply: 'Применить', clear: 'Сбросить', empty: '(пусто)' },
@@ -543,6 +661,33 @@ function rowHtml(r) {
     seasonsDisplay = String(r.sx || 0);
     seasonsSort = r.sx || 0;
   }
+
+  // Goals/appearance — a straight ratio of two columns already on the row,
+  // nothing new to fetch.
+  const gpa = r.apps ? r.goals / r.apps : null;
+  const gpaDisplay = gpa === null ? '—' : gpa.toFixed(2);
+
+  // Result influence: team's points/game with this player on the pitch
+  // minus points/game without him (see compute_result_influence() in
+  // all_players.py) — works for a defender/midfielder who never scores,
+  // unlike goals. nwo (matches without him) rides along as a visible
+  // reliability flag rather than being hidden: a player who starts every
+  // match leaves a 1-2 game "without him" sample, and the delta off that
+  // is noise, not signal.
+  let inflDisplay = '—', inflSort = '';
+  if (r.pw !== null && r.pw !== undefined && r.pwo !== null && r.pwo !== undefined) {
+    const delta = r.pw - r.pwo;
+    inflSort = delta;
+    const lowN = r.nwo < 3;
+    inflDisplay = `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} <span class="n-note">(N=${r.nwo})</span>` +
+      (lowN ? ` <span class="uncertain-mark" title="${esc(LANG[CURLANG].lowSample)}">*</span>` : '');
+  }
+
+  // Same with/without idea aimed specifically at defensive contribution —
+  // clean-sheet rate in the matches he played.
+  const csr = r.nw ? (r.csw / r.nw * 100) : null;
+  const csrDisplay = csr === null ? '—' : `${Math.round(csr)}%`;
+
   return `<tr>
     <td class="name-cell" data-col="n" data-v="${esc(r.n)}"><a href="${nameUrl}">${esc(r.n)}</a></td>
     <td data-col="by" data-v="${r.by || ''}">${esc(r.by || '—')}</td>
@@ -558,11 +703,14 @@ function rowHtml(r) {
     <td data-col="apps" data-v="${r.apps || 0}">${r.apps || 0}</td>
     <td data-col="starts" data-v="${r.starts || 0}">${r.starts || 0}</td>
     <td data-col="goals" data-v="${r.goals || 0}">${r.goals || 0}</td>
+    <td data-col="gpa" data-v="${gpa === null ? '' : gpa}">${gpaDisplay}</td>
     <td data-col="yc" data-v="${r.yc || 0}">${r.yc || '—'}</td>
     <td data-col="rc" data-v="${r.rc || 0}">${r.rc || '—'}</td>
     <td data-col="dyc" data-v="${r.dyc || 0}">${r.dyc || '—'}</td>
     <td data-col="cap" data-v="${r.cap || 0}">${r.cap || '—'}</td>
     <td data-col="gk" data-v="${r.gk || 0}">${r.gk || '—'}</td>
+    <td data-col="infl" data-v="${inflSort}" data-label="${esc(inflDisplay.replace(/<[^>]+>/g, ''))}">${inflDisplay}</td>
+    <td data-col="csr" data-v="${csr === null ? '' : csr}">${csrDisplay}</td>
   </tr>`;
 }
 
@@ -572,11 +720,11 @@ async function render() {
   const tbody = document.getElementById('playersBody');
   const cats = [...STATE.cats];
   if (!cats.length) {
-    tbody.innerHTML = `<tr><td class="empty-state" colspan="18">${LANG[CURLANG].pickCat}</td></tr>`;
+    tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].pickCat}</td></tr>`;
     document.getElementById('resultCount').textContent = '';
     return;
   }
-  tbody.innerHTML = `<tr><td class="empty-state" colspan="18">${LANG[CURLANG].loading}</td></tr>`;
+  tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].loading}</td></tr>`;
   const shardArrays = await Promise.all(cats.map(cat => fetchCategoryShard(CUR_SEASON, cat)));
   if (myToken !== RENDER_TOKEN) return; // a newer render() started (season/cat changed) while this fetch was in flight
 
@@ -598,7 +746,7 @@ async function render() {
 
   document.getElementById('resultCount').textContent = rows.length.toLocaleString();
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td class="empty-state" colspan="18">${LANG[CURLANG].noResults}</td></tr>`;
+    tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].noResults}</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(rowHtml).join('');

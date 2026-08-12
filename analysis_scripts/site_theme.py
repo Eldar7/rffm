@@ -453,15 +453,21 @@ function rffmInitDataTable(table, opts) {
       // each row's value once up front turns that into a flat O(n) cost.
       var decorated = rs.map(function (tr) { return [tr, cellVal(tr, state.sortKey)]; });
       decorated.sort(function (a, b) {
-        var av = a[1], bv = b[1], cmp;
+        var av = a[1], bv = b[1];
         if (type === 'number') {
           var an = parseFloat(av), bn = parseFloat(bv);
           var aNaN = isNaN(an), bNaN = isNaN(bn);
-          cmp = (aNaN && bNaN) ? 0 : aNaN ? 1 : bNaN ? -1 : (an - bn);
-        } else {
-          cmp = String(av).localeCompare(String(bv), 'ru');
+          // Empty/non-numeric cells always sort last, in *both* directions
+          // — applying sortDir to this branch too would flip "no data" to
+          // the top on a descending sort, which reads as "the biggest
+          // value" instead of "we don't know". Only real number-vs-number
+          // comparisons flip with direction.
+          if (aNaN && bNaN) return 0;
+          if (aNaN) return 1;
+          if (bNaN) return -1;
+          return (an - bn) * state.sortDir;
         }
-        return cmp * state.sortDir;
+        return String(av).localeCompare(String(bv), 'ru') * state.sortDir;
       });
       var sortFrag = document.createDocumentFragment();
       decorated.forEach(function (d) { sortFrag.appendChild(d[0]); });
