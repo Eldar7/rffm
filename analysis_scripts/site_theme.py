@@ -392,6 +392,7 @@ function rffmInitDataTable(table, opts) {
   // state ("unsorted") restores this render's original row order instead
   // of just freezing wherever the last active sort left it.
   var originalOrder = Array.prototype.slice.call(tbody.rows);
+  var everSorted = false; // skip the reorder pass entirely until a sort has actually run once
   var pop = document.createElement('div');
   pop.className = 'dt-pop';
   document.body.appendChild(pop);
@@ -433,11 +434,26 @@ function rffmInitDataTable(table, opts) {
       }
       tr.style.display = visible ? '' : 'none';
     });
+    // Reordering goes through a DocumentFragment (one DOM mutation) rather
+    // than N individual tbody.appendChild(tr) calls (N mutations, O(n) each
+    // in practice — appendChild-to-move on a table with tens of thousands
+    // of rows turned this into a multi-second, near-freezing operation on
+    // the all-players page's larger categories). The unsorted branch is
+    // additionally skipped entirely unless a sort has actually run at
+    // least once — a fresh table is already in original order, so the
+    // very first apply() (every table gets one on init) has nothing to
+    // restore.
     if (state.sortKey) {
       var th = ths.filter(function (t) { return t.dataset.key === state.sortKey; })[0];
       var type = th ? th.dataset.type : 'text';
-      rs.sort(function (a, b) {
-        var av = cellVal(a, state.sortKey), bv = cellVal(b, state.sortKey), cmp;
+      // Decorate-sort-undecorate: cellVal() does a querySelector per call,
+      // and Array.sort's comparator runs ~n*log(n) times — on a table with
+      // tens of thousands of rows that's hundreds of thousands of
+      // querySelector calls if read inside the comparator itself. Reading
+      // each row's value once up front turns that into a flat O(n) cost.
+      var decorated = rs.map(function (tr) { return [tr, cellVal(tr, state.sortKey)]; });
+      decorated.sort(function (a, b) {
+        var av = a[1], bv = b[1], cmp;
         if (type === 'number') {
           var an = parseFloat(av), bn = parseFloat(bv);
           var aNaN = isNaN(an), bNaN = isNaN(bn);
@@ -447,9 +463,14 @@ function rffmInitDataTable(table, opts) {
         }
         return cmp * state.sortDir;
       });
-      rs.forEach(function (tr) { tbody.appendChild(tr); });
-    } else {
-      originalOrder.forEach(function (tr) { tbody.appendChild(tr); });
+      var sortFrag = document.createDocumentFragment();
+      decorated.forEach(function (d) { sortFrag.appendChild(d[0]); });
+      tbody.appendChild(sortFrag);
+      everSorted = true;
+    } else if (everSorted) {
+      var restoreFrag = document.createDocumentFragment();
+      originalOrder.forEach(function (tr) { restoreFrag.appendChild(tr); });
+      tbody.appendChild(restoreFrag);
     }
     ths.forEach(function (th) {
       var key = th.dataset.key;

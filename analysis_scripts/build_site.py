@@ -26,6 +26,7 @@ import competition_structure
 import team_cards
 import team_rosters
 import player_cards
+import all_players
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -165,6 +166,11 @@ CARDS_RU = [
         "title": "Сравнение сезонов",
         "desc": "Матчи, клубы, голы и соревнования по сезонам с фильтрами по возрасту / дивизиону / типу игры.",
     },
+    {
+        "href": "all_players.html",
+        "title": "Все игроки",
+        "desc": "Явки, голы, карточки и карьерные метрики (год старта, число клубов/команд) по каждому игроку — с фильтрами по сезону/возрасту/дивизиону и сортировкой по любой колонке.",
+    },
 ]
 CARDS_ES = [
     "Marcadores extraños, dominadores y colistas",
@@ -175,6 +181,8 @@ CARDS_ES = [
     "Para cada edad/sexo/tipo de juego: la escalera completa de divisiones, ascensos/descensos, la salida a la RFEF y el calendario de fases de la temporada.",
     "Comparación entre temporadas",
     "Partidos, clubes, goles y competiciones por temporada, filtrables por edad / división / tipo de juego.",
+    "Todos los jugadores",
+    "Partidos, goles, tarjetas y métricas de carrera (año de inicio, nº de clubes/equipos) de cada jugador — con filtros por temporada/edad/división y orden por cualquier columna.",
 ]
 
 
