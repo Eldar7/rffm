@@ -74999,3 +74999,10 @@ run_id,timestamp,stage,entity_type,entity_id,source_url,http_status,success,retr
 17ad994d9f83,2026-08-13T09:29:50.236333+00:00,fetch_page,player_ficha,999255,https://www.rffm.es/fichajugador/999255?temporada=13,200,True,0,html_next_data,,,0.9126037389996782
 17ad994d9f83,2026-08-13T09:29:50.358560+00:00,fetch_page,player_ficha,998823,https://www.rffm.es/fichajugador/998823?temporada=13,200,True,0,html_next_data,,,1.282533028999751
 17ad994d9f83,2026-08-13T09:29:50.466241+00:00,fetch_page,player_ficha,999234,https://www.rffm.es/fichajugador/999234?temporada=13,200,True,0,html_next_data,,,1.1492514870005834
+17ad994d9f83,2026-08-13T09:29:50.776578+00:00,fetch_page,player_ficha,999259,https://www.rffm.es/fichajugador/999259?temporada=13,200,True,0,html_next_data,,,1.4493890240009932
+17ad994d9f83,2026-08-13T09:29:50.797290+00:00,fetch_page,player_ficha,998619,https://www.rffm.es/fichajugador/998619?temporada=13,200,True,0,html_next_data,,,2.279623915999764
+17ad994d9f83,2026-08-13T09:29:50.954206+00:00,fetch_page,player_ficha,999872,https://www.rffm.es/fichajugador/999872?temporada=13,200,True,0,html_next_data,,,0.5922396579990163
+17ad994d9f83,2026-08-13T09:29:51.177752+00:00,fetch_page,player_ficha,999292,https://www.rffm.es/fichajugador/999292?temporada=13,200,True,0,html_next_data,,,1.0140356919982878
+17ad994d9f83,2026-08-13T09:29:51.323900+00:00,fetch_page,player_ficha,999791,https://www.rffm.es/fichajugador/999791?temporada=13,200,True,0,html_next_data,,,1.1550560140003654
+17ad994d9f83,2026-08-13T09:29:51.580185+00:00,fetch_page,player_ficha,999859,https://www.rffm.es/fichajugador/999859?temporada=13,200,True,0,html_next_data,,,1.3407482059992617
+17ad994d9f83,2026-08-13T09:29:51.672437+00:00,fetch_page,player_ficha,999839,https://www.rffm.es/fichajugador/999839?temporada=13,200,True,0,html_next_data,,,1.4854998250011704
