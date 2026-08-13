@@ -1,7 +1,4 @@
 check_name,severity,entity_type,entity_id,group_id,competition_id,details
-player_profile_coverage_gap,warning,player,1175088,,,player appears in match_lineups/ but no fichajugador profile was fetched (fetch failure or empty page)
-player_profile_coverage_gap,warning,player,609251,,,player appears in match_lineups/ but no fichajugador profile was fetched (fetch failure or empty page)
-player_profile_coverage_gap,warning,player,8355849,,,player appears in match_lineups/ but no fichajugador profile was fetched (fetch failure or empty page)
 jugados_reconciliation_mismatch,warning,player,1000144,,,site-reported matches_played=22 vs 23 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
 jugados_reconciliation_mismatch,warning,player,1000672,,,site-reported matches_played=22 vs 24 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
 jugados_reconciliation_mismatch,warning,player,1000789,,,site-reported matches_played=26 vs 29 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
@@ -23841,6 +23838,7 @@ jugados_reconciliation_mismatch,warning,player,998624,,,site-reported matches_pl
 jugados_reconciliation_mismatch,warning,player,998702,,,site-reported matches_played=18 vs 25 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
 jugados_reconciliation_mismatch,warning,player,998619,,,site-reported matches_played=20 vs 29 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
 jugados_reconciliation_mismatch,warning,player,999872,,,site-reported matches_played=18 vs 19 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
+jugados_reconciliation_mismatch,warning,player,8355849,,,site-reported matches_played=4 vs 7 rows collected in match_lineups/ - likely a gap in acta-partido coverage for this player
 birth_year_out_of_range,warning,player,1000466,,,"birth_year=2000.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
 birth_year_out_of_range,warning,player,10006768,,,"birth_year=2009.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
 birth_year_out_of_range,warning,player,1000368,,,"birth_year=2005.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
@@ -97681,3 +97679,6 @@ birth_year_out_of_range,warning,player,999292,,,"birth_year=2004.0 is outside th
 birth_year_out_of_range,warning,player,999791,,,"birth_year=2004.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
 birth_year_out_of_range,warning,player,999859,,,"birth_year=2004.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
 birth_year_out_of_range,warning,player,999839,,,"birth_year=2005.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
+birth_year_out_of_range,warning,player,8355849,,,"birth_year=2005.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
+birth_year_out_of_range,warning,player,609251,,,"birth_year=2001.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
+birth_year_out_of_range,warning,player,1175088,,,"birth_year=2006.0 is outside the sane bound [2012, 2022] for BENJAMIN/PREBENJAMIN"
