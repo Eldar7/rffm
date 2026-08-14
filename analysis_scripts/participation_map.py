@@ -216,6 +216,7 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
                 }
                 player["stints"][stint_key] = stint
             stint["matches"].append({
+                "mid": mid,
                 "date": m["date"],
                 "round": m["round"],
                 "start": row.is_starter == "True",

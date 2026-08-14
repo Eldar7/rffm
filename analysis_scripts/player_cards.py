@@ -287,14 +287,48 @@ PMAP_CSS = r"""
 #pmapRoot .pm-cell{background:var(--pm-field);border-radius:2px;position:relative;height:var(--pm-cell)}
 #pmapRoot .pm-cell.pm-mo{box-shadow:-1px 0 0 rgba(13,21,31,.1)}
 #pmapRoot .pm-cell.pm-play{display:flex;gap:1px;overflow:hidden;cursor:pointer}
-#pmapRoot .pm-cell.pm-play i{flex:1;align-self:flex-end;border-radius:1px}
+/* "mseg" (match segment) — deliberately NOT named .pm-seg, which is already
+   the unrelated segmented-button-group wrapper class used by the toolbar
+   above (Названия турниров/Заливка, S/M/L) — reusing that name here once
+   collided the two and visually broke both. */
+#pmapRoot .pm-mseg{flex:1;align-self:flex-end;border-radius:1px;position:relative;
+  border-bottom:2px solid transparent;box-sizing:border-box}
+#pmapRoot .pm-mseg.pm-win{border-bottom-color:#2f9e5c}
+#pmapRoot .pm-mseg.pm-draw{border-bottom-color:#98a4b0}
+#pmapRoot .pm-mseg.pm-loss{border-bottom-color:#d1495b}
 #pmapRoot .pm-cell.pm-info{cursor:help}
 #pmapRoot .pm-cell.pm-play:hover,#pmapRoot .pm-cell.pm-play:focus-visible,#pmapRoot .pm-cell.pm-act{
   outline:2px solid var(--pm-ink);outline-offset:0;z-index:5;border-radius:2px}
 #pmapRoot .pm-cell.pm-play:focus-visible{outline-color:var(--pm-chalk)}
 #pmapRoot.pm-solo .pm-cell.pm-play{opacity:.16}
 #pmapRoot.pm-solo .pm-cell.pm-play.pm-keep{opacity:1}
-#pmapRoot.pm-nofill .pm-cell.pm-play i{height:100% !important}
+#pmapRoot.pm-nofill .pm-mseg{height:100% !important}
+
+/* Начинка сегмента (старт/замена, капитан, вратарь, голы, карточки) — как в
+   team_card.html/"Состав по матчам", но только когда клетка достаточно
+   большая (зум L, --pm-detail) и в неделе ровно один матч (иначе не
+   помещается читаемо на несколько сегментов сразу). */
+#pmapRoot .pm-mseg b, #pmapRoot .pm-mseg em, #pmapRoot .pm-mseg s{display:none}
+#pmapRoot.pm-detail .pm-mseg b{
+  display:block;position:absolute;left:50%;top:3px;width:7px;height:7px;margin-left:-3.5px;
+  border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 0 0 1px rgba(13,21,31,.25);
+}
+#pmapRoot.pm-detail .pm-mseg b.pm-dot-sub{background:transparent;border:1.5px solid rgba(255,255,255,.95);box-shadow:none}
+#pmapRoot.pm-detail .pm-mseg b.pm-dot-cap{box-shadow:0 0 0 2px #ffc766}
+#pmapRoot.pm-detail .pm-mseg b.pm-dot-gk{box-shadow:0 0 0 2px #4fa3e3}
+#pmapRoot.pm-detail .pm-mseg b.pm-dot-cap.pm-dot-gk{box-shadow:0 0 0 2px #ffc766, 0 0 0 4px #4fa3e3}
+#pmapRoot.pm-detail .pm-mseg em{
+  display:block;position:absolute;right:2px;bottom:3px;font:700 8.5px/1 'IBM Plex Mono';
+  font-style:normal;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);
+}
+#pmapRoot.pm-detail .pm-mseg s{
+  display:block;position:absolute;left:2px;bottom:3px;width:4px;height:6px;border-radius:1px;
+  text-decoration:none;
+}
+#pmapRoot.pm-detail .pm-mseg s.pm-card-y{background:#f0c419}
+#pmapRoot.pm-detail .pm-mseg s.pm-card-r{background:#e2504a}
+#pmapRoot.pm-detail .pm-mseg s.pm-card-d{background:linear-gradient(180deg,#f0c419 50%,#e2504a 50%)}
+#pmapRoot.pm-detail .pm-mseg s + s{left:8px}
 #pmapRoot .pm-rib{position:absolute;height:var(--pm-gap);border-radius:2px;opacity:.85;pointer-events:none}
 #pmapRoot .pm-rib b{position:absolute;top:0;bottom:0;width:1px;background:#fff;opacity:.9}
 #pmapRoot .pm-lane{height:var(--pm-lane);overflow:hidden;position:relative}
@@ -314,6 +348,11 @@ PMAP_CSS = r"""
 #pmapRoot .pm-legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 0;color:#5c6a78;font-size:11.5px}
 #pmapRoot .pm-legend .pm-li{display:flex;align-items:center;gap:6px}
 #pmapRoot .pm-gl{width:12px;height:12px;border-radius:2px;background:var(--pm-field);position:relative;flex:none}
+#pmapRoot .pm-wdl-swatch{display:flex;gap:2px;flex:none}
+#pmapRoot .pm-wdl-swatch i{width:12px;height:12px;border-radius:2px;background:#c9d0d8;border-bottom:3px solid}
+#pmapRoot .pm-wdl-swatch i.w{border-bottom-color:#2f9e5c}
+#pmapRoot .pm-wdl-swatch i.d{border-bottom-color:#98a4b0}
+#pmapRoot .pm-wdl-swatch i.l{border-bottom-color:#d1495b}
 #pmapRoot .pm-gl.pm-full{background:#2f5fd0}
 #pmapRoot .pm-gl.pm-split{display:flex;gap:1px;overflow:hidden}
 #pmapRoot .pm-gl.pm-split i{flex:1;background:#2f5fd0}
@@ -336,6 +375,7 @@ PMAP_CSS = r"""
 .pm-tip .pm-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px}
 .pm-tip .pm-kv dt{color:#8ba0b4;margin:0}
 .pm-tip .pm-kv dd{margin:0;font-weight:600;font-family:'IBM Plex Mono';font-size:10.5px}
+.pm-tip .pm-of{color:#8ba0b4;font-weight:500}
 .pm-tip .pm-flag{display:inline-block;margin-top:8px;padding:3px 6px;border-radius:5px;
   background:rgba(255,199,102,.16);color:#ffc766;font:600 9px/1 'Barlow Condensed';
   text-transform:uppercase;letter-spacing:.1em}
@@ -366,6 +406,11 @@ function pmAgeCatRank(age){
   for (let i=0;i<PM.CAT_AGE.length;i++){ if (age>=PM.CAT_AGE[i][0] && age<=PM.CAT_AGE[i][1]) return i; }
   if (age < PM.CAT_AGE[0][0]) return 0;
   return -1;
+}
+function pmExpectedCatName(age){
+  const rank = pmAgeCatRank(age);
+  if (rank < 0) return CURLANG==='es' ? 'Adulto' : 'Взрослый';
+  return PM.CAT_NAME[PM.CATS[rank]] || null;
 }
 function pmBucket(cat, seasonYear, birthYear){
   if (PM.ADULT_CATS.includes(cat)) return {zone:'ADULT'};
@@ -558,15 +603,18 @@ const PM_WIDTH = n => `calc(var(--pm-cell)*${n} + var(--pm-gap)*${Math.max(1,n) 
 function pmRender(){
   const root = document.getElementById('pmapRoot');
   const allRows = pmAllRows();
-  // Every season this player has a registration for (SEASONS, same list the
-  // "Заявки" tab uses) stays on the axis, even ones with no participation-map
-  // rows at all — whether that's because acta_partido was never crawled for
-  // that season (perSeason[s] === undefined) or it was crawled but this
-  // player has zero protocol matches in it (perSeason[s] === null / []) is
-  // not distinguished in the placeholder — both render as "no data this
-  // season" rather than silently dropping the column (see conversation:
-  // the season axis must not break).
-  const seasonsWithData = SEASONS;
+  // Seasons between the player's first and last real activity stay on the
+  // axis even with zero participation-map rows in them — that's a genuine
+  // gap (e.g. no acta_partido for that category that year) worth showing
+  // as a "нет протоколов" placeholder. Seasons before the player's first
+  // appearance or after their last one carry no such signal (there was
+  // never any protocol to be missing) and are just noise, so those get
+  // trimmed off the axis entirely rather than padding it with placeholders
+  // on both ends.
+  const hasData = s => (PM_STATE.perSeason[s] || []).length > 0;
+  const firstIdx = SEASONS.findIndex(hasData);
+  const lastIdx = SEASONS.length - 1 - [...SEASONS].reverse().findIndex(hasData);
+  const seasonsWithData = firstIdx === -1 ? [] : SEASONS.slice(firstIdx, lastIdx + 1);
   if (!allRows.length){
     root.innerHTML = `<div class="pm-empty" data-i18n="pm_empty">У этого игрока нет данных протоколов матчей (acta_partido) ни в одном сезоне.</div>`;
     return;
@@ -666,7 +714,7 @@ function pmBuildBar(usedTeams, teamMeta){
       <div class="pm-seg" id="pmZoom">
         <button type="button" class="pm-btn" data-pm-cell="10">S</button>
         <button type="button" class="pm-btn" data-pm-cell="13" aria-pressed="true">M</button>
-        <button type="button" class="pm-btn" data-pm-cell="17">L</button>
+        <button type="button" class="pm-btn" data-pm-cell="26" data-pm-detail="1">L</button>
       </div>
     </div>
   </div>`;
@@ -680,10 +728,14 @@ function pmBuildLegend(){
   const L = CURLANG==='es' ? {
     full:'partido jugado (titular o suplente)', split:'2 partidos o 2 equipos en la semana',
     win:'competición en curso', none:'sin partidos',
+    wdl:'victoria / empate / derrota (borde inferior)',
+    detail:'En zoom L (con un solo partido esa semana): relleno = suplente, anillo dorado = capitán, anillo azul = portero, número = goles, barra = tarjeta.',
     note:'Los nombres de torneo solo se muestran si el jugador disputó <code>≥20%</code> de los partidos del equipo y <code>≥2</code> partidos. Los minutos jugados no están en la fuente de datos — el relleno de la casilla es siempre completo.'
   } : {
     full:'сыграл матч (старт или замена)', split:'2 матча или 2 команды за неделю',
     win:'соревнование идёт', none:'матчей нет',
+    wdl:'победа / ничья / поражение (нижняя кромка)',
+    detail:'На зуме L (если на неделе один матч): пустой кружок = замена, золотое кольцо = капитан, синее кольцо = вратарь, число = голы, полоска = карточка.',
     note:'Названия турниров подписываются, только если игрок сыграл <code>≥20%</code> матчей команды и <code>≥2</code> матча. Сыгранных минут в источнике нет — заливка ячейки всегда полная.'
   };
   return `<div class="pm-legend">
@@ -691,7 +743,9 @@ function pmBuildLegend(){
     <div class="pm-li"><span class="pm-gl pm-split"><i></i><i></i></span>${L.split}</div>
     <div class="pm-li"><span class="pm-gl pm-win"></span>${L.win}</div>
     <div class="pm-li"><span class="pm-gl"></span>${L.none}</div>
+    <div class="pm-li"><span class="pm-wdl-swatch"><i class="w"></i><i class="d"></i><i class="l"></i></span>${L.wdl}</div>
   </div>
+  <p class="pm-note">${L.detail}</p>
   <p class="pm-note">${L.note}</p>`;
 }
 
@@ -720,9 +774,11 @@ function pmRenderHead(seasons, seasonMeta, NW){
     rows.forEach(r => { const w = pmWIdx(new Date(r.date), meta.anchor) - meta.w0; if (w>=0 && w<NW) per[w]++; });
     const mx = Math.max(1, ...per);
     const bars = per.map(v => `<i class="${v?'pm-on':''}" style="height:${v?Math.max(18,v/mx*100):0}%"></i>`).join('');
-    const age = PM_STATE.birthYear ? `${meta.y - PM_STATE.birthYear}` : '';
+    const ageNum = PM_STATE.birthYear ? meta.y - PM_STATE.birthYear : null;
+    const age = ageNum != null ? `${ageNum}` : '';
+    const expCatName = ageNum != null ? pmExpectedCatName(ageNum) : null;
     h += `<div class="pm-sh">
-      <div class="pm-row1"><h4 data-pm-jump="${season}">${season}</h4>${age ? `<span class="pm-age pm-mono">${age} ${CURLANG==='es'?'años':'лет'}</span>` : ''}</div>
+      <div class="pm-row1"><h4 data-pm-jump="${season}">${season}</h4>${age ? `<span class="pm-age pm-mono">${age} ${CURLANG==='es'?'años':'лет'}</span>` : ''}${expCatName ? `<span class="pm-pill" title="${CURLANG==='es'?'Categoría que corresponde a esta edad':'Категория, полагающаяся по возрасту'}">${pmEsc(expCatName)}</span>` : ''}</div>
       <div class="pm-months" style="grid-template-columns:repeat(${NW},var(--pm-cell))">${mo}</div>
       <div class="pm-load" style="grid-template-columns:repeat(${NW},var(--pm-cell))">${bars}</div>
     </div>`;
@@ -810,7 +866,16 @@ function pmRenderBody(ROWS, TPL, ROW_TPL, seasons, seasonMeta, NW, CELLS, teamMe
         if (moStart) cls.push('pm-mo');
         if (ms.length){
           cls.push('pm-play');
-          inner = ms.slice(0,3).map(m => `<i style="background:${teamMeta[m.tid]?teamMeta[m.tid].color:'#8895a1'};height:100%"></i>`).join('');
+          const single = ms.length === 1;
+          inner = ms.slice(0,3).map(m => {
+            const color = teamMeta[m.tid] ? teamMeta[m.tid].color : '#8895a1';
+            const outcome = (m.gf!=null && m.ga!=null) ? (m.gf>m.ga?'pm-win':m.gf<m.ga?'pm-loss':'pm-draw') : '';
+            if (!single) return `<i class="pm-mseg ${outcome}" data-pm-mid="${pmEsc(m.mid)}" style="background:${color};height:100%"></i>`;
+            const dotCls = ['pm-dot', m.start?'':'pm-dot-sub', m.cap?'pm-dot-cap':'', m.gk?'pm-dot-gk':''].filter(Boolean).join(' ');
+            const goalsTag = m.goals ? `<em>${m.goals}</em>` : '';
+            const cardTags = (m.cards||[]).slice(0,2).map(c => `<s class="${c==='roja'?'pm-card-r':c==='doble_amarilla'?'pm-card-d':'pm-card-y'}"></s>`).join('');
+            return `<i class="pm-mseg ${outcome}" data-pm-mid="${pmEsc(m.mid)}" style="background:${color};height:100%"><b class="${dotCls}"></b>${goalsTag}${cardTags}</i>`;
+          }).join('');
           cls.push(...[...new Set(ms.map(m => 'f-'+m.tid))]);
           att += ` tabindex="0" role="button" aria-label="${pmEsc(pmAriaOf(ms,d))}"`;
         } else {
@@ -912,6 +977,7 @@ function pmWireControls(usedTeams, teamMeta){
     btn.addEventListener('click', () => {
       root.querySelectorAll('[data-pm-cell]').forEach(b => b.setAttribute('aria-pressed', String(b===btn)));
       root.style.setProperty('--pm-cell', btn.getAttribute('data-pm-cell')+'px');
+      root.classList.toggle('pm-detail', btn.hasAttribute('data-pm-detail'));
     });
   });
   root.querySelectorAll('[data-pm-jump]').forEach(h => {
@@ -947,11 +1013,14 @@ function pmWeekCard(key){
       <dl class="pm-kv">
         <dt>${CURLANG==='es'?'Fecha':'Дата'}</dt><dd>${pmFmtY(new Date(m.date))}, ${m.home?(CURLANG==='es'?'en casa':'дома'):(CURLANG==='es'?'fuera':'в гостях')}</dd>
         <dt>${CURLANG==='es'?'Rol':'Роль'}</dt><dd>${m.start ? (CURLANG==='es'?'titular':'в старте') : (CURLANG==='es'?'suplente':'вышел на замену')}</dd>
-        <dt>${CURLANG==='es'?'Goles':'Голы'}</dt><dd>${m.goals||0}</dd>
+        <dt>${CURLANG==='es'?'Marcador':'Счёт'}</dt><dd>${m.gf ?? '?'}:${m.ga ?? '?'}</dd>
+        <dt>${CURLANG==='es'?'Goles':'Голы'}</dt><dd>${m.goals||0}${m.gf ? ` <span class="pm-of">${CURLANG==='es'?'de':'из'} ${m.gf}</span>` : ''}</dd>
         <dt>${CURLANG==='es'?'Equipo':'Команда'}</dt><dd>${pmEsc(m.team||'')}</dd>
       </dl>`;
-    if (m._bucket && m._bucket.zone==='NUM' && m._bucket.level>0) html += `<span class="pm-flag">${CURLANG==='es'?'con categoría superior':'за категорию старше'}</span>`;
-    else if (m._bucket && m._bucket.zone==='ADULT') html += `<span class="pm-flag">${CURLANG==='es'?'nivel adulto':'взрослый уровень'}</span>`;
+    const catName = m.cat ? (PM.CAT_NAME[m.cat] || m.cat) : null;
+    if (catName && m._bucket && (m._bucket.zone==='ADULT' || (m._bucket.zone==='NUM' && m._bucket.level>0))) {
+      html += `<span class="pm-flag">${pmEsc(catName)}</span>`;
+    }
     html += `</div>`;
   });
   return html;
@@ -978,7 +1047,14 @@ function pmFamilyCard(famId){
       <dt>${CURLANG==='es'?'Jugó el jugador':'Сыграл игрок'}</dt><dd>${dom.apps} · ${pct}%</dd>
       <dt>${CURLANG==='es'?'Goles':'Голы'}</dt><dd>${fam.comps.reduce((s,c)=>s+c.matches.reduce((s2,m)=>s2+(m.goals||0),0),0)}</dd>
       <dt>${CURLANG==='es'?'Resultado del equipo':'Итог команды'}</dt><dd>${place}</dd>
-    </dl>${(dom.matches[0]._bucket && dom.matches[0]._bucket.zone==='NUM' && dom.matches[0]._bucket.level>0) ? `<span class="pm-flag">${CURLANG==='es'?'con categoría superior':'за категорию старше'}</span>` : ''}</div>`;
+    </dl>${pmFamilyCatFlag(dom.matches[0])}</div>`;
+}
+function pmFamilyCatFlag(m0){
+  if (!m0 || !m0._bucket) return '';
+  const isAbove = m0._bucket.zone==='ADULT' || (m0._bucket.zone==='NUM' && m0._bucket.level>0);
+  if (!isAbove) return '';
+  const catName = m0.cat ? (PM.CAT_NAME[m0.cat] || m0.cat) : null;
+  return catName ? `<span class="pm-flag">${pmEsc(catName)}</span>` : '';
 }
 
 function pmWireTooltip(){
@@ -1001,6 +1077,10 @@ function pmWireTooltip(){
     if (famId) root.querySelectorAll(`[data-pm-cellfam~="${famId}"], [data-pm-family="${famId}"]`).forEach(el => el.classList.add('pm-hl'));
   }
   function point(e){
+    if (e.type === 'click') {
+      const seg = e.target.closest('[data-pm-mid]');
+      if (seg) { window.open(`https://www.rffm.es/acta-partido/${encodeURIComponent(seg.dataset.pmMid)}`, '_blank', 'noopener'); return; }
+    }
     const cellEl = e.target.closest('.pm-cell'), tr = e.target.closest('.pm-track');
     if (tr){
       tr.classList.add('pm-hl');
