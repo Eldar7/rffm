@@ -8,6 +8,12 @@ tmp/
 # Generated GitHub Pages site (built by analysis_scripts/build_site.py in CI)
 /site/
 
+# Generated data shards from local test builds of analysis_scripts (e.g.
+# participation_map.py) — reproducible from output/processed/rffm/, not
+# meant to be committed (unlike the hand-curated one-off files that already
+# live directly under reports/).
+/reports/data/
+
 # Python
 __pycache__/
 *.py[cod]
