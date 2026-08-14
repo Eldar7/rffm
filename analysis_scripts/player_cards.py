@@ -464,7 +464,7 @@ async function initParticipationMap(pid){
     const p = await pmFetchSeason(season, pid);
     if (p === undefined) { perSeason[season] = undefined; return; } // no file at all for this season/shard
     if (p === null) { perSeason[season] = null; return; } // season has pmap data but not for this player
-    perSeason[season] = p.rows || [];
+    perSeason[season] = pmExpandStints(p.stints || []);
     if (birthYear == null && p.birth_year) birthYear = parseInt(p.birth_year, 10);
     if (!name) name = p.name;
   }));
@@ -475,6 +475,25 @@ async function initParticipationMap(pid){
     return;
   }
   pmRender();
+}
+
+// participation_map.py ships one entry per (team, competition) "stint" with
+// shared fields (team/comp/div/...) stored once and a compact per-match
+// list nested inside, instead of one flat row per match repeating those
+// fields — cut the shipped JSON by roughly an order of magnitude (see the
+// conversation this was diagnosed in: the flat shape alone pushed the
+// GitHub Pages artifact over the 10GB limit). Expand back into the flat
+// per-match "row" shape here, once per fetch, so the rest of the rendering
+// engine below (already written against that flat shape) doesn't change.
+function pmExpandStints(stints){
+  const out = [];
+  stints.forEach(s => {
+    const header = {tid:s.tid, team:s.team, club:s.club, comp_id:s.comp_id, comp:s.comp, phase:s.phase,
+      grp:s.grp, group_id:s.group_id, cat:s.cat, div:s.div, gt:s.gt, gt_id:s.gt_id,
+      pos:s.pos, grp_size:s.grp_size, tm:s.tm};
+    (s.matches || []).forEach(m => out.push(Object.assign({}, header, m)));
+  });
+  return out;
 }
 
 function pmAllRows(){

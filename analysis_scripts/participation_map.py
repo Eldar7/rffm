@@ -18,6 +18,13 @@ Sharded by player_id % SHARD_MOD (same modulus as player_cards.py, so the
 same client-side shard_of() works for both), one file per (season, shard):
 data/participation_map_<season>/<shard>.json.
 
+Grouped into "stints" — one entry per (team, competition) pairing, with
+team/competition/division/etc. stored once and a compact per-match list
+nested inside — rather than one flat row per match repeating those fields.
+A flat-row shape here pushed a single season past 1GB and the whole site
+past GitHub Pages' 10GB artifact limit; player_cards.py's pmExpandStints()
+unpacks this back into flat per-match rows client-side before rendering.
+
 Usage:
     python analysis_scripts/participation_map.py
     python analysis_scripts/participation_map.py --season 2024-2025 --output-dir reports
@@ -112,6 +119,7 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
             "away_team": clean(row.away_team),
             "home_score": clean_int(row.home_score),
             "away_score": clean_int(row.away_score),
+            "group": clean(row.group),
             "group_id": clean(row.group_id),
             "competition_id": clean(row.competition_id),
             "category": clean(row.category),
@@ -174,25 +182,42 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
             player = shard.setdefault(pid, {
                 "name": pid_to_name.get(pid) or pid,
                 "birth_year": clean_int(pid_to_birth.get(pid)),
-                "rows": [],
+                "stints": {},  # (tid, comp_id) -> stint dict, flattened to a list before writing
             })
-            player["rows"].append({
-                "mid": mid,
+            # A "stint" = one (team, competition) pairing for this player —
+            # team/competition/division/etc. only ever change between
+            # stints, never match-to-match within one, so they're stored
+            # once per stint instead of once per match (participation_map's
+            # payload was ~30 fields/match with most of them byte-identical
+            # across every match of a stint, which alone pushed a single
+            # season's shards past several GB — see the conversation this
+            # was diagnosed in). Only genuinely per-match facts go in
+            # "matches".
+            stint_key = f"{tid}|{m['competition_id']}"
+            stint = player["stints"].get(stint_key)
+            if stint is None:
+                stint = {
+                    "tid": tid,
+                    "team": team_info.get("team"),
+                    "club": team_info.get("club"),
+                    "comp_id": m["competition_id"],
+                    "comp": clean(comp.competition) if comp is not None else None,
+                    "phase": clean(comp.phase_label) if comp is not None else None,
+                    "grp": m["group"],
+                    "group_id": m["group_id"],
+                    "cat": (clean(comp.category_base) if comp is not None else None) or m["category"] or "OTHER",
+                    "div": (clean(comp.division_level) if comp is not None else None) or "OTHER",
+                    "gt": (clean(comp.game_type) if comp is not None else None) or m["game_type"],
+                    "gt_id": (clean(comp.game_type_id) if comp is not None else None) or m["game_type_id"],
+                    "pos": pos,
+                    "grp_size": grp_size,
+                    "tm": team_matches_total.get((m["competition_id"], tid), 0),
+                    "matches": [],
+                }
+                player["stints"][stint_key] = stint
+            stint["matches"].append({
                 "date": m["date"],
                 "round": m["round"],
-                "tid": tid,
-                "team": team_info.get("team"),
-                "club": team_info.get("club"),
-                "comp_id": m["competition_id"],
-                "comp": clean(comp.competition) if comp is not None else None,
-                "phase": clean(comp.phase_label) if comp is not None else None,
-                "grp": clean(comp.competition) if comp is not None else None,
-                "group_id": m["group_id"],
-                "cat": (clean(comp.category_base) if comp is not None else None) or m["category"] or "OTHER",
-                "cat_raw": clean(comp.category_label_raw) if comp is not None else None,
-                "div": (clean(comp.division_level) if comp is not None else None) or "OTHER",
-                "gt": (clean(comp.game_type) if comp is not None else None) or m["game_type"],
-                "gt_id": (clean(comp.game_type_id) if comp is not None else None) or m["game_type_id"],
                 "start": row.is_starter == "True",
                 "sub": row.is_substitute == "True",
                 "cap": row.is_captain == "True",
@@ -203,10 +228,11 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
                 "opp": m["away_team"] if is_home else m["home_team"],
                 "gf": m["home_score"] if is_home else m["away_score"],
                 "ga": m["away_score"] if is_home else m["home_score"],
-                "pos": pos,
-                "grp_size": grp_size,
-                "tm": team_matches_total.get((m["competition_id"], tid), 0),
             })
+
+    for shard in shards.values():
+        for player in shard.values():
+            player["stints"] = list(player["stints"].values())
 
     return shards
 
