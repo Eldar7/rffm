@@ -77,7 +77,12 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     if not lineups_dir.exists() or not matches_path.exists():
         return {}
     m = pd.read_csv(matches_path, dtype=str, usecols=["match_id", "match_date", "status"])
-    mid_to_date = dict(zip(m["match_id"], m["match_date"]))
+    # A missing match_date reads back as float NaN even under dtype=str (pandas'
+    # universal missing-value marker) — NaN is truthy in Python, so the `or`
+    # fallback below wouldn't catch it and a NaN sort key would collide with
+    # the str ones from every other match. Coerce to None here so it does.
+    mid_to_date = {mid: (date if isinstance(date, str) else None)
+                   for mid, date in zip(m["match_id"], m["match_date"])}
     mid_to_status = dict(zip(m["match_id"], m["status"]))
 
     categories = sorted(p.stem for p in lineups_dir.glob("*.csv"))
