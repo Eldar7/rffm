@@ -1047,7 +1047,12 @@ html,body{margin:0;}
 body{ background:var(--bg); color:var(--ink); font-family:'PT Sans', ui-sans-serif, "Helvetica Neue", Arial, sans-serif;
   line-height:1.5; -webkit-font-smoothing:antialiased; }
 a{ color:var(--accent); text-decoration:none; } a:hover{ text-decoration:underline; }
-.page{ max-width:900px; margin:0 auto; padding:2.25rem 1.25rem 4rem; display:flex; flex-direction:column; gap:1.5rem; }
+.page{ max-width:900px; margin:0 auto; padding:2.25rem 1.25rem 4rem; display:flex; flex-direction:column; gap:1.5rem; transition:max-width .15s; }
+/* Карта участия — тот же полноширинный формат, что и в согласованном
+   прототипе (--pm-track/--pm-label там рассчитаны на широкую доску, а не
+   на список из "Заявок"); .page здесь расширяется только пока открыт этот
+   таб, чтобы список регистраций по-прежнему был по центру и не растягивался. */
+.page.pm-wide{ max-width:1600px; }
 h1{ font-family:'Oswald', ui-sans-serif, "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight:700;
   text-transform:uppercase; letter-spacing:0.01em; text-wrap:balance; margin:0; color:var(--ink); font-size:clamp(1.3rem,2.6vw,1.8rem); line-height:1.2; }
 header.masthead{display:flex; flex-direction:column; gap:0.4rem; border-bottom:3px solid var(--ink); padding-bottom:1rem; position:relative;}
@@ -1474,6 +1479,7 @@ function showTab(name) {
   document.getElementById('tabBtnReg').classList.toggle('active', !isPMap);
   document.getElementById('panePMap').classList.toggle('active', isPMap);
   document.getElementById('paneReg').classList.toggle('active', !isPMap);
+  document.querySelector('.page').classList.toggle('pm-wide', isPMap);
   if (isPMap && !PMAP_LOADED) {
     PMAP_LOADED = true;
     if (typeof initParticipationMap === 'function') initParticipationMap(CUR_PID);
