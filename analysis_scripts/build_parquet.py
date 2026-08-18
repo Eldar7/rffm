@@ -86,7 +86,12 @@ def list_seasons() -> list[str]:
 def compact_types(df: pd.DataFrame) -> pd.DataFrame:
     n = len(df)
     for col in df.columns:
-        if df[col].dtype != object:
+        # pandas >=2.something / 3.x: dtype=str on read_csv gives the
+        # `string`/StringDtype extension type, not numpy `object` - a bare
+        # `dtype != object` check (what earlier pandas needed) silently
+        # skips every column under this pandas version, so nothing here
+        # actually got downcast. is_string_dtype catches both.
+        if not pd.api.types.is_string_dtype(df[col]):
             continue
         numeric = pd.to_numeric(df[col], errors="coerce")
         non_null = df[col].notna()
