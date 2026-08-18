@@ -1,0 +1,72 @@
+name: Build and commit Parquet tables
+
+# Runs analysis_scripts/build_parquet.py against the CSVs already committed
+# under output/processed/rffm/ and commits its output to
+# output/processed/rffm_parquet/ — a lossless, ~27x smaller copy of the
+# same data (see analysis_scripts/build_parquet.py's docstring for the
+# column/type rules and site/DATA_DICTIONARY.md's normalization notes for
+# why players.csv alone gets deduped).
+#
+# Deliberately parallel, not a replacement: output/processed/rffm/ (the
+# CSVs) is never read-write here beyond checkout, never modified, never
+# deleted. This workflow only ever adds/updates files under
+# output/processed/rffm_parquet/, so the old data and the old site
+# (pages-deploy.yml, entirely CSV-driven) are unaffected either way.
+# Removing the CSVs, once the Parquet copy is trusted, is a separate,
+# deliberate decision for later - not something this workflow does.
+#
+# Manual dispatch only for now (no cron) until the migration is verified
+# end to end - see the "v2" site build in pages-deploy.yml that renders
+# the same reports from this Parquet copy for comparison against the
+# CSV-driven original.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parquet-build
+  cancel-in-progress: false
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Parquet tables
+        run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet
+
+      - name: Commit and push to main
+        run: |
+          git config user.name "rffm-parquet-bot"
+          git config user.email "actions@github.com"
+
+          git add output/processed/rffm_parquet
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "parquet-build: refresh output/processed/rffm_parquet from current CSVs"
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt $attempt."
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::error::Failed to push output/processed/rffm_parquet after retries."
+          exit 1

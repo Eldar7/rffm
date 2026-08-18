@@ -18,10 +18,24 @@ this script:
   - Season-sharded tables (one CSV per season, e.g. matches.csv) already
     carry `season`/`season_id` — kept as-is.
   - Per-season tables with no season column (teams.csv, venues.csv,
-    players.csv, clubs.csv) get `season` injected from the directory name,
-    since a team/player/club row means "as seen in that season's crawl"
-    (see CLAUDE.md: clubs/venues aren't category-scoped but ARE
-    season-scoped — a new season's crawl writes its own copy).
+    clubs.csv) get `season` injected from the directory name, since a
+    team/club row means "as seen in that season's crawl" (see CLAUDE.md:
+    clubs/venues aren't category-scoped but ARE season-scoped — a new
+    season's crawl writes its own copy) and metadata genuinely varies by
+    season (e.g. team_cards.py/player_cards.py note club_name_raw sponsor
+    suffixes changing ~20% of the time for the same team_id) — deduping
+    these across seasons would silently lose real history.
+  - players.csv is different: player_id is a *stable, timeless* identity
+    (see DATA_DICTIONARY.md: "stable identity only"), so unlike
+    teams/clubs/venues it IS deduped to one row per player_id instead of
+    kept per-season — concatenating it the same way as teams.csv would
+    otherwise produce ~3.2 rows/player on average (983,407 rows for
+    303,968 distinct players, checked on the real dataset) and silently
+    fan out every join through player_id. The most-recent season's
+    `player_name`/`birth_year` is kept; `birth_year` genuinely disagrees
+    across seasons for 18,616 players (6% — the site itself edits birth
+    years sometimes, not a crawl bug), so a `birth_year_conflict` column
+    flags those instead of silently picking a value.
   - Category-sharded enrichment dirs (match_lineups/<CATEGORY>.csv etc.)
     get both `season` and `category_base` injected from the path, since
     neither is a column inside those CSVs.
@@ -57,7 +71,9 @@ FLAT_TABLES = [
 ]
 
 # One CSV per season, no season column inside -> inject from dir name.
-PER_SEASON_TABLES = ["teams.csv", "venues.csv", "players.csv", "clubs.csv"]
+# players.csv is handled separately (build_players_table) — deduped by
+# player_id instead, see module docstring.
+PER_SEASON_TABLES = ["teams.csv", "venues.csv", "clubs.csv"]
 
 # One CSV per (season, category) under a subdirectory -> inject both.
 SHARDED_DIRS = ["match_lineups", "match_goals", "match_cards", "match_staff", "match_officials"]
@@ -119,6 +135,31 @@ def build_per_season_table(name: str, seasons: list[str]) -> pd.DataFrame | None
     return compact_types(pd.concat(frames, ignore_index=True))
 
 
+def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
+    """players.csv, deduped to one row per player_id (see module docstring
+    for why this table alone gets this treatment). Takes the most recent
+    season's player_name/birth_year for each player_id; flags player_ids
+    where birth_year disagreed across seasons instead of silently
+    resolving the conflict."""
+    frames = []
+    for season in seasons:
+        f = BASE / season / "players.csv"
+        if not f.exists():
+            continue
+        df = read_csv(f)
+        df["season"] = season
+        frames.append(df)
+    if not frames:
+        return None
+
+    all_rows = pd.concat(frames, ignore_index=True)
+    conflict = all_rows.groupby("player_id")["birth_year"].transform("nunique") > 1
+    all_rows["birth_year_conflict"] = conflict
+    all_rows = all_rows.sort_values("season")
+    deduped = all_rows.drop_duplicates("player_id", keep="last").drop(columns=["season"])
+    return compact_types(deduped.reset_index(drop=True))
+
+
 def build_sharded_table(dirname: str, seasons: list[str]) -> pd.DataFrame | None:
     frames = []
     for season in seasons:
@@ -168,6 +209,9 @@ def main():
     print("Per-season tables (season injected from directory):")
     for name in PER_SEASON_TABLES:
         write(name.removesuffix(".csv"), build_per_season_table(name, seasons))
+
+    print("Players (deduped to one row per player_id, see module docstring):")
+    write("players", build_players_table(seasons))
 
     print("Category-sharded enrichment tables (season + category_base injected):")
     for dirname in SHARDED_DIRS:
