@@ -57,7 +57,7 @@ PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parq
 # Tables with no `season` column in the original CSV (season is purely a
 # directory-name artifact of build_parquet.py) - dropped after filtering
 # so the returned shape matches pd.read_csv(season_dir / f"{name}.csv").
-NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs", "players_by_season"}
+NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs", "players_by_season", "game_types", "seasons"}
 
 # Category-sharded enrichment tables: build_parquet.py writes these as one
 # file per season (<name>/<season>.parquet), not one combined file, so

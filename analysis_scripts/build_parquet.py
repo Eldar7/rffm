@@ -81,12 +81,29 @@ FLAT_TABLES = [
     "matches.csv", "standings.csv", "scorers.csv", "groups.csv",
     "competitions.csv", "team_group_membership.csv",
     "player_competition_participation.csv",
+    # site-reported season aggregates per player (DATA_DICTIONARY.md) - not
+    # read by any current report generator (grep-verified), but real
+    # analytical data, not crawl provenance, so it belongs in the compact
+    # copy on the same "don't silently drop site data" grounds as
+    # everything else here.
+    "player_season_stats.csv",
 ]
 
 # One CSV per season, no season column inside -> inject from dir name.
 # players.csv is handled separately (build_players_table) — deduped by
 # player_id instead, see module docstring.
-PER_SEASON_TABLES = ["teams.csv", "venues.csv", "clubs.csv"]
+PER_SEASON_TABLES = [
+    "teams.csv", "venues.csv", "clubs.csv",
+    # RFFM's own small reference lists (game type id -> name, season id ->
+    # name + date range) - re-fetched by every crawl, not read by any
+    # report generator today (grep-verified; matches.csv/competitions.csv
+    # already carry game_type/season as denormalized text, no join needed
+    # for current use), kept per-season rather than deduped like teams/
+    # venues/clubs since there's no reason to assume the site's own list
+    # is perfectly stable across years (a new season_id gets added every
+    # year, by definition).
+    "game_types.csv", "seasons.csv",
+]
 
 # One CSV per (season, category) under a subdirectory -> inject both.
 SHARDED_DIRS = ["match_lineups", "match_goals", "match_cards", "match_staff", "match_officials"]
@@ -282,7 +299,8 @@ def main():
 
     for pattern in ["*/matches.csv", "*/standings.csv", "*/scorers.csv", "*/groups.csv",
                      "*/competitions.csv", "*/team_group_membership.csv",
-                     "*/player_competition_participation.csv", "*/teams.csv", "*/venues.csv",
+                     "*/player_competition_participation.csv", "*/player_season_stats.csv",
+                     "*/teams.csv", "*/venues.csv", "*/game_types.csv", "*/seasons.csv",
                      "*/players.csv", "*/clubs.csv", "*/match_lineups/*.csv", "*/match_goals/*.csv",
                      "*/match_cards/*.csv", "*/match_staff/*.csv", "*/match_officials/*.csv"]:
         total_csv_bytes += sum(f.stat().st_size for f in BASE.glob(pattern))
