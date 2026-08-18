@@ -396,16 +396,8 @@ function rffmInitDataTable(table, opts) {
   var thead = table.tHead, tbody = table.tBodies[0];
   if (!thead || !tbody) return null;
   var ths = Array.prototype.slice.call(thead.querySelectorAll('th[data-key]'));
+  var colCount = thead.querySelectorAll('th').length || 1;
   var state = { sortKey: null, sortDir: 1, filters: {} };
-  // Captured once, before any sort/filter runs, so the third click-cycle
-  // state ("unsorted") restores this render's original row order instead
-  // of just freezing wherever the last active sort left it.
-  var originalOrder = Array.prototype.slice.call(tbody.rows);
-  var everSorted = false; // skip the reorder pass entirely until a sort has actually run once
-  var pop = document.createElement('div');
-  pop.className = 'dt-pop';
-  document.body.appendChild(pop);
-  var openKey = null;
 
   function colCell(tr, key) { return tr.querySelector('[data-col="' + key + '"]'); }
   function cellVal(tr, key) {
@@ -420,38 +412,113 @@ function rffmInitDataTable(table, opts) {
     var l = td.getAttribute('data-label');
     return l !== null ? l : cellVal(tr, key);
   }
-  function rows() { return Array.prototype.slice.call(tbody.rows); }
+
+  // allRows: every row as a <tr> node, live or detached. Two ways in:
+  //  (a) old style — tbody already has all the rows (page built them via
+  //      tbody.innerHTML before calling us); allRows just snapshots them.
+  //  (b) new style — opts.rows + opts.rowHtml, parsed into a detached
+  //      <template> (real DOM nodes, but the browser never lays out or
+  //      paints anything not attached to the document) so the tens-of-
+  //      thousands-of-rows case doesn't force a multi-second reflow just
+  //      to compute a table nobody's scrolled to see yet.
+  var allRows;
+  if (opts.rows && opts.rowHtml) {
+    var tpl = document.createElement('template');
+    tpl.innerHTML = opts.rows.map(opts.rowHtml).join('');
+    allRows = Array.prototype.slice.call(tpl.content.children);
+  } else {
+    allRows = Array.prototype.slice.call(tbody.rows);
+  }
+  // Captured once, before any sort/filter runs, so the third click-cycle
+  // state ("unsorted") restores this render's original row order instead
+  // of just freezing wherever the last active sort left it.
+  var originalOrder = allRows.slice();
+  var everSorted = false; // skip the reorder pass entirely until a sort has actually run once
+  var visible = allRows.slice(); // current filtered+sorted node list, in final order
+  var pop = document.createElement('div');
+  pop.className = 'dt-pop';
+  document.body.appendChild(pop);
+  var openKey = null;
   function closePop() { pop.classList.remove('open'); openKey = null; }
 
   function distinct(key) {
     var map = new Map();
-    rows().forEach(function (tr) {
+    allRows.forEach(function (tr) {
       var v = cellVal(tr, key), l = cellLabel(tr, key);
       if (!map.has(v)) map.set(v, l);
     });
     return map;
   }
 
+  // ---- rendering: everything at once for small tables (nothing to gain
+  // from windowing a table that already fits on screen); past VIRTUALIZE_AT
+  // rows, only the ones in or near the viewport are ever inserted into the
+  // live tbody, bracketed by two spacer rows sized to exactly the height
+  // the skipped rows would have taken — so the scrollbar and scroll
+  // position behave exactly as if every row were really there. ----
+  var scroller = table.closest('.table-scroll') || table.closest('.matrix-scroll') || table.closest('.summary-scroll');
+  var VIRTUALIZE_AT = 300, BUFFER = 12;
+  var rowHeight = 0;
+  var rafPending = false;
+
+  function measureRowHeight() {
+    if (rowHeight || !visible.length) return;
+    var tr = visible[0], wasConnected = tr.isConnected;
+    if (!wasConnected) tbody.appendChild(tr);
+    rowHeight = tr.getBoundingClientRect().height || 28;
+    if (!wasConnected) tbody.removeChild(tr);
+  }
+
+  function spacerRow(px) {
+    var tr = document.createElement('tr');
+    tr.className = 'dt-spacer';
+    tr.innerHTML = '<td colspan="' + colCount + '" style="padding:0;border:0;height:' + px + 'px"></td>';
+    return tr;
+  }
+
+  function renderWindow() {
+    var frag = document.createDocumentFragment();
+    if (!scroller || visible.length <= VIRTUALIZE_AT) {
+      visible.forEach(function (tr) { frag.appendChild(tr); });
+      tbody.innerHTML = '';
+      tbody.appendChild(frag);
+      return;
+    }
+    measureRowHeight();
+    var theadH = thead.getBoundingClientRect().height;
+    var effScroll = Math.max(0, scroller.scrollTop - theadH);
+    var viewportH = Math.max(0, scroller.clientHeight - theadH);
+    var startIdx = Math.max(0, Math.floor(effScroll / rowHeight) - BUFFER);
+    var count = Math.ceil(viewportH / rowHeight) + 2 * BUFFER;
+    var endIdx = Math.min(visible.length, startIdx + count);
+    if (startIdx > 0) frag.appendChild(spacerRow(startIdx * rowHeight));
+    for (var i = startIdx; i < endIdx; i++) frag.appendChild(visible[i]);
+    if (endIdx < visible.length) frag.appendChild(spacerRow((visible.length - endIdx) * rowHeight));
+    tbody.innerHTML = '';
+    tbody.appendChild(frag);
+  }
+
+  function onVirtualScroll() {
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(function () { rafPending = false; renderWindow(); });
+  }
+  if (scroller) { scroller.addEventListener('scroll', onVirtualScroll); window.addEventListener('resize', onVirtualScroll); }
+
   function apply() {
-    var rs = rows();
-    rs.forEach(function (tr) {
-      var visible = true;
+    var filtered = allRows.filter(function (tr) {
       for (var key in state.filters) {
         var allowed = state.filters[key];
         if (!allowed) continue;
-        if (!allowed.has(cellVal(tr, key))) { visible = false; break; }
+        if (!allowed.has(cellVal(tr, key))) return false;
       }
-      tr.style.display = visible ? '' : 'none';
+      return true;
     });
-    // Reordering goes through a DocumentFragment (one DOM mutation) rather
-    // than N individual tbody.appendChild(tr) calls (N mutations, O(n) each
-    // in practice — appendChild-to-move on a table with tens of thousands
-    // of rows turned this into a multi-second, near-freezing operation on
-    // the all-players page's larger categories). The unsorted branch is
-    // additionally skipped entirely unless a sort has actually run at
-    // least once — a fresh table is already in original order, so the
-    // very first apply() (every table gets one on init) has nothing to
-    // restore.
+    // Sorting/filtering both operate on a plain JS array of <tr> nodes —
+    // never on tbody itself — so this is cheap regardless of table size
+    // (tens of milliseconds for tens of thousands of rows; sorting was
+    // never actually the slow part — laying out that many live rows was,
+    // see the conversation this was diagnosed in).
     if (state.sortKey) {
       var th = ths.filter(function (t) { return t.dataset.key === state.sortKey; })[0];
       var type = th ? th.dataset.type : 'text';
@@ -460,7 +527,7 @@ function rffmInitDataTable(table, opts) {
       // tens of thousands of rows that's hundreds of thousands of
       // querySelector calls if read inside the comparator itself. Reading
       // each row's value once up front turns that into a flat O(n) cost.
-      var decorated = rs.map(function (tr) { return [tr, cellVal(tr, state.sortKey)]; });
+      var decorated = filtered.map(function (tr) { return [tr, cellVal(tr, state.sortKey)]; });
       decorated.sort(function (a, b) {
         var av = a[1], bv = b[1];
         if (type === 'number') {
@@ -478,15 +545,15 @@ function rffmInitDataTable(table, opts) {
         }
         return String(av).localeCompare(String(bv), 'ru') * state.sortDir;
       });
-      var sortFrag = document.createDocumentFragment();
-      decorated.forEach(function (d) { sortFrag.appendChild(d[0]); });
-      tbody.appendChild(sortFrag);
+      filtered = decorated.map(function (d) { return d[0]; });
       everSorted = true;
     } else if (everSorted) {
-      var restoreFrag = document.createDocumentFragment();
-      originalOrder.forEach(function (tr) { restoreFrag.appendChild(tr); });
-      tbody.appendChild(restoreFrag);
+      var filteredSet = new Set(filtered);
+      filtered = originalOrder.filter(function (tr) { return filteredSet.has(tr); });
     }
+    visible = filtered;
+    if (scroller) scroller.scrollTop = 0;
+    renderWindow();
     ths.forEach(function (th) {
       var key = th.dataset.key;
       var ic = th.querySelector('.dt-sort-ic');
@@ -495,10 +562,7 @@ function rffmInitDataTable(table, opts) {
       th.classList.toggle('dt-sorted-desc', state.sortKey === key && state.sortDir === -1);
       th.classList.toggle('dt-filtered', !!state.filters[key]);
     });
-    if (opts.onChange) {
-      var visible = rs.filter(function (tr) { return tr.style.display !== 'none'; }).length;
-      opts.onChange(visible, rs.length);
-    }
+    if (opts.onChange) opts.onChange(visible.length, allRows.length);
   }
 
   function openPopover(th) {
