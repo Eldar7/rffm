@@ -302,7 +302,16 @@ CSS = """
 # this module's base tokens (--line, --ink-muted) for pages that don't
 # define the finer-grained set team_cards.py's own <style> block uses.
 DATATABLE_CSS = """
-  table.dtable thead th[data-key] { position: relative; padding-right: 1.7rem; cursor: pointer; user-select: none; }
+  /* :where() zeroes this selector's specificity so a page's own `thead th`
+     rule (all_clubs.py/all_players.py/all_teams.py set `position: sticky`
+     there for a scrolling table body) always wins instead of losing to this
+     shared default on the class+attribute selector's higher specificity —
+     that mismatch was silently turning sticky headers back into `relative`
+     ones, so they scrolled away with the rest of the table instead of
+     staying put. Pages that don't set their own thead-th position (team_cards.py,
+     player_cards.py's registrations table) keep this `relative` default
+     unchanged, since :where() only changes precedence, not the value. */
+  :where(table.dtable thead th[data-key]) { position: relative; padding-right: 1.7rem; cursor: pointer; user-select: none; }
   table.dtable thead th[data-key]:hover { color: var(--accent); }
   table.dtable thead th[data-key] .dt-sort-ic {
     display: inline-block; margin-left: 0.3rem; font-size: 0.62rem; color: var(--accent); min-width: 0.6em;
