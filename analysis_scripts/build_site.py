@@ -7,6 +7,14 @@ them and summarizes season/category coverage from coverage_manifest.csv.
 Every report is regenerated from the CSVs already committed under
 output/processed/rffm/ — nothing here re-scrapes the RFFM site.
 
+Also builds <output-dir>/v2/weird_scores.html from weird_scores_report_v2
+(Parquet-sourced, via rffm_data.py, reading output/processed/rffm_parquet/
+instead of the CSVs) when that Parquet copy exists — a live, deployed
+proof that the Parquet migration reproduces the CSV-driven site exactly,
+sitting next to the untouched original rather than replacing it. Skipped
+with a message if output/processed/rffm_parquet/ hasn't been built yet
+(analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
+
 Usage:
     python analysis_scripts/build_site.py --output-dir site
 """
@@ -22,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import season_comparison
 import club_division_map
 import weird_scores_report
+import weird_scores_report_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -300,6 +309,16 @@ def main():
 
     print("Building weird_scores.html...")
     weird_scores_report.build_all(out_dir)
+
+    parquet_dir = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
+    if (parquet_dir / "matches.parquet").exists():
+        print("Building v2/weird_scores.html (Parquet-sourced proof of concept)...")
+        v2_dir = out_dir / "v2"
+        v2_dir.mkdir(parents=True, exist_ok=True)
+        weird_scores_report_v2.build_all(v2_dir)
+    else:
+        print("Skipping v2/weird_scores.html: output/processed/rffm_parquet/ not built yet "
+              "(run analysis_scripts/build_parquet.py first)")
 
     print("Building index.html...")
     coverage = coverage_rows()

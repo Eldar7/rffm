@@ -44,6 +44,12 @@ PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parq
 # so the returned shape matches pd.read_csv(season_dir / f"{name}.csv").
 NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs"}
 
+# Category-sharded enrichment tables: build_parquet.py writes these as one
+# file per season (<name>/<season>.parquet), not one combined file, so
+# they need a different, season-required load path - see build_parquet.py's
+# module docstring ("Category-sharded enrichment dirs") for why.
+SHARDED_TABLES = {"match_lineups", "match_goals", "match_cards", "match_staff", "match_officials"}
+
 
 @lru_cache(maxsize=None)
 def _load(name: str) -> pd.DataFrame:
@@ -54,6 +60,14 @@ def _load(name: str) -> pd.DataFrame:
             f"--output-dir output/processed/rffm_parquet` first, or a season/table "
             f"that hasn't been through the Parquet ETL yet."
         )
+    return pd.read_parquet(path)
+
+
+@lru_cache(maxsize=None)
+def _load_sharded_season(name: str, season: str) -> pd.DataFrame | None:
+    path = PARQUET_DIR / name / f"{season}.parquet"
+    if not path.exists():
+        return None
     return pd.read_parquet(path)
 
 
@@ -77,6 +91,16 @@ def read_table(name: str, season: str | None = None, category: str | None = None
     """Returns a DataFrame shaped like the original per-season/per-category
     CSV read. `season`/`category` are ignored where the table doesn't carry
     that dimension (e.g. players is global; flat tables have no category)."""
+    if name in SHARDED_TABLES:
+        if season is None:
+            raise ValueError(f"{name} is season-sharded on disk - season= is required")
+        df = _load_sharded_season(name, season)
+        if df is None:
+            return _stringify(pd.DataFrame(columns=["category_base"]))  # empty, matches "dir missing" originals
+        if category is not None:
+            df = df[df["category_base"] == category].drop(columns=["category_base"])
+        return _stringify(df)
+
     df = _load(name)
 
     if name == "players":
@@ -95,9 +119,12 @@ def read_table(name: str, season: str | None = None, category: str | None = None
 
 
 def list_categories(name: str, season: str) -> list[str]:
-    """Category files build_sharded_table() would have globbed for this
+    """Category files build_sharded_season() would have globbed for this
     season, e.g. list_categories("match_lineups", "2025-2026") mirrors
     what `(BASE / season / "match_lineups").glob("*.csv")` used to give."""
+    if name in SHARDED_TABLES:
+        df = _load_sharded_season(name, season)
+        return sorted(df["category_base"].unique().tolist()) if df is not None else []
     df = _load(name)
     if "season" not in df.columns or "category_base" not in df.columns:
         raise ValueError(f"{name} has no per-season/category shards")
@@ -105,6 +132,8 @@ def list_categories(name: str, season: str) -> list[str]:
 
 
 def list_seasons(name: str) -> list[str]:
+    if name in SHARDED_TABLES:
+        return sorted(p.stem for p in (PARQUET_DIR / name).glob("*.parquet"))
     df = _load(name)
     if "season" not in df.columns:
         raise ValueError(f"{name} has no season column")

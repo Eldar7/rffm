@@ -2,8 +2,11 @@
 """
 Converts every CSV under output/processed/rffm/<season>/ into a small set of
 compact, lossless Parquet tables — one file per table, concatenated across
-all seasons — for the planned duckdb-wasm frontend (SQL queries over static
-files in the browser instead of the current hand-sharded JSON per report).
+all seasons, EXCEPT the category-sharded enrichment tables (match_lineups
+etc.), which are one file per season (see "Category-sharded enrichment
+dirs" below for why) — for the planned duckdb-wasm frontend (SQL queries
+over static files in the browser instead of the current hand-sharded JSON
+per report).
 
 Not wired into any report yet: this only produces the Parquet files. Run it
 independently to inspect output size; analysis_scripts/build_site.py does
@@ -37,8 +40,16 @@ this script:
     years sometimes, not a crawl bug), so a `birth_year_conflict` column
     flags those instead of silently picking a value.
   - Category-sharded enrichment dirs (match_lineups/<CATEGORY>.csv etc.)
-    get both `season` and `category_base` injected from the path, since
-    neither is a column inside those CSVs.
+    get `category_base` injected from the path, and are written out one
+    Parquet file per season (output/processed/rffm_parquet/match_lineups/
+    <season>.parquet) rather than one file for all 10 seasons combined -
+    combined, match_lineups alone crossed 100MB (GitHub's hard per-file
+    push limit, hit for real committing this) with room to spare for
+    nothing but 2-3 more seasons of growth. Per-season files mirror how
+    output/processed/rffm/<season>/ itself is already partitioned, so a
+    new season's crawl only ever adds one new small file instead of
+    requiring the combined file to be rewritten (and re-approaching the
+    limit) every time.
   - Numeric-looking columns are downcast to the smallest int type that
     fits (checked against the real min/max in this dataset, not assumed).
   - Object columns with fewer distinct values than half the row count
@@ -165,17 +176,19 @@ def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
     return compact_types(deduped.reset_index(drop=True))
 
 
-def build_sharded_table(dirname: str, seasons: list[str]) -> pd.DataFrame | None:
+def build_sharded_season(dirname: str, season: str) -> pd.DataFrame | None:
+    """One season's worth of a category-sharded enrichment dir, all
+    categories concatenated with `category_base` injected - the unit
+    build_sharded_table() below writes one Parquet file per (see module
+    docstring for why per-season rather than one combined file)."""
+    d = BASE / season / dirname
+    if not d.exists():
+        return None
     frames = []
-    for season in seasons:
-        d = BASE / season / dirname
-        if not d.exists():
-            continue
-        for f in sorted(d.glob("*.csv")):
-            df = read_csv(f)
-            df.insert(0, "category_base", f.stem)
-            df.insert(0, "season", season)
-            frames.append(df)
+    for f in sorted(d.glob("*.csv")):
+        df = read_csv(f)
+        df.insert(0, "category_base", f.stem)
+        frames.append(df)
     if not frames:
         return None
     return compact_types(pd.concat(frames, ignore_index=True))
@@ -218,9 +231,24 @@ def main():
     print("Players (deduped to one row per player_id, see module docstring):")
     write("players", build_players_table(seasons))
 
-    print("Category-sharded enrichment tables (season + category_base injected):")
+    print("Category-sharded enrichment tables (one Parquet file per season, category_base injected):")
     for dirname in SHARDED_DIRS:
-        write(dirname, build_sharded_table(dirname, seasons))
+        total_rows = 0
+        total_bytes_this_table = 0
+        for season in seasons:
+            df = build_sharded_season(dirname, season)
+            if df is None or df.empty:
+                continue
+            season_dir = out_dir / dirname
+            season_dir.mkdir(parents=True, exist_ok=True)
+            out = season_dir / f"{season}.parquet"
+            df.to_parquet(out, compression="zstd", compression_level=args.compression_level, index=False)
+            size = out.stat().st_size
+            total_parquet_bytes += size
+            total_bytes_this_table += size
+            total_rows += len(df)
+        print(f"  {dirname:<32} {total_rows:>9,} rows -> {total_bytes_this_table / 1e6:8.2f} MB "
+              f"across {len(seasons)} files")
 
     for pattern in ["*/matches.csv", "*/standings.csv", "*/scorers.csv", "*/groups.csv",
                      "*/competitions.csv", "*/team_group_membership.csv",
