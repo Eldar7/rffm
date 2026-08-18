@@ -116,3 +116,42 @@ that claim was wrong, traced to this artifact, and the column was removed
 history if a genuine conflict ever does show up in future data).
 
 ---
+
+## Referential integrity gaps found by `analysis_scripts/validate_parquet.py`
+
+This project's crawl-time checks (`data_quality_report.csv`'s 9
+`check_name` types) are all plausibility/reconciliation checks
+(value-range, site-vs-computed) — none of them check whether an ID column
+actually resolves in the table it references. `validate_parquet.py`
+(anti-join over `output/processed/rffm_parquet/`) does, and found two real,
+structural gaps — small relative to table size, not crawl failures, not
+yet root-caused past the pattern below:
+
+**`match_cards.player_id` not in `players`: 25,170 distinct player_ids**,
+spread across every category and most seasons (roughly 1,300-1,900 per
+season×category cell, no single outlier). A player can apparently receive
+a card without a corresponding row ever showing up in that season's
+`players.csv` (fichajugador). Not a coverage-status issue — checked
+`coverage_manifest.csv`: fichajugador shows `complete` for every affected
+season/category, including 2025-2026.
+
+**`player_competition_participation.team_id`/`.group_id`/`.competition_id`
+not in `teams`/`groups`/`competitions`: 767/981/129 distinct values**,
+spread across all 9 fichajugador-covered seasons (25-301 per season, not
+concentrated in the newest/least-stable one — checked, ruling out "core
+crawl just hasn't caught up with enrichment yet" as the whole story). The
+team names in the violating rows are real clubs (e.g. "U.D. TALAMANCA",
+"MOSTOLES C.F."), not the known placeholder/unassigned codes from the
+`clubs.csv` gap entry above — so this isn't the same phenomenon.
+
+**Not yet investigated further** — root cause unconfirmed, could be teams/
+groups that only ever appear via a registration and never actually play a
+core-crawled match that season, or an endpoint-coverage asymmetry between
+what `main.py`'s core crawl discovers and what fichajugador reports. Worth
+running `validate_parquet.py` again after investigating to see if the
+count changes. Not wired into `parquet-build.yml` as a hard gate yet for
+exactly this reason - it would fail on every run until this is understood
+or explicitly accepted as a known, permanent characteristic (same posture
+DATA_QUALITY_REPORT's `severity=warning` checks already take).
+
+---
