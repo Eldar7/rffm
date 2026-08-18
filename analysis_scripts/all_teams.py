@@ -567,8 +567,7 @@ async function render() {
     tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].noResults}</td></tr>`;
     return;
   }
-  tbody.innerHTML = rows.map(rowHtml).join('');
-  rffmInitDataTable(document.getElementById('teamsTable'), { labels: DT_LABELS[CURLANG] });
+  rffmInitDataTable(document.getElementById('teamsTable'), { labels: DT_LABELS[CURLANG], rows, rowHtml });
 }
 
 function initCategoryChips() {
