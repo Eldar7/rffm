@@ -35,10 +35,12 @@ this script:
     otherwise produce ~3.2 rows/player on average (983,407 rows for
     303,968 distinct players, checked on the real dataset) and silently
     fan out every join through player_id. The most-recent season's
-    `player_name`/`birth_year` is kept; `birth_year` genuinely disagrees
-    across seasons for 18,616 players (6% — the site itself edits birth
-    years sometimes, not a crawl bug), so a `birth_year_conflict` column
-    flags those instead of silently picking a value.
+    `player_name`/`birth_year` is kept; a `birth_year_conflict` column
+    flags player_ids where it actually disagrees across seasons once
+    compared numerically (see build_players_table - the naive
+    string-equality version of this check flagged 18,594 players, every
+    one of them the same upstream ".0" float-serialization artifact
+    matches.py's matchday/scores carry, not a real disagreement).
   - Category-sharded enrichment dirs (match_lineups/<CATEGORY>.csv etc.)
     get `category_base` injected from the path, and are written out one
     Parquet file per season (output/processed/rffm_parquet/match_lineups/
@@ -115,7 +117,15 @@ def compact_types(df: pd.DataFrame) -> pd.DataFrame:
                         df[col] = numeric.astype(f"Int{dtype[3:]}")
                         break
             else:
-                df[col] = numeric.astype("float32")
+                # float64/"double", not float32: venues.latitude/longitude
+                # carry up to 17 significant digits in the source CSV (e.g.
+                # "-3.818636699999999") - float32's ~7 significant digits
+                # would silently truncate real precision on exactly the
+                # field DATA_DICTIONARY.md calls out as "exact... not
+                # geocoded". Confirmed on the real data: float32 changed
+                # every single venue's coordinates measurably; float64
+                # round-trips them exactly.
+                df[col] = numeric.astype("float64")
         elif df[col].nunique(dropna=True) < max(n * 0.5, 1):
             df[col] = df[col].astype("category")
     return df
@@ -155,8 +165,19 @@ def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
     """players.csv, deduped to one row per player_id (see module docstring
     for why this table alone gets this treatment). Takes the most recent
     season's player_name/birth_year for each player_id; flags player_ids
-    where birth_year disagreed across seasons instead of silently
-    resolving the conflict."""
+    where birth_year genuinely disagreed across seasons instead of
+    silently resolving the conflict.
+
+    "Genuinely" is load-bearing: comparing birth_year as raw strings
+    (season A's CSV had "1991", season B's had "1991.0" - the same
+    upstream float-serialization artifact matches.py's matchday/scores
+    carry, see build_parquet.py's module docstring) flagged 18,594
+    players as conflicting. Every single one turned out to be that
+    formatting artifact, not a real disagreement, once compared as
+    numbers instead of strings - checked directly against this dataset,
+    not assumed. An earlier version of this function and its docstring
+    claimed "RFFM edits birth years sometimes" from the unnormalized
+    count; that claim was wrong and is corrected here."""
     frames = []
     for season in seasons:
         f = BASE / season / "players.csv"
@@ -169,7 +190,8 @@ def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
         return None
 
     all_rows = pd.concat(frames, ignore_index=True)
-    conflict = all_rows.groupby("player_id")["birth_year"].transform("nunique") > 1
+    by_numeric = pd.to_numeric(all_rows["birth_year"], errors="coerce")
+    conflict = by_numeric.groupby(all_rows["player_id"]).transform("nunique") > 1
     all_rows["birth_year_conflict"] = conflict
     all_rows = all_rows.sort_values("season")
     deduped = all_rows.drop_duplicates("player_id", keep="last").drop(columns=["season"])
@@ -230,6 +252,14 @@ def main():
 
     print("Players (deduped to one row per player_id, see module docstring):")
     write("players", build_players_table(seasons))
+
+    print("Players by season (NOT deduped - mirrors the original per-season"
+          " players.csv exactly, for season-order-sensitive call sites like"
+          " player_career.py's earliest-known-birth_year logic - defensive:"
+          " this dataset has zero players whose birth_year genuinely changes"
+          " across seasons, but per-season history is what would let"
+          " 'earliest' stay correct if that's ever not true):")
+    write("players_by_season", build_per_season_table("players.csv", seasons))
 
     print("Category-sharded enrichment tables (one Parquet file per season, category_base injected):")
     for dirname in SHARDED_DIRS:

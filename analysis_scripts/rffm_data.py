@@ -9,27 +9,42 @@ call would have produced, so a report generator can switch its data source
 by changing the read call only — join keys, clean()/norm_id() helpers, and
 every downstream computation stay untouched.
 
-Two intentional differences from the CSV originals, both grep-verified
-harmless (no report generator in analysis_scripts/*.py touches either):
+Two intentional differences from the CSV originals:
   - `source_url`/`scraped_at` are absent — build_parquet.py drops them
     (source_url is 100% derivable from IDs; scraped_at is crawl
-    provenance). Only analysis_scripts/retry_check.py used them, and it
-    doesn't build the site.
-  - players() takes no `season`: player_id is a stable, season-independent
-    identity (DATA_DICTIONARY.md: "stable identity only"), so
-    output/processed/rffm_parquet/players.parquet is deduped to one row
-    per player_id instead of repeated per season (see build_parquet.py's
-    build_players_table). Every report generator only ever uses this
-    table as a player_id -> name/birth_year lookup dict, never counts or
-    filters it by season, so returning the global table for every season
-    is behavior-preserving.
+    provenance). Grep-verified harmless: only analysis_scripts/
+    retry_check.py used either, and it doesn't build the site.
+  - read_table("players") takes no `season` and returns a table deduped to
+    one row per player_id (player_id is a stable identity - DATA_
+    DICTIONARY.md: "stable identity only") instead of the original's one
+    row per (player_id, season). Safe for the common case - every report
+    that just does a player_id -> name/birth_year lookup dict.
+    player_career.py's compute_career_index() is different: it picks each
+    player's *earliest* recorded birth_year by walking seasons in order,
+    so it needs the original per-season shape rather than "latest value
+    only" - use read_table("players_by_season", season=...) for that (and
+    anything else season-order-sensitive): same one-row-per-(player_id,
+    season) shape as the CSVs, not deduped. In practice this dataset has
+    zero players whose birth_year genuinely changes across seasons once
+    compared numerically (build_parquet.py's build_players_table checked
+    directly) - the CSVs' raw text does disagree for 18,594 players
+    ("1991" one season, "1991.0" another - the same upstream float-
+    serialization artifact matches.py's matchday/scores carry), which is
+    why compute_career_index() vs its Parquet-backed port still won't
+    match byte-for-byte on birth_year: the original keeps the ".0" noise,
+    the Parquet path cleans it via real int typing. players_by_season is
+    still the right table for this pattern (defensive - if a genuine
+    conflict ever does appear in future data, per-season history is what
+    lets "earliest" be computed correctly at all), it just turned out this
+    dataset's actual risk was formatting noise, not real disagreement.
 
 Usage:
     import rffm_data as data
     matches = data.read_table("matches", season="2025-2026")
     lineups = data.read_table("match_lineups", season="2025-2026", category="CADETE")
     teams = data.read_table("teams", season="2025-2026")
-    players = data.read_table("players")
+    players = data.read_table("players")                              # global identity lookup
+    players_2025 = data.read_table("players_by_season", season="2025-2026")  # original per-season shape
 """
 
 from functools import lru_cache
@@ -42,7 +57,7 @@ PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parq
 # Tables with no `season` column in the original CSV (season is purely a
 # directory-name artifact of build_parquet.py) - dropped after filtering
 # so the returned shape matches pd.read_csv(season_dir / f"{name}.csv").
-NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs"}
+NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs", "players_by_season"}
 
 # Category-sharded enrichment tables: build_parquet.py writes these as one
 # file per season (<name>/<season>.parquet), not one combined file, so
