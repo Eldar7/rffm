@@ -40,12 +40,9 @@ this script:
     otherwise produce ~3.2 rows/player on average (983,407 rows for
     303,968 distinct players, checked on the real dataset) and silently
     fan out every join through player_id. The most-recent season's
-    `player_name`/`birth_year` is kept; a `birth_year_conflict` column
-    flags player_ids where it actually disagrees across seasons once
-    compared numerically (see build_players_table - the naive
-    string-equality version of this check flagged 18,594 players, every
-    one of them the same upstream ".0" float-serialization artifact
-    matches.py's matchday/scores carry, not a real disagreement).
+    `player_name`/`birth_year` is kept (see build_players_table for why
+    there's no conflict-flagging column here despite an earlier version
+    having one).
   - Category-sharded enrichment dirs (match_lineups/<CATEGORY>.csv etc.)
     get `category_base` injected from the path, and are written out one
     Parquet file per season (output/processed/rffm_parquet/match_lineups/
@@ -232,20 +229,20 @@ def build_per_season_table(name: str, seasons: list[str]) -> pd.DataFrame | None
 def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
     """players.csv, deduped to one row per player_id (see module docstring
     for why this table alone gets this treatment). Takes the most recent
-    season's player_name/birth_year for each player_id; flags player_ids
-    where birth_year genuinely disagreed across seasons instead of
-    silently resolving the conflict.
+    season's player_name/birth_year for each player_id.
 
-    "Genuinely" is load-bearing: comparing birth_year as raw strings
-    (season A's CSV had "1991", season B's had "1991.0" - the same
-    upstream float-serialization artifact matches.py's matchday/scores
-    carry, see build_parquet.py's module docstring) flagged 18,594
-    players as conflicting. Every single one turned out to be that
-    formatting artifact, not a real disagreement, once compared as
-    numbers instead of strings - checked directly against this dataset,
-    not assumed. An earlier version of this function and its docstring
-    claimed "RFFM edits birth years sometimes" from the unnormalized
-    count; that claim was wrong and is corrected here."""
+    No conflict-flagging here: an earlier version added a
+    `birth_year_conflict` column for player_ids where birth_year disagreed
+    across seasons, but checked-and-confirmed on this dataset that's 0
+    players once compared numerically (a naive raw-string comparison
+    flagged 18,594 - every one of them the same ".0" float-serialization
+    artifact matches.py's matchday/scores carry, not a real disagreement -
+    see module docstring). Nothing read the column either. If a genuine
+    conflict ever does show up in future data, players_by_season already
+    has the full per-season history to find it with a plain
+    `GROUP BY player_id HAVING COUNT(DISTINCT birth_year) > 1` - a
+    dedicated flag column for a problem that provably doesn't exist here,
+    checked by nothing, was solving a hypothetical twice over."""
     frames = []
     for season in seasons:
         f = BASE / season / "players.csv"
@@ -258,9 +255,6 @@ def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
         return None
 
     all_rows = pd.concat(frames, ignore_index=True)
-    by_numeric = pd.to_numeric(all_rows["birth_year"], errors="coerce")
-    conflict = by_numeric.groupby(all_rows["player_id"]).transform("nunique") > 1
-    all_rows["birth_year_conflict"] = conflict
     all_rows = all_rows.sort_values("season")
     deduped = all_rows.drop_duplicates("player_id", keep="last").drop(columns=["season"])
     return compact_types(deduped.reset_index(drop=True))

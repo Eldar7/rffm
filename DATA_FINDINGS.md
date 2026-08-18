@@ -67,3 +67,52 @@ afterward," never as a fabricated transfer. That's intentional caution, not
 missing data.
 
 ---
+
+## The trailing-".0" artifact silently broke "seasons played/eligible" for 10% of players
+
+**Symptom:** `all_players.html`'s "Сезонов" column (and the same stat on
+`player_card.html`) shows blank/unknown eligibility for a player who
+clearly has fichajugador data for several seasons.
+
+**Cause:** Several numeric-looking columns (`matchday`, `home_score`/
+`away_score`, `team_id`, `venue_id`, `birth_year`, `jersey_number`,
+`team_position`/`team_points`, ...) serialize with a spurious trailing
+`.0` in some CSV files and not others — a pandas artifact from writing a
+column that had *any* null in it at CSV-export time, not a real data
+difference (`"5"` and `"5.0"` are the same value). `all_players.py`'s
+`seasons_ratio()` gates on `birth_year.isdigit()` before computing the
+stat — and `"2018.0".isdigit()` is `False`. Checked directly on the full
+dataset: **30,325 players (10%)** have this exact silent breakage on the
+CSV-driven site as of this writing.
+
+**This is not new data corruption** — it's always been there, just never
+surfaced because nothing compared the "clean" and "dirty" versions of the
+same value before. `output/processed/rffm_parquet/` (real int types,
+produced by `analysis_scripts/build_parquet.py`'s `compact_types`) doesn't
+carry the artifact, so any report ported to read from there (see the
+`_v2.py` report generators) fixes this as a side effect, not a deliberate
+fix. If you're computing anything from a numeric-looking CSV string column
+and get a suspiciously low match rate against `.isdigit()`/`int(x)`, check
+for this before assuming a real gap — `int(float(x))` or a numeric
+`pd.to_numeric()` conversion sidesteps it.
+
+---
+
+## `players.csv`'s birth_year "conflicts" across seasons are 100% a formatting artifact, 0% real
+
+**Symptom:** Comparing a player's `birth_year` across different seasons'
+`players.csv` files looks like it disagrees for a meaningful chunk of
+players (raw string comparison flagged 18,594 — 6% of players).
+
+**This is the same trailing-".0" artifact as above, not RFFM correcting
+birth years.** Checked directly: comparing `birth_year` as *numbers*
+instead of strings across every season, the real disagreement count is
+**zero**, for every one of 303,968 players in the dataset. An earlier
+build of `output/processed/rffm_parquet/players.parquet` had a
+`birth_year_conflict` column based on the unnormalized (string) comparison
+and a docstring claiming "the site itself edits birth years sometimes" —
+that claim was wrong, traced to this artifact, and the column was removed
+(nothing read it, and `players_by_season` already has the full per-season
+history if a genuine conflict ever does show up in future data).
+
+---

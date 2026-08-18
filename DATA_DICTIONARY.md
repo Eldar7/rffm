@@ -8,15 +8,53 @@ the data don't pay to load it. See `CLAUDE.md`'s "Scope" and "How to answer
 a query" for the season-partitioned paths and the query procedure/routing
 table this file assumes.
 
-## Why pandas, not SQL
+## Two copies of the data, two default tools
 
-Data lives as flat CSVs, not in a database — pandas reads one in a single
-line, nothing to provision. Pandas isn't "better than SQL" in general; if
-you'd genuinely rather write SQL, **DuckDB** can query these CSVs directly
-with zero setup (`duckdb.sql("SELECT * FROM 'output/processed/rffm/2025-2026/matches.csv'")`).
-But this repo has an established pandas convention (every recipe below is
-written in it) — default to pandas for consistency unless SQL is explicitly
-requested.
+- **`output/processed/rffm/<season>/*.csv`** — the source of truth, written
+  by the crawler. Every recipe below is written against these, in pandas
+  (`dtype=str`, then resolve/convert per column — see the quirks below).
+  This is what `analysis_scripts/*.py` (the original, non-`_v2` report
+  generators) read.
+- **`output/processed/rffm_parquet/`** — a compact (~20x smaller), lossless
+  derived copy, rebuilt from the CSVs above by
+  `analysis_scripts/build_parquet.py` (see that script's module docstring
+  for exactly which columns get dropped/renamed/retyped and why — the
+  short version: `source_url` dropped from analytical tables only,
+  `scraped_at` kept as a real timestamp, real int/float types instead of
+  `dtype=str`, `players` deduped to one row per `player_id` with
+  `players_by_season` alongside it for season-order-sensitive lookups, the
+  four `*crawl_log.csv`/`*_data_quality_report.csv` families merged into
+  two tables with a `log_family` column). **Default to this one** for any
+  new ad hoc question — query it with SQL via DuckDB, no pandas
+  boilerplate, no season loop for most tables:
+  ```sql
+  SELECT p.player_name, COUNT(*) AS goals
+  FROM 'output/processed/rffm_parquet/match_goals/*.parquet' g
+  JOIN 'output/processed/rffm_parquet/players.parquet' p USING (player_id)
+  GROUP BY p.player_name ORDER BY goals DESC LIMIT 10
+  ```
+  (`match_lineups`/`match_goals`/`match_cards`/`match_staff`/
+  `match_officials` are one Parquet file *per season*, not one combined
+  file — glob `*.parquet` across seasons like above, or point at one
+  season's file directly. Every other table is one file for all seasons.)
+
+  For the exact current columns/types of any table, ask DuckDB directly
+  rather than trusting a static list here (which *will* drift — this repo
+  has already been burned once by duplicate schema docs going stale, see
+  "Why one file" in `CLAUDE.md`):
+  ```sql
+  DESCRIBE SELECT * FROM 'output/processed/rffm_parquet/matches.parquet';
+  ```
+  The join keys, PKs, category taxonomy, and quirks documented below apply
+  identically to both copies — only the file format/column-drop details
+  above differ. `analysis_scripts/rffm_data.py` is a third way in, but it's
+  for report-generator code specifically (`analysis_scripts/*_v2.py`), not
+  ad hoc queries — see its own module docstring.
+
+  Pandas still works fine on the Parquet copy too
+  (`pd.read_parquet(...)`) if you'd rather stay in pandas than switch to
+  SQL — the "default to Parquet" recommendation above is about which data
+  copy to query, independent of pandas vs SQL.
 
 ## Core tables
 
@@ -445,7 +483,14 @@ purpose: the core files are fully rebuilt from scratch on every `main.py`
 run, so an appending enrichment stage on top of them would get silently
 wiped by the next unrelated core rerun. Want a unified view across all
 crawl logs? `pd.concat()` them at analysis time — don't merge the files on
-disk. (Each of these lives inside its season's directory alongside that
+disk. This constraint is specifically about the live CSVs during crawling
+(resumability - see below); `output/processed/rffm_parquet/crawl_log.parquet`
+and `.../data_quality_report.parquet` DO merge all four families into one
+file each, with a `log_family` column ("core"/"acta"/"fichajugador"/
+"clubs") — read-only derived copies aren't subject to the same constraint,
+this is just the `pd.concat()`-at-analysis-time the paragraph above
+suggests, done once at build time instead of per query.
+(Each of these lives inside its season's directory alongside that
 season's other tables — `crawl_log.csv` is per-season too, not global.) Note
 `venues.csv`'s own fetches (`/campo/<id>`) log into core's `crawl_log.csv`,
 not a fourth family — that stage isn't robots.txt-gated, so it runs inside

@@ -42,8 +42,14 @@ crawler for a new season writes to its own new directory and never touches
 another season's files. The lone exception is `coverage_manifest.csv`
 itself, which lives one level up at `output/processed/rffm/coverage_manifest.csv`
 (see "Is this season done" below) since its whole purpose is to be the one
-cross-season index. Answer questions by running a pandas script (via Bash),
-not by eyeballing CSV rows — see "How to answer a query" below.
+cross-season index. A compact, lossless copy of every table above also
+lives at `output/processed/rffm_parquet/` (rebuilt from these CSVs by
+`analysis_scripts/build_parquet.py`) — **default to querying that one**
+for any new question, via DuckDB SQL or `pd.read_parquet`, not these CSVs
+directly; see "How to answer a query" below and `DATA_DICTIONARY.md`'s
+"Two copies of the data, two default tools" for why and exactly how the
+two differ. Either way: answer questions by running a script (via Bash),
+not by eyeballing rows.
 
 ## Is this season/category/stage done? — `coverage_manifest.csv`
 
@@ -98,17 +104,26 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
    through `teams.csv`/`players.csv` to get canonical `team_id`/`player_id`
    values, *then* filter everything else by ID. Free-text columns carry the
    site's raw formatting (quotes, accents, case) and are unreliable keys.
-2. **Load only the CSVs the question needs** (table below).
-3. **Run one self-contained pandas script via Bash** — don't hand-inspect
-   CSV rows for anything beyond a first look.
+2. **Load only the tables the question needs** (table below).
+3. **Query `output/processed/rffm_parquet/` by default** — one self-contained
+   DuckDB SQL query (or `pd.read_parquet` if you'd rather stay in pandas)
+   via Bash, no season loop for most tables. Fall back to the CSVs under
+   `output/processed/rffm/<season>/` (pandas, `dtype=str`) only if you're
+   working inside `analysis_scripts/*.py` report-generator code that isn't
+   on the Parquet path yet, or need a column the Parquet copy drops (rare —
+   see `DATA_DICTIONARY.md`). Either way: don't hand-inspect rows for
+   anything beyond a first look.
 4. **Sanity-check the row count** before presenting. Zero rows for two
    clubs/players that plausibly interacted is a signal something upstream
    is wrong (name typo, wrong scope, ID resolved against the wrong club),
    not necessarily a true negative.
 
-**Question type → CSVs → join key:**
+**Question type → tables → join key:** (same table names in either copy —
+`teams`/`matches`/etc., not `teams.csv`; `match_lineups/*` means glob
+across categories for the CSVs, across seasons for the Parquet copy - see
+"Two copies of the data" in `DATA_DICTIONARY.md`)
 
-| Question | CSVs | Join |
+| Question | Tables | Join |
 |---|---|---|
 | Club vs. club results / head-to-head | `teams`, `matches` | `club_name_raw` → `team_id` list → `home_team_id`/`away_team_id` |
 | What teams/levels does a club field this season | `teams`, `team_group_membership`, `groups`, `competitions` | `team_id` → `group_id` → `competition_id` |
