@@ -14,10 +14,15 @@ not read from here (yet).
 
 Column handling, same rules validated by hand on this dataset before writing
 this script:
-  - Drop `source_url` (100% derivable from IDs, e.g. an acta-partido URL is
-    just https://www.rffm.es/acta-partido/{match_id} — see README.md) and
-    `scraped_at` (crawl provenance, not analytical; per-stage freshness
-    already lives in coverage_manifest.csv, not needed per-row here).
+  - Drop `source_url` on the analytical tables only (100% derivable from
+    IDs, e.g. an acta-partido URL is just
+    https://www.rffm.es/acta-partido/{match_id} — see README.md).
+    `scraped_at` is kept and parsed to a real timestamp (measured cost:
+    +42MB/+20% over the whole dataset - accepted, since per-row scrape
+    time isn't reconstructible any other way once the CSVs are gone).
+    crawl_log/data_quality_report/manifest_* (see below) keep their own
+    `source_url`/`url` columns too - there it's the actual audit record of
+    what was fetched, not a derivable join convenience.
   - Season-sharded tables (one CSV per season, e.g. matches.csv) already
     carry `season`/`season_id` — kept as-is.
   - Per-season tables with no season column (teams.csv, venues.csv,
@@ -52,6 +57,23 @@ this script:
     new season's crawl only ever adds one new small file instead of
     requiring the combined file to be rewritten (and re-approaching the
     limit) every time.
+  - crawl_log.csv/acta_crawl_log.csv/fichajugador_crawl_log.csv/
+    clubs_crawl_log.csv (identical schema, four separate files per season -
+    DATA_DICTIONARY.md's "Three intentionally separate crawl_log/quality-
+    report families": core's crawl_log.csv is rebuilt from scratch every
+    main.py run, the other three grow incrementally and double as the
+    crawler's resumability marker, so they must stay separate ON DISK as
+    CSVs - that constraint doesn't apply to this read-only derived Parquet
+    copy) are concatenated into one `crawl_log` table with `season` +
+    `log_family` ("core"/"acta"/"fichajugador"/"clubs") injected - the
+    docstring's own suggestion ("want a unified view? pd.concat() at
+    analysis time") is exactly what this does, just once instead of
+    per-query. Same treatment for the four data_quality_report.csv
+    variants -> one `data_quality_report` table.
+  - manifest_groups.csv/manifest_pages.csv/manifest_endpoints.csv have no
+    source_url/scraped_at columns to worry about and no season column
+    inside (crawl discovery output, one file per season) - handled exactly
+    like teams.csv/venues.csv/clubs.csv (PER_SEASON_TABLES).
   - Numeric-looking columns are downcast to the smallest int type that
     fits (checked against the real min/max in this dataset, not assumed).
   - Object columns with fewer distinct values than half the row count
@@ -74,7 +96,7 @@ import pandas as pd
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 SEASON_RE = re.compile(r"^\d{4}-\d{4}$")
 
-DROP_COLS = ["source_url", "scraped_at"]
+DROP_COLS = ["source_url"]
 
 # One CSV per season, season/season_id columns already inside.
 FLAT_TABLES = [
@@ -103,6 +125,22 @@ PER_SEASON_TABLES = [
     # is perfectly stable across years (a new season_id gets added every
     # year, by definition).
     "game_types.csv", "seasons.csv",
+    # Crawl discovery manifests - what the crawler found on the site before
+    # deciding what to fetch. No source_url/scraped_at columns, so DROP_COLS
+    # is a no-op for these; listed here purely as documentation of that.
+    "manifest_groups.csv", "manifest_pages.csv", "manifest_endpoints.csv",
+]
+
+# Same schema in all four, one file per season each - see module docstring
+# ("Three intentionally separate crawl_log/quality-report families").
+# (log_family, filename) pairs.
+CRAWL_LOG_FAMILIES = [
+    ("core", "crawl_log.csv"), ("acta", "acta_crawl_log.csv"),
+    ("fichajugador", "fichajugador_crawl_log.csv"), ("clubs", "clubs_crawl_log.csv"),
+]
+DATA_QUALITY_REPORT_FAMILIES = [
+    ("core", "data_quality_report.csv"), ("acta", "acta_data_quality_report.csv"),
+    ("fichajugador", "fichajugador_data_quality_report.csv"), ("clubs", "clubs_data_quality_report.csv"),
 ]
 
 # One CSV per (season, category) under a subdirectory -> inject both.
@@ -111,6 +149,9 @@ SHARDED_DIRS = ["match_lineups", "match_goals", "match_cards", "match_staff", "m
 
 def list_seasons() -> list[str]:
     return sorted(d.name for d in BASE.iterdir() if d.is_dir() and SEASON_RE.match(d.name))
+
+
+TIMESTAMP_COLS = {"scraped_at", "timestamp"}
 
 
 def compact_types(df: pd.DataFrame) -> pd.DataFrame:
@@ -122,6 +163,9 @@ def compact_types(df: pd.DataFrame) -> pd.DataFrame:
         # skips every column under this pandas version, so nothing here
         # actually got downcast. is_string_dtype catches both.
         if not pd.api.types.is_string_dtype(df[col]):
+            continue
+        if col in TIMESTAMP_COLS:
+            df[col] = pd.to_datetime(df[col], format="ISO8601", utc=True)
             continue
         numeric = pd.to_numeric(df[col], errors="coerce")
         non_null = df[col].notna()
@@ -151,6 +195,13 @@ def compact_types(df: pd.DataFrame) -> pd.DataFrame:
 def read_csv(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path, dtype=str, encoding="utf-8-sig", low_memory=False)
     return df.drop(columns=[c for c in DROP_COLS if c in df.columns])
+
+
+def read_csv_raw(path: Path) -> pd.DataFrame:
+    """Like read_csv() but keeps every column, including source_url/url -
+    for crawl_log/data_quality_report, where that's the audit record of
+    what was actually fetched, not a derivable analytical convenience."""
+    return pd.read_csv(path, dtype=str, encoding="utf-8-sig", low_memory=False)
 
 
 def build_flat_table(name: str, seasons: list[str]) -> pd.DataFrame | None:
@@ -233,6 +284,35 @@ def build_sharded_season(dirname: str, season: str) -> pd.DataFrame | None:
     return compact_types(pd.concat(frames, ignore_index=True))
 
 
+def build_family_log_table(families: list[tuple[str, str]], seasons: list[str]) -> pd.DataFrame | None:
+    """crawl_log/data_quality_report: same schema across 4 per-season files
+    (core/acta/fichajugador/clubs - see module docstring), concatenated
+    with `season` + `log_family` injected. Uses read_csv_raw() - not
+    read_csv() - so source_url survives (it's the audit trail here, not a
+    redundant join key)."""
+    frames = []
+    for family, filename in families:
+        for season in seasons:
+            f = BASE / season / filename
+            if not f.exists():
+                continue
+            try:
+                df = read_csv_raw(f)
+            except pd.errors.EmptyDataError:
+                # A handful of these are a stray byte or two (not exactly
+                # 0-length) with no header at all - e.g.
+                # 2020-2021/acta_data_quality_report.csv is 1 byte - rather
+                # than guess a size cutoff, just skip whatever pandas
+                # itself can't find a header row in.
+                continue
+            df.insert(0, "log_family", family)
+            df.insert(0, "season", season)
+            frames.append(df)
+    if not frames:
+        return None
+    return compact_types(pd.concat(frames, ignore_index=True))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Convert RFFM CSVs to compact Parquet tables")
     parser.add_argument("--output-dir", default="site/data/parquet")
@@ -297,12 +377,22 @@ def main():
         print(f"  {dirname:<32} {total_rows:>9,} rows -> {total_bytes_this_table / 1e6:8.2f} MB "
               f"across {len(seasons)} files")
 
+    print("Crawl audit tables (4 per-season families concatenated, log_family injected,"
+          " source_url kept - see module docstring):")
+    write("crawl_log", build_family_log_table(CRAWL_LOG_FAMILIES, seasons))
+    write("data_quality_report", build_family_log_table(DATA_QUALITY_REPORT_FAMILIES, seasons))
+
     for pattern in ["*/matches.csv", "*/standings.csv", "*/scorers.csv", "*/groups.csv",
                      "*/competitions.csv", "*/team_group_membership.csv",
                      "*/player_competition_participation.csv", "*/player_season_stats.csv",
                      "*/teams.csv", "*/venues.csv", "*/game_types.csv", "*/seasons.csv",
+                     "*/manifest_groups.csv", "*/manifest_pages.csv", "*/manifest_endpoints.csv",
                      "*/players.csv", "*/clubs.csv", "*/match_lineups/*.csv", "*/match_goals/*.csv",
-                     "*/match_cards/*.csv", "*/match_staff/*.csv", "*/match_officials/*.csv"]:
+                     "*/match_cards/*.csv", "*/match_staff/*.csv", "*/match_officials/*.csv",
+                     "*/crawl_log.csv", "*/acta_crawl_log.csv", "*/fichajugador_crawl_log.csv",
+                     "*/clubs_crawl_log.csv", "*/data_quality_report.csv",
+                     "*/acta_data_quality_report.csv", "*/fichajugador_data_quality_report.csv",
+                     "*/clubs_data_quality_report.csv"]:
         total_csv_bytes += sum(f.stat().st_size for f in BASE.glob(pattern))
 
     print(f"\nTotal: {total_csv_bytes / 1e6:.0f} MB CSV -> {total_parquet_bytes / 1e6:.0f} MB Parquet "

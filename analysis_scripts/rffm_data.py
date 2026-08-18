@@ -9,11 +9,17 @@ call would have produced, so a report generator can switch its data source
 by changing the read call only — join keys, clean()/norm_id() helpers, and
 every downstream computation stay untouched.
 
-Two intentional differences from the CSV originals:
-  - `source_url`/`scraped_at` are absent — build_parquet.py drops them
-    (source_url is 100% derivable from IDs; scraped_at is crawl
-    provenance). Grep-verified harmless: only analysis_scripts/
-    retry_check.py used either, and it doesn't build the site.
+Intentional differences from the CSV originals:
+  - `source_url` is absent from every analytical table (build_parquet.py
+    drops it - 100% derivable from IDs). Grep-verified harmless: only
+    analysis_scripts/retry_check.py used it, and it doesn't build the
+    site. `scraped_at` IS kept (parsed to a real timestamp), but stringifies
+    with a space instead of the original's "T" date/time separator
+    (str(pd.Timestamp) formatting, not a data difference) - moot for the
+    site today since no report generator reads it, kept for archival/
+    ad hoc-query completeness (see build_parquet.py's module docstring).
+    crawl_log/data_quality_report keep source_url too - there it's the
+    audit record of what was fetched, not a derivable convenience.
   - read_table("players") takes no `season` and returns a table deduped to
     one row per player_id (player_id is a stable identity - DATA_
     DICTIONARY.md: "stable identity only") instead of the original's one
@@ -57,7 +63,10 @@ PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parq
 # Tables with no `season` column in the original CSV (season is purely a
 # directory-name artifact of build_parquet.py) - dropped after filtering
 # so the returned shape matches pd.read_csv(season_dir / f"{name}.csv").
-NO_SEASON_COLUMN_IN_ORIGINAL = {"teams", "venues", "clubs", "players_by_season", "game_types", "seasons"}
+NO_SEASON_COLUMN_IN_ORIGINAL = {
+    "teams", "venues", "clubs", "players_by_season", "game_types", "seasons",
+    "manifest_groups", "manifest_pages", "manifest_endpoints",
+}
 
 # Category-sharded enrichment tables: build_parquet.py writes these as one
 # file per season (<name>/<season>.parquet), not one combined file, so
