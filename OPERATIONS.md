@@ -12,7 +12,7 @@ worth restating so they don't get silently broken.
 
 ## Dependency order
 
-Four entrypoints. `enrich_clubs.py` only depends on step 1 (not on
+Five entrypoints. `enrich_clubs.py` only depends on step 1 (not on
 `enrich_acta.py`), so it can run any time after `main.py` - it's listed
 third here only because it's the newer addition, not because of an ordering
 requirement:
@@ -38,6 +38,17 @@ requirement:
    profiles/season stats/participation. Reads `match_lineups/<category>.csv`
    (needs step 2 done first for the categories it targets). Same order of
    magnitude as step 2.
+5. `enrich_club_profiles.py` → `rffm_scraper/club_profile_pipeline.py` —
+   full club profile + every team a club has ever fielded, from
+   `/fichaclub/<club_id>`. Reads every season's already-committed
+   `clubs.csv` (cross-season, so it needs step 3 done for at least one
+   season, not all of them - the target list is just whatever `club_id`s
+   are currently known). Manually dispatched only - deliberately **not**
+   part of `crawl-all.yml`'s self-chaining per-season backfill plan (see
+   that section below), since it isn't a "run once per season" step the
+   way the other four are; it's closer to a periodically-refreshable
+   snapshot of current site state. A few hundred requests, well under an
+   hour even serial.
 
 `config.yaml`'s `target.season_label` picks the season (not CLI-overridable
 — see the workflow walkthrough below for why that matters);
@@ -138,6 +149,17 @@ skip straight to `acta_partido`/`fichajugador` with the new
 `scope_category` (`clubs` needs no re-dispatch - it was never
 category-scoped to begin with).
 
+`club_profiles` is dispatched separately from the per-season sequence
+above, whenever you want (`season_label`/`scope_category` inputs are both
+ignored - see the workflow's input descriptions). Default dispatch (no
+extra flags) is a resumable backfill of whatever `club_id`s aren't yet
+covered; re-dispatching later after a new season's `clubs.csv` lands picks
+up any new `club_id`s automatically. A deliberate refresh of *already*-covered
+`club_id`s (to catch a club's roster/profile drifting over time) needs
+`--force-refetch`, which isn't exposed as a workflow input on purpose - run
+it manually (`python enrich_club_profiles.py --force-refetch`) as an
+infrequent, deliberate action, not a routine dispatch choice.
+
 **Parallel workers for enrichment stages:** `acta_partido`, `fichajugador`,
 and `clubs` all support parallel HTTP workers (`config.yaml`'s
 `*.workers`, CLI `--workers N`, or the `rffm-crawl.yml` `workers` input).
@@ -192,6 +214,12 @@ core (--all-categories) → clubs → acta_partido × 10 categories → fichajug
 Categories in priority order: BENJAMIN, PREBENJAMIN, ALEVIN, INFANTIL,
 CADETE, JUVENIL, AFICIONADO, SENIOR, VETERANOS, UNIVERSITARIO. OTHER
 (cup/copa competitions) is excluded — no meaningful acta/fichajugador data.
+
+`club_profiles` is deliberately **not** in this plan - it's a cross-season,
+manually-dispatched stage (see "Dependency order" above), not a
+"run once per season until complete" step the way the other four are.
+`next_crawl_step.py` never queues it; dispatch it yourself via
+`rffm-crawl.yml`'s `club_profiles` stage whenever you want a backfill/refresh.
 
 Seasons with only BENJAMIN+PREBENJAMIN in `groups.csv` (crawled before
 `--all-categories` existed) are flagged for core re-crawl automatically
@@ -380,6 +408,10 @@ pages - not fetch failures, see `clubs_data_quality_report.csv`). No other
 categories have acta_partido/fichajugador enrichment yet. Season 2024-2025:
 `core` complete (all categories, via the manual 24-worker run above, not
 GitHub Actions), including `venues.csv`; no enrichment stages started yet.
+`club_profiles` (cross-season, `season="ALL"` in `coverage_manifest.csv`):
+`complete` as of a manual local run (2026-08-19, not GitHub Actions) against
+all 1,054 `club_id`s known at the time across every season's `clubs.csv` -
+685 resolved, 369 `club: null` (see `DATA_FINDINGS.md`), 0 fetch failures.
 
 ## Fixing `complete_with_failures` — `retry_check.py`
 

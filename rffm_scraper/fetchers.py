@@ -156,6 +156,21 @@ def fetch_fichaequipo(client: RffmClient, settings: Settings, team_id: str) -> P
     )
 
 
+def fetch_fichaclub(client: RffmClient, settings: Settings, club_id: str) -> PageFetchResult:
+    """Club profile page: /fichaclub/<club_id> - the club's own full profile
+    (address, contact, every team it has ever fielded), richer than
+    fichaequipo's per-team snapshot. Takes the real club_id (codigo_club),
+    NOT a team_id - passing a team_id here returns pageProps.club: null
+    (confirmed live). NOT robots.txt-disallowed (only fichaequipo/
+    fichajugador/acta-partido are) - gated behind enrichment.fetch_fichaclub
+    anyway, for consistency with the other enrichment stages.
+    """
+    return fetch_page(
+        client, settings, f"{settings.site.pages.fichaclub}/{club_id}", {},
+        entity_type="club_ficha", entity_id=club_id,
+    )
+
+
 def fetch_fichajugador(
     client: RffmClient, settings: Settings, *, season_id: str, player_id: str,
 ) -> PageFetchResult:
