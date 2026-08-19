@@ -1,9 +1,17 @@
 """Enrichment pipeline: /fichajugador/<player_id> -> player profile/season stats/participation.
 
 Runs *after* acta_pipeline.py: targets are the unique player_ids already
-collected in match_lineups.csv (that file only contains whichever category
-scope the acta stage was last run for, so no further category filtering
-happens here - the scope is inherited from it).
+collected in match_lineups.csv, match_cards.csv and match_goals.csv (those
+files only contain whichever category scope the acta stage was last run
+for, so no further category filtering happens here - the scope is
+inherited from it). match_cards/match_goals are included alongside
+match_lineups because a card/goal's codjugador can belong to someone who
+never appears in that match's lineup extraction at all - see
+DATA_FINDINGS.md's "match_cards.player_id not in players" entry: RFFM uses
+one shared player/jugador id space for both playing and coaching roles, so
+a real, fetchable /fichajugador/<id> page exists for these ids too, even
+though many of them turn out to be coaches rather than players (see
+is_likely_coach below).
 
 Known simplification: scorers.csv does not currently capture codigo_jugador
 (only player_name, aggregated from the goleadores page), so it cannot be
@@ -68,12 +76,20 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+# Directories to union fichajugador fetch targets from - see module
+# docstring for why match_cards/match_goals are included alongside
+# match_lineups.
+_TARGET_SOURCE_DIRS = ["match_lineups", "match_cards", "match_goals"]
+
+
 def _load_target_player_ids(settings: Settings) -> list[str]:
-    lineups_dir = settings.processed_dir / "match_lineups"
-    frames = [
-        pd.read_csv(p, usecols=["player_id"], dtype=str)
-        for p in sorted(lineups_dir.glob("*.csv"))
-    ]
+    frames = []
+    for dirname in _TARGET_SOURCE_DIRS:
+        d = settings.processed_dir / dirname
+        frames.extend(
+            pd.read_csv(p, usecols=["player_id"], dtype=str)
+            for p in sorted(d.glob("*.csv"))
+        )
     if not frames:
         return []
     return sorted(pd.concat(frames)["player_id"].dropna().unique().tolist())
@@ -111,6 +127,71 @@ def _reread_table(processed, filename: str) -> pd.DataFrame:
     id_cols = _ID_COLUMNS.get(filename)
     dtype = {col: str for col in id_cols} if id_cols else None
     return pd.read_csv(path, dtype=dtype)
+
+
+# role_kind values from match_staff that represent an actual coaching/
+# technical role with a real person_id - team_delegate/field_delegate are
+# excluded because the site itself has no id field for those roles (see
+# DATA_FINDINGS.md), so they can never corroborate a player_id either way.
+_COACH_STAFF_ROLES = {"head_coach", "assistant_coach", "other_staff"}
+
+
+def _staff_coach_person_ids(processed) -> set[str]:
+    staff_dir = processed / "match_staff"
+    if not staff_dir.exists():
+        return set()
+    frames = [
+        pd.read_csv(p, usecols=["role_kind", "person_id"], dtype=str)
+        for p in sorted(staff_dir.glob("*.csv"))
+    ]
+    if not frames:
+        return set()
+    df = pd.concat(frames)
+    return set(df.loc[df["role_kind"].isin(_COACH_STAFF_ROLES), "person_id"].dropna())
+
+
+def _season_stats_coach_like_ids(processed) -> set[str]:
+    """player_ids whose player_season_stats shows the site's own "0 matches
+    played but has cards" signature - the pattern DATA_FINDINGS.md's
+    match_cards.player_id root-cause entry confirmed live for youth-category
+    coaches carded under the shared player/jugador id space (ages 21-35 in
+    categories whose player bracket is 10-18). This catches the majority of
+    coach ids that never resolve to match_staff at all (this project's own
+    match_staff extraction doesn't catch every coach for every match)."""
+    path = processed / "player_season_stats.csv"
+    if not path.exists():
+        return set()
+    cols = ["player_id", "matches_played", "yellow_cards", "red_cards", "second_yellow_cards"]
+    df = pd.read_csv(path, dtype=str, usecols=cols)
+    for col in cols[1:]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    cards_total = df[cols[2:]].fillna(0).sum(axis=1)
+    coach_like = (df["matches_played"] == 0) & (cards_total > 0)
+    return set(df.loc[coach_like, "player_id"].dropna())
+
+
+def _backfill_is_likely_coach(processed) -> int:
+    """Adds/refreshes players.csv's is_likely_coach column for every player
+    currently on record (not just this run's freshly-fetched ones) - see
+    models.Player for what the column means and why it's computed here
+    rather than at per-fetch parse time. Idempotent and cheap enough to run
+    at the end of every fichajugador run: recomputes the full column from
+    the current match_staff/player_season_stats rather than incrementally
+    patching it, so it self-heals as those tables grow.
+
+    dtype=str throughout, including on write - never lets pandas infer a
+    numeric type for any *other* column, so this can't reintroduce the
+    trailing-".0" float-serialization artifact documented in
+    DATA_FINDINGS.md just by round-tripping the file through this function.
+    """
+    players_path = processed / "players.csv"
+    if not players_path.exists():
+        return 0
+    players_df = pd.read_csv(players_path, dtype=str, keep_default_na=True)
+    coach_ids = _staff_coach_person_ids(processed) | _season_stats_coach_like_ids(processed)
+    players_df["is_likely_coach"] = players_df["player_id"].isin(coach_ids)
+    write_csv(players_df, players_path)
+    return int(players_df["is_likely_coach"].sum())
 
 
 def _flush_batch(processed, batches: dict[str, list[dict]], crawl_log_rows: list[dict]) -> None:
@@ -355,6 +436,8 @@ def run_player_enrichment(
     quality_issues = run_player_quality_checks(players_df, season_stats_df, lineups_df, set(target_player_ids))
     write_csv(pd.DataFrame(quality_issues), processed / "fichajugador_data_quality_report.csv")
 
+    likely_coaches = _backfill_is_likely_coach(processed)
+
     summary = dict(
         scope_category=scope_category,
         targets=len(target_player_ids),
@@ -366,6 +449,7 @@ def run_player_enrichment(
         failed=progress.failed,
         missing_after_this_run=len(missing),
         status=final_status,
+        likely_coaches=likely_coaches,
         players=len(players_df),
         season_stats=len(season_stats_df),
         competition_participations=len(competitions_df),

@@ -42,8 +42,14 @@ crawler for a new season writes to its own new directory and never touches
 another season's files. The lone exception is `coverage_manifest.csv`
 itself, which lives one level up at `output/processed/rffm/coverage_manifest.csv`
 (see "Is this season done" below) since its whole purpose is to be the one
-cross-season index. Answer questions by running a pandas script (via Bash),
-not by eyeballing CSV rows — see "How to answer a query" below.
+cross-season index. A compact, lossless copy of every table above also
+lives at `output/processed/rffm_parquet/` (rebuilt from these CSVs by
+`analysis_scripts/build_parquet.py`) — **default to querying that one**
+for any new question, via DuckDB SQL or `pd.read_parquet`, not these CSVs
+directly; see "How to answer a query" below and `DATA_DICTIONARY.md`'s
+"Two copies of the data, two default tools" for why and exactly how the
+two differ. Either way: answer questions by running a script (via Bash),
+not by eyeballing rows.
 
 ## Is this season/category/stage done? — `coverage_manifest.csv`
 
@@ -61,6 +67,10 @@ import pandas as pd
 coverage = pd.read_csv("output/processed/rffm/coverage_manifest.csv")
 print(coverage[coverage["season"] == "2025-2026"])
 ```
+
+One row is different: `stage == "club_profiles"` uses `season="ALL"` (a
+synthetic key) since that stage is cross-season, not tied to any one
+season's crawl — see `DATA_DICTIONARY.md`'s `clubs_extended.csv` entry.
 
 ## Tables at a glance
 
@@ -89,6 +99,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 - `player_season_stats.csv` — site-reported season aggregates per player
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
 - `clubs.csv` (`club_id`, `enrich_clubs.py`) — one row per club: real RFFM club id, website, correspondence address (**not** a stadium address — see `DATA_DICTIONARY.md`)
+- `clubs_extended.csv` / `club_teams.csv` (`enrich_club_profiles.py`) — richer club profile + every team the club has ever fielded, from `/fichaclub/<club_id>`. Cross-season, **append-only snapshot log** (not one row per `club_id` — see `DATA_DICTIONARY.md` for the "get current state" recipe)
 
 ## How to answer a query
 
@@ -98,17 +109,26 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
    through `teams.csv`/`players.csv` to get canonical `team_id`/`player_id`
    values, *then* filter everything else by ID. Free-text columns carry the
    site's raw formatting (quotes, accents, case) and are unreliable keys.
-2. **Load only the CSVs the question needs** (table below).
-3. **Run one self-contained pandas script via Bash** — don't hand-inspect
-   CSV rows for anything beyond a first look.
+2. **Load only the tables the question needs** (table below).
+3. **Query `output/processed/rffm_parquet/` by default** — one self-contained
+   DuckDB SQL query (or `pd.read_parquet` if you'd rather stay in pandas)
+   via Bash, no season loop for most tables. Fall back to the CSVs under
+   `output/processed/rffm/<season>/` (pandas, `dtype=str`) only if you're
+   working inside `analysis_scripts/*.py` report-generator code that isn't
+   on the Parquet path yet, or need a column the Parquet copy drops (rare —
+   see `DATA_DICTIONARY.md`). Either way: don't hand-inspect rows for
+   anything beyond a first look.
 4. **Sanity-check the row count** before presenting. Zero rows for two
    clubs/players that plausibly interacted is a signal something upstream
    is wrong (name typo, wrong scope, ID resolved against the wrong club),
    not necessarily a true negative.
 
-**Question type → CSVs → join key:**
+**Question type → tables → join key:** (same table names in either copy —
+`teams`/`matches`/etc., not `teams.csv`; `match_lineups/*` means glob
+across categories for the CSVs, across seasons for the Parquet copy - see
+"Two copies of the data" in `DATA_DICTIONARY.md`)
 
-| Question | CSVs | Join |
+| Question | Tables | Join |
 |---|---|---|
 | Club vs. club results / head-to-head | `teams`, `matches` | `club_name_raw` → `team_id` list → `home_team_id`/`away_team_id` |
 | What teams/levels does a club field this season | `teams`, `team_group_membership`, `groups`, `competitions` | `team_id` → `group_id` → `competition_id` |
@@ -117,6 +137,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 | A team's fixture list | `matches` | `home_team_id`/`away_team_id` |
 | Where does a team/club play (address, map link) | `teams`, `matches`, `venues` | `club_name_raw` → `team_id` → `matches.venue_id` → `venues` |
 | A club's identity/website/correspondence address | `clubs` | `club_name_raw` (join to `teams` if starting from a `team_id`) — opt-in table, check `coverage_manifest.csv` first |
+| A club's full profile (address, socials, founding date) or every team it has ever fielded | `clubs_extended`, `club_teams` | `club_id` — cross-season, append-only (take the latest `scraped_at` per `club_id`), see `DATA_DICTIONARY.md` |
 | A player's appearances/goals/cards | `match_lineups/*`, `match_goals/*`, `match_cards/*`, `matches` | `player_id` → `match_id` → `matches` for date/context; glob all category files |
 | Did a player move teams/clubs | `match_lineups/*`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |
 | Match report detail (lineup, staff, ref) | `match_lineups/*`, `match_staff/*`, `match_officials/*` | `match_id` |

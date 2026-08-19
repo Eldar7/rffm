@@ -8,15 +8,53 @@ the data don't pay to load it. See `CLAUDE.md`'s "Scope" and "How to answer
 a query" for the season-partitioned paths and the query procedure/routing
 table this file assumes.
 
-## Why pandas, not SQL
+## Two copies of the data, two default tools
 
-Data lives as flat CSVs, not in a database — pandas reads one in a single
-line, nothing to provision. Pandas isn't "better than SQL" in general; if
-you'd genuinely rather write SQL, **DuckDB** can query these CSVs directly
-with zero setup (`duckdb.sql("SELECT * FROM 'output/processed/rffm/2025-2026/matches.csv'")`).
-But this repo has an established pandas convention (every recipe below is
-written in it) — default to pandas for consistency unless SQL is explicitly
-requested.
+- **`output/processed/rffm/<season>/*.csv`** — the source of truth, written
+  by the crawler. Every recipe below is written against these, in pandas
+  (`dtype=str`, then resolve/convert per column — see the quirks below).
+  This is what `analysis_scripts/*.py` (the original, non-`_v2` report
+  generators) read.
+- **`output/processed/rffm_parquet/`** — a compact (~20x smaller), lossless
+  derived copy, rebuilt from the CSVs above by
+  `analysis_scripts/build_parquet.py` (see that script's module docstring
+  for exactly which columns get dropped/renamed/retyped and why — the
+  short version: `source_url` dropped from analytical tables only,
+  `scraped_at` kept as a real timestamp, real int/float types instead of
+  `dtype=str`, `players` deduped to one row per `player_id` with
+  `players_by_season` alongside it for season-order-sensitive lookups, the
+  four `*crawl_log.csv`/`*_data_quality_report.csv` families merged into
+  two tables with a `log_family` column). **Default to this one** for any
+  new ad hoc question — query it with SQL via DuckDB, no pandas
+  boilerplate, no season loop for most tables:
+  ```sql
+  SELECT p.player_name, COUNT(*) AS goals
+  FROM 'output/processed/rffm_parquet/match_goals/*.parquet' g
+  JOIN 'output/processed/rffm_parquet/players.parquet' p USING (player_id)
+  GROUP BY p.player_name ORDER BY goals DESC LIMIT 10
+  ```
+  (`match_lineups`/`match_goals`/`match_cards`/`match_staff`/
+  `match_officials` are one Parquet file *per season*, not one combined
+  file — glob `*.parquet` across seasons like above, or point at one
+  season's file directly. Every other table is one file for all seasons.)
+
+  For the exact current columns/types of any table, ask DuckDB directly
+  rather than trusting a static list here (which *will* drift — this repo
+  has already been burned once by duplicate schema docs going stale, see
+  "Why one file" in `CLAUDE.md`):
+  ```sql
+  DESCRIBE SELECT * FROM 'output/processed/rffm_parquet/matches.parquet';
+  ```
+  The join keys, PKs, category taxonomy, and quirks documented below apply
+  identically to both copies — only the file format/column-drop details
+  above differ. `analysis_scripts/rffm_data.py` is a third way in, but it's
+  for report-generator code specifically (`analysis_scripts/*_v2.py`), not
+  ad hoc queries — see its own module docstring.
+
+  Pandas still works fine on the Parquet copy too
+  (`pd.read_parquet(...)`) if you'd rather stay in pandas than switch to
+  SQL — the "default to Parquet" recommendation above is about which data
+  copy to query, independent of pandas vs SQL.
 
 ## Core tables
 
@@ -248,18 +286,22 @@ re-crawl of enrichment data needed.
 - **`match_lineups/<category>.csv`** — per-match, per-player, one file per
   `scope_category` (e.g. `match_lineups/ALEVIN.csv`). FK `match_id` →
   `matches.csv`, FK `player_id` → `players.csv`. Columns: `match_id,
-  team_id, player_id, jersey_number, is_starter, is_substitute, is_captain,
-  is_goalkeeper, position_raw, position_abbr_raw, sex_raw`.
-  Dropped columns and how to recover them:
-  `player_name_raw` → join `players.csv` on `player_id`;
-  `source_url` → `f"https://www.rffm.es/acta-partido/{match_id}"`;
-  `scraped_at` → join `acta_crawl_log.csv` on `entity_id=match_id` where
-  `success=True`, take `timestamp`.
+  team_id, player_id, player_name_raw, jersey_number, is_starter,
+  is_substitute, is_captain, is_goalkeeper, position_raw,
+  position_abbr_raw, sex_raw`. `player_name_raw` is kept as-scraped (not
+  dropped, despite `players.csv` also carrying a name for the same
+  `player_id` via a join — cheap to keep, and useful for the ~3.6% of
+  card/goal `player_id`s that don't resolve in `players.csv`, see
+  `player_competition_participation`'s FK note and DATA_FINDINGS.md).
+  Dropped columns and how to recover them: `source_url` →
+  `f"https://www.rffm.es/acta-partido/{match_id}"`; `scraped_at` → join
+  `acta_crawl_log.csv` on `entity_id=match_id` where `success=True`, take
+  `timestamp`.
 - **`match_goals/<category>.csv`** — one row per goal event. `goal_type_raw`
   (site's `tipo_gol`, values `"100"/"101"/"102"` observed) is kept
   **opaque** — no confirmed decoding exists (unlike cards, below). Columns:
-  `match_id, team_id, player_id, minute, minute_raw, goal_type_raw`.
-  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+  `match_id, team_id, player_id, player_name_raw, minute, minute_raw,
+  goal_type_raw`. `source_url`, `scraped_at` dropped (see above).
 - **`match_cards/<category>.csv`** — one row per card. `card_type_raw` is
   the site's raw `codigo_tipo_amonestacion` code; `card_type_label` is a
   **derived, inferred** decoding — `"100"→"amarilla"`, `"101"→"roja"`,
@@ -267,9 +309,12 @@ re-crawl of enrichment data needed.
   wording, **not** English) — see "Card-type mapping" below for the
   inference basis. `minute == 999` is a known sentinel (card issued when
   not literally in play) — treat as anomalous, not a literal minute.
-  Columns: `match_id, team_id, player_id, minute, minute_raw,
-  card_type_raw, card_type_label, is_second_yellow`.
-  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+  Columns: `match_id, team_id, player_id, player_name_raw, minute,
+  minute_raw, card_type_raw, card_type_label, is_second_yellow`.
+  `source_url`, `scraped_at` dropped (see above). `player_id` includes
+  coaches carded from the bench (RFFM has no separate coach id space —
+  see DATA_FINDINGS.md); `fichajugador` enrichment fetches these ids too,
+  and `players.csv`'s `is_likely_coach` flags them.
 - **`match_staff/<category>.csv`** — coaches/delegates, always has a real
   `team_id`. `role_kind` is one of exactly `"head_coach"`,
   `"assistant_coach"`, `"team_delegate"`, `"other_staff"`. Columns:
@@ -284,7 +329,21 @@ re-crawl of enrichment data needed.
   `source_url`, `scraped_at` dropped (see above).
 - **`players.csv`** (`player_id` PK) — stable identity only:
   `player_id, player_name, birth_year` (birth year, **not** age, which goes
-  stale every year), `source_url, scraped_at`.
+  stale every year), `source_url, scraped_at`, `is_likely_coach`.
+  `is_likely_coach` is **derived, not scraped from this player's own
+  fichajugador page** — `rffm_scraper.player_pipeline._backfill_is_likely_coach()`
+  sets it after every fichajugador run by cross-referencing two independent
+  signals: (a) this `player_id` was ever logged as `match_staff.person_id`
+  with `role_kind` in `head_coach`/`assistant_coach`/`other_staff`, or (b)
+  `player_season_stats` shows the site's own "0 matches played but has
+  cards" pattern for this player — see DATA_FINDINGS.md's
+  `match_cards.player_id` entry for why that pattern means "coach, not
+  player" (RFFM has no separate coach id space). `None`/blank for any
+  `players.csv` row written before this backfill first ran. A `True` here
+  is a strong signal, not proof either way — a genuine player *could*
+  coincidentally show 0 matches in a data-gap season; check
+  `player_competition_participation`/`match_lineups` for that `player_id`
+  if it matters for a specific query.
 - **`player_season_stats.csv`** — site-reported season aggregates (matches
   played, goals, cards) — **all values come verbatim from the site**, none
   are locally computed, including `goals_per_match`. Useful to
@@ -318,6 +377,143 @@ re-crawl of enrichment data needed.
   club delegate, not public club data. Columns: `club_id, club_name_raw,
   portal_web, crest_url, correspondence_address, locality, province,
   postal_code, representative_team_id, source_url, scraped_at`.
+- **`clubs_extended.csv` / `club_teams.csv`** (`enrich_club_profiles.py`,
+  from `/fichaclub/<club_id>`) — the club's own richer site profile: takes
+  the real `club_id` (`codigo_club`) directly in the URL (not a `team_id` -
+  a `team_id` there returns `club: null`), and returns every team the club
+  has ever fielded, not just one representative team the way `clubs.csv`
+  does. Targets are every `club_id` already present across every season's
+  `clubs.csv` (cross-season - not one of these per season, unlike every
+  other table above; both files live at the processed root next to
+  `coverage_manifest.csv`, not inside a season directory). Not to be
+  confused with `analysis_scripts/club_profile.py`'s unrelated "Club
+  Profile" HTML report (donor/destination player-career flows) - same
+  English phrase, different feature entirely.
+
+  **Both tables are append-only snapshot logs, not one row per `club_id`
+  like every other table in this file.** A club's profile/roster is the
+  site's *current* state and genuinely drifts over time (new/deactivated
+  teams, name changes) - unlike match results or a player's per-season
+  stats, which are a fixed historical record once written. So a fetch never
+  overwrites a prior row; every successful `/fichaclub/` fetch (the initial
+  backfill, or a later deliberate `--force-refetch` refresh run) appends a
+  fresh snapshot stamped with that fetch's own `scraped_at`. `club_id` is
+  **not** unique in either file - get the current state with:
+
+  ```python
+  clubs_extended = pd.read_csv("output/processed/rffm/clubs_extended.csv", dtype=str)
+  current = clubs_extended.sort_values("scraped_at").groupby("club_id").tail(1)
+  ```
+
+  Full history (what changed, when) is just the file itself - nothing extra
+  to compute. `coverage_manifest.csv` records this stage as
+  `season="ALL", category_base="ALL", stage="club_profiles"` (a synthetic
+  key, same convention as `category_base="ALL"` elsewhere) since it isn't
+  tied to any one season.
+
+  `clubs_extended.csv` columns: `club_id, club_name, crest_url, delegacion,
+  comarca, cif, registered_address, registered_locality,
+  registered_province, registered_postal_code, correspondence_address,
+  correspondence_locality, correspondence_province,
+  correspondence_postal_code, correspondence_titular,
+  correspondence_tratamiento, correspondence_email, portal_web, twitter,
+  facebook, linkedin, instagram, telefonos, fax, fecha_fundacion,
+  presidente, source_url, scraped_at`. `registered_*` is the club's real
+  registered address (`domicilio` on the source page); `correspondence_*` is
+  a separate mailing address (`domicilio_correspondencia`) - the same two
+  distinct addresses `clubs.csv` already has under different names, plus
+  the registered one clubs.csv doesn't carry at all. **Deliberately
+  includes `telefonos`/`fax`/`correspondence_email`/`correspondence_titular`/
+  `presidente`** (a club officer's personal contact info) - unlike
+  `clubs.csv`, which excludes these on purpose; this table's inclusion is
+  an equally deliberate, explicit choice for this table, not an
+  inconsistency. `crest_url` is a relative path (e.g.
+  `/pnfg/pimg/Clubes/...`), same convention as `clubs.csv`'s `crest_url` -
+  prepend `https://www.rffm.es` to get a fetchable image URL.
+
+  `club_teams.csv` columns: `club_id, team_id, categoria, team_name_raw,
+  en_competicion, source_url, scraped_at`. One row per `(club_id, team)` per
+  snapshot. `team_id` is the *same id space* as `teams.csv`'s `team_id`
+  (confirmed by cross-reference - e.g. team_id `106`/`107`/`300231` under
+  club_id `1011` match ARAVACA C.F.'s team_ids in every season's
+  `teams.csv`), so it's directly joinable, though a given `team_id` here
+  won't necessarily appear in any one season's `teams.csv` (this table
+  covers the team's entire history at the club, not one season).
+  `en_competicion`: the site's own flag - `True` if the team is currently
+  registered in a live competition, `False` if it's a historical/inactive
+  team the club has fielded in the past.
+
+  **`club: null` is a valid, successful outcome**, not a fetch failure - a
+  stale/defunct `club_id` genuinely has no `/fichaclub/` profile on the
+  site (see `DATA_FINDINGS.md`'s "clubs_extended.csv - high null rate for
+  older-season club_ids", ~35% of all 1,054 target club_ids as of the
+  initial 2026-08 backfill, concentrated almost entirely in `club_id`s only
+  ever seen in 2016-2019 seasons' `clubs.csv` - 0.4% for 2025-2026 alone).
+  These club_ids simply have no row in `clubs_extended.csv`/`club_teams.csv`
+  at all; `club_profiles_data_quality_report.csv` records each one as an
+  `info`-severity `club_profile_not_found` row (not a warning) - see
+  `club_profiles_crawl_log.csv` to distinguish "confirmed null" (`success`
+  is `True`) from a genuine fetch failure (`club_profile_coverage_gap`,
+  `success` is `False`).
+
+### Where each club-data column comes from
+
+Two different tables can look like they overlap because they describe the
+same real-world clubs, but they read two different site pages, keyed by two
+different entity types - this table is the definitive column→source
+mapping so it's never a guessing game which one is authoritative for a
+given field. See `DATA_FINDINGS.md`'s "clubs.csv vs clubs_extended.csv" for
+the empirical agreement rate between the two (spoiler: high for
+`portal_web`/`crest_url`/postal code, lower for free-text address strings -
+formatting, not wrong data).
+
+**`clubs.csv`** — source page `/fichaequipo/<team_id>` (one representative
+team per club), JSON key `pageProps.team`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo_club` | |
+| `club_name_raw` | `nombre_club` | |
+| `portal_web` | `portal_web` | |
+| `crest_url` | `escudo_club` | relative path |
+| `correspondence_address` | `domicilio_correspondencia` | mailing address, not a stadium |
+| `locality` / `province` / `postal_code` | `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | |
+| `representative_team_id` | — | the `team_id` this row was fetched with, not a JSON field |
+| `telefonos` / `email_correspondencia` / `fax` | *(excluded)* | deliberately dropped — personal contact info |
+
+**`clubs_extended.csv`** — source page `/fichaclub/<club_id>` (the club
+itself, every team it has ever fielded), JSON key `pageProps.club`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo` | |
+| `club_name` | `nombre_club` | |
+| `crest_url` | `escudo` | relative path, same convention as `clubs.csv` |
+| `delegacion` / `comarca` | `delegacion` / `comarca` | RFFM's internal district grouping — no equivalent in `clubs.csv` |
+| `cif` | `CIF` | Spanish tax ID — no equivalent in `clubs.csv` |
+| `registered_address` / `registered_locality` / `registered_province` / `registered_postal_code` | `domicilio` / `localidad` / `provincia` / `codigo_postal` | the club's real registered address — **`clubs.csv` has no equivalent at all**, only the correspondence one below |
+| `correspondence_address` / `correspondence_locality` / `correspondence_province` / `correspondence_postal_code` | `domicilio_correspondencia` / `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | same concept as `clubs.csv`'s `correspondence_address`/`locality`/`province`/`postal_code`, independently fetched from a different page |
+| `correspondence_titular` / `correspondence_tratamiento` | `titular_correspondencia` / `tratamiento_correspondencia` | the named contact person for club mail — no equivalent in `clubs.csv` (excluded there as personal info) |
+| `correspondence_email` | `email_correspondencia` | excluded from `clubs.csv`; deliberately included here |
+| `portal_web` | `portal_web` | same concept as `clubs.csv`'s `portal_web` |
+| `twitter` / `facebook` / `linkedin` / `instagram` | same-named fields | no equivalent in `clubs.csv` |
+| `telefonos` / `fax` | `telefonos` / `fax` | excluded from `clubs.csv`; deliberately included here |
+| `fecha_fundacion` | `fecha_fundacion` | founding date — no equivalent in `clubs.csv` |
+| `presidente` | `presidente` | club president's name — no equivalent in `clubs.csv` |
+
+**`club_teams.csv`** — same source page/fetch as `clubs_extended.csv`
+(one page returns both), JSON key `pageProps.club.equipos_club[]`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | — | the `club_id` this page was fetched with, not a per-item JSON field |
+| `team_id` | `codigo_equipo` | same id space as `teams.csv`'s `team_id` |
+| `categoria` | `categoria` | |
+| `team_name_raw` | `nombre_equipo` | |
+| `en_competicion` | `en_competicion` | `"1"`/`"0"` mapped to `True`/`False` |
+
+No table in this project has ever listed every team a club has fielded
+before this one — there's no `clubs.csv` equivalent to compare against.
 
 ## Worked example — "give me all results between two clubs" (season 2025-2026)
 
@@ -445,11 +641,27 @@ purpose: the core files are fully rebuilt from scratch on every `main.py`
 run, so an appending enrichment stage on top of them would get silently
 wiped by the next unrelated core rerun. Want a unified view across all
 crawl logs? `pd.concat()` them at analysis time — don't merge the files on
-disk. (Each of these lives inside its season's directory alongside that
+disk. This constraint is specifically about the live CSVs during crawling
+(resumability - see below); `output/processed/rffm_parquet/crawl_log.parquet`
+and `.../data_quality_report.parquet` DO merge all four families into one
+file each, with a `log_family` column ("core"/"acta"/"fichajugador"/
+"clubs") — read-only derived copies aren't subject to the same constraint,
+this is just the `pd.concat()`-at-analysis-time the paragraph above
+suggests, done once at build time instead of per query.
+(Each of these lives inside its season's directory alongside that
 season's other tables — `crawl_log.csv` is per-season too, not global.) Note
 `venues.csv`'s own fetches (`/campo/<id>`) log into core's `crawl_log.csv`,
 not a fourth family — that stage isn't robots.txt-gated, so it runs inside
 `main.py` itself rather than as a separate enrichment entrypoint.
+
+`club_profiles_crawl_log.csv`/`club_profiles_data_quality_report.csv` is a
+fifth family, with two differences from the three above: it lives at the
+processed root (`output/processed/rffm/`), not inside any season's
+directory, since the stage itself is cross-season (see `clubs_extended.csv`
+above); and unlike the others, a `success=True` row here does not imply a
+row was written to the primary output table — `club: null` is a valid
+successful outcome with no `clubs_extended.csv`/`club_teams.csv` row at all
+(see above).
 
 Unlike core's `crawl_log.csv` (rebuilt from scratch every run), the three
 enrichment crawl logs grow incrementally across a season's crawl and also

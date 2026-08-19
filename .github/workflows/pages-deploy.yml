@@ -2,8 +2,12 @@ name: Deploy RFFM site to GitHub Pages
 
 # Rebuilds the static GitHub Pages site from the CSVs already committed
 # under output/processed/rffm/ (analysis_scripts/build_site.py) and
-# publishes it. Never scrapes rffm.es and never writes back to the repo -
-# entirely separate from rffm-crawl.yml/crawl-all.yml. configure-pages'
+# publishes it. Also rebuilds site/data/parquet/ (analysis_scripts/
+# build_parquet.py) — compact Parquet tables for the planned duckdb-wasm
+# frontend; not consumed by any report yet, but ships alongside the JSON
+# so it's ready when that lands. Never scrapes rffm.es and never writes
+# back to the repo - entirely separate from rffm-crawl.yml/crawl-all.yml.
+# configure-pages'
 # enablement:true asks it to switch Pages to "Source: GitHub Actions"
 # itself on first run; if the token lacks permission for that, it still
 # needs doing once by hand in repo Settings > Pages.
@@ -41,6 +45,9 @@ jobs:
 
       - name: Build site
         run: python analysis_scripts/build_site.py --output-dir site
+
+      - name: Build Parquet tables
+        run: python analysis_scripts/build_parquet.py --output-dir site/data/parquet
 
       - uses: actions/configure-pages@v5
         with:

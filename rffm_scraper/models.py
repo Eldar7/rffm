@@ -69,6 +69,56 @@ class Club(Row):
     scraped_at: str
 
 
+class ClubProfile(Row):
+    """One row per successful /fichaclub/<club_id> fetch - clubs_extended.csv
+    is append-only (a new snapshot on every fetch, including refresh runs),
+    not one row per club_id like clubs.csv. See club_profile_pipeline.py."""
+
+    club_id: str
+    club_name: Optional[str]
+    crest_url: Optional[str]
+    delegacion: Optional[str]
+    comarca: Optional[str]
+    cif: Optional[str]
+    registered_address: Optional[str]
+    registered_locality: Optional[str]
+    registered_province: Optional[str]
+    registered_postal_code: Optional[str]
+    correspondence_address: Optional[str]
+    correspondence_locality: Optional[str]
+    correspondence_province: Optional[str]
+    correspondence_postal_code: Optional[str]
+    correspondence_titular: Optional[str]
+    correspondence_tratamiento: Optional[str]
+    correspondence_email: Optional[str]
+    portal_web: Optional[str]
+    twitter: Optional[str]
+    facebook: Optional[str]
+    linkedin: Optional[str]
+    instagram: Optional[str]
+    telefonos: Optional[str]
+    fax: Optional[str]
+    fecha_fundacion: Optional[str]
+    presidente: Optional[str]
+    source_url: str
+    scraped_at: str
+
+
+class ClubTeamRosterEntry(Row):
+    """One row per (club_id, team) per successful /fichaclub/ fetch -
+    club_teams.csv is append-only, same snapshot semantics as ClubProfile
+    above. team_id is the same id space as teams.csv's team_id (confirmed by
+    cross-reference)."""
+
+    club_id: str
+    team_id: str
+    categoria: Optional[str]
+    team_name_raw: Optional[str]
+    en_competicion: Optional[bool]
+    source_url: str
+    scraped_at: str
+
+
 class TeamGroupMembership(Row):
     season: str
     season_id: str
@@ -235,6 +285,12 @@ class Player(Row):
     birth_year: Optional[int]
     source_url: str
     scraped_at: str
+    # Derived, not scraped from this player's own fichajugador fetch - filled
+    # in by player_pipeline._backfill_is_likely_coach() after the run, by
+    # cross-referencing match_staff/player_season_stats (needs data outside
+    # this one fetch, so it can't be set at parse time the way
+    # card_type_label is). None until that backfill has run at least once.
+    is_likely_coach: Optional[bool] = None
 
 
 class PlayerSeasonStats(Row):

@@ -1,5 +1,5 @@
 name: RFFM crawl
-run-name: "${{ inputs.stage }} ${{ inputs.season_label }} / ${{ inputs.stage == 'core' && (inputs.all_categories && 'ALL' || 'priority') || inputs.scope_category }}"
+run-name: "${{ inputs.stage }} ${{ inputs.stage == 'club_profiles' && 'cross-season' || inputs.season_label }} / ${{ inputs.stage == 'core' && (inputs.all_categories && 'ALL' || 'priority') || (inputs.stage == 'clubs' || inputs.stage == 'club_profiles') && 'ALL' || inputs.scope_category }}"
 
 # Manually-dispatched crawl job for any stage. Deliberately dispatch-only for
 # now (no `schedule:` trigger yet) - add a cron once this has been watched
@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
     inputs:
       season_label:
-        description: "Season to crawl, e.g. 2025-2026 (must already exist in /api/seasons on the site)"
+        description: "Season to crawl, e.g. 2025-2026 (must already exist in /api/seasons on the site). Ignored for stage=club_profiles, which is cross-season - any value works."
         required: true
         default: "2025-2026"
       stage:
@@ -35,9 +35,10 @@ on:
           - acta_partido
           - fichajugador
           - clubs
+          - club_profiles
         default: core
       scope_category:
-        description: "Category scope for acta_partido/fichajugador (ignored for core and clubs, which each cover every configured category in one pass)"
+        description: "Category scope for acta_partido/fichajugador (ignored for core, clubs, and club_profiles, which each cover every configured category/season in one pass)"
         required: false
         default: "PREBENJAMIN"
       all_categories:
@@ -76,8 +77,13 @@ permissions:
 
 concurrency:
   # One crawl at a time per (season, stage) - prevents two dispatches from
-  # racing to flush batches into the same season directory.
-  group: rffm-crawl-${{ github.event.inputs.season_label }}-${{ github.event.inputs.stage }}
+  # racing to flush batches into the same season directory. club_profiles is
+  # cross-season (writes to output/processed/rffm/ directly, not any one
+  # season's directory - see club_profile_pipeline.py), so it's pinned to a
+  # fixed "ALL" key regardless of season_label - two dispatches with
+  # different season_label values would otherwise land in different
+  # concurrency groups and race on the same clubs_extended.csv/club_teams.csv.
+  group: rffm-crawl-${{ inputs.stage == 'club_profiles' && 'ALL' || inputs.season_label }}-${{ inputs.stage }}
   cancel-in-progress: false
 
 jobs:
@@ -194,6 +200,23 @@ jobs:
           fi
           python3 enrich_clubs.py --log-level INFO $extra
 
+      - name: Run club-profiles enrichment
+        # Cross-season (see club_profile_pipeline.py) - season_label is
+        # ignored, not passed through. Default (no extra flags) is a
+        # resumable backfill; a deliberate refresh run (re-snapshot every
+        # club_id) is a manual --force-refetch dispatch, not exposed as a
+        # workflow input on purpose - it's meant to be an infrequent,
+        # deliberate action, not a routine dispatch choice.
+        if: inputs.stage == 'club_profiles'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
+        run: |
+          extra=""
+          if [ "${{ inputs.workers }}" != "0" ] && [ -n "${{ inputs.workers }}" ]; then
+            extra="--workers ${{ inputs.workers }}"
+          fi
+          python3 enrich_club_profiles.py --log-level INFO $extra
+
       - name: Commit and push to run branch
         # Runs even on failure/cancel so whatever was collected gets pushed.
         # Merge into main is a separate job below so a cancel of THIS job
@@ -209,7 +232,7 @@ jobs:
           # kill the crawler process instantly, so make sure nothing is
           # still writing to output/processed/*.csv before the git snapshot
           # below.
-          pkill -9 -f "enrich_acta.py|enrich_players.py|main.py" 2>/dev/null || true
+          pkill -9 -f "enrich_acta.py|enrich_players.py|enrich_clubs.py|enrich_club_profiles.py|main.py" 2>/dev/null || true
           sleep 2
 
           # The real, confirmed cause of "cannot rebase: You have unstaged
@@ -227,15 +250,19 @@ jobs:
           git checkout -- config.yaml
 
           scope_desc="${{ inputs.scope_category }}"
-          if [ "${{ inputs.stage }}" = "core" ] || [ "${{ inputs.stage }}" = "clubs" ]; then
+          if [ "${{ inputs.stage }}" = "core" ] || [ "${{ inputs.stage }}" = "clubs" ] || [ "${{ inputs.stage }}" = "club_profiles" ]; then
             scope_desc="ALL"
+          fi
+          season_desc="${{ inputs.season_label }}"
+          if [ "${{ inputs.stage }}" = "club_profiles" ]; then
+            season_desc="cross-season"
           fi
 
           git add output/processed
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${{ inputs.season_label }} scope=${scope_desc} (final)"
+            git commit -m "rffm-crawl: ${{ inputs.stage }} season=${season_desc} scope=${scope_desc} (final)"
           fi
 
           for attempt in 1 2 3 4 5; do
