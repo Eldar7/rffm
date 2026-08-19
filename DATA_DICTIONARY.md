@@ -397,6 +397,65 @@ re-crawl of enrichment data needed.
   is `True`) from a genuine fetch failure (`club_profile_coverage_gap`,
   `success` is `False`).
 
+### Where each club-data column comes from
+
+Two different tables can look like they overlap because they describe the
+same real-world clubs, but they read two different site pages, keyed by two
+different entity types - this table is the definitive column→source
+mapping so it's never a guessing game which one is authoritative for a
+given field. See `DATA_FINDINGS.md`'s "clubs.csv vs clubs_extended.csv" for
+the empirical agreement rate between the two (spoiler: high for
+`portal_web`/`crest_url`/postal code, lower for free-text address strings -
+formatting, not wrong data).
+
+**`clubs.csv`** — source page `/fichaequipo/<team_id>` (one representative
+team per club), JSON key `pageProps.team`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo_club` | |
+| `club_name_raw` | `nombre_club` | |
+| `portal_web` | `portal_web` | |
+| `crest_url` | `escudo_club` | relative path |
+| `correspondence_address` | `domicilio_correspondencia` | mailing address, not a stadium |
+| `locality` / `province` / `postal_code` | `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | |
+| `representative_team_id` | — | the `team_id` this row was fetched with, not a JSON field |
+| `telefonos` / `email_correspondencia` / `fax` | *(excluded)* | deliberately dropped — personal contact info |
+
+**`clubs_extended.csv`** — source page `/fichaclub/<club_id>` (the club
+itself, every team it has ever fielded), JSON key `pageProps.club`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo` | |
+| `club_name` | `nombre_club` | |
+| `crest_url` | `escudo` | relative path, same convention as `clubs.csv` |
+| `delegacion` / `comarca` | `delegacion` / `comarca` | RFFM's internal district grouping — no equivalent in `clubs.csv` |
+| `cif` | `CIF` | Spanish tax ID — no equivalent in `clubs.csv` |
+| `registered_address` / `registered_locality` / `registered_province` / `registered_postal_code` | `domicilio` / `localidad` / `provincia` / `codigo_postal` | the club's real registered address — **`clubs.csv` has no equivalent at all**, only the correspondence one below |
+| `correspondence_address` / `correspondence_locality` / `correspondence_province` / `correspondence_postal_code` | `domicilio_correspondencia` / `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | same concept as `clubs.csv`'s `correspondence_address`/`locality`/`province`/`postal_code`, independently fetched from a different page |
+| `correspondence_titular` / `correspondence_tratamiento` | `titular_correspondencia` / `tratamiento_correspondencia` | the named contact person for club mail — no equivalent in `clubs.csv` (excluded there as personal info) |
+| `correspondence_email` | `email_correspondencia` | excluded from `clubs.csv`; deliberately included here |
+| `portal_web` | `portal_web` | same concept as `clubs.csv`'s `portal_web` |
+| `twitter` / `facebook` / `linkedin` / `instagram` | same-named fields | no equivalent in `clubs.csv` |
+| `telefonos` / `fax` | `telefonos` / `fax` | excluded from `clubs.csv`; deliberately included here |
+| `fecha_fundacion` | `fecha_fundacion` | founding date — no equivalent in `clubs.csv` |
+| `presidente` | `presidente` | club president's name — no equivalent in `clubs.csv` |
+
+**`club_teams.csv`** — same source page/fetch as `clubs_extended.csv`
+(one page returns both), JSON key `pageProps.club.equipos_club[]`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | — | the `club_id` this page was fetched with, not a per-item JSON field |
+| `team_id` | `codigo_equipo` | same id space as `teams.csv`'s `team_id` |
+| `categoria` | `categoria` | |
+| `team_name_raw` | `nombre_equipo` | |
+| `en_competicion` | `en_competicion` | `"1"`/`"0"` mapped to `True`/`False` |
+
+No table in this project has ever listed every team a club has fielded
+before this one — there's no `clubs.csv` equivalent to compare against.
+
 ## Worked example — "give me all results between two clubs" (season 2025-2026)
 
 ```python

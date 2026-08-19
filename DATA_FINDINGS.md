@@ -105,3 +105,46 @@ decade, not a crawl defect. Expected; don't re-investigate as a bug. See
 (severity `info`, not `warning`) for the full list.
 
 ---
+
+## clubs.csv vs clubs_extended.csv — where they agree, where they don't, and why
+
+**Symptom:** for the ~671 clubs present in both 2025-2026's `clubs.csv`
+(`enrich_clubs.py`, from `/fichaequipo/<team_id>`) and the new
+`clubs_extended.csv` (`enrich_club_profiles.py`, from
+`/fichaclub/<club_id>`), several columns that *sound* like the same field
+don't always match exactly. This looks like it could be a bug in one of the
+two pipelines. It isn't — see `DATA_DICTIONARY.md`'s "Where each column
+comes from" for the full field-by-field source mapping; this entry records
+the empirical comparison that motivated writing it.
+
+**Measured agreement** (2025-2026 `clubs.csv` vs `clubs_extended.csv`,
+2026-08 backfill, 671 clubs present in both):
+
+| Field pair | Match rate | Why the gap |
+|---|---|---|
+| `portal_web` (old) vs `portal_web` (new) | 670/671 (99.9%) | Noise-level; effectively the same value. |
+| `crest_url` (old) vs `crest_url` (new) | 659/671 (98%) | Noise-level. |
+| `postal_code` (old) vs `correspondence_postal_code` (new) | 668/671 (99.6%) after stripping `postal_code`'s known trailing-`.0` pandas artifact (same quirk `matches.csv`'s `home_score`/`away_score` have — see `DATA_DICTIONARY.md`) — only 5/671 (!) before that correction, which looks alarming until you realize it's a formatting artifact in the older file, not a data disagreement. |
+| `correspondence_address` (old) vs `correspondence_address` (new) | ~355/671 (53%) as an exact string match | **Not** 47% wrong data — most "mismatches" are the same physical address written differently by the two source pages (`"Pº"` vs `"PASEO"`, `"Av."` vs `"Avenida"`, punctuation/capitalization). A small number are genuine content differences (see below). |
+
+**Why the gap exists at all:** the two tables are sourced from two
+different pages about two different things — `clubs.csv` reads a
+per-*team* page (`/fichaequipo/<team_id>`, one representative team sampled
+per club) captured on 2026-08-03; `clubs_extended.csv` reads the club's own
+profile page (`/fichaclub/<club_id>`) captured on 2026-08-19. Sixteen days
+apart, and from a page keyed by a different entity, so some drift/
+formatting difference between "the same" field is expected, not a defect
+in either pipeline.
+
+**Genuine content differences found** (not formatting, not the pandas
+artifact) — a handful of clubs where the address *and* postal code both
+differ, e.g. `club_id` `30435` (MEXICO F.C. S.A.D.): `clubs.csv` has "Avda.
+Juan Pablo II, 30 - 2º A" / `28860`; `clubs_extended.csv` has "Calle
+Bulgaria 4, San Blas - Canillegas" / `28022`. Reads as the club having
+genuinely moved/updated its address between the two data sources — not a
+bug in either fetch. If you need a club's current address, prefer
+`clubs_extended.csv` (sourced from the club's own profile rather than one
+sampled team, and easy to re-freshen via `--force-refetch` — see
+`OPERATIONS.md`).
+
+---
