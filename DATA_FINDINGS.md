@@ -167,6 +167,23 @@ worked example of the site's shared player/coach id space rather than
 deleted, since the diagnosis itself remains true and useful context for
 why `is_likely_coach` exists.
 
+**Confirmed working, mid-rollout:** the fichajugador re-crawl using the
+widened target list has so far been re-run for 2017-2018..2020-2021.
+Checking `match_cards.player_id` orphans *by season* after that partial
+re-run: **2018-2019, 2019-2020, 2020-2021 are at 0 orphans; 2017-2018 is
+down to 1.** The remaining 19,173 distinct orphan `player_id`s
+(`validate_parquet.py`'s current total) are now **entirely concentrated in
+the seasons not yet re-crawled** (2021-2022 through 2025-2026, 3,375 to
+7,084 distinct orphan players per season, growing with season recency).
+Note this total isn't directly comparable to the 11,045/25,170 figures
+seen earlier in this project's history - those were taken at different
+points as `match_cards` itself grew (more categories/seasons fetched over
+time) - so don't read the change in the topline number as the fix making
+things worse; the per-season breakdown above is the reliable signal.
+Expect the total to drop close to 0 once the remaining seasons are
+re-crawled the same way - re-run `validate_parquet.py` after that finishes
+rather than trusting any single total here as final.
+
 **`match_cards`/`match_lineups`/`match_goals`'s `player_name_raw` is NOT
 dropped** (correcting a stale claim that circulated in this project's
 planning notes): checked directly - the column is present, and 99.08%
@@ -232,6 +249,18 @@ re-running `validate_parquet.py` after any future discovery-scheduling
 change to see if the count drops. Not wired into `parquet-build.yml` as a
 hard gate for the same reason as before (same posture
 DATA_QUALITY_REPORT's `severity=warning` checks already take).
+
+**Numbers drift as new seasons are added, still the same phenomenon:**
+after the 2016-2017 season and 2017-2018..2020-2021's fichajugador re-crawl
+(see the `match_cards.player_id` entry above) landed, the counts moved to
+832/1006/129 team_id/group_id/competition_id orphans - consistent growth
+from more seasons existing, not a new problem. Also found one single-row
+sibling of this exact pattern: `scorers.team_id -> teams` now has 1
+violation (`team_id=13538231`, 2021-2022) - same "team/competition/group
+the core crawl never discovered that season" story, just surfaced through
+`scorers.csv` instead of `player_competition_participation.csv`. Not
+investigated further individually; same "accepted, re-check after a
+discovery-scheduling change" posture as above.
 
 ---
 
