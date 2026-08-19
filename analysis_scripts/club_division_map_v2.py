@@ -11,8 +11,15 @@ division tier, game type), cell = team count + best position reached that
 season. Filterable client-side by season / age category / division / game
 type; click a club to open a detail panel with its real home venues (exact
 lat/lon from venues.csv, not a single collapsed guess), its crest/website/
-correspondence address (clubs.csv, where crawled), and every team/division
-entry for that club.
+correspondence address (clubs.csv, where crawled), every team/division entry
+for that club THIS season, and (new) a "Составы клуба по сезонам" grid —
+every squad the club has ever fielded (rows) x every season it has core
+data for (columns), cell = division reached + final standing that season —
+the club-level companion to team_card.html's per-team "Карта участия" tab.
+Fed by the same data/team_participation/<slug>.json file
+team_participation_map_v2.py builds and that tab reads (loadClubPyramidHistory()),
+not by this page's own per-season club_map_<season>.json — that file only
+ever carries one season at a time, this grid needs every season at once.
 
 Each season's matrix is written as its own JSON file under
 <output-dir>/data/club_map_<season>.json and fetched client-side when the
@@ -568,6 +575,23 @@ footer.note code{ font-family: ui-monospace, monospace; font-size:0.86em; backgr
   font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;
   background:var(--pos-red-soft); color:var(--pos-red); }
 
+.pyr-wrap{overflow-x:auto;}
+.pyr-grid{border-collapse:separate; border-spacing:0; font-size:0.78rem; white-space:nowrap;}
+.pyr-grid th, .pyr-grid td{padding:0.3rem 0.4rem; text-align:center; vertical-align:middle;}
+.pyr-grid thead th{ position:sticky; top:0; background:var(--surface); font-family:'JetBrains Mono',monospace;
+  font-size:0.68rem; font-weight:700; color:var(--ink-soft); z-index:2; border-bottom:1px solid var(--line-strong); }
+.pyr-grid th.pyr-team-head{ position:sticky; left:0; z-index:3; background:var(--surface); text-align:left; min-width:11rem; }
+.pyr-grid td.pyr-team-cell{ position:sticky; left:0; z-index:1; background:var(--surface); text-align:left;
+  border-right:1px solid var(--line-strong); font-weight:600; }
+.pyr-grid tbody tr:hover td{background:var(--accent-soft);}
+.pyr-grid tbody tr:hover td.pyr-team-cell{background:var(--accent-soft);}
+.pyr-cat-row td{ background:var(--bg); font-family:'JetBrains Mono',monospace; font-size:0.68rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); text-align:left; padding-top:0.5rem; }
+.pyr-cell-badge{ display:inline-flex; flex-direction:column; align-items:center; gap:0.05rem;
+  padding:0.15rem 0.4rem; border-radius:6px; min-width:2.6rem; font-size:0.68rem; font-weight:700; line-height:1.2; }
+.pyr-cell-pos{font-weight:400; opacity:0.8; font-size:0.64rem;}
+.pyr-cell-empty{color:var(--ink-faint); opacity:0.35;}
+
 /* ---------- position badges: gold=1st, then 4 flat, non-gradient bands by proximity to top/bottom ---------- */
 .pos-badge{ display:inline-flex; align-items:baseline; gap:0.15rem; padding:0.1rem 0.45rem; border-radius:999px;
   font-family:ui-monospace,monospace; font-size:0.76rem; font-weight:700; white-space:nowrap; }
@@ -677,6 +701,7 @@ const SEASONS = %SEASONS_JSON%;
 const DEFAULT_CATS = %DEFAULT_CATS_JSON%;
 const CAT_ORDER = %CAT_ORDER_JSON%;
 const DIV_ORDER_JS = %DIV_ORDER_JSON%;
+const DIV_CODE_JS = %DIV_CODE_JSON%;
 const CAT_LABEL_RU = %CAT_LABEL_RU_JSON%;
 const CAT_LABEL_ES = %CAT_LABEL_ES_JSON%;
 const DIV_LABEL_RU = %DIV_LABEL_RU_JSON%;
@@ -1121,6 +1146,7 @@ function openClubModal(club, opts) {
 
   const venuesTitle = L === 'ru' ? 'Реальные площадки (из БД)' : 'Sedes reales (de la BD)';
   const teamsTitle = L === 'ru' ? 'Команды и дивизионы' : 'Equipos y divisiones';
+  const pyramidTitle = L === 'ru' ? 'Составы клуба по сезонам' : 'Plantillas del club por temporada';
   const allCompsTitle = L === 'ru' ? 'Все соревнования клуба' : 'Todas las competiciones del club';
   const allCompsBody = allCompsHtml(club) ||
     `<div class="modal-note">${L === 'ru' ? 'Нет данных о матчах.' : 'Sin datos de partidos.'}</div>`;
@@ -1131,14 +1157,105 @@ function openClubModal(club, opts) {
     ${addrHtml}
     <div class="modal-section"><h3>${venuesTitle}</h3>${venuesHtml}</div>
     <div class="modal-section"><h3>${teamsTitle}</h3>${teamsHtml}</div>
+    <div class="modal-section"><h3>${pyramidTitle}</h3><div id="modalPyramid">${L === 'ru' ? 'Загрузка…' : 'Cargando…'}</div></div>
     <div class="modal-section"><h3>${allCompsTitle}</h3>${allCompsBody}</div>
   `;
   document.getElementById('modalBackdrop').classList.remove('hidden');
   OPEN_CLUB_SLUG = club.slug;
+  loadClubPyramidHistory(club.slug);
   if (!opts.fromRestore) {
     MODAL_PUSHED_BY_US = true;
     syncUrl(true);
   }
+}
+
+// "Составы клуба по сезонам" — every squad this club has ever fielded
+// (team_id, a stable slot per DATA_DICTIONARY.md/team_participation_map_v2.py's
+// docstring — see there for why it's the *division* that moves season to
+// season, not the id itself), one row per squad, one column per season it
+// has core data for, cell = category/division reached + final standing.
+// Separate fetch from the rest of the modal (which is this SEASON's data
+// only, from club_map_<season>.json) since this spans every season at once
+// — data/team_participation/<slug>.json, the same file team_card.html's
+// "Карта участия" tab reads. Cached per slug so re-opening the same club
+// modal doesn't re-fetch.
+const PYRAMID_CACHE = {};
+async function loadClubPyramidHistory(slug) {
+  if (!(slug in PYRAMID_CACHE)) {
+    PYRAMID_CACHE[slug] = fetch(`data/team_participation/${slug}.json`)
+      .then(r => r.ok ? r.json() : null).catch(() => null);
+  }
+  const payload = await PYRAMID_CACHE[slug];
+  // The modal may have been closed/reopened on a different club while this
+  // fetch was in flight — only render if it's still the one being shown.
+  if (OPEN_CLUB_SLUG !== slug) return;
+  const el = document.getElementById('modalPyramid');
+  if (!el) return;
+  el.innerHTML = renderPyramidHistory(payload);
+}
+
+function pyrDivCode(div) { return DIV_CODE_JS[div] || (div || '').slice(0, 4).toUpperCase(); }
+
+function renderPyramidHistory(payload) {
+  const L = CURLANG;
+  const teams = payload && payload.teams ? payload.teams : {};
+  const tids = Object.keys(teams);
+  if (!tids.length) {
+    return `<div class="modal-note">${L === 'ru' ? 'Нет данных по сезонам.' : 'Sin datos por temporada.'}</div>`;
+  }
+  const allSeasons = new Set();
+  tids.forEach(tid => teams[tid].stints.forEach(s => allSeasons.add(s.season)));
+  const seasonList = [...allSeasons].sort();
+  const firstY = parseInt(seasonList[0].slice(0, 4), 10), lastY = parseInt(seasonList[seasonList.length - 1].slice(0, 4), 10);
+  const seasons = [];
+  for (let y = firstY; y <= lastY; y++) seasons.push(`${y}-${y + 1}`);
+
+  // Rows grouped by the squad's most RECENT category (a squad essentially
+  // never changes category — see team_participation_map_v2.py's docstring —
+  // so "most recent" and "only" coincide in the overwhelming common case),
+  // then by squad_suffix (A, B, C...) within it, matching the "Команды и
+  // дивизионы" section above.
+  const rowMeta = tids.map(tid => {
+    const t = teams[tid];
+    const latest = t.stints.reduce((a, b) => (b.season > a.season ? b : a), t.stints[0]);
+    return { tid, team: t.team, suffix: t.suffix || '', cat: latest.cat || 'OTHER', byseason: {} };
+  });
+  rowMeta.forEach(row => {
+    teams[row.tid].stints.forEach(s => {
+      (row.byseason || (row.byseason = {}))[s.season] = (row.byseason[s.season] || []).concat([s]);
+    });
+  });
+  const catRank = c => { const i = CAT_ORDER.indexOf(c); return i === -1 ? 999 : i; };
+  rowMeta.sort((a, b) => catRank(a.cat) - catRank(b.cat) || a.suffix.localeCompare(b.suffix) || a.team.localeCompare(b.team));
+
+  const head = `<thead><tr><th class="pyr-team-head">${L === 'ru' ? 'Состав' : 'Plantilla'}</th>` +
+    seasons.map(s => `<th>${s}</th>`).join('') + `</tr></thead>`;
+
+  let prevCat = null, body = '';
+  rowMeta.forEach(row => {
+    if (row.cat !== prevCat) {
+      body += `<tr class="pyr-cat-row"><td colspan="${seasons.length + 1}">${esc(catLabel(row.cat))}</td></tr>`;
+      prevCat = row.cat;
+    }
+    const cells = seasons.map(season => {
+      const stints = (row.byseason || {})[season];
+      if (!stints || !stints.length) return `<td class="pyr-cell-empty">—</td>`;
+      const cellsHtml = stints.map(s => {
+        const cls = tierClass(s.tier);
+        const pos = (s.standing && s.standing.pos)
+          ? `<span class="pyr-cell-pos">${esc(s.standing.pos)}${s.standing.size ? '/' + esc(s.standing.size) : ''}</span>` : '';
+        const href = `team_card.html?season=${encodeURIComponent(season)}&club=${encodeURIComponent(OPEN_CLUB_SLUG)}&team=${encodeURIComponent(row.tid)}&tab=pmap`;
+        return `<a class="pyr-cell-badge ${cls}" href="${href}" title="${esc(s.comp || '')}">${esc(pyrDivCode(s.div))}${pos}</a>`;
+      }).join(' ');
+      return `<td>${cellsHtml}</td>`;
+    }).join('');
+    body += `<tr><td class="pyr-team-cell">${teamCardLink(row.tid, esc(row.team), OPEN_CLUB_SLUG)}${row.suffix ? '' : ''}</td>${cells}</tr>`;
+  });
+
+  const note = L === 'ru'
+    ? 'Клетка — итоговый дивизион и место в группе за сезон (клик открывает карту участия этой команды). Прочерк — состав не выступал в этом сезоне.'
+    : 'Cada celda es la división y puesto final de esa temporada (clic abre el mapa de participación de ese equipo). El guion significa que la plantilla no compitió esa temporada.';
+  return `<div class="pyr-wrap"><table class="pyr-grid">${head}<tbody>${body}</tbody></table></div><p class="modal-note" style="margin-top:0.5rem;">${note}</p>`;
 }
 function closeModal() {
   document.getElementById('modalBackdrop').classList.add('hidden');
@@ -1312,6 +1429,7 @@ def build_html(seasons: list[str]) -> str:
             .replace("%CAT_LABEL_ES_JSON%", json.dumps(CAT_LABEL_ES, ensure_ascii=False))
             .replace("%DIV_LABEL_RU_JSON%", json.dumps(DIV_LABEL_RU, ensure_ascii=False))
             .replace("%DIV_LABEL_ES_JSON%", json.dumps(DIV_LABEL_ES, ensure_ascii=False))
+            .replace("%DIV_CODE_JSON%", json.dumps(DIV_CODE))
             .replace("%I18N_ES_JSON%", json.dumps(i18n_es, ensure_ascii=False)))
 
 

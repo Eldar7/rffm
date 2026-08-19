@@ -99,15 +99,34 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     """Match pd.read_csv(..., dtype=str): every value is either a Python
     str or real NaN - never "5373769.0"/"<NA>" as literal text.
 
-    Deliberately vectorized `.astype(str)` per column, not `.apply(lambda
-    v: str(v))`: apply() on a nullable Int16/Int32 column that contains any
-    NA silently upcasts through numpy float64 for its internal fast path
-    once the column is large enough (confirmed on this dataset - a 3-row
-    slice stayed int, the real ~578k-row column did not), turning e.g.
-    sex_raw's "0" into "0.0". astype(str) does not do this and correctly
-    preserves real NaN (not the literal text "nan"/"<NA>") for missing
-    values - verified against this dataset's actual null columns."""
-    out = {col: df[col].astype(str) for col in df.columns}
+    A plain vectorized `.astype(str)` per column (this function's original
+    form) looks right printed - `print()` renders a real missing pd.NA and
+    the literal 4-character string "<NA>" identically - but they are not
+    the same thing: `Series([1, 2, None], dtype="Int32").astype(str)` turns
+    the missing slot into the *literal string* "<NA>", which
+    clean()/norm_id()'s `pd.isna(v)` check (every report generator's
+    null-guard, including this file's own callers) does not catch, since
+    isna("<NA>") is False. Confirmed on real data: matches.parquet's
+    home_team_id has 12,383 genuine nulls (bye-match placeholder) at the
+    raw Parquet level, and read_table("matches", ...) silently reported
+    ZERO before this fix - every one had turned into the text "<NA>" and
+    was passing every "is this missing" check as if it were a real team id.
+    `.apply(lambda v: str(v))` doesn't fix this either and reintroduces the
+    OTHER bug this function was written to dodge: on a nullable Int16/Int32
+    column, apply()'s internal fast path silently upcasts through numpy
+    float64 once the column is large enough (confirmed on this dataset - a
+    3-row slice stayed int, the real ~578k-row column did not), turning
+    e.g. sex_raw's "0" into "0.0".
+
+    The actual fix: go through `.astype(object)` first (a real Python
+    int/bool/str per cell, real None for any missing slot - no upcast,
+    since object dtype has no numeric fast path to trigger it), THEN
+    stringify only the non-None cells. Gets both properties at once."""
+    out = {}
+    for col in df.columns:
+        s = df[col]
+        obj = s.astype(object).where(s.notna(), None)
+        out[col] = obj.map(lambda v: v if v is None else str(v))
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
 

@@ -18,6 +18,22 @@ fichaequipo page), and the base this project's future roster×matches
 participation matrix (see the docstring note at the bottom of this file)
 will build on.
 
+Also renders a third tab, "Карта участия" (TMAP_CSS/TMAP_JS below) — the
+team-level counterpart to player_cards.py's per-player participation map,
+fed by team_participation_map_v2.py's data/team_participation/<clubSlug>.json
+(all seasons, not just the one CUR_SEASON the Матчи/Состав tabs show): a
+visual ladder of how this ONE team_id (a stable squad slot — DATA_
+DICTIONARY.md/team_participation_map_v2.py's docstring: it's the *division*
+that moves season to season, not the team_id following the players' age
+upward) moved through divisions within a season and across every season it
+has core data for, and which competitions (league, cup, playoff) it entered
+along the way. Structurally a straight port of player_cards.py's PMAP
+band/lane/cell grid engine (same per-season week columns, same math), with
+the player-specific parts dropped (age-relative bucket, per-team color/
+filter, captain/gk/sub cell detail — none apply to a single fixed team) and
+color repurposed from "which club" to match outcome (win/draw/loss), since
+there's only ever one team in view here.
+
 Data volume forced two scoping decisions:
   - one JSON per (season, club) under <output-dir>/data/team_cards_<season>/
     <slug>.json — not one file per team_id (9000+ teams in 2025-2026 alone)
@@ -44,7 +60,7 @@ from pathlib import Path
 import pandas as pd
 
 import rffm_data as data
-from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER
+from club_division_map import CAT_LABEL_ES, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER, TIER_OF
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
                          THEME_SWITCH_JS, club_slug_map, switch_row_html)
 
@@ -198,7 +214,7 @@ I18N_ES = {
     "h_comps": "Competiciones",
     "comps_p": "Haz clic en una tarjeta de competición para activarla/desactivarla — los partidos, el resumen "
                "por jugador y el once inicial de abajo se recalculan solo con las competiciones activas.",
-    "tab_matches": "Partidos", "tab_roster": "Plantilla",
+    "tab_matches": "Partidos", "tab_roster": "Plantilla", "tab_pmap": "Mapa de participación",
     "h_roster": "Plantilla por partido",
     "roster_p": "Filas — jugadores, columnas — partidos de la temporada. Círculo relleno — titular, círculo hueco — "
                 "suplente que entró, borde dorado — capitán, borde azul — jugó de portero ese partido, número al "
@@ -214,6 +230,505 @@ I18N_ES = {
               '<code>match_lineups/match_goals/match_cards</code>. Ver <code>analysis_scripts/team_cards.py</code>, '
               '<code>analysis_scripts/team_rosters.py</code>.',
 }
+
+# "Карта участия" tab — team-level port of player_cards.py's PMAP band/lane/
+# cell engine (same #id-scoped self-contained dark palette, deliberately not
+# tied to the page's own --accent/--win/--loss tokens or light/dark toggle,
+# same as the player map — see PMAP_CSS's docstring note there). Player-only
+# rules dropped: per-team filter bar/legend swatch (moot — exactly one team
+# ever shown here), age-relative "own level" rail highlight and water line
+# (a team_id's category doesn't drift with age the way a player's does — see
+# team_participation_map_v2.py's docstring), captain/gk/sub/goal/card cell
+# detail (there's no per-player data at team granularity). Kept: the
+# per-season week grid (identical math — pure calendar arithmetic, not
+# player-specific), band/lane/cell layout, ribbon+label lane (now one ribbon
+# per stint directly, not reconstructed from flattened rows — stints already
+# arrive pre-grouped by (team, competition) from the server), S/M/L zoom,
+# tooltip. Match-cell color is repurposed from "which club" (moot, one team)
+# to match outcome (win/draw/loss) — the signal actually useful when there's
+# only one team to look at.
+TMAP_CSS = r"""
+#tmapRoot{
+  --tm-ink:#0d151f; --tm-ink2:#1d2a38; --tm-paper:#fff; --tm-page:#e9edf1;
+  --tm-rule:#dde3ea; --tm-rule2:#eef1f5; --tm-muted:#6b7784;
+  --tm-field:#eaeef3; --tm-chalk:#2f9e5c; --tm-chalk-soft:#e1f3e8;
+  --tm-win:#2f9e5c; --tm-draw:#98a4b0; --tm-loss:#d1495b;
+  --tm-cell:13px; --tm-gap:2px; --tm-lane:14px; --tm-band:18px; --tm-label:190px;
+  --tm-sgap:calc(var(--tm-cell)/2 + var(--tm-gap));
+  --tm-nw:38; --tm-ns:5;
+  --tm-track:calc(var(--tm-nw)*var(--tm-cell) + (var(--tm-nw) - 1)*var(--tm-gap));
+  --tm-lbl:min(12px, calc(var(--tm-cell) + 1px));
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif; color:var(--tm-ink);
+  background:var(--tm-page); border-radius:14px; padding:18px; margin-top:4px;
+}
+#tmapRoot *{box-sizing:border-box}
+#tmapRoot .tm-cond{font-family:'Barlow Condensed',Inter,sans-serif;text-transform:uppercase;letter-spacing:.05em}
+#tmapRoot .tm-mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+#tmapRoot .tm-scoreboard{ background:var(--tm-ink);color:#fff;border-radius:14px;padding:16px 20px;
+  display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap; }
+#tmapRoot .tm-sb-id .tm-kicker{font:600 11px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.16em;color:#7f93a8}
+#tmapRoot .tm-sb-id h3{font:700 26px/1.05 'Barlow Condensed';text-transform:uppercase;letter-spacing:.02em;margin:6px 0 3px;color:#fff}
+#tmapRoot .tm-sb-id .tm-club{color:#9fb2c4;font-size:12.5px}
+#tmapRoot .tm-sb-nums{display:flex;gap:20px;flex-wrap:wrap}
+#tmapRoot .tm-num{min-width:56px}
+#tmapRoot .tm-num b{display:block;font:600 22px/1 'IBM Plex Mono';letter-spacing:-.02em}
+#tmapRoot .tm-num span{display:block;margin-top:4px;font:600 9.5px/1.2 'Barlow Condensed';text-transform:uppercase;letter-spacing:.12em;color:#8ba0b4}
+#tmapRoot .tm-num.hi b{color:#ffc766}
+#tmapRoot .tm-lede{margin:14px 2px 12px;max-width:760px;color:#41505f;font-size:13px}
+#tmapRoot .tm-bar{ background:var(--tm-paper);border:1px solid var(--tm-rule);border-bottom:0;
+  border-radius:12px 12px 0 0;padding:10px 12px; display:flex;gap:12px;align-items:center;justify-content:flex-end;flex-wrap:wrap; }
+#tmapRoot .tm-seg{display:flex;border:1px solid var(--tm-rule);border-radius:8px;overflow:hidden}
+#tmapRoot .tm-seg .tm-btn{border:0;border-radius:0;border-left:1px solid var(--tm-rule)}
+#tmapRoot .tm-seg .tm-btn:first-child{border-left:0}
+#tmapRoot .tm-btn{ border:1px solid var(--tm-rule);background:#fff;border-radius:8px;padding:5px 9px;
+  font:500 12px/1 Inter;color:#3d4b59;cursor:pointer;transition:.14s; }
+#tmapRoot .tm-btn:hover{border-color:#b9c4d0;background:#f7f9fb}
+#tmapRoot .tm-btn[aria-pressed="true"]{background:var(--tm-ink);border-color:var(--tm-ink);color:#fff}
+#tmapRoot .tm-shell{ background:var(--tm-paper);border:1px solid var(--tm-rule);border-radius:0 0 12px 12px;
+  overflow:auto;box-shadow:0 12px 30px rgba(16,32,48,.07);position:relative;max-height:70vh; }
+#tmapRoot .tm-grid{ display:grid; grid-template-columns:var(--tm-label) repeat(var(--tm-ns), var(--tm-track));
+  column-gap:var(--tm-sgap); padding:0 14px 0 0; min-width:min-content; }
+#tmapRoot .tm-head{position:sticky;top:0;z-index:6;background:var(--tm-paper);padding-top:10px;box-shadow:0 1px 0 var(--tm-rule)}
+#tmapRoot .tm-body{position:relative;padding-top:10px;padding-bottom:6px}
+#tmapRoot .tm-foot{padding:8px 14px 12px;border-top:1px solid var(--tm-rule2)}
+#tmapRoot .tm-stick{position:sticky;left:0;z-index:4;background:var(--tm-paper);padding-left:14px}
+#tmapRoot .tm-head .tm-stick{z-index:7}
+#tmapRoot .tm-sh{padding-bottom:7px}
+#tmapRoot .tm-sh .tm-row1{display:flex;align-items:baseline;gap:7px}
+#tmapRoot .tm-sh h4{font:700 17px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.03em;margin:0}
+#tmapRoot .tm-pill{font:600 9.5px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.1em;
+  padding:3px 6px;border-radius:5px;background:var(--tm-chalk-soft);color:var(--tm-chalk)}
+#tmapRoot .tm-months{display:grid;gap:var(--tm-gap);margin-top:8px;height:12px}
+#tmapRoot .tm-mo{font:500 9px/12px 'IBM Plex Mono';color:#93a1af;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;box-shadow:-1px 0 0 var(--tm-rule);padding-left:3px}
+#tmapRoot .tm-mo.tm-first{box-shadow:none;padding-left:0}
+#tmapRoot .tm-placeholder{grid-column:1/-1;display:flex;align-items:center;justify-content:center;
+  font:600 10.5px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.08em;color:#a8b3be;
+  background:repeating-linear-gradient(135deg,var(--tm-field),var(--tm-field) 6px,#e2e7ed 6px,#e2e7ed 12px);
+  border-radius:4px;text-align:center;padding:4px}
+#tmapRoot .tm-labels{display:grid;grid-template-columns:24px 1fr;column-gap:6px}
+#tmapRoot .tm-rl{display:flex;align-items:center;min-width:0;overflow:hidden;height:var(--tm-cell)}
+#tmapRoot .tm-rl .tm-dv{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.04em;
+  font-weight:600;font-size:var(--tm-lbl);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2b3947}
+#tmapRoot .tm-lvl{display:flex;align-items:center;justify-content:center;height:var(--tm-cell);
+  border-radius:4px;font:600 9.5px/1 'IBM Plex Mono'; background:#eef2f6;color:#7b8894}
+#tmapRoot .tm-bandcap{display:flex;align-items:center;gap:6px;height:var(--tm-band);
+  font:600 9px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.12em;color:#9aa6b2}
+#tmapRoot .tm-track{display:grid;grid-template-columns:repeat(var(--tm-nw), var(--tm-cell));gap:var(--tm-gap);position:relative}
+#tmapRoot .tm-span{grid-column:1/-1;position:relative}
+#tmapRoot .tm-cell{background:var(--tm-field);border-radius:2px;position:relative;height:var(--tm-cell)}
+#tmapRoot .tm-cell.tm-mo{box-shadow:-1px 0 0 rgba(13,21,31,.1)}
+#tmapRoot .tm-cell.tm-play{display:flex;gap:1px;overflow:hidden;cursor:pointer}
+#tmapRoot .tm-mseg{flex:1;align-self:flex-end;border-radius:1px;position:relative;height:100%}
+#tmapRoot .tm-mseg.tm-win{background:var(--tm-win)}
+#tmapRoot .tm-mseg.tm-draw{background:var(--tm-draw)}
+#tmapRoot .tm-mseg.tm-loss{background:var(--tm-loss)}
+#tmapRoot .tm-mseg.tm-pending{background:var(--tm-field);border:1.5px dashed #c3cdd8}
+#tmapRoot .tm-cell.tm-info{cursor:help}
+#tmapRoot .tm-cell.tm-play:hover,#tmapRoot .tm-cell.tm-play:focus-visible{
+  outline:2px solid var(--tm-ink);outline-offset:0;z-index:5;border-radius:2px}
+#tmapRoot .tm-rib{position:absolute;height:var(--tm-gap);border-radius:2px;opacity:.85;pointer-events:none}
+#tmapRoot .tm-rib b{position:absolute;top:0;bottom:0;width:1px;background:#fff;opacity:.9}
+#tmapRoot .tm-lane{height:var(--tm-lane);overflow:hidden;position:relative}
+#tmapRoot .tm-cl{position:absolute;top:0;height:var(--tm-lane);display:flex;align-items:center;gap:5px;
+  font:600 9.5px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.06em;
+  color:#5c6a78;white-space:nowrap;overflow:hidden;cursor:default}
+#tmapRoot .tm-cl s{text-decoration:none;width:4px;height:4px;border-radius:1px;flex:none}
+#tmapRoot .tm-cl em{font-style:normal;color:#9aa6b2;font-family:'IBM Plex Mono';font-size:8.5px}
+#tmapRoot .tm-fs{font:500 10.5px/1.4 'IBM Plex Mono';color:#6b7784}
+#tmapRoot .tm-fs b{color:var(--tm-ink);font-weight:600}
+#tmapRoot .tm-legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 0;color:#5c6a78;font-size:11.5px}
+#tmapRoot .tm-legend .tm-li{display:flex;align-items:center;gap:6px}
+#tmapRoot .tm-wdl-swatch{display:flex;gap:2px;flex:none}
+#tmapRoot .tm-wdl-swatch i{width:12px;height:12px;border-radius:2px;background:#c9d0d8}
+#tmapRoot .tm-wdl-swatch i.w{background:var(--tm-win)}
+#tmapRoot .tm-wdl-swatch i.d{background:var(--tm-draw)}
+#tmapRoot .tm-wdl-swatch i.l{background:var(--tm-loss)}
+#tmapRoot .tm-note{margin:10px 2px 0;color:#7d8996;font-size:11.5px;max-width:900px}
+#tmapRoot .tm-empty{padding:26px;text-align:center;color:#8b98a4;font-size:13px}
+.tm-tip{position:fixed;z-index:60;width:280px;background:#0d151f;color:#fff;border-radius:12px;
+  padding:12px 14px 13px;box-shadow:0 22px 50px rgba(9,18,28,.34);pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;
+  font-family:'Inter',ui-sans-serif,sans-serif;}
+.tm-tip.tm-on{opacity:1;transform:none}
+.tm-tip h5{font:700 13.5px/1.2 'Barlow Condensed';text-transform:uppercase;letter-spacing:.04em;margin:0;color:#fff}
+.tm-tip .tm-sub{font:500 10px/1.3 'IBM Plex Mono';color:#8ba0b4;margin-top:3px}
+.tm-tip .tm-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px;margin-top:9px}
+.tm-tip .tm-kv dt{color:#8ba0b4;margin:0}
+.tm-tip .tm-kv dd{margin:0;font-weight:600;font-family:'IBM Plex Mono';font-size:10.5px}
+@media (max-width:700px){ #tmapRoot{--tm-label:130px; padding:12px} #tmapRoot .tm-scoreboard{padding:14px} #tmapRoot .tm-sb-id h3{font-size:21px} }
+"""
+
+# Client-side rendering engine for the "Карта участия" tab. See TMAP_CSS's
+# docstring for what was ported from player_cards.py's PMAP engine and what
+# was dropped/repurposed. Fetches data/team_participation/<clubSlug>.json
+# (team_participation_map_v2.py — ALL seasons in one file, unlike the
+# Матчи/Состав tabs' per-CUR_SEASON fetch) once per page load, independent
+# of which season the rest of the page is showing.
+TMAP_JS = r"""
+const TM = {};
+TM.CATEGORIES = %CATEGORIES_JSON%;
+TM.CAT_LABEL = %CAT_LABEL_JSON%;
+TM.TIER_OF = %TIER_OF_JSON%;
+TM.HUES = ['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#4a3aa7','#e34948'];
+TM.DAY = 864e5;
+
+function tmMonday(d){ const x=new Date(d); const k=(x.getDay()+6)%7; x.setDate(x.getDate()-k); x.setHours(0,0,0,0); return x; }
+function tmAnchor(y){ return tmMonday(new Date(y,8,1)); }
+function tmWIdx(date, anchor){ return Math.round((tmMonday(date)-anchor)/(7*TM.DAY)); }
+function tmWDate(anchor,i){ return new Date(anchor.getTime()+i*7*TM.DAY); }
+const TM_MONTHS = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const TM_MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function tmMonthName(m){ return (CURLANG === 'es' ? TM_MONTHS_ES : TM_MONTHS)[m]; }
+function tmFmt(d){ return `${d.getDate()} ${tmMonthName(d.getMonth())}`; }
+function tmFmtY(d){ return `${d.getDate()} ${tmMonthName(d.getMonth())} ${d.getFullYear()}`; }
+function tmEsc(s){ return String(s ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+// comp_id -> stable hue (hash), same "fixed order, hashed to a validated
+// set" categorical-color approach player_cards.py's pmClubBaseColor uses
+// for club — here there's only ever one team in view, so color is spent on
+// distinguishing competitions (league vs cup vs playoff running the same
+// season) instead.
+function tmHash(s){ let h=0; for (let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return Math.abs(h); }
+const TM_COMP_COLOR_CACHE = {};
+function tmCompColor(compId){
+  const key = compId || '—';
+  if (!(key in TM_COMP_COLOR_CACHE)) TM_COMP_COLOR_CACHE[key] = TM.HUES[tmHash(key) % TM.HUES.length];
+  return TM_COMP_COLOR_CACHE[key];
+}
+
+function tmShardOf(){ return null; } // no sharding — one file per club, see build script docstring
+
+let TM_PAYLOAD = null, TM_PAYLOAD_LOADING = null;
+async function tmFetchPayload(){
+  if (TM_PAYLOAD) return TM_PAYLOAD;
+  if (TM_PAYLOAD_LOADING) return TM_PAYLOAD_LOADING;
+  TM_PAYLOAD_LOADING = fetch(`data/team_participation/${CUR_CLUB_SLUG}.json`)
+    .then(r => r.ok ? r.json() : null).catch(() => null);
+  TM_PAYLOAD = await TM_PAYLOAD_LOADING;
+  return TM_PAYLOAD;
+}
+
+let TM_STATE = null;
+
+async function initParticipationMap(){
+  const root = document.getElementById('tmapRoot');
+  root.innerHTML = `<div class="tm-empty">${LANG[CURLANG].loading}</div>`;
+  const payload = await tmFetchPayload();
+  const team = payload && payload.teams && payload.teams[CUR_TEAM_ID];
+  if (!team || !team.stints || !team.stints.length){
+    root.innerHTML = `<div class="tm-empty">${CURLANG === 'es'
+      ? 'No hay datos de temporadas/competiciones para este equipo.'
+      : 'Нет данных о сезонах/соревнованиях для этой команды.'}</div>`;
+    return;
+  }
+  TM_STATE = { team, cellSize: 13 };
+  tmRender();
+}
+
+function tmSeasonRange(stints){
+  const seasons = [...new Set(stints.map(s => s.season))].sort();
+  const first = parseInt(seasons[0].slice(0,4), 10), last = parseInt(seasons[seasons.length-1].slice(0,4), 10);
+  const out = [];
+  for (let y=first; y<=last; y++) out.push(`${y}-${y+1}`);
+  return out;
+}
+
+function tmBuildRows(stints){
+  const map = new Map();
+  stints.forEach(s => {
+    const div = s.div || 'OTHER';
+    const cat = s.cat || 'OTHER';
+    const key = `${cat}|${div}`;
+    s._rowKey = key;
+    if (!map.has(key)) map.set(key, { key, cat, div, tier: TM.TIER_OF[div] ?? null });
+  });
+  const rows = [...map.values()];
+  const catRank = c => { const i = TM.CATEGORIES.indexOf(c); return i === -1 ? 999 : i; };
+  rows.sort((a,b) => catRank(a.cat)-catRank(b.cat) || ((a.tier??99)-(b.tier??99)) || a.div.localeCompare(b.div));
+  return rows;
+}
+
+function tmBuildTPL(rows){
+  const tpl = [];
+  const push = k => { tpl.push(k); return tpl.length; };
+  let prevCat = null;
+  rows.forEach(r => {
+    if (r.cat !== prevCat){ r.bandRow = push('band'); prevCat = r.cat; }
+    r.laneRow = push('lane');
+    r.cellRow = push('cell');
+  });
+  return tpl;
+}
+function tmTopOf(tpl, idx){
+  let band=0,lane=0,cell=0;
+  for (let i=0;i<idx-1;i++){ if (tpl[i]==='band') band++; else if (tpl[i]==='lane') lane++; else cell++; }
+  return `calc(var(--tm-band)*${band} + var(--tm-lane)*${lane} + var(--tm-cell)*${cell} + var(--tm-gap)*${(idx-1)})`;
+}
+function tmBottomOfCell(tpl, r){ return `calc(${tmTopOf(tpl, r.cellRow)} + var(--tm-cell))`; }
+function tmDivName(div){ return (CURLANG==='ru' ? DIV_LABEL_RU : DIV_LABEL_ES)[div] || div; }
+function tmCatName(cat){ return TM.CAT_LABEL[cat] || cat; }
+
+const TM_COL = i => `calc((var(--tm-cell) + var(--tm-gap)) * ${i})`;
+const TM_WIDTH = n => `calc(var(--tm-cell)*${n} + var(--tm-gap)*${Math.max(1,n) - 1})`;
+
+function tmRender(){
+  const root = document.getElementById('tmapRoot');
+  const team = TM_STATE.team;
+  const stints = team.stints;
+  const seasons = tmSeasonRange(stints);
+  const ROWS = tmBuildRows(stints);
+  const TPL = tmBuildTPL(ROWS);
+  const ROW_TPL = TPL.map(k => k==='band'?'var(--tm-band)':k==='lane'?'var(--tm-lane)':'var(--tm-cell)').join(' ');
+  root.style.setProperty('--tm-cell', TM_STATE.cellSize + 'px');
+
+  const stintsBySeason = {};
+  stints.forEach(s => (stintsBySeason[s.season] = stintsBySeason[s.season] || []).push(s));
+
+  const seasonMeta = {};
+  let NW = 20;
+  seasons.forEach(season => {
+    const y = parseInt(season.slice(0,4), 10);
+    const anchor = tmAnchor(y);
+    const ss = stintsBySeason[season] || [];
+    const dates = [];
+    ss.forEach(s => s.matches.forEach(m => { if (m.date) dates.push(new Date(m.date)); }));
+    if (!dates.length){ seasonMeta[season] = {anchor, w0:0, nw:0, y}; return; }
+    const w0 = Math.max(0, tmWIdx(new Date(Math.min(...dates)), anchor) - 1);
+    const w1 = tmWIdx(new Date(Math.max(...dates)), anchor) + 1;
+    seasonMeta[season] = {anchor, w0, nw: w1-w0+1, y};
+    NW = Math.max(NW, w1-w0+1);
+  });
+  root.style.setProperty('--tm-nw', NW);
+  root.style.setProperty('--tm-ns', seasons.length);
+
+  // index: rowKey§season§week -> matches (each annotated with its stint)
+  const CELLS = new Map();
+  stints.forEach(s => {
+    const meta = seasonMeta[s.season]; if (!meta || !meta.nw) return;
+    s.matches.forEach(m => {
+      if (!m.date) return;
+      const w = tmWIdx(new Date(m.date), meta.anchor);
+      const k = `${s._rowKey}§${s.season}§${w}`;
+      if (!CELLS.has(k)) CELLS.set(k, []);
+      CELLS.get(k).push(Object.assign({_stint:s}, m));
+    });
+  });
+
+  root.innerHTML = tmBuildScoreboard(team, stints, seasons) + tmBuildBar() +
+    `<div class="tm-shell" id="tmShell">
+      <div class="tm-grid tm-head" id="tmHead"></div>
+      <div class="tm-grid tm-body" id="tmBody"></div>
+    </div>` + tmBuildLegend() + `<div class="tm-tip" id="tmTip" role="tooltip" aria-hidden="true"></div>`;
+
+  tmRenderHead(seasons, seasonMeta, NW, stintsBySeason);
+  tmRenderBody(ROWS, TPL, ROW_TPL, seasons, seasonMeta, NW, CELLS, stintsBySeason);
+  tmWireControls();
+  tmWireTooltip(CELLS);
+}
+
+function tmBuildScoreboard(team, stints, seasons){
+  const allMatches = [];
+  stints.forEach(s => s.matches.forEach(m => allMatches.push(Object.assign({_stint:s}, m))));
+  const played = allMatches.filter(m => m.res);
+  const w = played.filter(m => m.res==='W').length, d = played.filter(m => m.res==='D').length, l = played.filter(m => m.res==='L').length;
+  const comps = new Set(stints.map(s => s.comp_id)).size;
+  const nums = CURLANG==='es'
+    ? [[seasons.length,'temporadas'],[comps,'competiciones'],[played.length,'partidos'],[w,'victorias',1],[d,'empates'],[l,'derrotas']]
+    : [[seasons.length,'сезонов'],[comps,'соревнований'],[played.length,'матчей'],[w,'побед',1],[d,'ничьих'],[l,'поражений']];
+  const numsHtml = nums.map(([a,b,hi]) => `<div class="tm-num${hi?' hi':''}"><b class="tm-mono">${a}</b><span>${tmEsc(b)}</span></div>`).join('');
+  const latest = stints.reduce((a,b) => (b.season > a.season ? b : a), stints[0]);
+  const latestSub = CURLANG==='es'
+    ? `Ahora: <b>${tmEsc(tmDivName(latest.div))}</b> (${tmEsc(tmCatName(latest.cat))})`
+    : `Сейчас: <b>${tmEsc(tmDivName(latest.div))}</b> (${tmEsc(tmCatName(latest.cat))})`;
+  return `<div class="tm-scoreboard">
+    <div class="tm-sb-id">
+      <div class="tm-kicker tm-cond">RFFM &middot; ${tmEsc(team.team||'')}</div>
+      <h3>${CURLANG==='es'?'Mapa de participación':'Карта участия'}</h3>
+      <div class="tm-club">${latestSub}</div>
+    </div>
+    <div class="tm-sb-nums">${numsHtml}</div>
+  </div>
+  <p class="tm-lede">${CURLANG==='es'
+    ? 'Cada casilla es una <b>semana natural</b> (lunes-domingo). Las filas son categoría/división — el color de cada partido es el resultado (victoria/empate/derrota), el color de la cinta es la competición.'
+    : 'Каждый квадрат — <b>календарная неделя</b> (понедельник-воскресенье). Строки — категория/дивизион, цвет матча — результат (победа/ничья/поражение), цвет ленты — соревнование.'}</p>`;
+}
+
+function tmBuildBar(){
+  return `<div class="tm-bar">
+    <div class="tm-seg" id="tmZoom">
+      <button type="button" class="tm-btn" data-tm-cell="10">S</button>
+      <button type="button" class="tm-btn" data-tm-cell="13" aria-pressed="true">M</button>
+      <button type="button" class="tm-btn" data-tm-cell="20">L</button>
+    </div>
+  </div>`;
+}
+
+function tmBuildLegend(){
+  const L = CURLANG==='es' ? {
+    win:'victoria', draw:'empate', loss:'derrota', none:'sin partidos',
+    ribbon:'La cinta de color bajo cada tramo marca una competición (liga, copa, playoff...); el nombre y el resultado final se muestran encima cuando hay sitio.',
+  } : {
+    win:'победа', draw:'ничья', loss:'поражение', none:'матчей нет',
+    ribbon:'Цветная лента под каждым отрезком — соревнование (лига, кубок, плей-офф...); название и итог сезона подписаны сверху, если помещаются.',
+  };
+  return `<div class="tm-legend">
+    <div class="tm-li"><span class="tm-wdl-swatch"><i class="w"></i><i class="d"></i><i class="l"></i></span>${L.win} / ${L.draw} / ${L.loss}</div>
+  </div>
+  <p class="tm-note">${L.ribbon}</p>`;
+}
+
+function tmRenderHead(seasons, seasonMeta, NW, stintsBySeason){
+  const head = document.getElementById('tmHead');
+  let h = `<div class="tm-stick tm-sh"><div class="tm-row1"><span class="tm-cond" style="font:600 9.5px/1 'Barlow Condensed';text-transform:uppercase;letter-spacing:.12em;color:#98a4b0">${CURLANG==='es'?'Categoría · división':'Категория · дивизион'}</span></div>
+    <div class="tm-months" style="grid-template-columns:1fr"><span class="tm-mo tm-first">${CURLANG==='es'?'semana lun-dom':'неделя пн-вс'}</span></div></div>`;
+  seasons.forEach(season => {
+    const meta = seasonMeta[season];
+    if (!meta.nw){
+      h += `<div class="tm-sh"><div class="tm-row1"><h4>${season}</h4><span class="tm-pill" style="background:#e2e7ed;color:#8b98a4">${CURLANG==='es'?'sin competición':'не выступала'}</span></div>
+        <div class="tm-months" style="height:auto"></div></div>`;
+      return;
+    }
+    let mo = '', run = null;
+    for (let i=0;i<NW;i++){
+      const d = tmWDate(meta.anchor, meta.w0+i); d.setDate(d.getDate()+3);
+      if (!run || run.m !== d.getMonth()){ if (run) mo += tmCellMonth(run); run = {m:d.getMonth(), a:i, n:1, first:!mo}; }
+      else run.n++;
+    }
+    mo += tmCellMonth(run);
+    function tmCellMonth(r){ return `<span class="tm-mo${r.first?' tm-first':''}" style="grid-column:${r.a+1}/span ${r.n}">${tmMonthName(r.m)}</span>`; }
+    h += `<div class="tm-sh">
+      <div class="tm-row1"><h4>${season}</h4></div>
+      <div class="tm-months" style="grid-template-columns:repeat(${NW},var(--tm-cell))">${mo}</div>
+    </div>`;
+  });
+  head.innerHTML = h;
+}
+
+function tmRenderBody(ROWS, TPL, ROW_TPL, seasons, seasonMeta, NW, CELLS, stintsBySeason){
+  const body = document.getElementById('tmBody');
+  let lab = `<div class="tm-stick tm-labels" style="grid-template-rows:${ROW_TPL};row-gap:var(--tm-gap)">`;
+  let prevCat = null;
+  ROWS.forEach(r => {
+    if (r.cat !== prevCat){
+      lab += `<div class="tm-bandcap" style="grid-row:${r.bandRow};grid-column:1/-1">${tmEsc(tmCatName(r.cat))}</div>`;
+      prevCat = r.cat;
+    }
+  });
+  ROWS.forEach(r => {
+    lab += `<div class="tm-rl" style="grid-row:${r.cellRow};grid-column:1/-1" title="${tmEsc(tmDivName(r.div))}"><span class="tm-dv">${tmEsc(tmDivName(r.div))}</span></div>`;
+  });
+  lab += `</div>`;
+
+  let cols = '';
+  seasons.forEach(season => {
+    const meta = seasonMeta[season];
+    let t = `<div class="tm-track" style="grid-template-rows:${ROW_TPL}">`;
+    if (!meta.nw){
+      t += `<div class="tm-placeholder" style="grid-row:1/-1">${CURLANG==='es'?'Sin partidos esta temporada':'Нет матчей в этом сезоне'}</div></div>`;
+      cols += t; return;
+    }
+    const stintsThisSeason = stintsBySeason[season] || [];
+    ROWS.forEach(r => {
+      const rowStints = stintsThisSeason.filter(s => s._rowKey === r.key);
+      // one ribbon per stint directly — server already grouped matches by
+      // (team, competition), no need to reconstruct "families" the way the
+      // player map does from flattened rows (see TMAP_CSS's docstring).
+      rowStints.forEach(s => {
+        const weeks = s.matches.filter(m => m.date).map(m => tmWIdx(new Date(m.date), meta.anchor));
+        if (!weeks.length) return;
+        const w0 = Math.min(...weeks), w1 = Math.max(...weeks);
+        const a = Math.max(0, w0-meta.w0), b = Math.min(NW-1, w1-meta.w0);
+        const color = tmCompColor(s.comp_id);
+        t += `<div class="tm-rib" style="background:${color};top:${tmBottomOfCell(TPL,r)};left:${TM_COL(a)};width:${TM_WIDTH(b-a+1)}"></div>`;
+      });
+      t += `<div class="tm-span tm-lane" style="grid-row:${r.laneRow}">`;
+      rowStints.forEach(s => {
+        const weeks = s.matches.filter(m => m.date).map(m => tmWIdx(new Date(m.date), meta.anchor));
+        if (!weeks.length) return;
+        const w0 = Math.min(...weeks), w1 = Math.max(...weeks);
+        const a = Math.max(0, w0-meta.w0), b = Math.min(NW-1, w1-meta.w0);
+        const color = tmCompColor(s.comp_id);
+        const standing = s.standing && s.standing.pos
+          ? ` <em>${tmEsc(s.standing.pos)}${s.standing.size?('/'+tmEsc(s.standing.size)):''}</em>` : '';
+        t += `<div class="tm-cl" style="left:${TM_COL(a)};width:${TM_WIDTH(b-a+1)}" title="${tmEsc(s.comp||'')}">
+          <s style="background:${color}"></s>${tmEsc(s.comp||'')}${standing}</div>`;
+      });
+      t += `</div>`;
+      for (let i=0;i<NW;i++){
+        const w = meta.w0+i;
+        const d = tmWDate(meta.anchor, w), thu = new Date(d.getTime()+3*TM.DAY);
+        const moStart = thu.getDate() <= 7;
+        const ms = CELLS.get(`${r.key}§${season}§${w}`) || [];
+        const cls = ['tm-cell']; let st = `grid-row:${r.cellRow};`, inner = '', att = '';
+        if (moStart) cls.push('tm-mo');
+        if (ms.length){
+          cls.push('tm-play');
+          inner = ms.slice(0,3).map(m => {
+            const outcome = m.res ? `tm-${m.res==='W'?'win':m.res==='D'?'draw':'loss'}` : 'tm-pending';
+            return `<i class="tm-mseg ${outcome}"></i>`;
+          }).join('');
+          att += ` tabindex="0" role="button" data-tm-k="${r.key}§${season}§${w}" aria-label="${tmEsc(tmAriaOf(ms,d))}"`;
+        }
+        t += `<div class="${cls.join(' ')}" style="${st}"${att}>${inner}</div>`;
+      }
+    });
+    t += `</div>`;
+    cols += t;
+  });
+  body.innerHTML = lab + cols;
+}
+
+function tmAriaOf(ms, d){
+  const opp = ms.map(m => m.opp).filter(Boolean).join(', ');
+  return CURLANG==='es' ? `Semana ${tmFmtY(d)}: vs ${opp}` : `Неделя ${tmFmtY(d)}: против ${opp}`;
+}
+
+function tmWireControls(){
+  const root = document.getElementById('tmapRoot');
+  root.querySelectorAll('[data-tm-cell]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      root.querySelectorAll('[data-tm-cell]').forEach(b => b.setAttribute('aria-pressed', String(b===btn)));
+      TM_STATE.cellSize = parseInt(btn.getAttribute('data-tm-cell'), 10);
+      tmRender();
+    });
+  });
+}
+
+function tmWireTooltip(CELLS){
+  const root = document.getElementById('tmapRoot');
+  const tip = document.getElementById('tmTip');
+  function show(el){
+    const k = el.getAttribute('data-tm-k');
+    if (!k) return;
+    const ms = CELLS.get(k) || [];
+    if (!ms.length) return;
+    const rows = ms.map(m => {
+      const outcome = m.res ? (CURLANG==='es'?{W:'Victoria',D:'Empate',L:'Derrota'}:{W:'Победа',D:'Ничья',L:'Поражение'})[m.res] : (CURLANG==='es'?'por jugar':'ещё не сыгран');
+      const score = (m.gf!=null && m.ga!=null) ? `${m.gf}:${m.ga}` : '';
+      const ha = m.home ? LANG[CURLANG].home : LANG[CURLANG].away;
+      return `<div class="tm-kv">
+        <dt>${CURLANG==='es'?'Fecha':'Дата'}</dt><dd>${tmEsc(m.date||'')}</dd>
+        <dt>${ha}</dt><dd>${tmEsc(m.opp||'')}</dd>
+        <dt>${CURLANG==='es'?'Resultado':'Результат'}</dt><dd>${score||outcome}</dd>
+        <dt>${CURLANG==='es'?'Competición':'Соревнование'}</dt><dd>${tmEsc(m._stint.comp||'')}</dd>
+      </div>`;
+    }).join('<hr style="border:0;border-top:1px solid rgba(255,255,255,.13);margin:8px 0">');
+    tip.innerHTML = `<h5>${tmEsc(ms.length>1 ? (CURLANG==='es'?`${ms.length} partidos`:`${ms.length} матча`) : (ms[0].opp||''))}</h5>${rows}`;
+    tip.classList.add('tm-on');
+    const r = el.getBoundingClientRect();
+    let left = r.left + r.width/2 - 140, top = r.bottom + 10;
+    left = Math.max(8, Math.min(left, window.innerWidth - 288));
+    if (top + 200 > window.innerHeight) top = r.top - 10 - 200;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
+  }
+  function hide(){ tip.classList.remove('tm-on'); }
+  root.addEventListener('mouseover', e => { const el = e.target.closest('[data-tm-k]'); if (el) show(el); });
+  root.addEventListener('mouseout', e => { if (e.target.closest('[data-tm-k]')) hide(); });
+  root.addEventListener('focusin', e => { const el = e.target.closest('[data-tm-k]'); if (el) show(el); });
+  root.addEventListener('focusout', e => { if (e.target.closest('[data-tm-k]')) hide(); });
+}
+"""
 
 HTML = r"""<!DOCTYPE html>
 <html lang="ru">
@@ -367,6 +882,7 @@ td.cell-mark{text-align:center;}
 table.dtable{font-size:0.82rem;}
 table.dtable td{white-space:nowrap;}
 %DATATABLE_CSS%
+%TMAP_CSS%
 </style>
 </head>
 <body>
@@ -396,6 +912,7 @@ table.dtable td{white-space:nowrap;}
   <div class="tabs">
     <button type="button" class="tab-btn active" id="tabBtnMatches" data-i18n="tab_matches">Матчи</button>
     <button type="button" class="tab-btn" id="tabBtnRoster" data-i18n="tab_roster">Состав</button>
+    <button type="button" class="tab-btn" id="tabBtnPmap" data-i18n="tab_pmap">Карта участия</button>
   </div>
 
   <section class="tab-pane active" id="paneMatches">
@@ -459,6 +976,10 @@ table.dtable td{white-space:nowrap;}
     </div>
   </section>
 
+  <section class="tab-pane" id="panePmap">
+    <div id="tmapRoot"><div class="tm-empty">Загрузка…</div></div>
+  </section>
+
   <footer class="note" data-i18n="footer">Построено из <code>output/processed/rffm/matches.csv</code> и
     <code>match_lineups/match_goals/match_cards</code>. См. <code>analysis_scripts/team_cards.py</code>,
     <code>analysis_scripts/team_rosters.py</code>.</footer>
@@ -505,6 +1026,8 @@ function esc(s) {
 }
 
 %DATATABLE_JS%
+
+%TMAP_JS%
 
 function groupCalUrl(m) {
   if (!(m.season_id && m.comp_id && m.group_id && m.gt_id)) return null;
@@ -910,20 +1433,24 @@ function refreshAll() {
 // a shared/reloaded link lands on the same tab the sharer was looking at.
 function showTab(name, opts) {
   opts = opts || {};
-  const isRoster = name === 'roster';
+  const isRoster = name === 'roster', isPmap = name === 'pmap';
   document.getElementById('tabBtnRoster').classList.toggle('active', isRoster);
-  document.getElementById('tabBtnMatches').classList.toggle('active', !isRoster);
+  document.getElementById('tabBtnMatches').classList.toggle('active', !isRoster && !isPmap);
+  document.getElementById('tabBtnPmap').classList.toggle('active', isPmap);
   document.getElementById('paneRoster').classList.toggle('active', isRoster);
-  document.getElementById('paneMatches').classList.toggle('active', !isRoster);
+  document.getElementById('paneMatches').classList.toggle('active', !isRoster && !isPmap);
+  document.getElementById('panePmap').classList.toggle('active', isPmap);
   if (isRoster) loadRoster();
+  if (isPmap) initParticipationMap();
   if (!opts.silent) {
     const params = new URLSearchParams(location.search);
-    if (isRoster) params.set('tab', 'roster'); else params.delete('tab');
+    if (isRoster || isPmap) params.set('tab', name); else params.delete('tab');
     history.replaceState(null, '', location.pathname + '?' + params.toString());
   }
 }
 document.getElementById('tabBtnMatches').addEventListener('click', () => showTab('matches'));
 document.getElementById('tabBtnRoster').addEventListener('click', () => showTab('roster'));
+document.getElementById('tabBtnPmap').addEventListener('click', () => showTab('pmap'));
 
 async function main() {
   const params = new URLSearchParams(location.search);
@@ -961,7 +1488,8 @@ async function main() {
   CUR_TEAM = team;
   ACTIVE_COMP_KEYS = new Set(Object.keys(team.competitions || {}));
   refreshAll();
-  showTab(params.get('tab') === 'roster' ? 'roster' : 'matches', { silent: true });
+  const initialTab = params.get('tab');
+  showTab(initialTab === 'roster' || initialTab === 'pmap' ? initialTab : 'matches', { silent: true });
 }
 
 (function () {
@@ -995,7 +1523,12 @@ def build_html() -> str:
             .replace("%DATATABLE_JS%", DATATABLE_JS)
             .replace("%DIV_ORDER_JSON%", json.dumps(DIV_ORDER))
             .replace("%DIV_LABEL_RU_JSON%", json.dumps(DIV_LABEL_RU, ensure_ascii=False))
-            .replace("%DIV_LABEL_ES_JSON%", json.dumps(DIV_LABEL_ES, ensure_ascii=False)))
+            .replace("%DIV_LABEL_ES_JSON%", json.dumps(DIV_LABEL_ES, ensure_ascii=False))
+            .replace("%TMAP_CSS%", TMAP_CSS)
+            .replace("%TMAP_JS%", TMAP_JS)
+            .replace("%CATEGORIES_JSON%", json.dumps(CATEGORIES))
+            .replace("%CAT_LABEL_JSON%", json.dumps(CAT_LABEL_ES, ensure_ascii=False))
+            .replace("%TIER_OF_JSON%", json.dumps(TIER_OF)))
 
 
 def main():
