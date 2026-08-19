@@ -124,8 +124,8 @@ This project's crawl-time checks (`data_quality_report.csv`'s 9
 (value-range, site-vs-computed) — none of them check whether an ID column
 actually resolves in the table it references. `validate_parquet.py`
 (anti-join over `output/processed/rffm_parquet/`) does, and found two real,
-structural gaps — small relative to table size, not crawl failures, not
-yet root-caused past the pattern below:
+structural gaps — small relative to table size, not crawl failures. Both
+are now root-caused, below.
 
 **`match_cards.player_id` not in `players`: 11,045 distinct player_ids
 (3.63% of the 303,968 this project knows about) — root-caused, mostly
@@ -158,13 +158,33 @@ coaches carded on the bench, not a crawl bug:**
    that same id, and this project's `match_staff` extraction doesn't
    catch every coach for every match.
 
-**Not a data quality bug**, and not something `enrich_players.py` fetching
-more aggressively would meaningfully fix - these ids mostly resolve to
-real people, just not people functioning as *players* in the match the
-card was recorded in, so adding them to `players.csv` would misrepresent
-them as youth players. The more useful fix, if one is wanted, is
-completeness of `match_staff`'s own coach/delegate capture, not
-`_load_target_player_ids()`'s scope.
+**Update:** `_load_target_player_ids()` now unions `match_cards`/
+`match_goals` `player_id` alongside `match_lineups`, so these ids *are*
+fetched as of this change - `players.csv` gains a real row for them
+(marked `is_likely_coach=True` where the match_staff/season-stats
+evidence above applies - see that column's entry below). Kept as a
+worked example of the site's shared player/coach id space rather than
+deleted, since the diagnosis itself remains true and useful context for
+why `is_likely_coach` exists.
+
+**`match_cards`/`match_lineups`/`match_goals`'s `player_name_raw` is NOT
+dropped** (correcting a stale claim that circulated in this project's
+planning notes): checked directly - the column is present, and 99.08%
+populated (1,173,201 / 1,184,111 `match_cards` rows; the 10,910 with a
+`player_id` but blank `player_name_raw` are a small, separate edge case,
+not a systemic write-path loss) in both the CSV and the Parquet copy.
+`DATA_DICTIONARY.md` briefly documented it as "dropped, recover by
+joining `players.csv`" - that was wrong and has been fixed; don't
+re-investigate this as a bug.
+
+**`players.csv.is_likely_coach`:** a derived flag (not scraped) added to
+answer "was this `player_id` ever functioning as a coach rather than a
+player" - see DATA_DICTIONARY.md's `players.csv` entry for exactly how
+it's computed (`match_staff.person_id` cross-reference OR the "0 matches,
+has cards" `player_season_stats` pattern from this same root-cause). Not
+something `enrich_players.py` fetching more aggressively alone would have
+produced - it needed the target-scope widening above *and* this
+cross-reference to be useful.
 
 **`player_competition_participation.team_id`/`.group_id`/`.competition_id`
 not in `teams`/`groups`/`competitions`: 767/981/129 distinct values**,
@@ -175,14 +195,42 @@ team names in the violating rows are real clubs (e.g. "U.D. TALAMANCA",
 "MOSTOLES C.F."), not the known placeholder/unassigned codes from the
 `clubs.csv` gap entry above — so this isn't the same phenomenon.
 
-**Not yet investigated further** — root cause unconfirmed, could be teams/
-groups that only ever appear via a registration and never actually play a
-core-crawled match that season, or an endpoint-coverage asymmetry between
-what `main.py`'s core crawl discovers and what fichajugador reports. Worth
-running `validate_parquet.py` again after investigating to see if the
-count changes. Not wired into `parquet-build.yml` as a hard gate yet for
-exactly this reason - it would fail on every run until this is understood
-or explicitly accepted as a known, permanent characteristic (same posture
+**Root-caused:** anti-joining the *same* orphan rows against
+`competitions`/`groups` (not just `teams`) shows **99.9% (1,769 of
+1,770) of orphan `team_id` rows also have an orphan `competition_id` and
+`group_id`** on the exact same row - this is not a per-team gap, it's
+whole competitions/groups the core crawl never discovered that season, and
+the team-level symptom is just downstream of that. Grouping the orphan
+rows by `competition` name shows two distinct patterns, both consistent
+with "core crawl's `/api/competitions` discovery is a point-in-time
+snapshot, `player_competition_participation` (via `/fichajugador/`) is
+fetched later and reflects the site's state at *that* later time":
+
+1. **Second-phase/playoff competitions created after discovery ran** -
+   `"... 2ª FASE"` / `"SEGUNDA FASE ..."` competitions dominate the list
+   (e.g. `SEGUNDA FASE PRIMERA FEMENINO INFANTIL F7`, `PREBENJAMIN F7 - 2ª
+   FASE`) - RFFM creates these mid/late-season once regular-season
+   standings determine the bracket, so a core crawl that ran before that
+   point can never see them, even for a category/season that *is* in
+   scope (`PREBENJAMIN F7 - 2ª FASE` shows up despite `PREBENJAMIN` being
+   this project's target category).
+2. **Division tiers outside the crawled category/division scope** -
+   `SEGUNDA ALEVIN` (471 rows), `TERCERA CADETE` (143 rows) - a
+   lower-division tier of an otherwise-covered category that a given
+   season's core crawl run didn't include (see CLAUDE.md's "Scope" -
+   `--all-categories`/division coverage isn't guaranteed uniform across
+   seasons; check that season's own `groups.csv`/`competitions.csv`).
+
+Spread across all 9 seasons (not concentrated in the newest), consistent
+with both causes being structural rather than a one-off crawl failure.
+**Not a code bug to patch reactively** - fixing it for real means either
+re-running core discovery periodically through a season (to catch
+newly-created phase-2 competitions before they're needed) or deliberately
+widening division-level scope, both product/scope decisions rather than
+parser fixes. Left as documented, accepted behavior for now; worth
+re-running `validate_parquet.py` after any future discovery-scheduling
+change to see if the count drops. Not wired into `parquet-build.yml` as a
+hard gate for the same reason as before (same posture
 DATA_QUALITY_REPORT's `severity=warning` checks already take).
 
 ---

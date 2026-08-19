@@ -235,6 +235,12 @@ class Player(Row):
     birth_year: Optional[int]
     source_url: str
     scraped_at: str
+    # Derived, not scraped from this player's own fichajugador fetch - filled
+    # in by player_pipeline._backfill_is_likely_coach() after the run, by
+    # cross-referencing match_staff/player_season_stats (needs data outside
+    # this one fetch, so it can't be set at parse time the way
+    # card_type_label is). None until that backfill has run at least once.
+    is_likely_coach: Optional[bool] = None
 
 
 class PlayerSeasonStats(Row):

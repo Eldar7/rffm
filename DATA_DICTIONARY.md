@@ -286,18 +286,22 @@ re-crawl of enrichment data needed.
 - **`match_lineups/<category>.csv`** — per-match, per-player, one file per
   `scope_category` (e.g. `match_lineups/ALEVIN.csv`). FK `match_id` →
   `matches.csv`, FK `player_id` → `players.csv`. Columns: `match_id,
-  team_id, player_id, jersey_number, is_starter, is_substitute, is_captain,
-  is_goalkeeper, position_raw, position_abbr_raw, sex_raw`.
-  Dropped columns and how to recover them:
-  `player_name_raw` → join `players.csv` on `player_id`;
-  `source_url` → `f"https://www.rffm.es/acta-partido/{match_id}"`;
-  `scraped_at` → join `acta_crawl_log.csv` on `entity_id=match_id` where
-  `success=True`, take `timestamp`.
+  team_id, player_id, player_name_raw, jersey_number, is_starter,
+  is_substitute, is_captain, is_goalkeeper, position_raw,
+  position_abbr_raw, sex_raw`. `player_name_raw` is kept as-scraped (not
+  dropped, despite `players.csv` also carrying a name for the same
+  `player_id` via a join — cheap to keep, and useful for the ~3.6% of
+  card/goal `player_id`s that don't resolve in `players.csv`, see
+  `player_competition_participation`'s FK note and DATA_FINDINGS.md).
+  Dropped columns and how to recover them: `source_url` →
+  `f"https://www.rffm.es/acta-partido/{match_id}"`; `scraped_at` → join
+  `acta_crawl_log.csv` on `entity_id=match_id` where `success=True`, take
+  `timestamp`.
 - **`match_goals/<category>.csv`** — one row per goal event. `goal_type_raw`
   (site's `tipo_gol`, values `"100"/"101"/"102"` observed) is kept
   **opaque** — no confirmed decoding exists (unlike cards, below). Columns:
-  `match_id, team_id, player_id, minute, minute_raw, goal_type_raw`.
-  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+  `match_id, team_id, player_id, player_name_raw, minute, minute_raw,
+  goal_type_raw`. `source_url`, `scraped_at` dropped (see above).
 - **`match_cards/<category>.csv`** — one row per card. `card_type_raw` is
   the site's raw `codigo_tipo_amonestacion` code; `card_type_label` is a
   **derived, inferred** decoding — `"100"→"amarilla"`, `"101"→"roja"`,
@@ -305,9 +309,12 @@ re-crawl of enrichment data needed.
   wording, **not** English) — see "Card-type mapping" below for the
   inference basis. `minute == 999` is a known sentinel (card issued when
   not literally in play) — treat as anomalous, not a literal minute.
-  Columns: `match_id, team_id, player_id, minute, minute_raw,
-  card_type_raw, card_type_label, is_second_yellow`.
-  `player_name_raw`, `source_url`, `scraped_at` dropped (see above).
+  Columns: `match_id, team_id, player_id, player_name_raw, minute,
+  minute_raw, card_type_raw, card_type_label, is_second_yellow`.
+  `source_url`, `scraped_at` dropped (see above). `player_id` includes
+  coaches carded from the bench (RFFM has no separate coach id space —
+  see DATA_FINDINGS.md); `fichajugador` enrichment fetches these ids too,
+  and `players.csv`'s `is_likely_coach` flags them.
 - **`match_staff/<category>.csv`** — coaches/delegates, always has a real
   `team_id`. `role_kind` is one of exactly `"head_coach"`,
   `"assistant_coach"`, `"team_delegate"`, `"other_staff"`. Columns:
@@ -322,7 +329,21 @@ re-crawl of enrichment data needed.
   `source_url`, `scraped_at` dropped (see above).
 - **`players.csv`** (`player_id` PK) — stable identity only:
   `player_id, player_name, birth_year` (birth year, **not** age, which goes
-  stale every year), `source_url, scraped_at`.
+  stale every year), `source_url, scraped_at`, `is_likely_coach`.
+  `is_likely_coach` is **derived, not scraped from this player's own
+  fichajugador page** — `rffm_scraper.player_pipeline._backfill_is_likely_coach()`
+  sets it after every fichajugador run by cross-referencing two independent
+  signals: (a) this `player_id` was ever logged as `match_staff.person_id`
+  with `role_kind` in `head_coach`/`assistant_coach`/`other_staff`, or (b)
+  `player_season_stats` shows the site's own "0 matches played but has
+  cards" pattern for this player — see DATA_FINDINGS.md's
+  `match_cards.player_id` entry for why that pattern means "coach, not
+  player" (RFFM has no separate coach id space). `None`/blank for any
+  `players.csv` row written before this backfill first ran. A `True` here
+  is a strong signal, not proof either way — a genuine player *could*
+  coincidentally show 0 matches in a data-gap season; check
+  `player_competition_participation`/`match_lineups` for that `player_id`
+  if it matters for a specific query.
 - **`player_season_stats.csv`** — site-reported season aggregates (matches
   played, goals, cards) — **all values come verbatim from the site**, none
   are locally computed, including `goals_per_match`. Useful to
