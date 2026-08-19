@@ -377,6 +377,143 @@ re-crawl of enrichment data needed.
   club delegate, not public club data. Columns: `club_id, club_name_raw,
   portal_web, crest_url, correspondence_address, locality, province,
   postal_code, representative_team_id, source_url, scraped_at`.
+- **`clubs_extended.csv` / `club_teams.csv`** (`enrich_club_profiles.py`,
+  from `/fichaclub/<club_id>`) — the club's own richer site profile: takes
+  the real `club_id` (`codigo_club`) directly in the URL (not a `team_id` -
+  a `team_id` there returns `club: null`), and returns every team the club
+  has ever fielded, not just one representative team the way `clubs.csv`
+  does. Targets are every `club_id` already present across every season's
+  `clubs.csv` (cross-season - not one of these per season, unlike every
+  other table above; both files live at the processed root next to
+  `coverage_manifest.csv`, not inside a season directory). Not to be
+  confused with `analysis_scripts/club_profile.py`'s unrelated "Club
+  Profile" HTML report (donor/destination player-career flows) - same
+  English phrase, different feature entirely.
+
+  **Both tables are append-only snapshot logs, not one row per `club_id`
+  like every other table in this file.** A club's profile/roster is the
+  site's *current* state and genuinely drifts over time (new/deactivated
+  teams, name changes) - unlike match results or a player's per-season
+  stats, which are a fixed historical record once written. So a fetch never
+  overwrites a prior row; every successful `/fichaclub/` fetch (the initial
+  backfill, or a later deliberate `--force-refetch` refresh run) appends a
+  fresh snapshot stamped with that fetch's own `scraped_at`. `club_id` is
+  **not** unique in either file - get the current state with:
+
+  ```python
+  clubs_extended = pd.read_csv("output/processed/rffm/clubs_extended.csv", dtype=str)
+  current = clubs_extended.sort_values("scraped_at").groupby("club_id").tail(1)
+  ```
+
+  Full history (what changed, when) is just the file itself - nothing extra
+  to compute. `coverage_manifest.csv` records this stage as
+  `season="ALL", category_base="ALL", stage="club_profiles"` (a synthetic
+  key, same convention as `category_base="ALL"` elsewhere) since it isn't
+  tied to any one season.
+
+  `clubs_extended.csv` columns: `club_id, club_name, crest_url, delegacion,
+  comarca, cif, registered_address, registered_locality,
+  registered_province, registered_postal_code, correspondence_address,
+  correspondence_locality, correspondence_province,
+  correspondence_postal_code, correspondence_titular,
+  correspondence_tratamiento, correspondence_email, portal_web, twitter,
+  facebook, linkedin, instagram, telefonos, fax, fecha_fundacion,
+  presidente, source_url, scraped_at`. `registered_*` is the club's real
+  registered address (`domicilio` on the source page); `correspondence_*` is
+  a separate mailing address (`domicilio_correspondencia`) - the same two
+  distinct addresses `clubs.csv` already has under different names, plus
+  the registered one clubs.csv doesn't carry at all. **Deliberately
+  includes `telefonos`/`fax`/`correspondence_email`/`correspondence_titular`/
+  `presidente`** (a club officer's personal contact info) - unlike
+  `clubs.csv`, which excludes these on purpose; this table's inclusion is
+  an equally deliberate, explicit choice for this table, not an
+  inconsistency. `crest_url` is a relative path (e.g.
+  `/pnfg/pimg/Clubes/...`), same convention as `clubs.csv`'s `crest_url` -
+  prepend `https://www.rffm.es` to get a fetchable image URL.
+
+  `club_teams.csv` columns: `club_id, team_id, categoria, team_name_raw,
+  en_competicion, source_url, scraped_at`. One row per `(club_id, team)` per
+  snapshot. `team_id` is the *same id space* as `teams.csv`'s `team_id`
+  (confirmed by cross-reference - e.g. team_id `106`/`107`/`300231` under
+  club_id `1011` match ARAVACA C.F.'s team_ids in every season's
+  `teams.csv`), so it's directly joinable, though a given `team_id` here
+  won't necessarily appear in any one season's `teams.csv` (this table
+  covers the team's entire history at the club, not one season).
+  `en_competicion`: the site's own flag - `True` if the team is currently
+  registered in a live competition, `False` if it's a historical/inactive
+  team the club has fielded in the past.
+
+  **`club: null` is a valid, successful outcome**, not a fetch failure - a
+  stale/defunct `club_id` genuinely has no `/fichaclub/` profile on the
+  site (see `DATA_FINDINGS.md`'s "clubs_extended.csv - high null rate for
+  older-season club_ids", ~35% of all 1,054 target club_ids as of the
+  initial 2026-08 backfill, concentrated almost entirely in `club_id`s only
+  ever seen in 2016-2019 seasons' `clubs.csv` - 0.4% for 2025-2026 alone).
+  These club_ids simply have no row in `clubs_extended.csv`/`club_teams.csv`
+  at all; `club_profiles_data_quality_report.csv` records each one as an
+  `info`-severity `club_profile_not_found` row (not a warning) - see
+  `club_profiles_crawl_log.csv` to distinguish "confirmed null" (`success`
+  is `True`) from a genuine fetch failure (`club_profile_coverage_gap`,
+  `success` is `False`).
+
+### Where each club-data column comes from
+
+Two different tables can look like they overlap because they describe the
+same real-world clubs, but they read two different site pages, keyed by two
+different entity types - this table is the definitive column→source
+mapping so it's never a guessing game which one is authoritative for a
+given field. See `DATA_FINDINGS.md`'s "clubs.csv vs clubs_extended.csv" for
+the empirical agreement rate between the two (spoiler: high for
+`portal_web`/`crest_url`/postal code, lower for free-text address strings -
+formatting, not wrong data).
+
+**`clubs.csv`** — source page `/fichaequipo/<team_id>` (one representative
+team per club), JSON key `pageProps.team`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo_club` | |
+| `club_name_raw` | `nombre_club` | |
+| `portal_web` | `portal_web` | |
+| `crest_url` | `escudo_club` | relative path |
+| `correspondence_address` | `domicilio_correspondencia` | mailing address, not a stadium |
+| `locality` / `province` / `postal_code` | `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | |
+| `representative_team_id` | — | the `team_id` this row was fetched with, not a JSON field |
+| `telefonos` / `email_correspondencia` / `fax` | *(excluded)* | deliberately dropped — personal contact info |
+
+**`clubs_extended.csv`** — source page `/fichaclub/<club_id>` (the club
+itself, every team it has ever fielded), JSON key `pageProps.club`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | `codigo` | |
+| `club_name` | `nombre_club` | |
+| `crest_url` | `escudo` | relative path, same convention as `clubs.csv` |
+| `delegacion` / `comarca` | `delegacion` / `comarca` | RFFM's internal district grouping — no equivalent in `clubs.csv` |
+| `cif` | `CIF` | Spanish tax ID — no equivalent in `clubs.csv` |
+| `registered_address` / `registered_locality` / `registered_province` / `registered_postal_code` | `domicilio` / `localidad` / `provincia` / `codigo_postal` | the club's real registered address — **`clubs.csv` has no equivalent at all**, only the correspondence one below |
+| `correspondence_address` / `correspondence_locality` / `correspondence_province` / `correspondence_postal_code` | `domicilio_correspondencia` / `localidad_correspondencia` / `provincia_correspondencia` / `codigo_postal_correspondencia` | same concept as `clubs.csv`'s `correspondence_address`/`locality`/`province`/`postal_code`, independently fetched from a different page |
+| `correspondence_titular` / `correspondence_tratamiento` | `titular_correspondencia` / `tratamiento_correspondencia` | the named contact person for club mail — no equivalent in `clubs.csv` (excluded there as personal info) |
+| `correspondence_email` | `email_correspondencia` | excluded from `clubs.csv`; deliberately included here |
+| `portal_web` | `portal_web` | same concept as `clubs.csv`'s `portal_web` |
+| `twitter` / `facebook` / `linkedin` / `instagram` | same-named fields | no equivalent in `clubs.csv` |
+| `telefonos` / `fax` | `telefonos` / `fax` | excluded from `clubs.csv`; deliberately included here |
+| `fecha_fundacion` | `fecha_fundacion` | founding date — no equivalent in `clubs.csv` |
+| `presidente` | `presidente` | club president's name — no equivalent in `clubs.csv` |
+
+**`club_teams.csv`** — same source page/fetch as `clubs_extended.csv`
+(one page returns both), JSON key `pageProps.club.equipos_club[]`:
+
+| Column | Site JSON field | Notes |
+|---|---|---|
+| `club_id` | — | the `club_id` this page was fetched with, not a per-item JSON field |
+| `team_id` | `codigo_equipo` | same id space as `teams.csv`'s `team_id` |
+| `categoria` | `categoria` | |
+| `team_name_raw` | `nombre_equipo` | |
+| `en_competicion` | `en_competicion` | `"1"`/`"0"` mapped to `True`/`False` |
+
+No table in this project has ever listed every team a club has fielded
+before this one — there's no `clubs.csv` equivalent to compare against.
 
 ## Worked example — "give me all results between two clubs" (season 2025-2026)
 
@@ -516,6 +653,15 @@ season's other tables — `crawl_log.csv` is per-season too, not global.) Note
 `venues.csv`'s own fetches (`/campo/<id>`) log into core's `crawl_log.csv`,
 not a fourth family — that stage isn't robots.txt-gated, so it runs inside
 `main.py` itself rather than as a separate enrichment entrypoint.
+
+`club_profiles_crawl_log.csv`/`club_profiles_data_quality_report.csv` is a
+fifth family, with two differences from the three above: it lives at the
+processed root (`output/processed/rffm/`), not inside any season's
+directory, since the stage itself is cross-season (see `clubs_extended.csv`
+above); and unlike the others, a `success=True` row here does not imply a
+row was written to the primary output table — `club: null` is a valid
+successful outcome with no `clubs_extended.csv`/`club_teams.csv` row at all
+(see above).
 
 Unlike core's `crawl_log.csv` (rebuilt from scratch every run), the three
 enrichment crawl logs grow incrementally across a season's crawl and also

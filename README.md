@@ -31,10 +31,11 @@ Output:
 Optional enrichment stages (see "robots.txt and enrichment" below) each have
 their own entrypoint and are off by default: `enrich_acta.py` (match
 lineups/goals/cards/staff/officials), `enrich_players.py` (player
-profiles/season stats), and `enrich_clubs.py` (club identity/correspondence
-address). Venue/field data (`venues.csv`) is **not** a separate opt-in stage
-- it's part of the core `main.py` crawl, since `/campo/` is not in
-robots.txt's `Disallow` list.
+profiles/season stats), `enrich_clubs.py` (club identity/correspondence
+address), and `enrich_club_profiles.py` (full club profile + every team a
+club has ever fielded, cross-season, from `/fichaclub/<club_id>`). Venue/field
+data (`venues.csv`) is **not** a separate opt-in stage - it's part of the
+core `main.py` crawl, since `/campo/` is not in robots.txt's `Disallow` list.
 
 ## Storage layout
 
@@ -100,6 +101,7 @@ Discovery output is saved as a timestamped JSON manifest under
 | Acta de partido (match report) | `/acta-partido/<match_id>?temporada=&competicion=&grupo=` | Enrichment only, **off by default** — see robots.txt note below. |
 | Ficha de equipo (team profile) | `/fichaequipo/<team_id>` | Enrichment only, **off by default** — see robots.txt note below. |
 | Ficha de jugador (player profile) | `/fichajugador/<player_id>?temporada=` | Enrichment only, **off by default** — see robots.txt note below. |
+| Ficha de club (club profile) | `/fichaclub/<club_id>` | Enrichment-adjacent, **off by default** (gated for consistency, not because robots.txt requires it). Takes the real `club_id`, not a `team_id` - a `team_id` returns `club: null`. Cross-season, not category/season-scoped. |
 
 All of the above are server-rendered Next.js pages. Rather than scraping
 visible HTML text, every fetcher locates the `<script id="__NEXT_DATA__"
@@ -125,16 +127,19 @@ Disallow: /fichaequipo/
 Disallow: /fichajugador/
 Disallow: /acta-partido/
 ```
-`/campo/` is **not** in this list. The core MVP (calendario/clasificaciones/
-goleadores + `/campo/` + the `/api/*` discovery endpoints) does **not**
-touch any disallowed path. The three still-disallowed enrichment sources
-above are implemented but **off by default**
+`/campo/` and `/fichaclub/` are **not** in this list. The core MVP
+(calendario/clasificaciones/goleadores + `/campo/` + the `/api/*` discovery
+endpoints) does **not** touch any disallowed path. The three still-disallowed
+enrichment sources above are implemented but **off by default**
 (`enrichment.fetch_acta_partido` / `enrichment.fetch_fichaequipo` /
 `enrichment.fetch_fichajugador` in `config.yaml`), requiring an explicit,
 informed opt-in per run — this is a deliberate policy choice, not a
 limitation to work around. Note `fetch_fichaequipo` now gates the
 `enrich_clubs.py` stage (club identity), not a `fichaequipo`-per-team crawl
-- see "Entities collected" below.
+- see "Entities collected" below. `/fichaclub/` (`enrich_club_profiles.py`)
+is legally fetchable without any opt-in - unlike `/campo/`, it's still
+gated behind `enrichment.fetch_fichaclub` anyway, purely for consistency
+with the other three enrichment stages, not because robots.txt requires it.
 
 ## Entities collected
 
@@ -149,6 +154,11 @@ limitation to work around. Note `fetch_fichaequipo` now gates the
 - **Enrichment (opt-in, `enrich_clubs.py`):** club identity (real RFFM
   `club_id`), website, correspondence address - one representative team per
   club, not every team (see `DATA_DICTIONARY.md` for why one is enough).
+- **Enrichment (opt-in, `enrich_club_profiles.py`):** full club profile
+  (registered + correspondence address, socials, contact info, founding
+  date) and every team the club has ever fielded - from `/fichaclub/<club_id>`,
+  cross-season (not season-scoped, unlike every other enrichment stage).
+  Append-only snapshot tables, not upserted - see `DATA_DICTIONARY.md`.
 
 ### matches.csv vs fixtures.csv
 
@@ -186,6 +196,12 @@ lives in exactly one of these.
 - ✅ **2024-2025, all categories (core only)**: a second season, 1,201
   groups, 223 competitions, 114,554 matches, 689 venues, 9,193 teams -
   demonstrates the multi-season storage layout; no enrichment run yet.
+- ✅ **club_profiles (cross-season)**: first full backfill (2026-08-19)
+  covered all 1,054 `club_id`s known across every season's `clubs.csv`
+  (2016-2017 .. 2025-2026) - 685 resolved to a real `/fichaclub/` profile
+  (8,946 team-roster rows total), 369 returned `club: null` (a stale/defunct
+  `club_id` from an older season, not a fetch failure - see
+  `DATA_FINDINGS.md`). 0 fetch failures out of 1,054 requests.
 - ⚠️ Fallback/limited by design: acta-partido/fichaequipo/fichajugador
   enrichment is disabled by default (robots.txt). acta_partido/fichajugador
   are additionally category-scoped (`--scope`), typically piloted on one
@@ -208,6 +224,7 @@ main.py                # core crawl: discovery + calendario/clasificaciones/gole
 enrich_acta.py          # opt-in: match lineups/goals/cards/staff/officials
 enrich_players.py       # opt-in: player profiles/season stats
 enrich_clubs.py         # opt-in: club identity/correspondence address
+enrich_club_profiles.py # opt-in: full club profile + team roster, cross-season
 .github/workflows/
   rffm-crawl.yml          # manually-dispatched crawl job (any stage), commits+pushes on success
 rffm_scraper/
@@ -219,6 +236,7 @@ rffm_scraper/
   acta_parsers.py             # match report JSON → lineups/goals/cards/staff/officials
   fichajugador_parsers.py       # player profile JSON → player/season-stats/participation
   club_parsers.py                # fichaequipo JSON → club identity/address
+  club_profile_parsers.py         # fichaclub JSON → club profile/team roster
   normalize.py                   # category matching, dates, team-name/suffix parsing
   models.py                       # pydantic row schemas (one per CSV)
   row_io.py                        # shared CSV validation/writing/atomic-write/coverage-manifest/resumability helpers
@@ -226,7 +244,8 @@ rffm_scraper/
   acta_pipeline.py                   # match-report enrichment orchestration (batched, resumable)
   player_pipeline.py                   # player-profile enrichment orchestration (batched, resumable)
   club_pipeline.py                      # club enrichment orchestration (batched, resumable)
-  quality_checks.py / acta_quality_checks.py / player_quality_checks.py / club_quality_checks.py
+  club_profile_pipeline.py               # club-profile enrichment orchestration (cross-season, append-only)
+  quality_checks.py / acta_quality_checks.py / player_quality_checks.py / club_quality_checks.py / club_profile_quality_checks.py
 
 output/processed/rffm/
   coverage_manifest.csv  # cross-season index: is season × category × stage done?

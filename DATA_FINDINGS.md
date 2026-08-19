@@ -167,6 +167,23 @@ worked example of the site's shared player/coach id space rather than
 deleted, since the diagnosis itself remains true and useful context for
 why `is_likely_coach` exists.
 
+**Confirmed working, mid-rollout:** the fichajugador re-crawl using the
+widened target list has so far been re-run for 2017-2018..2020-2021.
+Checking `match_cards.player_id` orphans *by season* after that partial
+re-run: **2018-2019, 2019-2020, 2020-2021 are at 0 orphans; 2017-2018 is
+down to 1.** The remaining 19,173 distinct orphan `player_id`s
+(`validate_parquet.py`'s current total) are now **entirely concentrated in
+the seasons not yet re-crawled** (2021-2022 through 2025-2026, 3,375 to
+7,084 distinct orphan players per season, growing with season recency).
+Note this total isn't directly comparable to the 11,045/25,170 figures
+seen earlier in this project's history - those were taken at different
+points as `match_cards` itself grew (more categories/seasons fetched over
+time) - so don't read the change in the topline number as the fix making
+things worse; the per-season breakdown above is the reliable signal.
+Expect the total to drop close to 0 once the remaining seasons are
+re-crawled the same way - re-run `validate_parquet.py` after that finishes
+rather than trusting any single total here as final.
+
 **`match_cards`/`match_lineups`/`match_goals`'s `player_name_raw` is NOT
 dropped** (correcting a stale claim that circulated in this project's
 planning notes): checked directly - the column is present, and 99.08%
@@ -232,5 +249,98 @@ re-running `validate_parquet.py` after any future discovery-scheduling
 change to see if the count drops. Not wired into `parquet-build.yml` as a
 hard gate for the same reason as before (same posture
 DATA_QUALITY_REPORT's `severity=warning` checks already take).
+
+**Numbers drift as new seasons are added, still the same phenomenon:**
+after the 2016-2017 season and 2017-2018..2020-2021's fichajugador re-crawl
+(see the `match_cards.player_id` entry above) landed, the counts moved to
+832/1006/129 team_id/group_id/competition_id orphans - consistent growth
+from more seasons existing, not a new problem. Also found one single-row
+sibling of this exact pattern: `scorers.team_id -> teams` now has 1
+violation (`team_id=13538231`, 2021-2022) - same "team/competition/group
+the core crawl never discovered that season" story, just surfaced through
+`scorers.csv` instead of `player_competition_participation.csv`. Not
+investigated further individually; same "accepted, re-check after a
+discovery-scheduling change" posture as above.
+
+---
+
+## clubs_extended.csv — high null rate for older-season club_ids
+
+**Symptom:** `enrich_club_profiles.py`'s first full backfill (2026-08-19,
+1,054 target `club_id`s — the union across every season's `clubs.csv`)
+returned `club: null` for 369/1,054 targets (35%) — no
+`clubs_extended.csv`/`club_teams.csv` row at all for those, despite every
+one of the 1,054 requests returning HTTP 200 (`club_profiles_crawl_log.csv`
+has zero `success=False` rows for this run — see `failed: 0` in the run
+summary). At a glance this looks like it could be a URL/parsing bug, since
+35% seems high for "just some defunct clubs."
+
+**This is not a bug — confirmed by live re-fetch of several null `club_id`s
+outside the pipeline (`1029`, `1045`, `18104587`, `20798797`), all
+independently reproducing `pageProps.club: null`.** The real explanation:
+the null rate correlates almost perfectly with how old the season is that a
+`club_id` was *only* ever seen in:
+
+| Season (via that season's `clubs.csv`) | Null rate among that season's club_ids |
+|---|---|
+| 2016-2017 | 34.2% |
+| 2018-2019 | 29.8% |
+| 2020-2021 | 20.7% |
+| 2022-2023 | 15.2% |
+| 2024-2025 | 3.0% |
+| 2025-2026 | 0.4% |
+
+Only 20 of the 369 null `club_id`s appear in either of the two most recent
+seasons' `clubs.csv` at all. This reads as `codigo_club` values that were
+valid identities in RFFM's system years ago (still referenced by old
+`fichaequipo` pages, which is how `clubs.csv` picked them up in the first
+place) but have since been merged/deactivated/reassigned in whatever
+manages `/fichaclub/` today — a genuine site-side identity drift over a
+decade, not a crawl defect. Expected; don't re-investigate as a bug. See
+`club_profiles_data_quality_report.csv`'s `club_profile_not_found` rows
+(severity `info`, not `warning`) for the full list.
+
+---
+
+## clubs.csv vs clubs_extended.csv — where they agree, where they don't, and why
+
+**Symptom:** for the ~671 clubs present in both 2025-2026's `clubs.csv`
+(`enrich_clubs.py`, from `/fichaequipo/<team_id>`) and the new
+`clubs_extended.csv` (`enrich_club_profiles.py`, from
+`/fichaclub/<club_id>`), several columns that *sound* like the same field
+don't always match exactly. This looks like it could be a bug in one of the
+two pipelines. It isn't — see `DATA_DICTIONARY.md`'s "Where each column
+comes from" for the full field-by-field source mapping; this entry records
+the empirical comparison that motivated writing it.
+
+**Measured agreement** (2025-2026 `clubs.csv` vs `clubs_extended.csv`,
+2026-08 backfill, 671 clubs present in both):
+
+| Field pair | Match rate | Why the gap |
+|---|---|---|
+| `portal_web` (old) vs `portal_web` (new) | 670/671 (99.9%) | Noise-level; effectively the same value. |
+| `crest_url` (old) vs `crest_url` (new) | 659/671 (98%) | Noise-level. |
+| `postal_code` (old) vs `correspondence_postal_code` (new) | 668/671 (99.6%) after stripping `postal_code`'s known trailing-`.0` pandas artifact (same quirk `matches.csv`'s `home_score`/`away_score` have — see `DATA_DICTIONARY.md`) — only 5/671 (!) before that correction, which looks alarming until you realize it's a formatting artifact in the older file, not a data disagreement. |
+| `correspondence_address` (old) vs `correspondence_address` (new) | ~355/671 (53%) as an exact string match | **Not** 47% wrong data — most "mismatches" are the same physical address written differently by the two source pages (`"Pº"` vs `"PASEO"`, `"Av."` vs `"Avenida"`, punctuation/capitalization). A small number are genuine content differences (see below). |
+
+**Why the gap exists at all:** the two tables are sourced from two
+different pages about two different things — `clubs.csv` reads a
+per-*team* page (`/fichaequipo/<team_id>`, one representative team sampled
+per club) captured on 2026-08-03; `clubs_extended.csv` reads the club's own
+profile page (`/fichaclub/<club_id>`) captured on 2026-08-19. Sixteen days
+apart, and from a page keyed by a different entity, so some drift/
+formatting difference between "the same" field is expected, not a defect
+in either pipeline.
+
+**Genuine content differences found** (not formatting, not the pandas
+artifact) — a handful of clubs where the address *and* postal code both
+differ, e.g. `club_id` `30435` (MEXICO F.C. S.A.D.): `clubs.csv` has "Avda.
+Juan Pablo II, 30 - 2º A" / `28860`; `clubs_extended.csv` has "Calle
+Bulgaria 4, San Blas - Canillegas" / `28022`. Reads as the club having
+genuinely moved/updated its address between the two data sources — not a
+bug in either fetch. If you need a club's current address, prefer
+`clubs_extended.csv` (sourced from the club's own profile rather than one
+sampled team, and easy to re-freshen via `--force-refetch` — see
+`OPERATIONS.md`).
 
 ---

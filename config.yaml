@@ -41,6 +41,12 @@ site:
     acta_partido: "/acta-partido"
     fichaequipo: "/fichaequipo"
     fichajugador: "/fichajugador"
+    # Club profile page (codigo_club in the path, NOT a team_id - a team_id
+    # here returns club: null, confirmed live). NOT in robots.txt's
+    # Disallow list (only fichaequipo/fichajugador/acta-partido are) - still
+    # gated behind `enrichment.fetch_fichaclub` below for consistency with
+    # the other three enrichment stages, even though not legally required.
+    fichaclub: "/fichaclub"
 
 network:
   user_agent: "Mozilla/5.0 (compatible; RFFM-DataCollector/1.0; contact: research use)"
@@ -68,6 +74,7 @@ enrichment:
   fetch_acta_partido: true       # disallowed by robots.txt - explicit opt-in, run via enrich_acta.py
   fetch_fichaequipo: true        # disallowed by robots.txt - explicit opt-in, run via enrich_clubs.py
   fetch_fichajugador: true       # disallowed by robots.txt - explicit opt-in, run via enrich_players.py
+  fetch_fichaclub: true          # ALLOWED by robots.txt - gated anyway for consistency, run via enrich_club_profiles.py
   # Settings for the enrich_acta.py stage (match lineups/goals/cards/staff/
   # officials, from /acta-partido/<match_id>). Off by default; explicitly
   # opted into for a PREBENJAMIN pilot before widening to other categories.
@@ -99,6 +106,24 @@ enrichment:
   # is not an age-bracket concept, so every club_name_raw in teams.csv is a
   # target regardless of which categories that season's core crawl covered.
   clubs:
+    progress_report_every: 25
+    csv_flush_every: 100
+    rate_limit_seconds: 1.25
+    force_refetch: false
+    workers: 8
+  # Settings for the enrich_club_profiles.py stage (full club profile +
+  # every team the club has ever fielded, from /fichaclub/<club_id>).
+  # Targets are every club_id already present across every season's
+  # clubs.csv (cross-season, not season-scoped - see club_profile_pipeline.py).
+  # Cross-season, manually dispatched - not part of the crawl-all.yml
+  # per-season backfill chain (see rffm-crawl.yml's club_profiles stage).
+  # force_refetch has a different meaning here than in the other enrichment
+  # stages: since clubs_extended.csv/club_teams.csv are append-only snapshot
+  # logs (a club's profile/roster can genuinely change over time - new
+  # teams, name changes), force_refetch=true means "take a fresh snapshot of
+  # every target club_id now, regardless of what's already recorded" (a
+  # deliberate refresh run), not just "ignore the local raw-HTML cache".
+  club_profiles:
     progress_report_every: 25
     csv_flush_every: 100
     rate_limit_seconds: 1.25
