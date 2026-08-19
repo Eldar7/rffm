@@ -136,12 +136,46 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     The actual fix: go through `.astype(object)` first (a real Python
     int/bool/str per cell, real None for any missing slot - no upcast,
     since object dtype has no numeric fast path to trigger it), THEN
-    stringify only the non-None cells. Gets both properties at once."""
+    stringify only the non-None cells. Gets both properties at once.
+
+    One more pandas-3.x gotcha layered on top of that, found the same way
+    as build_parquet.py's compact_types() one (see its own comment):
+    `Series.map()` infers the RESULT column's dtype too, and for an
+    all-string(-or-None) object column pandas 3.x aggressively infers
+    `StringDtype` right there, before the value even reaches a DataFrame -
+    and under StringDtype, a missing slot silently becomes a raw Python
+    `float('nan')` instead of staying `None`/`pd.NA` (confirmed: `.dtype`
+    on the `.map()` result alone, with no DataFrame involved yet, already
+    reads "str"). `.itertuples()` (every _v2 report generator's read
+    pattern) then hands that nan back verbatim. Confirmed on real data:
+    matches.parquet's home_team_id, 2,144 genuine nulls for 2025-2026 alone
+    - every one came back as `float('nan')` through `.itertuples()`,
+    invisible to any `v is None` check (including this file's own
+    docstring example above, and team_participation_map_v2.py's `clean()`)
+    and fatal to `json.dumps(..., allow_nan=False)`. Once `.map()`/
+    `.astype(str)` has already inferred StringDtype, the None is gone for
+    good - a later `.astype(object)` on the result just relabels the dtype
+    without restoring it (tried, checked, didn't work). Skipping the
+    inference entirely fixes it - the first version of this fix did that
+    with a plain per-cell Python list comprehension, which is correct but
+    measured ~7s to stringify one 578k-row/13-column table (every read_table
+    call pays this, so every report build compounds it into minutes). The
+    version below gets the same guarantee - never construct a Series/array
+    that pandas could infer as StringDtype - without a Python-level loop:
+    stringify through numpy's `.astype(str)` on only the *non-null* slice of
+    a plain object-dtype numpy array (numpy's own C loop, not pandas
+    dtype-inferring machinery), assign back in place, and hand the finished
+    numpy object array to the Series constructor with an explicit
+    `dtype=object`. Measured ~150x faster on the same column, byte-for-byte
+    identical output."""
     out = {}
     for col in df.columns:
         s = df[col]
-        obj = s.astype(object).where(s.notna(), None)
-        out[col] = obj.map(lambda v: v if v is None else str(v))
+        arr = s.astype(object).where(s.notna(), None).to_numpy(dtype=object, copy=False)
+        not_none = arr != None  # noqa: E711 - elementwise identity check over an object array, not a scalar `is`
+        arr = arr.copy()
+        arr[not_none] = arr[not_none].astype(str)
+        out[col] = pd.Series(arr, index=df.index, dtype=object)
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
 
