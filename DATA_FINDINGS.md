@@ -67,3 +67,41 @@ afterward," never as a fabricated transfer. That's intentional caution, not
 missing data.
 
 ---
+
+## clubs_extended.csv — high null rate for older-season club_ids
+
+**Symptom:** `enrich_club_profiles.py`'s first full backfill (2026-08-19,
+1,054 target `club_id`s — the union across every season's `clubs.csv`)
+returned `club: null` for 369/1,054 targets (35%) — no
+`clubs_extended.csv`/`club_teams.csv` row at all for those, despite every
+one of the 1,054 requests returning HTTP 200 (`club_profiles_crawl_log.csv`
+has zero `success=False` rows for this run — see `failed: 0` in the run
+summary). At a glance this looks like it could be a URL/parsing bug, since
+35% seems high for "just some defunct clubs."
+
+**This is not a bug — confirmed by live re-fetch of several null `club_id`s
+outside the pipeline (`1029`, `1045`, `18104587`, `20798797`), all
+independently reproducing `pageProps.club: null`.** The real explanation:
+the null rate correlates almost perfectly with how old the season is that a
+`club_id` was *only* ever seen in:
+
+| Season (via that season's `clubs.csv`) | Null rate among that season's club_ids |
+|---|---|
+| 2016-2017 | 34.2% |
+| 2018-2019 | 29.8% |
+| 2020-2021 | 20.7% |
+| 2022-2023 | 15.2% |
+| 2024-2025 | 3.0% |
+| 2025-2026 | 0.4% |
+
+Only 20 of the 369 null `club_id`s appear in either of the two most recent
+seasons' `clubs.csv` at all. This reads as `codigo_club` values that were
+valid identities in RFFM's system years ago (still referenced by old
+`fichaequipo` pages, which is how `clubs.csv` picked them up in the first
+place) but have since been merged/deactivated/reassigned in whatever
+manages `/fichaclub/` today — a genuine site-side identity drift over a
+decade, not a crawl defect. Expected; don't re-investigate as a bug. See
+`club_profiles_data_quality_report.csv`'s `club_profile_not_found` rows
+(severity `info`, not `warning`) for the full list.
+
+---

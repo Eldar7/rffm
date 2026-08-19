@@ -62,6 +62,10 @@ coverage = pd.read_csv("output/processed/rffm/coverage_manifest.csv")
 print(coverage[coverage["season"] == "2025-2026"])
 ```
 
+One row is different: `stage == "club_profiles"` uses `season="ALL"` (a
+synthetic key) since that stage is cross-season, not tied to any one
+season's crawl — see `DATA_DICTIONARY.md`'s `clubs_extended.csv` entry.
+
 ## Tables at a glance
 
 One line each — table name, PK, what it holds. **Exact columns, quirks,
@@ -89,6 +93,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 - `player_season_stats.csv` — site-reported season aggregates per player
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
 - `clubs.csv` (`club_id`, `enrich_clubs.py`) — one row per club: real RFFM club id, website, correspondence address (**not** a stadium address — see `DATA_DICTIONARY.md`)
+- `clubs_extended.csv` / `club_teams.csv` (`enrich_club_profiles.py`) — richer club profile + every team the club has ever fielded, from `/fichaclub/<club_id>`. Cross-season, **append-only snapshot log** (not one row per `club_id` — see `DATA_DICTIONARY.md` for the "get current state" recipe)
 
 ## How to answer a query
 
@@ -117,6 +122,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 | A team's fixture list | `matches` | `home_team_id`/`away_team_id` |
 | Where does a team/club play (address, map link) | `teams`, `matches`, `venues` | `club_name_raw` → `team_id` → `matches.venue_id` → `venues` |
 | A club's identity/website/correspondence address | `clubs` | `club_name_raw` (join to `teams` if starting from a `team_id`) — opt-in table, check `coverage_manifest.csv` first |
+| A club's full profile (address, socials, founding date) or every team it has ever fielded | `clubs_extended`, `club_teams` | `club_id` — cross-season, append-only (take the latest `scraped_at` per `club_id`), see `DATA_DICTIONARY.md` |
 | A player's appearances/goals/cards | `match_lineups/*`, `match_goals/*`, `match_cards/*`, `matches` | `player_id` → `match_id` → `matches` for date/context; glob all category files |
 | Did a player move teams/clubs | `match_lineups/*`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |
 | Match report detail (lineup, staff, ref) | `match_lineups/*`, `match_staff/*`, `match_officials/*` | `match_id` |
