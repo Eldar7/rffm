@@ -119,6 +119,33 @@ class ClubTeamRosterEntry(Row):
     scraped_at: str
 
 
+class TeamClubMapping(Row):
+    """One row per team_id -> club_id, output/processed/rffm/team_club_map.csv
+    (cross-season - see team_club_pipeline.py's module docstring). Unlike
+    clubs_extended.csv/club_teams.csv this is NOT an append-only snapshot
+    log: a team_id's club_id is a stable, permanent fact once resolved (RFFM
+    never reassigns a team_id to a different club), so there is exactly one
+    row per team_id, upserted rather than accumulated.
+
+    `source` records how this row was obtained, since most rows are seeded
+    for free from data another stage already fetched rather than from a
+    live /fichaequipo/ request of this stage's own:
+      - "fichaequipo_direct": this stage's own live fetch of
+        /fichaequipo/<team_id> -> codigo_club.
+      - "fichaclub_roster": copied from club_teams.csv (the /fichaclub/
+        roster already lists this team_id under its club_id).
+      - "clubs_representative": copied from some season's clubs.csv, where
+        this team_id was the representative_team_id for its club_name_raw
+        group.
+    """
+
+    team_id: str
+    club_id: str
+    source: str
+    source_url: str
+    scraped_at: str
+
+
 class TeamGroupMembership(Row):
     season: str
     season_id: str

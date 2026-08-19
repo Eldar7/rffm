@@ -36,6 +36,18 @@ correctly deduped in the published `clubs.csv` (first-fetched row kept).
 They are not duplicates in the data — they are the same real-world club
 fielding multiple teams.
 
+**Update (team_club_map.csv):** the finding above is specifically about the
+one *representative* team_id per `club_name_raw` group failing to resolve
+- it does not mean every other team of that same club also fails. Live
+spot-checks found real cases where a non-representative sibling team (same
+club, different `club_name_raw` spelling - e.g. "A.D. ARGANDA CLUB DE
+FUTBOL 'B'" vs the already-resolved "A.D. ARGANDA C.F.") resolved fine on
+its own `/fichaequipo/` page. `enrich_team_clubs.py`/`team_club_map.csv`
+targets every team_id, not just representatives, and closes most of that
+gap - see `DATA_DICTIONARY.md`'s `team_club_map.csv` entry. The 326 figure
+above should not be read as "326 permanently unresolvable clubs" - re-check
+against `team_club_map.csv` first.
+
 ---
 
 ## club_profile.html — a club renamed across seasons can show up as two clubs

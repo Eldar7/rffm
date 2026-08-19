@@ -171,7 +171,11 @@ PER_SEASON_TABLES = [
 # Same schema in all five, one file per season each - see module docstring
 # ("Three intentionally separate crawl_log/quality-report families") -
 # except "club_profiles", which lives once at output/processed/rffm/ (not
-# per-season), same reasoning as CROSS_SEASON_TABLES below.
+# per-season), same reasoning as CROSS_SEASON_TABLES below. team_clubs'
+# quality report is per-season too (like clubs) - "did season S's own
+# team_ids get resolved" is a season-scoped question even though the
+# underlying fetch history (team_clubs_crawl_log.csv, below) isn't - see
+# team_club_pipeline.py's module docstring.
 # (log_family, filename) pairs.
 CRAWL_LOG_FAMILIES = [
     ("core", "crawl_log.csv"), ("acta", "acta_crawl_log.csv"),
@@ -180,8 +184,15 @@ CRAWL_LOG_FAMILIES = [
 DATA_QUALITY_REPORT_FAMILIES = [
     ("core", "data_quality_report.csv"), ("acta", "acta_data_quality_report.csv"),
     ("fichajugador", "fichajugador_data_quality_report.csv"), ("clubs", "clubs_data_quality_report.csv"),
+    ("team_clubs", "team_clubs_data_quality_report.csv"),
 ]
+# Cross-season crawl-log families (single file at output/processed/rffm/,
+# not per-season). team_clubs' log is cross-season even though its quality
+# report above isn't - team_id resolution isn't season-scoped (the same
+# team_id recurs across seasons), but per-season coverage still is - see
+# team_club_pipeline.py's module docstring.
 CROSS_SEASON_CRAWL_LOG_FAMILY = ("club_profiles", "club_profiles_crawl_log.csv")
+CROSS_SEASON_TEAM_CLUBS_CRAWL_LOG_FAMILY = ("team_clubs", "team_clubs_crawl_log.csv")
 CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY = ("club_profiles", "club_profiles_data_quality_report.csv")
 
 # One CSV per (season, category) under a subdirectory -> inject both.
@@ -193,8 +204,11 @@ SHARDED_DIRS = ["match_lineups", "match_goals", "match_cards", "match_staff", "m
 # season's clubs.csv, not one season's crawl, and every fetch (initial or a
 # later --force-refetch) appends a new scraped_at-stamped row rather than
 # overwriting, so there's no "season" to inject and no per-season file to
-# glob - just read the one file as-is.
-CROSS_SEASON_TABLES = ["clubs_extended.csv", "club_teams.csv"]
+# glob - just read the one file as-is. team_club_map.csv (see
+# team_club_pipeline.py) is cross-season for the same reason, though unlike
+# the other two it's upserted (one row per team_id) rather than
+# append-only, since a team_id's club_id is a permanent fact once resolved.
+CROSS_SEASON_TABLES = ["clubs_extended.csv", "club_teams.csv", "team_club_map.csv"]
 
 
 def list_seasons() -> list[str]:
@@ -367,18 +381,18 @@ def build_sharded_season(dirname: str, season: str) -> pd.DataFrame | None:
 
 def build_family_log_table(
     families: list[tuple[str, str]], seasons: list[str],
-    cross_season_family: tuple[str, str] | None = None,
+    cross_season_families: list[tuple[str, str]] | None = None,
 ) -> pd.DataFrame | None:
-    """crawl_log/data_quality_report: same schema across 4 per-season files
-    (core/acta/fichajugador/clubs - see module docstring), concatenated
-    with `season` + `log_family` injected. Uses read_csv_raw() - not
-    read_csv() - so source_url survives (it's the audit trail here, not a
-    redundant join key).
+    """crawl_log/data_quality_report: same schema across several per-season
+    files (core/acta/fichajugador/clubs[/team_clubs] - see module
+    docstring), concatenated with `season` + `log_family` injected. Uses
+    read_csv_raw() - not read_csv() - so source_url survives (it's the
+    audit trail here, not a redundant join key).
 
-    cross_season_family (e.g. club_profiles) is a 5th, optional family
-    whose log lives once at output/processed/rffm/ instead of per-season -
-    same file, same schema, just read once with `season` left null rather
-    than glob a season directory that doesn't apply to it."""
+    cross_season_families (e.g. club_profiles, team_clubs) are extra
+    families whose log lives once at output/processed/rffm/ instead of
+    per-season - same file, same schema, just read once with `season` left
+    null rather than glob a season directory that doesn't apply to it."""
     frames = []
     for family, filename in families:
         for season in seasons:
@@ -397,8 +411,7 @@ def build_family_log_table(
             df.insert(0, "log_family", family)
             df.insert(0, "season", season)
             frames.append(df)
-    if cross_season_family:
-        family, filename = cross_season_family
+    for family, filename in cross_season_families or []:
         f = BASE / filename
         if f.exists():
             try:
@@ -536,12 +549,14 @@ def main():
     for name in CROSS_SEASON_TABLES:
         write(name.removesuffix(".csv"), build_cross_season_table(name))
 
-    print("Crawl audit tables (4 per-season families + 1 cross-season family concatenated,"
+    print("Crawl audit tables (per-season families + cross-season families concatenated,"
           " log_family injected, source_url kept; one Parquet file per season plus one"
-          " ALL.parquet for the cross-season club_profiles family - see module docstring):")
-    write_partitioned("crawl_log", build_family_log_table(CRAWL_LOG_FAMILIES, seasons, CROSS_SEASON_CRAWL_LOG_FAMILY))
+          " ALL.parquet for each cross-season family - see module docstring):")
+    write_partitioned("crawl_log", build_family_log_table(
+        CRAWL_LOG_FAMILIES, seasons, [CROSS_SEASON_CRAWL_LOG_FAMILY, CROSS_SEASON_TEAM_CLUBS_CRAWL_LOG_FAMILY]
+    ))
     write_partitioned("data_quality_report", build_family_log_table(
-        DATA_QUALITY_REPORT_FAMILIES, seasons, CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY
+        DATA_QUALITY_REPORT_FAMILIES, seasons, [CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY]
     ))
 
     for pattern in ["*/matches.csv", "*/standings.csv", "*/scorers.csv", "*/groups.csv",
@@ -554,9 +569,10 @@ def main():
                      "*/crawl_log.csv", "*/acta_crawl_log.csv", "*/fichajugador_crawl_log.csv",
                      "*/clubs_crawl_log.csv", "*/data_quality_report.csv",
                      "*/acta_data_quality_report.csv", "*/fichajugador_data_quality_report.csv",
-                     "*/clubs_data_quality_report.csv"]:
+                     "*/clubs_data_quality_report.csv", "*/team_clubs_data_quality_report.csv"]:
         total_csv_bytes += sum(f.stat().st_size for f in BASE.glob(pattern))
-    for name in [*CROSS_SEASON_TABLES, "club_profiles_crawl_log.csv", "club_profiles_data_quality_report.csv"]:
+    for name in [*CROSS_SEASON_TABLES, "club_profiles_crawl_log.csv", "club_profiles_data_quality_report.csv",
+                 "team_clubs_crawl_log.csv"]:
         f = BASE / name
         if f.exists():
             total_csv_bytes += f.stat().st_size

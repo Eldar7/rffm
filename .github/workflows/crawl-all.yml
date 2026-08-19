@@ -123,7 +123,7 @@ jobs:
           if [ -n "$output" ]; then
             IFS='|' read -r season stage scope all_cat _done _total <<< "$output"
             scope_display="${scope:-ALL}"
-            if [ "$stage" = "core" ] || [ "$stage" = "clubs" ]; then
+            if [ "$stage" = "core" ] || [ "$stage" = "clubs" ] || [ "$stage" = "team_clubs" ]; then
               scope_display="ALL"
             fi
             echo "label=${stage} ${season} / ${scope_display}" >> "$GITHUB_OUTPUT"
