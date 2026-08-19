@@ -167,22 +167,36 @@ worked example of the site's shared player/coach id space rather than
 deleted, since the diagnosis itself remains true and useful context for
 why `is_likely_coach` exists.
 
-**Confirmed working, mid-rollout:** the fichajugador re-crawl using the
-widened target list has so far been re-run for 2017-2018..2020-2021.
-Checking `match_cards.player_id` orphans *by season* after that partial
-re-run: **2018-2019, 2019-2020, 2020-2021 are at 0 orphans; 2017-2018 is
-down to 1.** The remaining 19,173 distinct orphan `player_id`s
-(`validate_parquet.py`'s current total) are now **entirely concentrated in
-the seasons not yet re-crawled** (2021-2022 through 2025-2026, 3,375 to
-7,084 distinct orphan players per season, growing with season recency).
-Note this total isn't directly comparable to the 11,045/25,170 figures
-seen earlier in this project's history - those were taken at different
-points as `match_cards` itself grew (more categories/seasons fetched over
-time) - so don't read the change in the topline number as the fix making
-things worse; the per-season breakdown above is the reliable signal.
-Expect the total to drop close to 0 once the remaining seasons are
-re-crawled the same way - re-run `validate_parquet.py` after that finishes
-rather than trusting any single total here as final.
+**Confirmed fixed, full rollout complete:** the fichajugador re-crawl
+using the widened target list has now been run for all 9
+fichajugador-covered seasons (2017-2018 through 2025-2026 - 2016-2017 has
+no acta/fichajugador data at all, so nothing to widen there), 39,121
+newly-fetched player_ids total (per-season target computation, not a
+global one - see below for why that number differs from the
+25,170/11,045 figures quoted earlier in this project's history).
+Re-running `validate_parquet.py` after the full rollout:
+`match_cards.player_id` orphans dropped from 11,045 to **2** - both
+confirmed as live HTTP fetch failures for that specific id during the
+crawl (a handful of `failed:`/`missing_after_this_run:` targets showed up
+in every season's run summary; these two never got a successful fetch),
+not a remaining logic gap. Re-fetching those two specifically (e.g. via
+`retry_check.py` or a forced re-run) should close this to 0.
+
+**Why the total target count (39,121) is larger than the original
+25,170/11,045 figures:** those earlier numbers were computed against a
+*global*, cross-season deduplication of `player_id` (matching
+`players.parquet`'s own dedup-to-one-row-per-player treatment) - but the
+crawler's actual resumability/target-computation is **per season
+directory** (`output/processed/rffm/<season>/`, independent
+`players.csv`/`fichajugador_crawl_log.csv` per season - see
+`OPERATIONS.md`'s storage layout). A person carded as a coach in *both*
+2022-2023 and 2024-2025, say, counts once in the global view but needs
+two separate fetches (one per season) in the real pipeline, since each
+season's crawl has no visibility into another season's `players.csv`.
+Verified empirically before running: zero overlap between each season's
+"new target" set and that same season's existing `players.csv` in every
+one of the 9 seasons - so 39,121 was already the true minimal delta, not
+inflated by re-fetching anyone already done.
 
 **`match_cards`/`match_lineups`/`match_goals`'s `player_name_raw` is NOT
 dropped** (correcting a stale claim that circulated in this project's
@@ -204,13 +218,24 @@ produced - it needed the target-scope widening above *and* this
 cross-reference to be useful.
 
 **`player_competition_participation.team_id`/`.group_id`/`.competition_id`
-not in `teams`/`groups`/`competitions`: 767/981/129 distinct values**,
-spread across all 9 fichajugador-covered seasons (25-301 per season, not
-concentrated in the newest/least-stable one — checked, ruling out "core
-crawl just hasn't caught up with enrichment yet" as the whole story). The
-team names in the violating rows are real clubs (e.g. "U.D. TALAMANCA",
-"MOSTOLES C.F."), not the known placeholder/unassigned codes from the
-`clubs.csv` gap entry above — so this isn't the same phenomenon.
+not in `teams`/`groups`/`competitions`: 858/1,006/129 distinct values** as
+of the fully-widened fichajugador re-crawl (was 767/981/129 before) —
+spread across all 9 fichajugador-covered seasons, not concentrated in the
+newest/least-stable one. The team names in the violating rows are real
+clubs (e.g. "U.D. TALAMANCA", "MOSTOLES C.F."), not the known
+placeholder/unassigned codes from the `clubs.csv` gap entry above — so
+this isn't the same phenomenon. **The rise in `team_id`/`group_id` counts
+(767→858, 981→1,006) is expected, not a regression**: widening fichajugador
+targets added ~39,121 more `player_competition_participation` rows overall
+(one newly-fetched profile can register several new team/group
+combinations), so more instances of the *same already-diagnosed* gap
+below surface - re-checked after the widening: 2,004 of 2,006 orphan
+`team_id` rows (99.9%, same rate as before) still have an orphan
+`competition_id`/`group_id` on the same row. `competition_id`'s count
+staying exactly 129 makes sense too - it's a `COUNT(DISTINCT
+competition_id)`, so new rows referencing an *already-orphaned*
+competition don't move it; only a genuinely new missing competition
+would.
 
 **Root-caused:** anti-joining the *same* orphan rows against
 `competitions`/`groups` (not just `teams`) shows **99.9% (1,769 of
