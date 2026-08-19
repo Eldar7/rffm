@@ -127,13 +127,44 @@ actually resolves in the table it references. `validate_parquet.py`
 structural gaps — small relative to table size, not crawl failures, not
 yet root-caused past the pattern below:
 
-**`match_cards.player_id` not in `players`: 25,170 distinct player_ids**,
-spread across every category and most seasons (roughly 1,300-1,900 per
-season×category cell, no single outlier). A player can apparently receive
-a card without a corresponding row ever showing up in that season's
-`players.csv` (fichajugador). Not a coverage-status issue — checked
-`coverage_manifest.csv`: fichajugador shows `complete` for every affected
-season/category, including 2025-2026.
+**`match_cards.player_id` not in `players`: 11,045 distinct player_ids
+(3.63% of the 303,968 this project knows about) — root-caused, mostly
+coaches carded on the bench, not a crawl bug:**
+
+1. `_load_target_player_ids()` in `rffm_scraper/player_pipeline.py` sources
+   fichajugador fetch targets from `match_lineups` only, not
+   `match_cards`/`match_goals` — so a card recipient who never appears in
+   that match's lineup extraction never gets their `/fichajugador/<id>`
+   page fetched, even when a real one exists on the site. Confirmed by
+   hand: `https://www.rffm.es/fichajugador/<id>?temporada=<season_id>`
+   returns a genuine `FICHA DEL JUGADOR` for IDs this project has no
+   `players.csv` row for.
+2. Most of these are coaches, not players who simply weren't fetched.
+   Anti-joining the same (match_id, team_id, id) against `match_staff.
+   person_id` explains 65% of the rows directly (same match, same team -
+   real names, `role_kind='head_coach'`/`'other_staff'`), and another
+   handful resolve if you drop the match/team restriction and just check
+   whether the id appears as staff *anywhere* in `match_staff` (a coach
+   who works with more than one team at the club). For the remainder
+   (8,525 ids, 0.79% of all known players) that don't resolve to staff at
+   all: fetched 8 of them live and cross-referenced age against the
+   category their card was in - CADETE/JUVENIL/ALEVIN. Every single one
+   with a listed age (6/8; the other 2 have no active-season
+   team/category, i.e. inactive this season) was 21-35 years old, in
+   categories whose player age bracket is 10-18 (DATA_DICTIONARY.md's
+   "Category taxonomy" table). RFFM appears to use one person/`jugador` ID
+   space for both playing and coaching roles - someone registered as an
+   adult player elsewhere gets their youth-team coaching card logged under
+   that same id, and this project's `match_staff` extraction doesn't
+   catch every coach for every match.
+
+**Not a data quality bug**, and not something `enrich_players.py` fetching
+more aggressively would meaningfully fix - these ids mostly resolve to
+real people, just not people functioning as *players* in the match the
+card was recorded in, so adding them to `players.csv` would misrepresent
+them as youth players. The more useful fix, if one is wanted, is
+completeness of `match_staff`'s own coach/delegate capture, not
+`_load_target_player_ids()`'s scope.
 
 **`player_competition_participation.team_id`/`.group_id`/`.competition_id`
 not in `teams`/`groups`/`competitions`: 767/981/129 distinct values**,
