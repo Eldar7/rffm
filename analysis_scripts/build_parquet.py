@@ -1,12 +1,38 @@
 #!/usr/bin/env python3
 """
 Converts every CSV under output/processed/rffm/<season>/ into a small set of
-compact, lossless Parquet tables — one file per table, concatenated across
-all seasons, EXCEPT the category-sharded enrichment tables (match_lineups
-etc.), which are one file per season (see "Category-sharded enrichment
-dirs" below for why) — for the planned duckdb-wasm frontend (SQL queries
-over static files in the browser instead of the current hand-sharded JSON
-per report).
+compact, lossless Parquet tables — for the planned duckdb-wasm frontend (SQL
+queries over static files in the browser instead of the current hand-sharded
+JSON per report).
+
+Almost every table is one Parquet file *per season*
+(output/processed/rffm_parquet/<table>/<season>.parquet), not one combined
+file — this is deliberate and load-bearing for git, not just a size
+optimization. A committed Parquet file is a zstd-compressed binary blob: git
+cannot delta it the way it deltas text, so a combined file gets fully
+rewritten (full size, no useful diff) in git history on every commit that
+touches ANY row in ANY season - measured directly on this dataset (two real
+snapshots of a combined players.parquet cost 11MB in git history even after
+aggressive repack, vs 8MB for the same two snapshots committed as CSV,
+despite the CSV being ~4x bigger per snapshot - see PLAYERS_CURRENT_CSV).
+Partitioning by season means a season that didn't change produces a
+byte-identical file, so git sees no diff for it at all - a new season's
+crawl only ever adds/updates that one small file. Measured overhead of
+partitioning (each file builds its own compression dictionary instead of
+sharing one across seasons): +15-31% total on-disk size depending on the
+table (crawl_log +24%, matches +31%, player_competition_participation
++15%) - accepted, since the goal here is bounding git history growth over
+years of incremental crawls, not minimizing a single snapshot's size.
+
+The two exceptions:
+  - `players` (see PLAYERS_CURRENT_CSV below) - deduped cross-season, can't
+    be partitioned by season without losing that property, so it's the one
+    table kept small enough (a few MB) that a full rewrite per touch is
+    acceptable, and kept as git-tracked CSV instead of committed Parquet
+    for the same delta-compression reason as above.
+  - `clubs_extended`/`club_teams` (CROSS_SEASON_TABLES) - genuinely
+    cross-season append-only logs with no season dimension to partition by;
+    small enough (well under 1MB combined) that this doesn't matter.
 
 Not wired into any report yet: this only produces the Parquet files. Run it
 independently to inspect output size; analysis_scripts/build_site.py does
@@ -44,16 +70,13 @@ this script:
     there's no conflict-flagging column here despite an earlier version
     having one).
   - Category-sharded enrichment dirs (match_lineups/<CATEGORY>.csv etc.)
-    get `category_base` injected from the path, and are written out one
-    Parquet file per season (output/processed/rffm_parquet/match_lineups/
-    <season>.parquet) rather than one file for all 10 seasons combined -
-    combined, match_lineups alone crossed 100MB (GitHub's hard per-file
-    push limit, hit for real committing this) with room to spare for
-    nothing but 2-3 more seasons of growth. Per-season files mirror how
-    output/processed/rffm/<season>/ itself is already partitioned, so a
-    new season's crawl only ever adds one new small file instead of
-    requiring the combined file to be rewritten (and re-approaching the
-    limit) every time.
+    get `category_base` injected from the path in addition to the
+    per-season partitioning every table gets (see top of this docstring) -
+    match_lineups was in fact the original reason this project discovered
+    the git-bloat problem partitioning now solves everywhere: combined, it
+    alone crossed 100MB (GitHub's hard per-file push limit, hit for real
+    committing this) with room to spare for nothing but 2-3 more seasons of
+    growth.
   - crawl_log.csv/acta_crawl_log.csv/fichajugador_crawl_log.csv/
     clubs_crawl_log.csv (identical schema, four separate files per season -
     DATA_DICTIONARY.md's "Three intentionally separate crawl_log/quality-
@@ -92,6 +115,23 @@ import pandas as pd
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 SEASON_RE = re.compile(r"^\d{4}-\d{4}$")
+
+# players.parquet is deliberately NOT git-tracked (see .gitignore) - a
+# binary Parquet blob gets fully rewritten by every commit that touches it
+# (no useful git delta, measured: two real players.parquet snapshots here
+# cost 11MB in git history even after aggressive repack, vs 8MB for the
+# same two snapshots as CSV, despite the CSV being ~4x bigger per snapshot -
+# git's delta compression works on text, not on already-zstd-compressed
+# binary). So the canonical, git-tracked source for the deduped players
+# table is this CSV instead - cross-season and derived (like
+# clubs_extended.csv/club_teams.csv), hence living at this top level rather
+# than under a season directory or reusing the "players.csv" name already
+# used per-season by the raw crawler output. output/processed/rffm_parquet/
+# players.parquet still gets (re)written to disk every build for read-path
+# consistency with every other table - it's just never committed; rebuild
+# it locally with `--players-only` before querying it after a fresh
+# checkout if it's missing.
+PLAYERS_CURRENT_CSV = "players_current.csv"
 
 DROP_COLS = ["source_url"]
 
@@ -273,6 +313,40 @@ def build_players_table(seasons: list[str]) -> pd.DataFrame | None:
     return compact_types(deduped.reset_index(drop=True))
 
 
+def write_players_current_csv(df: pd.DataFrame) -> Path:
+    """Writes the deduped players table to the git-tracked CSV (see
+    PLAYERS_CURRENT_CSV). df is expected already compact_types()'d (real
+    nullable Int/category dtypes, not raw strings) - pandas writes those out
+    as clean integers, so this does NOT reintroduce the trailing-'.0'
+    artifact the per-season source CSVs carry (see DATA_FINDINGS.md)."""
+    out = BASE / PLAYERS_CURRENT_CSV
+    df.to_csv(out, index=False)
+    return out
+
+
+def rebuild_players_parquet_from_csv(out_dir: Path, compression_level: int) -> pd.DataFrame | None:
+    """Fast on-demand path: rebuild just output/processed/rffm_parquet/
+    players.parquet (gitignored, see module docstring) from the already-
+    deduped, git-tracked players_current.csv - no need to re-scan and
+    re-dedupe every season's raw players.csv. Use this (--players-only)
+    after a fresh checkout instead of a full `build_parquet.py` run, which
+    would also rebuild every other table unnecessarily."""
+    f = BASE / PLAYERS_CURRENT_CSV
+    if not f.exists():
+        print(f"  {PLAYERS_CURRENT_CSV} not found at {f} - nothing to rebuild from.")
+        return None
+    # read_csv() re-reads everything as strings (CSV has no dtype info of
+    # its own) - compact_types() below re-derives the same real types
+    # write_players_current_csv's caller already had, so this round-trip is
+    # lossless for values, just not for dtype until compact_types runs again.
+    df = compact_types(read_csv(f))
+    out = out_dir / "players.parquet"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, compression="zstd", compression_level=compression_level, index=False)
+    print(f"  players                          {len(df):>9,} rows -> {out.stat().st_size / 1e6:8.2f} MB (from {PLAYERS_CURRENT_CSV})")
+    return df
+
+
 def build_sharded_season(dirname: str, season: str) -> pd.DataFrame | None:
     """One season's worth of a category-sharded enrichment dir, all
     categories concatenated with `category_base` injected - the unit
@@ -352,10 +426,21 @@ def main():
     parser = argparse.ArgumentParser(description="Convert RFFM CSVs to compact Parquet tables")
     parser.add_argument("--output-dir", default="site/data/parquet")
     parser.add_argument("--compression-level", type=int, default=15)
+    parser.add_argument(
+        "--players-only", action="store_true",
+        help="Only rebuild output/processed/rffm_parquet/players.parquet from the already-"
+             "deduped, git-tracked players_current.csv (gitignored, so a fresh checkout "
+             "won't have it) - skips every other table. Fast: no per-season scan/dedupe.",
+    )
     args = parser.parse_args()
 
     out_dir = Path(__file__).parent.parent / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.players_only:
+        print(f"Rebuilding players.parquet only, from {PLAYERS_CURRENT_CSV}:")
+        rebuild_players_parquet_from_csv(out_dir, args.compression_level)
+        return
 
     seasons = list_seasons()
     print(f"{len(seasons)} seasons: {seasons[0]}..{seasons[-1]}")
@@ -374,24 +459,58 @@ def main():
         total_parquet_bytes += size
         print(f"  {table_name:<32} {len(df):>9,} rows -> {size / 1e6:8.2f} MB")
 
-    print("Flat tables (one CSV/season, season column already present):")
+    def write_partitioned(table_name: str, df: pd.DataFrame | None, season_col: str = "season"):
+        """One Parquet file per season (out_dir/{table_name}/{season}.parquet)
+        instead of one combined file - see module docstring's "Season-
+        partitioned tables" note for why. Rows with no season (the
+        cross-season club_profiles log family) land in an "ALL" file, same
+        convention as CROSS_SEASON_*_FAMILY's season=None."""
+        nonlocal total_parquet_bytes
+        if df is None or df.empty:
+            print(f"  skip {table_name}: no data")
+            return
+        table_dir = out_dir / table_name
+        table_dir.mkdir(parents=True, exist_ok=True)
+        total_rows = 0
+        total_bytes_this_table = 0
+        n_files = 0
+        season_key = df[season_col].astype(str).where(df[season_col].notna(), "ALL")
+        for season_val, sub in df.groupby(season_key, observed=True):
+            if sub.empty:
+                continue
+            f = table_dir / f"{season_val}.parquet"
+            sub.to_parquet(f, compression="zstd", compression_level=args.compression_level, index=False)
+            size = f.stat().st_size
+            total_parquet_bytes += size
+            total_bytes_this_table += size
+            total_rows += len(sub)
+            n_files += 1
+        print(f"  {table_name:<32} {total_rows:>9,} rows -> {total_bytes_this_table / 1e6:8.2f} MB across {n_files} files")
+
+    print("Flat tables (one CSV/season, season column already present; one Parquet file per season):")
     for name in FLAT_TABLES:
-        write(name.removesuffix(".csv"), build_flat_table(name, seasons))
+        write_partitioned(name.removesuffix(".csv"), build_flat_table(name, seasons))
 
-    print("Per-season tables (season injected from directory):")
+    print("Per-season tables (season injected from directory; one Parquet file per season):")
     for name in PER_SEASON_TABLES:
-        write(name.removesuffix(".csv"), build_per_season_table(name, seasons))
+        write_partitioned(name.removesuffix(".csv"), build_per_season_table(name, seasons))
 
-    print("Players (deduped to one row per player_id, see module docstring):")
-    write("players", build_players_table(seasons))
+    print("Players (deduped to one row per player_id, see module docstring)."
+          " Canonical git-tracked source is players_current.csv (not the .parquet"
+          " below, which is gitignored - see PLAYERS_CURRENT_CSV):")
+    players_df = build_players_table(seasons)
+    if players_df is not None and not players_df.empty:
+        csv_out = write_players_current_csv(players_df)
+        print(f"  {PLAYERS_CURRENT_CSV:<32} {len(players_df):>9,} rows -> {csv_out.stat().st_size / 1e6:8.2f} MB (git-tracked)")
+    write("players", players_df)
 
     print("Players by season (NOT deduped - mirrors the original per-season"
           " players.csv exactly, for season-order-sensitive call sites like"
           " player_career.py's earliest-known-birth_year logic - defensive:"
           " this dataset has zero players whose birth_year genuinely changes"
           " across seasons, but per-season history is what would let"
-          " 'earliest' stay correct if that's ever not true):")
-    write("players_by_season", build_per_season_table("players.csv", seasons))
+          " 'earliest' stay correct if that's ever not true; one Parquet file per season):")
+    write_partitioned("players_by_season", build_per_season_table("players.csv", seasons))
 
     print("Category-sharded enrichment tables (one Parquet file per season, category_base injected):")
     for dirname in SHARDED_DIRS:
@@ -418,9 +537,10 @@ def main():
         write(name.removesuffix(".csv"), build_cross_season_table(name))
 
     print("Crawl audit tables (4 per-season families + 1 cross-season family concatenated,"
-          " log_family injected, source_url kept - see module docstring):")
-    write("crawl_log", build_family_log_table(CRAWL_LOG_FAMILIES, seasons, CROSS_SEASON_CRAWL_LOG_FAMILY))
-    write("data_quality_report", build_family_log_table(
+          " log_family injected, source_url kept; one Parquet file per season plus one"
+          " ALL.parquet for the cross-season club_profiles family - see module docstring):")
+    write_partitioned("crawl_log", build_family_log_table(CRAWL_LOG_FAMILIES, seasons, CROSS_SEASON_CRAWL_LOG_FAMILY))
+    write_partitioned("data_quality_report", build_family_log_table(
         DATA_QUALITY_REPORT_FAMILIES, seasons, CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY
     ))
 

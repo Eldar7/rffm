@@ -311,7 +311,7 @@ def main():
     weird_scores_report.build_all(out_dir)
 
     parquet_dir = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
-    if (parquet_dir / "matches.parquet").exists():
+    if any((parquet_dir / "matches").glob("*.parquet")):
         print("Building v2/weird_scores.html (Parquet-sourced proof of concept)...")
         v2_dir = out_dir / "v2"
         v2_dir.mkdir(parents=True, exist_ok=True)

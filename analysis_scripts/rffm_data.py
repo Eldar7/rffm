@@ -74,6 +74,21 @@ NO_SEASON_COLUMN_IN_ORIGINAL = {
 # module docstring ("Category-sharded enrichment dirs") for why.
 SHARDED_TABLES = {"match_lineups", "match_goals", "match_cards", "match_staff", "match_officials"}
 
+# Everything else that carries a `season` dimension is ALSO one Parquet file
+# per season now (<name>/<season>.parquet) - build_parquet.py stopped
+# writing these as one combined file for the same reason as SHARDED_TABLES
+# above: an unchanged season's file then stays byte-identical across
+# rebuilds, instead of git seeing the whole (binary, non-delta-friendly)
+# table as "changed" every time any one season's crawl adds new rows. Same
+# season-required load path as SHARDED_TABLES, just without category_base.
+SEASON_PARTITIONED_TABLES = {
+    "matches", "standings", "scorers", "groups", "competitions",
+    "team_group_membership", "player_competition_participation", "player_season_stats",
+    "teams", "venues", "clubs", "game_types", "seasons",
+    "manifest_groups", "manifest_pages", "manifest_endpoints",
+    "players_by_season", "crawl_log", "data_quality_report",
+}
+
 
 @lru_cache(maxsize=None)
 def _load(name: str) -> pd.DataFrame:
@@ -115,25 +130,23 @@ def read_table(name: str, season: str | None = None, category: str | None = None
     """Returns a DataFrame shaped like the original per-season/per-category
     CSV read. `season`/`category` are ignored where the table doesn't carry
     that dimension (e.g. players is global; flat tables have no category)."""
-    if name in SHARDED_TABLES:
+    if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         if season is None:
             raise ValueError(f"{name} is season-sharded on disk - season= is required")
         df = _load_sharded_season(name, season)
         if df is None:
-            return _stringify(pd.DataFrame(columns=["category_base"]))  # empty, matches "dir missing" originals
-        if category is not None:
+            cols = ["category_base"] if name in SHARDED_TABLES else []
+            return _stringify(pd.DataFrame(columns=cols))  # empty, matches "dir missing" originals
+        if category is not None and "category_base" in df.columns:
             df = df[df["category_base"] == category].drop(columns=["category_base"])
+        if name in NO_SEASON_COLUMN_IN_ORIGINAL and "season" in df.columns:
+            df = df.drop(columns=["season"])
         return _stringify(df)
 
     df = _load(name)
 
     if name == "players":
         return _stringify(df)
-
-    if season is not None and "season" in df.columns:
-        df = df[df["season"] == season]
-        if name in NO_SEASON_COLUMN_IN_ORIGINAL:
-            df = df.drop(columns=["season"])
 
     if category is not None and "category_base" in df.columns:
         df = df[df["category_base"] == category]
@@ -149,6 +162,8 @@ def list_categories(name: str, season: str) -> list[str]:
     if name in SHARDED_TABLES:
         df = _load_sharded_season(name, season)
         return sorted(df["category_base"].unique().tolist()) if df is not None else []
+    if name in SEASON_PARTITIONED_TABLES:
+        raise ValueError(f"{name} is season-partitioned but has no category_base column")
     df = _load(name)
     if "season" not in df.columns or "category_base" not in df.columns:
         raise ValueError(f"{name} has no per-season/category shards")
@@ -156,7 +171,7 @@ def list_categories(name: str, season: str) -> list[str]:
 
 
 def list_seasons(name: str) -> list[str]:
-    if name in SHARDED_TABLES:
+    if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         return sorted(p.stem for p in (PARQUET_DIR / name).glob("*.parquet"))
     df = _load(name)
     if "season" not in df.columns:

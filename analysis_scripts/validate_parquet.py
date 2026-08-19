@@ -38,43 +38,45 @@ import duckdb
 
 PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
 
-# (description, fk_source_glob, fk_column, pk_target_file, pk_column)
-# fk_source_glob is relative to --parquet-dir; sharded tables (one file per
-# season) are globbed with *.parquet, flat tables reference the single file
-# directly - both work the same way through DuckDB's glob support.
+# (description, fk_source_glob, fk_column, pk_target_glob, pk_column)
+# Almost every table is one Parquet file *per season* now (see
+# build_parquet.py's module docstring for why) - both fk and pk sides glob
+# with *.parquet. `players.parquet` is the one exception left as a single
+# file (deduped cross-season identity, can't be partitioned - see
+# build_parquet.py's PLAYERS_CURRENT_CSV).
 CHECKS: list[tuple[str, str, str, str, str]] = [
-    ("matches.home_team_id -> teams", "matches.parquet", "home_team_id", "teams.parquet", "team_id"),
-    ("matches.away_team_id -> teams", "matches.parquet", "away_team_id", "teams.parquet", "team_id"),
-    ("matches.competition_id -> competitions", "matches.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("matches.group_id -> groups", "matches.parquet", "group_id", "groups.parquet", "group_id"),
-    ("matches.venue_id -> venues", "matches.parquet", "venue_id", "venues.parquet", "venue_id"),
-    ("groups.competition_id -> competitions", "groups.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("team_group_membership.team_id -> teams", "team_group_membership.parquet", "team_id", "teams.parquet", "team_id"),
-    ("team_group_membership.competition_id -> competitions", "team_group_membership.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("team_group_membership.group_id -> groups", "team_group_membership.parquet", "group_id", "groups.parquet", "group_id"),
-    ("standings.team_id -> teams", "standings.parquet", "team_id", "teams.parquet", "team_id"),
-    ("standings.competition_id -> competitions", "standings.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("standings.group_id -> groups", "standings.parquet", "group_id", "groups.parquet", "group_id"),
-    ("scorers.team_id -> teams", "scorers.parquet", "team_id", "teams.parquet", "team_id"),
-    ("scorers.competition_id -> competitions", "scorers.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("scorers.group_id -> groups", "scorers.parquet", "group_id", "groups.parquet", "group_id"),
-    ("player_competition_participation.player_id -> players", "player_competition_participation.parquet", "player_id", "players.parquet", "player_id"),
-    ("player_competition_participation.team_id -> teams", "player_competition_participation.parquet", "team_id", "teams.parquet", "team_id"),
-    ("player_competition_participation.competition_id -> competitions", "player_competition_participation.parquet", "competition_id", "competitions.parquet", "competition_id"),
-    ("player_competition_participation.group_id -> groups", "player_competition_participation.parquet", "group_id", "groups.parquet", "group_id"),
-    ("player_season_stats.player_id -> players", "player_season_stats.parquet", "player_id", "players.parquet", "player_id"),
-    ("match_lineups.match_id -> matches", "match_lineups/*.parquet", "match_id", "matches.parquet", "match_id"),
-    ("match_lineups.team_id -> teams", "match_lineups/*.parquet", "team_id", "teams.parquet", "team_id"),
+    ("matches.home_team_id -> teams", "matches/*.parquet", "home_team_id", "teams/*.parquet", "team_id"),
+    ("matches.away_team_id -> teams", "matches/*.parquet", "away_team_id", "teams/*.parquet", "team_id"),
+    ("matches.competition_id -> competitions", "matches/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("matches.group_id -> groups", "matches/*.parquet", "group_id", "groups/*.parquet", "group_id"),
+    ("matches.venue_id -> venues", "matches/*.parquet", "venue_id", "venues/*.parquet", "venue_id"),
+    ("groups.competition_id -> competitions", "groups/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("team_group_membership.team_id -> teams", "team_group_membership/*.parquet", "team_id", "teams/*.parquet", "team_id"),
+    ("team_group_membership.competition_id -> competitions", "team_group_membership/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("team_group_membership.group_id -> groups", "team_group_membership/*.parquet", "group_id", "groups/*.parquet", "group_id"),
+    ("standings.team_id -> teams", "standings/*.parquet", "team_id", "teams/*.parquet", "team_id"),
+    ("standings.competition_id -> competitions", "standings/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("standings.group_id -> groups", "standings/*.parquet", "group_id", "groups/*.parquet", "group_id"),
+    ("scorers.team_id -> teams", "scorers/*.parquet", "team_id", "teams/*.parquet", "team_id"),
+    ("scorers.competition_id -> competitions", "scorers/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("scorers.group_id -> groups", "scorers/*.parquet", "group_id", "groups/*.parquet", "group_id"),
+    ("player_competition_participation.player_id -> players", "player_competition_participation/*.parquet", "player_id", "players.parquet", "player_id"),
+    ("player_competition_participation.team_id -> teams", "player_competition_participation/*.parquet", "team_id", "teams/*.parquet", "team_id"),
+    ("player_competition_participation.competition_id -> competitions", "player_competition_participation/*.parquet", "competition_id", "competitions/*.parquet", "competition_id"),
+    ("player_competition_participation.group_id -> groups", "player_competition_participation/*.parquet", "group_id", "groups/*.parquet", "group_id"),
+    ("player_season_stats.player_id -> players", "player_season_stats/*.parquet", "player_id", "players.parquet", "player_id"),
+    ("match_lineups.match_id -> matches", "match_lineups/*.parquet", "match_id", "matches/*.parquet", "match_id"),
+    ("match_lineups.team_id -> teams", "match_lineups/*.parquet", "team_id", "teams/*.parquet", "team_id"),
     ("match_lineups.player_id -> players", "match_lineups/*.parquet", "player_id", "players.parquet", "player_id"),
-    ("match_goals.match_id -> matches", "match_goals/*.parquet", "match_id", "matches.parquet", "match_id"),
-    ("match_goals.team_id -> teams", "match_goals/*.parquet", "team_id", "teams.parquet", "team_id"),
+    ("match_goals.match_id -> matches", "match_goals/*.parquet", "match_id", "matches/*.parquet", "match_id"),
+    ("match_goals.team_id -> teams", "match_goals/*.parquet", "team_id", "teams/*.parquet", "team_id"),
     ("match_goals.player_id -> players", "match_goals/*.parquet", "player_id", "players.parquet", "player_id"),
-    ("match_cards.match_id -> matches", "match_cards/*.parquet", "match_id", "matches.parquet", "match_id"),
-    ("match_cards.team_id -> teams", "match_cards/*.parquet", "team_id", "teams.parquet", "team_id"),
+    ("match_cards.match_id -> matches", "match_cards/*.parquet", "match_id", "matches/*.parquet", "match_id"),
+    ("match_cards.team_id -> teams", "match_cards/*.parquet", "team_id", "teams/*.parquet", "team_id"),
     ("match_cards.player_id -> players", "match_cards/*.parquet", "player_id", "players.parquet", "player_id"),
-    ("match_staff.match_id -> matches", "match_staff/*.parquet", "match_id", "matches.parquet", "match_id"),
-    ("match_staff.team_id -> teams", "match_staff/*.parquet", "team_id", "teams.parquet", "team_id"),
-    ("match_officials.match_id -> matches", "match_officials/*.parquet", "match_id", "matches.parquet", "match_id"),
+    ("match_staff.match_id -> matches", "match_staff/*.parquet", "match_id", "matches/*.parquet", "match_id"),
+    ("match_staff.team_id -> teams", "match_staff/*.parquet", "team_id", "teams/*.parquet", "team_id"),
+    ("match_officials.match_id -> matches", "match_officials/*.parquet", "match_id", "matches/*.parquet", "match_id"),
 ]
 
 
@@ -84,7 +86,12 @@ def run_checks(parquet_dir: Path) -> list[tuple[str, int]]:
     for label, fk_glob, fk_col, pk_file, pk_col in CHECKS:
         fk_path = parquet_dir / fk_glob
         pk_path = parquet_dir / pk_file
-        if not pk_path.exists():
+        # pk_file may be a glob (e.g. "teams/*.parquet") now that most
+        # tables are season-partitioned - Path.exists() can't resolve a
+        # wildcard, so check via glob() for those, plain exists() for the
+        # remaining single-file tables (players.parquet).
+        pk_found = bool(list(parquet_dir.glob(pk_file))) if "*" in pk_file else pk_path.exists()
+        if not pk_found:
             print(f"  skip {label}: {pk_file} not found")
             continue
         q = f"""
