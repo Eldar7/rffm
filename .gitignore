@@ -5,6 +5,13 @@ env/
 ENV/
 tmp/
 
+# Raw HTML cache (OPERATIONS.md/README.md: "gitignored, regenerated per run,
+# never pushed" - resumability depends on the CSVs + crawl logs, never on
+# this surviving). Was missing from this file despite being documented and
+# never actually committed in this repo's history - closing the gap rather
+# than relying on nobody ever running a broad `git add`.
+/output/raw/
+
 # Generated GitHub Pages site (built by analysis_scripts/build_site.py in CI)
 /site/
 
