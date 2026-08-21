@@ -50,8 +50,12 @@ additions, not because of an ordering requirement:
    seasons, so it's fetched at most once ever, not once per season it
    appears in) even though its per-run *target list* is still this
    season's `teams.csv` - see the module docstring for the full reasoning.
-   Queued automatically per season in `crawl-all.yml`'s plan, unlike step 5
-   below.
+   Also (re)writes `team_club_gap_reasons.csv` at the end of every run - a
+   fully recomputed classification of why each `team_id` still unresolved
+   after this run has no `club_id` (technical no-show, FASE ZONAL,
+   non-federated local cup, ...), not tied to this run's own targets - see
+   `DATA_DICTIONARY.md`. Queued automatically per season in
+   `crawl-all.yml`'s plan, unlike step 5 below.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups/<category>.csv`
    (needs step 2 done first for the categories it targets). Same order of

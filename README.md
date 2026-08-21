@@ -162,7 +162,10 @@ with the other three enrichment stages, not because robots.txt requires it.
   club_id` mapping (`team_club_map.csv`) - every team, not one
   representative per club, resolving exactly the gap `enrich_clubs.py`
   leaves. Cross-season: a `team_id`'s `club_id` is fetched at most once
-  ever, regardless of how many seasons it appears in - see
+  ever, regardless of how many seasons it appears in. Also writes
+  `team_club_gap_reasons.csv` - a recomputed-every-run classification of
+  *why* each still-unresolved `team_id` has no `club_id` (technical
+  no-show, FASE ZONAL, non-federated local cup, ...) - see
   `DATA_DICTIONARY.md`.
 - **Enrichment (opt-in, `enrich_club_profiles.py`):** full club profile
   (registered + correspondence address, socials, contact info, founding
