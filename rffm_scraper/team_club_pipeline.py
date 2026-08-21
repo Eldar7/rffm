@@ -144,6 +144,21 @@ def _load_all_teams_name_map(processed_root) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True).dropna(subset=["team_id", "club_name_raw"]).drop_duplicates()
 
 
+# club_name_raw values that are RFFM's own generic placeholder labels, not
+# a real club identity - "Equipo Casa/Fuera (No asignado)" is reused
+# verbatim as a bye/no-show stand-in across ~700-800 *different*,
+# unrelated team_id slots in different groups, and "Finalista N F-7/F-11"
+# is a bracket-TBD placeholder likewise reused across different brackets.
+# Matching on either would propagate one team_id's real (or later-reused,
+# per the club_pipeline.py module docstring's team_id-reuse finding)
+# club_id to every other placeholder sharing the same generic text - a
+# real false-positive caught live (all 606-798 "No asignado" team_ids
+# collapsed onto the one club_id that team_id 17145319 happened to become
+# in a later season - see DATA_FINDINGS.md). Excluded from
+# exact_name_match entirely; still correctly left unresolved.
+_NON_CLUB_NAME_PATTERN = r"No asignado|^Finalista\s"
+
+
 def _load_exact_name_match_candidates(processed_root, resolved: pd.DataFrame) -> pd.DataFrame:
     """team_id -> club_id for team_ids not yet resolved, whose club_name_raw
     exactly matches another team_id's club_name_raw that IS already
@@ -152,6 +167,9 @@ def _load_exact_name_match_candidates(processed_root, resolved: pd.DataFrame) ->
     string equality - this is the same reasoning already used to dedupe
     clubs.csv by club_id (codigo_club confirmed identical across every team
     of a club), just applied in the team_id -> club_id direction instead.
+    club_name_raw values matching _NON_CLUB_NAME_PATTERN are excluded
+    first - see that constant's comment for why exact-string equality
+    alone isn't safe for those.
 
     A club_name_raw group with more than one distinct club_id among its
     resolved members is a genuine collision (should not happen given that
@@ -160,6 +178,7 @@ def _load_exact_name_match_candidates(processed_root, resolved: pd.DataFrame) ->
     name_map = _load_all_teams_name_map(processed_root)
     if name_map.empty or resolved.empty:
         return pd.DataFrame(columns=_MAP_COLUMNS)
+    name_map = name_map[~name_map["club_name_raw"].str.contains(_NON_CLUB_NAME_PATTERN, case=False, regex=True)]
 
     named = name_map.merge(
         resolved[["team_id", "club_id", "source_url", "scraped_at"]], on="team_id", how="left",
