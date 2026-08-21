@@ -143,6 +143,15 @@ class TeamClubMapping(Row):
         sources above - propagated with no name-matching heuristics beyond
         exact string equality. Skipped (not guessed at) whenever a
         club_name_raw group has more than one distinct resolved club_id.
+      - "manual_review": human-verified during analysis, not derivable by
+        any of the above (club_name_raw drifted too far for exact-string
+        matching - e.g. "FUTURO VELILLA F. S." vs its already-resolved
+        sibling "FUTURO VELILLA"). Confirmed via independent evidence
+        (shared venue_id across every season, consecutive team_id issued in
+        the same registration batch, or an unambiguous crest/name match),
+        documented per-row in DATA_FINDINGS.md - never added speculatively.
+        Not reproducible by re-running the pipeline; a one-time,
+        deliberately reviewed exception, not a recurring seeding layer.
     """
 
     team_id: str
