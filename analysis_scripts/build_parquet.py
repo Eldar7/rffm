@@ -30,9 +30,12 @@ The two exceptions:
     table kept small enough (a few MB) that a full rewrite per touch is
     acceptable, and kept as git-tracked CSV instead of committed Parquet
     for the same delta-compression reason as above.
-  - `clubs_extended`/`club_teams` (CROSS_SEASON_TABLES) - genuinely
-    cross-season append-only logs with no season dimension to partition by;
-    small enough (well under 1MB combined) that this doesn't matter.
+  - `clubs_extended`/`club_teams`/`team_club_map`/`team_club_gap_reasons`
+    (CROSS_SEASON_TABLES) - genuinely cross-season tables (the first two
+    append-only logs, the latter two upserted/recomputed - see
+    CROSS_SEASON_TABLES below for which) with no season dimension to
+    partition by; small enough (well under 1MB combined) that this doesn't
+    matter.
 
 Not wired into any report yet: this only produces the Parquet files. Run it
 independently to inspect output size; analysis_scripts/build_site.py does
@@ -208,7 +211,14 @@ SHARDED_DIRS = ["match_lineups", "match_goals", "match_cards", "match_staff", "m
 # team_club_pipeline.py) is cross-season for the same reason, though unlike
 # the other two it's upserted (one row per team_id) rather than
 # append-only, since a team_id's club_id is a permanent fact once resolved.
-CROSS_SEASON_TABLES = ["clubs_extended.csv", "club_teams.csv", "team_club_map.csv"]
+# team_club_gap_reasons.csv (also team_club_pipeline.py) is a third
+# variant again: fully overwritten on every team_clubs run (a derived
+# snapshot classifying whatever's still unresolved *right now*, not a
+# fetch record), so unlike the other two there's no history to preserve -
+# just read the one current file as-is, same as the others here.
+CROSS_SEASON_TABLES = [
+    "clubs_extended.csv", "club_teams.csv", "team_club_map.csv", "team_club_gap_reasons.csv",
+]
 
 
 def list_seasons() -> list[str]:

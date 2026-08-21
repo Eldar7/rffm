@@ -43,10 +43,12 @@ table this file assumes.
   git diff at all, instead of the whole table being rewritten on every
   touch). Exceptions, all single files, no glob needed: `players.parquet`
   (deduped cross-season — see next paragraph), `clubs_extended.parquet`/
-  `club_teams.parquet`/`team_club_map.parquet` (genuinely cross-season, no
-  season dimension to partition by — `team_club_map` is one row per
-  `team_id`, not an append-only log like the other two, but still no
-  season dimension since `team_id` is a stable cross-season identity).
+  `club_teams.parquet`/`team_club_map.parquet`/`team_club_gap_reasons.parquet`
+  (genuinely cross-season, no season dimension to partition by —
+  `team_club_map` is one row per `team_id`, not an append-only log like the
+  other two, but still no season dimension since `team_id` is a stable
+  cross-season identity; `team_club_gap_reasons` is a fully recomputed
+  snapshot on every run, again with no season dimension).
 
   **`players.parquet` is the one exception to "just query the Parquet
   copy" — it's gitignored, not committed** (same git-delta reasoning as
@@ -421,11 +423,50 @@ re-crawl of enrichment data needed.
   snapshot log. Most rows never needed a live fetch: `source` records how
   each was obtained - `fichaclub_roster` (copied from `club_teams.csv`,
   which already lists the `team_id` under its club from the `/fichaclub/`
-  side), `clubs_representative` (copied from some season's `clubs.csv`), or
+  side), `clubs_representative` (copied from some season's `clubs.csv`),
   `fichaequipo_direct` (this stage's own live fetch, for whatever's left
-  after the first two). Columns: `team_id, club_id, source, source_url,
-  scraped_at`. See `OPERATIONS.md`'s dependency order for how this stage
-  relates to `clubs`/`club_profiles`.
+  after the first two), `exact_name_match` (propagated to every other
+  `team_id` sharing an identical, non-placeholder `club_name_raw` with an
+  already-resolved `team_id` - see `rffm_scraper/models.py`'s
+  `TeamClubMapping` docstring for the placeholder-name exclusion this
+  layer applies, and `DATA_FINDINGS.md` for a false-positive incident
+  caught and fixed here), or `manual_review` (a small, non-recurring set of
+  human-verified exceptions the automated layers above can't reach - one
+  independently-evidenced row per `team_id`, documented in
+  `DATA_FINDINGS.md`; participates in every join exactly like the
+  automated sources, just tagged so its provenance is visible on request).
+  Columns: `team_id, club_id, source, source_url, scraped_at`. See
+  `OPERATIONS.md`'s dependency order for how this stage relates to
+  `clubs`/`club_profiles`.
+- **`team_club_gap_reasons.csv`** (`team_id` PK, also `team_club_pipeline.py`)
+  — classifies *why* each `team_id` still absent from `team_club_map.csv`
+  has no `club_id`, instead of leaving that ~16% residual gap unexplained.
+  Cross-season like `team_club_map.csv`, but a **fully recomputed snapshot
+  on every `team_clubs` run**, not upserted or append-only - a `team_id`
+  that gets resolved next run simply stops appearing here. Derived purely
+  from already-collected data (`matches.csv`'s `competition`/
+  `competition_id`, `competitions.csv`'s `division_level`, `club_name_raw`
+  patterns) - no live fetch, so it can also be recomputed standalone at any
+  time. `reason`, in classification priority order (first match wins - see
+  `rffm_scraper/models.py`'s `TeamClubGapReason` docstring for the exact
+  per-reason match rule and `DATA_FINDINGS.md` for how each was validated
+  against live data): `technical_no_show` (RFFM's own "No asignado"/
+  "Finalista N" placeholder names - not real teams), `fase_zonal`
+  (`division_level == "FASE ZONAL"` - one-day district festivals RFFM never
+  ties to a club_id), `non_federated_local_cup` (a "... COPA RFFM ...
+  COMPETICIONES LOCALES ..." cup - open only to non-federated municipal
+  league champions, who were never RFFM club members), `prison_league`
+  ("... TORNEO INTERCENTROS PENITENCIARIOS ..."), `out_of_region_national_tier`
+  (`PRIMERA NACIONAL`/`PRIMERA NACIONAL FEMENINO`/`DIVISION DE HONOR DE
+  JUVENILES` - the national tier, where other autonomous communities'
+  clubs play Madrid clubs, who resolve normally), `representative_squad`
+  (`club_name_raw` contains "SELECCION"), `university_team` (contains
+  "UNIVERSIDAD"/"UNIV."), or `unexplained` (none of the above matched - a
+  genuine, currently-unresolved gap; includes real ongoing clubs RFFM never
+  assigned a `club_id`, e.g. C.D. ELECTROCOR - see `DATA_FINDINGS.md`).
+  `evidence` is a short human-readable note (the matched competition name
+  or `club_name_raw` text) for spot-checking, not a queryable field.
+  Columns: `team_id, reason, evidence, scraped_at`.
 - **`clubs_extended.csv` / `club_teams.csv`** (`enrich_club_profiles.py`,
   from `/fichaclub/<club_id>`) — the club's own richer site profile: takes
   the real `club_id` (`codigo_club`) directly in the URL (not a `team_id` -
@@ -537,7 +578,7 @@ JSON key `pageProps.team`, when `source == "fichaequipo_direct"`:
 |---|---|---|
 | `team_id` | `codigo_equipo` | the `team_id` this row was fetched with |
 | `club_id` | `codigo_club` | |
-| `source` | — | `fichaequipo_direct` / `fichaclub_roster` / `clubs_representative` - see table entry above |
+| `source` | — | `fichaequipo_direct` / `fichaclub_roster` / `clubs_representative` / `exact_name_match` / `manual_review` - see table entry above |
 | `source_url` | — | the `/fichaequipo/` URL for `fichaequipo_direct` rows; the *original* `club_teams.csv`/`clubs.csv` row's `source_url` otherwise (provenance is preserved, not overwritten) |
 | `scraped_at` | — | same provenance-preserving rule as `source_url` |
 

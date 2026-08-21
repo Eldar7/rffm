@@ -100,6 +100,7 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
 - `clubs.csv` (`club_id`, `enrich_clubs.py`) — one row per club: real RFFM club id, website, correspondence address (**not** a stadium address — see `DATA_DICTIONARY.md`)
 - `team_club_map.csv` (`team_id`, `enrich_team_clubs.py`) — the complete `team_id → club_id` mapping, every team not just one representative per club. **Use this, not `club_name_raw`, whenever you need a `club_id` starting from a `team_id`** — `club_name_raw` drifts in spelling between teams of the same club. Cross-season, one row per `team_id` (not a snapshot log)
+- `team_club_gap_reasons.csv` (`team_id`, also `enrich_team_clubs.py`) — why a `team_id` still isn't in `team_club_map.csv` (technical no-show, FASE ZONAL, non-federated local cup, ...). Cross-season, fully recomputed every run (not a snapshot log) — see `DATA_DICTIONARY.md`
 - `clubs_extended.csv` / `club_teams.csv` (`enrich_club_profiles.py`) — richer club profile + every team the club has ever fielded, from `/fichaclub/<club_id>`. Cross-season, **append-only snapshot log** (not one row per `club_id` — see `DATA_DICTIONARY.md` for the "get current state" recipe)
 
 ## How to answer a query
