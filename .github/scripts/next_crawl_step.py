@@ -12,6 +12,7 @@ Exit codes:
 from __future__ import annotations
 
 import csv
+import glob
 import os
 import sys
 
@@ -41,7 +42,14 @@ SEASONS = [
 ]
 
 # Full ordered plan: for each season, the complete sequence of steps.
-# core first (all-categories), then clubs, then per-category enrich stages.
+# core first (all-categories), then clubs, then team_clubs, then per-category
+# enrich stages. team_clubs (rffm_scraper/team_club_pipeline.py) is a
+# separate step from clubs, not folded into it, even though both hit
+# /fichaequipo/ - clubs samples one representative team per club_name_raw
+# group, team_clubs resolves every remaining team_id directly. Both are
+# queued automatically per season here (unlike club_profiles below, which
+# is deliberately excluded from this plan) so a brand-new season picks up
+# complete team_id -> club_id coverage without a manual dispatch.
 def build_plan() -> list[dict]:
     steps = []
     # All core stages first so match data for every season is available before
@@ -50,6 +58,7 @@ def build_plan() -> list[dict]:
         steps.append({"season": season, "stage": "core", "scope": "", "all_categories": True})
     for season in SEASONS:
         steps.append({"season": season, "stage": "clubs", "scope": "", "all_categories": False})
+        steps.append({"season": season, "stage": "team_clubs", "scope": "", "all_categories": False})
         for cat in ENRICH_CATEGORIES:
             steps.append({"season": season, "stage": "acta_partido", "scope": cat, "all_categories": False})
         for cat in ENRICH_CATEGORIES:
@@ -75,13 +84,54 @@ def _seasons_needing_core_recrawl() -> set[str]:
     return limited
 
 
+def _seasons_needing_team_clubs_recrawl() -> set[str]:
+    """Seasons whose team_clubs step is marked done in the manifest but whose
+    teams.csv now has a team_id that's neither resolved (team_club_map.csv)
+    nor already attempted (team_clubs_crawl_log.csv) - e.g. that season's
+    core crawl was re-run and grew its team roster after team_clubs had
+    already reached complete/complete_with_failures. Unlike
+    _seasons_needing_core_recrawl above this is a direct data check, not a
+    content heuristic - team_club_map.csv/team_clubs_crawl_log.csv are both
+    small, already-committed cross-season files (see
+    team_club_pipeline.py), so recomputing "is there any remaining work"
+    here is cheap.
+    """
+    root = os.path.dirname(MANIFEST_PATH)
+
+    resolved_or_attempted: set[str] = set()
+    map_path = os.path.join(root, "team_club_map.csv")
+    if os.path.exists(map_path):
+        with open(map_path, newline="", encoding="utf-8") as f:
+            resolved_or_attempted.update(r["team_id"] for r in csv.DictReader(f) if r.get("team_id"))
+    log_path = os.path.join(root, "team_clubs_crawl_log.csv")
+    if os.path.exists(log_path):
+        with open(log_path, newline="", encoding="utf-8") as f:
+            resolved_or_attempted.update(
+                r["entity_id"] for r in csv.DictReader(f)
+                if r.get("entity_type") == "team_ficha" and r.get("success") == "True"
+            )
+
+    needs_recrawl = set()
+    for path in glob.glob(os.path.join(root, "*", "teams.csv")):
+        season = os.path.basename(os.path.dirname(path))
+        with open(path, newline="", encoding="utf-8") as f:
+            team_ids = {r["team_id"] for r in csv.DictReader(f) if r.get("team_id")}
+        if team_ids - resolved_or_attempted:
+            needs_recrawl.add(season)
+    return needs_recrawl
+
+
 def load_done() -> set[tuple[str, str, str]]:
     """Return set of (season, stage, scope) that are complete or complete_with_failures.
 
     Core entries for seasons that were crawled with only BENJAMIN+PREBENJAMIN
     are excluded so the orchestrator re-crawls them with --all-categories.
+    team_clubs entries for seasons with newly-grown, unresolved team_ids are
+    excluded the same way, so a later core re-crawl's new teams still get
+    resolved automatically instead of being silently skipped forever.
     """
     needs_core_recrawl = _seasons_needing_core_recrawl()
+    needs_team_clubs_recrawl = _seasons_needing_team_clubs_recrawl()
 
     done: set[tuple[str, str, str]] = set()
     if not os.path.exists(MANIFEST_PATH):
@@ -90,17 +140,19 @@ def load_done() -> set[tuple[str, str, str]]:
         for row in csv.DictReader(f):
             if row.get("status", "") in ("complete", "complete_with_failures"):
                 scope = row.get("category_base", "")
-                if row["stage"] in ("core", "clubs"):
+                if row["stage"] in ("core", "clubs", "team_clubs"):
                     scope = "ALL"
                 if row["stage"] == "core" and row["season"] in needs_core_recrawl:
                     continue  # force re-crawl with --all-categories
+                if row["stage"] == "team_clubs" and row["season"] in needs_team_clubs_recrawl:
+                    continue  # newly-grown team_ids still need resolving
                 done.add((row["season"], row["stage"], scope))
     return done
 
 
 def manifest_scope(step: dict) -> str:
     """The category_base value as stored in coverage_manifest for this step."""
-    if step["stage"] in ("core", "clubs"):
+    if step["stage"] in ("core", "clubs", "team_clubs"):
         return "ALL"
     return step["scope"]
 

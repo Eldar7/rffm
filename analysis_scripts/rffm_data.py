@@ -74,6 +74,21 @@ NO_SEASON_COLUMN_IN_ORIGINAL = {
 # module docstring ("Category-sharded enrichment dirs") for why.
 SHARDED_TABLES = {"match_lineups", "match_goals", "match_cards", "match_staff", "match_officials"}
 
+# Everything else that carries a `season` dimension is ALSO one Parquet file
+# per season now (<name>/<season>.parquet) - build_parquet.py stopped
+# writing these as one combined file for the same reason as SHARDED_TABLES
+# above: an unchanged season's file then stays byte-identical across
+# rebuilds, instead of git seeing the whole (binary, non-delta-friendly)
+# table as "changed" every time any one season's crawl adds new rows. Same
+# season-required load path as SHARDED_TABLES, just without category_base.
+SEASON_PARTITIONED_TABLES = {
+    "matches", "standings", "scorers", "groups", "competitions",
+    "team_group_membership", "player_competition_participation", "player_season_stats",
+    "teams", "venues", "clubs", "game_types", "seasons",
+    "manifest_groups", "manifest_pages", "manifest_endpoints",
+    "players_by_season", "crawl_log", "data_quality_report",
+}
+
 
 @lru_cache(maxsize=None)
 def _load(name: str) -> pd.DataFrame:
@@ -99,15 +114,34 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     """Match pd.read_csv(..., dtype=str): every value is either a Python
     str or real NaN - never "5373769.0"/"<NA>" as literal text.
 
-    Deliberately vectorized `.astype(str)` per column, not `.apply(lambda
-    v: str(v))`: apply() on a nullable Int16/Int32 column that contains any
-    NA silently upcasts through numpy float64 for its internal fast path
-    once the column is large enough (confirmed on this dataset - a 3-row
-    slice stayed int, the real ~578k-row column did not), turning e.g.
-    sex_raw's "0" into "0.0". astype(str) does not do this and correctly
-    preserves real NaN (not the literal text "nan"/"<NA>") for missing
-    values - verified against this dataset's actual null columns."""
-    out = {col: df[col].astype(str) for col in df.columns}
+    A plain vectorized `.astype(str)` per column (this function's original
+    form) looks right printed - `print()` renders a real missing pd.NA and
+    the literal 4-character string "<NA>" identically - but they are not
+    the same thing: `Series([1, 2, None], dtype="Int32").astype(str)` turns
+    the missing slot into the *literal string* "<NA>", which
+    clean()/norm_id()'s `pd.isna(v)` check (every report generator's
+    null-guard, including this file's own callers) does not catch, since
+    isna("<NA>") is False. Confirmed on real data: matches.parquet's
+    home_team_id has 12,383 genuine nulls (bye-match placeholder) at the
+    raw Parquet level, and read_table("matches", ...) silently reported
+    ZERO before this fix - every one had turned into the text "<NA>" and
+    was passing every "is this missing" check as if it were a real team id.
+    `.apply(lambda v: str(v))` doesn't fix this either and reintroduces the
+    OTHER bug this function was written to dodge: on a nullable Int16/Int32
+    column, apply()'s internal fast path silently upcasts through numpy
+    float64 once the column is large enough (confirmed on this dataset - a
+    3-row slice stayed int, the real ~578k-row column did not), turning
+    e.g. sex_raw's "0" into "0.0".
+
+    The actual fix: go through `.astype(object)` first (a real Python
+    int/bool/str per cell, real None for any missing slot - no upcast,
+    since object dtype has no numeric fast path to trigger it), THEN
+    stringify only the non-None cells. Gets both properties at once."""
+    out = {}
+    for col in df.columns:
+        s = df[col]
+        obj = s.astype(object).where(s.notna(), None)
+        out[col] = obj.map(lambda v: v if v is None else str(v))
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
 
@@ -115,25 +149,23 @@ def read_table(name: str, season: str | None = None, category: str | None = None
     """Returns a DataFrame shaped like the original per-season/per-category
     CSV read. `season`/`category` are ignored where the table doesn't carry
     that dimension (e.g. players is global; flat tables have no category)."""
-    if name in SHARDED_TABLES:
+    if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         if season is None:
             raise ValueError(f"{name} is season-sharded on disk - season= is required")
         df = _load_sharded_season(name, season)
         if df is None:
-            return _stringify(pd.DataFrame(columns=["category_base"]))  # empty, matches "dir missing" originals
-        if category is not None:
+            cols = ["category_base"] if name in SHARDED_TABLES else []
+            return _stringify(pd.DataFrame(columns=cols))  # empty, matches "dir missing" originals
+        if category is not None and "category_base" in df.columns:
             df = df[df["category_base"] == category].drop(columns=["category_base"])
+        if name in NO_SEASON_COLUMN_IN_ORIGINAL and "season" in df.columns:
+            df = df.drop(columns=["season"])
         return _stringify(df)
 
     df = _load(name)
 
     if name == "players":
         return _stringify(df)
-
-    if season is not None and "season" in df.columns:
-        df = df[df["season"] == season]
-        if name in NO_SEASON_COLUMN_IN_ORIGINAL:
-            df = df.drop(columns=["season"])
 
     if category is not None and "category_base" in df.columns:
         df = df[df["category_base"] == category]
@@ -149,6 +181,8 @@ def list_categories(name: str, season: str) -> list[str]:
     if name in SHARDED_TABLES:
         df = _load_sharded_season(name, season)
         return sorted(df["category_base"].unique().tolist()) if df is not None else []
+    if name in SEASON_PARTITIONED_TABLES:
+        raise ValueError(f"{name} is season-partitioned but has no category_base column")
     df = _load(name)
     if "season" not in df.columns or "category_base" not in df.columns:
         raise ValueError(f"{name} has no per-season/category shards")
@@ -156,7 +190,7 @@ def list_categories(name: str, season: str) -> list[str]:
 
 
 def list_seasons(name: str) -> list[str]:
-    if name in SHARDED_TABLES:
+    if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         return sorted(p.stem for p in (PARQUET_DIR / name).glob("*.parquet"))
     df = _load(name)
     if "season" not in df.columns:

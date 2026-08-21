@@ -5,6 +5,13 @@ env/
 ENV/
 tmp/
 
+# Raw HTML cache (OPERATIONS.md/README.md: "gitignored, regenerated per run,
+# never pushed" - resumability depends on the CSVs + crawl logs, never on
+# this surviving). Was missing from this file despite being documented and
+# never actually committed in this repo's history - closing the gap rather
+# than relying on nobody ever running a broad `git add`.
+/output/raw/
+
 # Generated GitHub Pages site (built by analysis_scripts/build_site.py in CI)
 /site/
 
@@ -13,6 +20,16 @@ tmp/
 # meant to be committed (unlike the hand-curated one-off files that already
 # live directly under reports/).
 /reports/data/
+
+# players.parquet is deliberately NOT git-tracked, unlike every other table
+# under output/processed/rffm_parquet/ — it's a binary blob that gets fully
+# rewritten (no useful git delta) on every commit that touches it, measured
+# to cost noticeably more in git history than committing the same data as
+# CSV (see analysis_scripts/build_parquet.py's PLAYERS_CURRENT_CSV comment
+# and DATA_FINDINGS.md). The git-tracked canonical source is
+# output/processed/rffm/players_current.csv instead; regenerate this file
+# locally with `build_parquet.py --players-only` after a fresh checkout.
+/output/processed/rffm_parquet/players.parquet
 
 # Python
 __pycache__/

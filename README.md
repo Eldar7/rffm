@@ -32,7 +32,9 @@ Optional enrichment stages (see "robots.txt and enrichment" below) each have
 their own entrypoint and are off by default: `enrich_acta.py` (match
 lineups/goals/cards/staff/officials), `enrich_players.py` (player
 profiles/season stats), `enrich_clubs.py` (club identity/correspondence
-address), and `enrich_club_profiles.py` (full club profile + every team a
+address), `enrich_team_clubs.py` (complete `team_id -> club_id` mapping -
+see "Entities collected" below for how it differs from `enrich_clubs.py`),
+and `enrich_club_profiles.py` (full club profile + every team a
 club has ever fielded, cross-season, from `/fichaclub/<club_id>`). Venue/field
 data (`venues.csv`) is **not** a separate opt-in stage - it's part of the
 core `main.py` crawl, since `/campo/` is not in robots.txt's `Disallow` list.
@@ -134,9 +136,10 @@ enrichment sources above are implemented but **off by default**
 (`enrichment.fetch_acta_partido` / `enrichment.fetch_fichaequipo` /
 `enrichment.fetch_fichajugador` in `config.yaml`), requiring an explicit,
 informed opt-in per run — this is a deliberate policy choice, not a
-limitation to work around. Note `fetch_fichaequipo` now gates the
-`enrich_clubs.py` stage (club identity), not a `fichaequipo`-per-team crawl
-- see "Entities collected" below. `/fichaclub/` (`enrich_club_profiles.py`)
+limitation to work around. Note `fetch_fichaequipo` now gates both the
+`enrich_clubs.py` stage (club identity, one representative team per club)
+and the `enrich_team_clubs.py` stage (complete `team_id -> club_id`
+mapping, every team) - see "Entities collected" below. `/fichaclub/` (`enrich_club_profiles.py`)
 is legally fetchable without any opt-in - unlike `/campo/`, it's still
 gated behind `enrichment.fetch_fichaclub` anyway, purely for consistency
 with the other three enrichment stages, not because robots.txt requires it.
@@ -153,7 +156,17 @@ with the other three enrichment stages, not because robots.txt requires it.
   player stats, per-player competition participation.
 - **Enrichment (opt-in, `enrich_clubs.py`):** club identity (real RFFM
   `club_id`), website, correspondence address - one representative team per
-  club, not every team (see `DATA_DICTIONARY.md` for why one is enough).
+  club, not every team (cheap, but leaves gaps when a club's teams have
+  drifted `club_name_raw` spellings - see `enrich_team_clubs.py` below).
+- **Enrichment (opt-in, `enrich_team_clubs.py`):** complete `team_id ->
+  club_id` mapping (`team_club_map.csv`) - every team, not one
+  representative per club, resolving exactly the gap `enrich_clubs.py`
+  leaves. Cross-season: a `team_id`'s `club_id` is fetched at most once
+  ever, regardless of how many seasons it appears in. Also writes
+  `team_club_gap_reasons.csv` - a recomputed-every-run classification of
+  *why* each still-unresolved `team_id` has no `club_id` (technical
+  no-show, FASE ZONAL, non-federated local cup, ...) - see
+  `DATA_DICTIONARY.md`.
 - **Enrichment (opt-in, `enrich_club_profiles.py`):** full club profile
   (registered + correspondence address, socials, contact info, founding
   date) and every team the club has ever fielded - from `/fichaclub/<club_id>`,
@@ -205,9 +218,9 @@ lives in exactly one of these.
 - ⚠️ Fallback/limited by design: acta-partido/fichaequipo/fichajugador
   enrichment is disabled by default (robots.txt). acta_partido/fichajugador
   are additionally category-scoped (`--scope`), typically piloted on one
-  category before widening; `enrich_clubs.py` is **not** category-scoped
-  (see "Entities collected" above) - one run covers every club regardless
-  of category.
+  category before widening; `enrich_clubs.py`/`enrich_team_clubs.py` are
+  **not** category-scoped (see "Entities collected" above) - one run covers
+  every club/team regardless of category.
 - ⚠️ Not modeled: match substitutions (zero populated examples found in the
   BENJAMÍN/PREBENJAMÍN age brackets — nothing to validate a schema against
   yet), `otras_tarjetas`, full multi-season player career history (player
@@ -224,6 +237,7 @@ main.py                # core crawl: discovery + calendario/clasificaciones/gole
 enrich_acta.py          # opt-in: match lineups/goals/cards/staff/officials
 enrich_players.py       # opt-in: player profiles/season stats
 enrich_clubs.py         # opt-in: club identity/correspondence address
+enrich_team_clubs.py    # opt-in: complete team_id -> club_id mapping, cross-season
 enrich_club_profiles.py # opt-in: full club profile + team roster, cross-season
 .github/workflows/
   rffm-crawl.yml          # manually-dispatched crawl job (any stage), commits+pushes on success
@@ -236,6 +250,7 @@ rffm_scraper/
   acta_parsers.py             # match report JSON → lineups/goals/cards/staff/officials
   fichajugador_parsers.py       # player profile JSON → player/season-stats/participation
   club_parsers.py                # fichaequipo JSON → club identity/address
+  team_club_parsers.py            # fichaequipo JSON → team_id -> club_id mapping row
   club_profile_parsers.py         # fichaclub JSON → club profile/team roster
   normalize.py                   # category matching, dates, team-name/suffix parsing
   models.py                       # pydantic row schemas (one per CSV)
@@ -244,8 +259,9 @@ rffm_scraper/
   acta_pipeline.py                   # match-report enrichment orchestration (batched, resumable)
   player_pipeline.py                   # player-profile enrichment orchestration (batched, resumable)
   club_pipeline.py                      # club enrichment orchestration (batched, resumable)
+  team_club_pipeline.py                  # team_id -> club_id resolution (batched, resumable, cross-season outputs)
   club_profile_pipeline.py               # club-profile enrichment orchestration (cross-season, append-only)
-  quality_checks.py / acta_quality_checks.py / player_quality_checks.py / club_quality_checks.py / club_profile_quality_checks.py
+  quality_checks.py / acta_quality_checks.py / player_quality_checks.py / club_quality_checks.py / team_club_quality_checks.py / club_profile_quality_checks.py
 
 output/processed/rffm/
   coverage_manifest.csv  # cross-season index: is season × category × stage done?

@@ -129,6 +129,22 @@ enrichment:
     rate_limit_seconds: 1.25
     force_refetch: false
     workers: 8
+  # Settings for the team_clubs stage (rffm_scraper/team_club_pipeline.py,
+  # enrich_team_clubs.py) - complete team_id -> club_id resolution, from
+  # /fichaequipo/<team_id> like `clubs` above, but every not-yet-resolved
+  # team_id across every season instead of one representative team per
+  # club_name_raw group. Gated by the same enrichment.fetch_fichaequipo
+  # opt-in as `clubs` above (same disallowed page). Most targets resolve for
+  # free from already-collected club_teams.csv/clubs.csv (see module
+  # docstring) - only the genuine gap needs a live fetch. force_refetch has
+  # the clubs.csv meaning (bypass the raw-HTML cache only, done_ids skip is
+  # never bypassed - a resolved team_id's club_id cannot change).
+  team_clubs:
+    progress_report_every: 25
+    csv_flush_every: 200
+    rate_limit_seconds: 1.25
+    force_refetch: false
+    workers: 8
 
 paths:
   output_dir: "output"

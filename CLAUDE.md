@@ -99,6 +99,8 @@ Enrichment (opt-in — see `README.md` for why opt-in, `OPERATIONS.md` for how/w
 - `player_season_stats.csv` — site-reported season aggregates per player
 - `player_competition_participation.csv` — team/group registration per player (can be >1 row/player)
 - `clubs.csv` (`club_id`, `enrich_clubs.py`) — one row per club: real RFFM club id, website, correspondence address (**not** a stadium address — see `DATA_DICTIONARY.md`)
+- `team_club_map.csv` (`team_id`, `enrich_team_clubs.py`) — the complete `team_id → club_id` mapping, every team not just one representative per club. **Use this, not `club_name_raw`, whenever you need a `club_id` starting from a `team_id`** — `club_name_raw` drifts in spelling between teams of the same club. Cross-season, one row per `team_id` (not a snapshot log)
+- `team_club_gap_reasons.csv` (`team_id`, also `enrich_team_clubs.py`) — why a `team_id` still isn't in `team_club_map.csv` (technical no-show, FASE ZONAL, non-federated local cup, ...). Cross-season, fully recomputed every run (not a snapshot log) — see `DATA_DICTIONARY.md`
 - `clubs_extended.csv` / `club_teams.csv` (`enrich_club_profiles.py`) — richer club profile + every team the club has ever fielded, from `/fichaclub/<club_id>`. Cross-season, **append-only snapshot log** (not one row per `club_id` — see `DATA_DICTIONARY.md` for the "get current state" recipe)
 
 ## How to answer a query
@@ -136,7 +138,8 @@ across categories for the CSVs, across seasons for the Parquet copy - see
 | Top scorers in a group | `scorers` | `group_id` |
 | A team's fixture list | `matches` | `home_team_id`/`away_team_id` |
 | Where does a team/club play (address, map link) | `teams`, `matches`, `venues` | `club_name_raw` → `team_id` → `matches.venue_id` → `venues` |
-| A club's identity/website/correspondence address | `clubs` | `club_name_raw` (join to `teams` if starting from a `team_id`) — opt-in table, check `coverage_manifest.csv` first |
+| A club's identity/website/correspondence address, starting from a `team_id` | `team_club_map`, `clubs` | `team_id` → `club_id` (via `team_club_map`, complete) → `clubs` — opt-in tables, check `coverage_manifest.csv` first |
+| A club's identity/website/correspondence address, starting from a name | `clubs` | `club_name_raw` — opt-in table, check `coverage_manifest.csv` first |
 | A club's full profile (address, socials, founding date) or every team it has ever fielded | `clubs_extended`, `club_teams` | `club_id` — cross-season, append-only (take the latest `scraped_at` per `club_id`), see `DATA_DICTIONARY.md` |
 | A player's appearances/goals/cards | `match_lineups/*`, `match_goals/*`, `match_cards/*`, `matches` | `player_id` → `match_id` → `matches` for date/context; glob all category files |
 | Did a player move teams/clubs | `match_lineups/*`, `matches`, `player_competition_participation` | `player_id`, sorted by `match_date`, diff `team_id` (see recipe in `DATA_DICTIONARY.md`) |

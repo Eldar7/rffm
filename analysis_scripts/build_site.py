@@ -7,12 +7,17 @@ them and summarizes season/category coverage from coverage_manifest.csv.
 Every report is regenerated from the CSVs already committed under
 output/processed/rffm/ — nothing here re-scrapes the RFFM site.
 
-Also builds <output-dir>/v2/weird_scores.html from weird_scores_report_v2
-(Parquet-sourced, via rffm_data.py, reading output/processed/rffm_parquet/
-instead of the CSVs) when that Parquet copy exists — a live, deployed
-proof that the Parquet migration reproduces the CSV-driven site exactly,
-sitting next to the untouched original rather than replacing it. Skipped
-with a message if output/processed/rffm_parquet/ hasn't been built yet
+Also builds <output-dir>/v2/* from the _v2 report generators (Parquet-
+sourced, via rffm_data.py, reading output/processed/rffm_parquet/ instead
+of the CSVs) when that Parquet copy exists, sitting next to the untouched
+CSV-driven originals rather than replacing them: weird_scores.html (a
+live, deployed proof the migration reproduces the CSV-driven site exactly),
+team_card.html + its team-participation-map data (team_participation_map_v2
+— the "Карта участия" tab: how one squad moved through divisions within a
+season and across seasons, core-data-only so it needs no acta_partido
+enrichment), and club_division_map.html (adds the squads-over-seasons grid
+that reads the same team-participation data). Skipped with a message if
+output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
 
 Usage:
@@ -31,6 +36,9 @@ import season_comparison
 import club_division_map
 import weird_scores_report
 import weird_scores_report_v2
+import team_cards_v2
+import club_division_map_v2
+import team_participation_map_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -311,13 +319,20 @@ def main():
     weird_scores_report.build_all(out_dir)
 
     parquet_dir = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
-    if (parquet_dir / "matches.parquet").exists():
+    if any((parquet_dir / "matches").glob("*.parquet")):
         print("Building v2/weird_scores.html (Parquet-sourced proof of concept)...")
         v2_dir = out_dir / "v2"
         v2_dir.mkdir(parents=True, exist_ok=True)
         weird_scores_report_v2.build_all(v2_dir)
+
+        print("Building v2/team_card.html + team-participation-map data...")
+        team_cards_v2.build_all(v2_dir)
+        team_participation_map_v2.build_all(v2_dir)
+
+        print("Building v2/club_division_map.html (squads-over-seasons grid)...")
+        club_division_map_v2.build_all(v2_dir)
     else:
-        print("Skipping v2/weird_scores.html: output/processed/rffm_parquet/ not built yet "
+        print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")
 
     print("Building index.html...")

@@ -18,6 +18,17 @@ clubs:
   re-fetches (it won't touch done_ids anymore) and also drops clubs.csv row
   if one exists without a real club_id, then resets manifest to partial.
 
+team_clubs:
+  Same failure shape as clubs above (team_ids attempted but with no
+  codigo_club, so no row in team_club_map.csv), but cross-season like
+  club_profiles below: team_clubs_crawl_log.csv and team_club_map.csv both
+  live once at the processed root, not per season - see
+  team_club_pipeline.py's module docstring. Retryable = the URL now returns
+  pageProps.team.codigo_club, same checker as clubs.
+  Fix: delete the success=True team_clubs_crawl_log.csv row for that
+  team_id (cross-season - affects every season's manifest row that still
+  lists it as a target) and reset this season's manifest row to partial.
+
 club_profiles:
   Different from every stage above: a club_id that returns club: null is a
   *valid* successful outcome (a stale/defunct club_id), not a failure - see
@@ -100,6 +111,7 @@ STAGE_CHECKER = {
     "acta_partido": is_acta_live,
     "fichajugador": is_ficha_live,
     "clubs":        is_club_live,
+    "team_clubs":   is_club_live,
 }
 
 
@@ -155,6 +167,37 @@ def load_clubs_missing(season: str) -> pd.DataFrame:
     return missing
 
 
+def load_team_clubs_missing(season: str) -> pd.DataFrame:
+    """team_clubs: find team_ids in this season's teams.csv that were
+    attempted but have no team_club_map.csv row.
+
+    target_team_ids = every team_id in this season's teams.csv (see
+    team_club_pipeline._load_season_team_ids). done_ids = union of
+    team_clubs_crawl_log.csv success=True (cross-season, top-level, not
+    per-season - unlike load_clubs_missing above) and team_club_map.csv
+    team_id (also top-level). missing = target - done.
+    """
+    teams_path = PROCESSED / season / "teams.csv"
+    if not teams_path.exists():
+        return pd.DataFrame()
+    teams = pd.read_csv(teams_path, dtype=str)
+    targets = teams[["team_id"]].drop_duplicates().copy()
+
+    done_ids: set[str] = set()
+    log_path = PROCESSED / "team_clubs_crawl_log.csv"
+    if log_path.exists():
+        log = pd.read_csv(log_path, dtype=str)
+        done_ids |= set(log[log["success"].str.lower() == "true"]["entity_id"].dropna())
+    map_path = PROCESSED / "team_club_map.csv"
+    if map_path.exists():
+        done_ids |= set(pd.read_csv(map_path, dtype=str)["team_id"].dropna())
+
+    missing = targets[~targets["team_id"].isin(done_ids)].copy()
+    missing["source_url"] = BASE_URL + "/fichaequipo/" + missing["team_id"]
+    missing = missing.rename(columns={"team_id": "entity_id"})
+    return missing
+
+
 def load_club_profiles_null() -> pd.DataFrame:
     """club_profiles: club_ids that came back club: null on their last
     fetch - info-severity club_profile_not_found rows in the quality
@@ -192,6 +235,24 @@ def clear_clubs_done(season: str, entity_ids: set[str]) -> int:
     """Remove success=True log entries for these team_ids so the pipeline
     re-fetches them on the next run."""
     log_path = PROCESSED / season / "clubs_crawl_log.csv"
+    if not log_path.exists():
+        return 0
+    log = pd.read_csv(log_path, dtype=str)
+    before = len(log)
+    log = log[~(
+        (log["success"].str.lower() == "true") &
+        (log["entity_id"].isin(entity_ids))
+    )]
+    log.to_csv(log_path, index=False)
+    return before - len(log)
+
+
+def clear_team_clubs_done(entity_ids: set[str]) -> int:
+    """Remove success=True team_clubs_crawl_log.csv rows for these team_ids
+    so the pipeline re-fetches them. Cross-season - one shared top-level
+    log, not per-season like clear_clubs_done above (see
+    team_club_pipeline.py's module docstring)."""
+    log_path = PROCESSED / "team_clubs_crawl_log.csv"
     if not log_path.exists():
         return 0
     log = pd.read_csv(log_path, dtype=str)
@@ -287,6 +348,9 @@ def main() -> None:
         if stage == "clubs":
             failures = load_clubs_missing(season)
             mode = "clubs-missing"
+        elif stage == "team_clubs":
+            failures = load_team_clubs_missing(season)
+            mode = "team_clubs-missing"
         else:
             failures = load_log_failures(season, stage)
             mode = "log-failures"
@@ -348,6 +412,8 @@ def main() -> None:
     for r in retryable:
         if r["stage"] == "clubs":
             removed = clear_clubs_done(r["season"], r["entity_ids"])
+        elif r["stage"] == "team_clubs":
+            removed = clear_team_clubs_done(r["entity_ids"])
         elif r["stage"] == "club_profiles":
             removed = clear_club_profiles_done(r["entity_ids"])
         else:
