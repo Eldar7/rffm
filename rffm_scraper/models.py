@@ -161,6 +161,56 @@ class TeamClubMapping(Row):
     scraped_at: str
 
 
+class TeamClubGapReason(Row):
+    """One row per team_id still absent from team_club_map.csv, classifying
+    *why* - team_club_gap_reasons.csv. Recomputed fresh on every
+    team_clubs run (not append-only - a derived snapshot, not a fetch
+    record), so a team_id that gets resolved next run simply stops
+    appearing here, and a newly-unresolved team_id from a new season's
+    core crawl gets classified automatically. See
+    team_club_pipeline.py's _compute_gap_reasons for the classification
+    rules and DATA_FINDINGS.md for how each was validated against the real
+    data (including how NOT everything under a given reason resolves to
+    0% - see the SELECCION/UNIVERSIDAD/COPA COMPETICIONES LOCALES caveat
+    there).
+
+    `reason`, in classification priority order:
+      - "technical_no_show": club_name_raw is RFFM's own generic
+        "Equipo Casa/Fuera (No asignado)" bye-slot label or a
+        "Finalista N F-7/F-11" bracket-TBD placeholder - not a team at all.
+      - "fase_zonal": played in a competition with
+        competitions.csv.division_level == "FASE ZONAL" - a one-day
+        district development festival RFFM never ties to a club_id.
+      - "non_federated_local_cup": played in a "... COPA RFFM ...
+        COMPETICIONES LOCALES ..." cup - open only to champions of
+        non-federated *municipal* leagues, who were never RFFM club
+        members to begin with (official rules: DATA_FINDINGS.md).
+      - "prison_league": played in a "... TORNEO INTERCENTROS
+        PENITENCIARIOS ..." competition - correctional-facility teams.
+      - "out_of_region_national_tier": played in PRIMERA NACIONAL /
+        PRIMERA NACIONAL FEMENINO / DIVISION DE HONOR DE JUVENILES - the
+        national tier, where Madrid clubs (who resolve normally) play
+        against clubs from other autonomous communities' federations
+        (who structurally can't have an RFFM club_id).
+      - "representative_squad": club_name_raw contains "SELECCION" - a
+        representative/regional squad, not a normal club.
+      - "university_team": club_name_raw contains "UNIVERSIDAD"/"UNIV." -
+        a university team.
+      - "unexplained": none of the above matched - a genuine, currently
+        unexplained gap (includes real ongoing clubs RFFM never gave a
+        club_id, like C.D. ELECTROCOR - see DATA_FINDINGS.md).
+
+    `evidence` is a short human-readable note (the matched competition
+    name, or the matched club_name_raw text) - not a queryable field, just
+    enough to spot-check the classification without re-deriving it.
+    """
+
+    team_id: str
+    reason: str
+    evidence: str
+    scraped_at: str
+
+
 class TeamGroupMembership(Row):
     season: str
     season_id: str

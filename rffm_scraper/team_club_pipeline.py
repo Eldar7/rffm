@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -78,7 +79,7 @@ import pandas as pd
 from rffm_scraper.config import Settings
 from rffm_scraper.fetchers import extract_next_data, fetch_fichaequipo
 from rffm_scraper.http_client import RffmClient
-from rffm_scraper.models import CrawlLogEntry, TeamClubMapping
+from rffm_scraper.models import CrawlLogEntry, TeamClubGapReason, TeamClubMapping
 from rffm_scraper.team_club_parsers import parse_team_club_mapping
 from rffm_scraper.row_io import (
     Progress,
@@ -259,6 +260,132 @@ def _resolved_team_ids(processed_root) -> set[str]:
     if not path.exists():
         return set()
     return set(pd.read_csv(path, usecols=["team_id"], dtype=str)["team_id"].dropna())
+
+
+_GAP_REASON_COLUMNS = ["team_id", "reason", "evidence", "scraped_at"]
+
+_NATIONAL_TIER_COMPETITIONS = {
+    "PRIMERA NACIONAL", "PRIMERA NACIONAL FEMENINO", "DIVISION DE HONOR DE JUVENILES",
+}
+
+
+def _load_all_matches_team_competition(processed_root) -> pd.DataFrame:
+    """(team_id, competition_id, competition) for every team appearance,
+    every season - used only for gap-reason classification, not fetch
+    targeting, so only the columns needed are read (matches.csv is the
+    biggest table in this project) to keep this cheap."""
+    frames = []
+    for path in sorted(processed_root.glob("*/matches.csv")):
+        df = pd.read_csv(
+            path, usecols=["home_team_id", "away_team_id", "competition_id", "competition"],
+            dtype=str, keep_default_na=True,
+        )
+        # matches.csv's home_team_id/away_team_id carry the project's known
+        # nullable-int-as-float CSV serialization quirk ("2002" -> "2002.0"
+        # - see DATA_DICTIONARY.md's "Known gaps") - teams.csv's team_id
+        # does not, so without stripping this every join against it here
+        # would silently miss almost everything.
+        for col in ("home_team_id", "away_team_id"):
+            df[col] = df[col].str.replace(r"\.0$", "", regex=True)
+        home = df[["home_team_id", "competition_id", "competition"]].rename(columns={"home_team_id": "team_id"})
+        away = df[["away_team_id", "competition_id", "competition"]].rename(columns={"away_team_id": "team_id"})
+        frames.append(pd.concat([home, away], ignore_index=True))
+    if not frames:
+        return pd.DataFrame(columns=["team_id", "competition_id", "competition"])
+    return pd.concat(frames, ignore_index=True).dropna(subset=["team_id"]).drop_duplicates()
+
+
+def _load_fase_zonal_competition_ids(processed_root) -> set[str]:
+    ids: set[str] = set()
+    for path in sorted(processed_root.glob("*/competitions.csv")):
+        df = pd.read_csv(path, usecols=["competition_id", "division_level"], dtype=str, keep_default_na=True)
+        ids |= set(df.loc[df["division_level"] == "FASE ZONAL", "competition_id"].dropna())
+    return ids
+
+
+def _classify_one_gap(
+    team_id: str, names: list[str], team_appearances: pd.DataFrame, fase_zonal_ids: set[str],
+) -> tuple[str, str]:
+    """Returns (reason, evidence) for one still-unresolved team_id - see
+    TeamClubGapReason's docstring for the full rule list and priority
+    order. `names` is every club_name_raw this team_id has ever carried
+    (a team_id can carry different text across seasons - see
+    DATA_FINDINGS.md's team_id-reuse note), `team_appearances` is this
+    team_id's rows from _load_all_matches_team_competition.
+    """
+    if any(re.search(r"No asignado", n, re.IGNORECASE) or re.match(r"^Finalista\s", n, re.IGNORECASE) for n in names):
+        return "technical_no_show", f"club_name_raw={' | '.join(names)!r}"
+
+    fz = team_appearances[team_appearances["competition_id"].isin(fase_zonal_ids)]
+    if not fz.empty:
+        return "fase_zonal", f"played in {fz.iloc[0]['competition']!r} (division_level=FASE ZONAL)"
+
+    locales = team_appearances[team_appearances["competition"].str.contains("COMPETICIONES LOCALES", case=False, na=False)]
+    if not locales.empty:
+        return "non_federated_local_cup", f"played in {locales.iloc[0]['competition']!r}"
+
+    penit = team_appearances[team_appearances["competition"].str.contains("PENITENCIARIOS", case=False, na=False)]
+    if not penit.empty:
+        return "prison_league", f"played in {penit.iloc[0]['competition']!r}"
+
+    national = team_appearances[team_appearances["competition"].isin(_NATIONAL_TIER_COMPETITIONS)]
+    if not national.empty:
+        return (
+            "out_of_region_national_tier",
+            f"played in {national.iloc[0]['competition']!r} - other, Madrid-based teams in the same "
+            "competition resolve normally",
+        )
+
+    if any(re.search(r"SELECCION", n, re.IGNORECASE) for n in names):
+        return "representative_squad", f"club_name_raw={' | '.join(names)!r}"
+
+    if any(re.search(r"UNIVERSI|UNIV\.", n, re.IGNORECASE) for n in names):
+        return "university_team", f"club_name_raw={' | '.join(names)!r}"
+
+    return "unexplained", ""
+
+
+def _compute_gap_reasons(settings: Settings) -> pd.DataFrame:
+    """Classify every still-unresolved team_id - see TeamClubGapReason's
+    docstring. Pure and re-derivable from already-committed data (no live
+    fetch), so this can run standalone at any time, not just at the end of
+    a live enrichment run."""
+    processed_root = settings.processed_root
+    name_map = _load_all_teams_name_map(processed_root)
+    if name_map.empty:
+        return pd.DataFrame(columns=_GAP_REASON_COLUMNS)
+
+    resolved_ids = _resolved_team_ids(processed_root)
+    unresolved_ids = sorted(set(name_map["team_id"]) - resolved_ids)
+    if not unresolved_ids:
+        return pd.DataFrame(columns=_GAP_REASON_COLUMNS)
+
+    names_by_team = name_map.groupby("team_id")["club_name_raw"].apply(lambda s: s.dropna().tolist())
+    appearances = _load_all_matches_team_competition(processed_root)
+    appearances = appearances[appearances["team_id"].isin(unresolved_ids)]
+    appearances_by_team = {tid: df for tid, df in appearances.groupby("team_id")}
+    fase_zonal_ids = _load_fase_zonal_competition_ids(processed_root)
+
+    empty_appearances = appearances.iloc[0:0]
+    now = _now_iso()
+    rows = []
+    for team_id in unresolved_ids:
+        names = names_by_team.get(team_id, [])
+        team_appearances = appearances_by_team.get(team_id, empty_appearances)
+        reason, evidence = _classify_one_gap(team_id, names, team_appearances, fase_zonal_ids)
+        rows.append(dict(team_id=team_id, reason=reason, evidence=evidence, scraped_at=now))
+    return pd.DataFrame(rows, columns=_GAP_REASON_COLUMNS)
+
+
+def _write_gap_reasons(settings: Settings) -> int:
+    """Recomputes and overwrites team_club_gap_reasons.csv - a derived
+    snapshot, not append-only (see TeamClubGapReason docstring). Returns
+    the row count written."""
+    df = _compute_gap_reasons(settings)
+    rows = validate_rows(TeamClubGapReason, df.to_dict("records"), "team_club_gap_reason")
+    out = pd.DataFrame(rows, columns=_GAP_REASON_COLUMNS)
+    write_csv(out, settings.processed_root / "team_club_gap_reasons.csv")
+    return len(out)
 
 
 def _raw_path(settings: Settings, team_id: str):
@@ -493,6 +620,13 @@ def run_team_club_enrichment(
     quality_issues = run_team_club_quality_checks(season_label, target_team_ids, resolved_after)
     write_csv(pd.DataFrame(quality_issues), processed / "team_clubs_data_quality_report.csv")
 
+    # Cross-season, recomputed fresh every run (not season-scoped like the
+    # quality report above) - classifies every team_id still unresolved
+    # after this run, not just this season's targets, so a season whose
+    # gaps were explained by an earlier run's classification stays
+    # explained. See TeamClubGapReason's docstring.
+    gap_reasons_written = _write_gap_reasons(settings)
+
     summary = dict(
         season=season_label,
         targets=len(target_team_ids),
@@ -507,6 +641,7 @@ def run_team_club_enrichment(
         status=final_status,
         team_club_map_rows=len(map_df),
         quality_issues=len(quality_issues),
+        gap_reasons_written=gap_reasons_written,
     )
     logger.info("team_clubs enrichment summary: %s", summary)
     return summary
