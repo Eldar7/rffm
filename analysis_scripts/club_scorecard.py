@@ -116,7 +116,11 @@ class Data:
         # club_teams.parquet + club_name_raw fallback entirely now that the
         # real fix landed upstream - ~84% of all team_ids resolve here
         # directly, no name-matching heuristics needed in this script at all.
-        team_club_map = pd.read_csv(root.parent / "rffm" / "team_club_map.csv", dtype={"team_id": "int64", "club_id": "int64"})
+        team_club_map = pd.read_csv(root.parent / "rffm" / "team_club_map.csv", dtype={"team_id": "int64", "club_id": "Int64"})
+        # Int64 (nullable, capital-I) rather than int64 - team_id.map() below
+        # produces NaN for every unresolved team_id, which would silently
+        # upcast a plain int64 Series to float64 (club_id showing as
+        # "1011.0") the moment any lookup misses.
         self.team_to_club = team_club_map.set_index("team_id")["club_id"]
 
         # competition_id -> tier, category_base, phase_label (regular season only).
