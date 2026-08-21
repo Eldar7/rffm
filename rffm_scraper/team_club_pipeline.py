@@ -13,7 +13,9 @@ already-resolved "A.D. ARGANDA C.F." are the same club, codigo_club=1363,
 but grouped as different clubs by name), so most of the coverage gap is not
 "RFFM has no data for this club" but "the representative sample never
 picked a team that happened to resolve". This stage targets EVERY
-not-yet-resolved team_id instead - no name-matching involved anywhere.
+not-yet-resolved team_id instead - no *fuzzy* name-matching involved
+anywhere (see the seeding layers below for the one, deliberately narrow,
+exact-string exception).
 
 Deliberately a separate stage from club_pipeline.py, not a patch to it -
 see PR discussion. club_pipeline.py's clubs.csv (one row per club_id, club
@@ -36,15 +38,21 @@ coverage_manifest.csv row stay season-scoped, since "did season S's own
 team_ids get resolved" is a meaningful season-scoped question even though
 the underlying fetch history isn't.
 
-Free seeding before any live fetch: most of the true team_id -> club_id
-mapping is already sitting in already-collected data that never required a
-dedicated fetch for this stage - club_teams.csv (the /fichaclub/ roster
-already lists every team_id under its club_id) and every season's own
-clubs.csv (representative_team_id -> club_id). _seed_known_mappings copies
-these into team_club_map.csv first, for free, every run (idempotent - only
-ever adds team_ids not already present) - so the live-fetch gap shrinks on
-its own as club_teams.csv grows from later club_profiles runs, without this
-stage doing anything extra.
+Free seeding before any live fetch, three layers, all in
+_seed_known_mappings: (1) club_teams.csv (the /fichaclub/ roster already
+lists every team_id under its club_id), (2) every season's own clubs.csv
+(representative_team_id -> club_id), (3) exact_name_match - a team_id whose
+club_name_raw is byte-for-byte identical to another, already-resolved
+team_id's club_name_raw (by layer 1, 2, or a prior run's live fetch) is
+assigned that same club_id. Layer 3 is still not the fuzzy club_name_raw
+matching this stage otherwise avoids everywhere else - it's the same
+"codigo_club is confirmed identical across every team of a club" reasoning
+clubs.csv already relies on, just requiring an exact string match rather
+than eyeballing a near-miss. All three run every invocation (idempotent -
+only ever adds team_ids not already present), so the live-fetch gap keeps
+shrinking on its own over time - both as club_teams.csv grows from later
+club_profiles runs, and as newly-resolved team_ids unlock their own
+exact-name siblings - without this stage doing anything extra.
 
 team_club_map.csv is NOT an append-only snapshot log like clubs_extended/
 club_teams - a team_id's club_id is a permanent fact once resolved (RFFM
@@ -123,22 +131,91 @@ def _load_known_clubs_representatives(processed_root) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)[_MAP_COLUMNS]
 
 
+def _load_all_teams_name_map(processed_root) -> pd.DataFrame:
+    """Every (team_id, club_name_raw) pair across every season's teams.csv -
+    cross-season, since exact_name_match needs to see the whole
+    club_name_raw universe, not just one season's."""
+    frames = []
+    for path in sorted(processed_root.glob("*/teams.csv")):
+        df = pd.read_csv(path, usecols=["team_id", "club_name_raw"], dtype=str, keep_default_na=True)
+        frames.append(df)
+    if not frames:
+        return pd.DataFrame(columns=["team_id", "club_name_raw"])
+    return pd.concat(frames, ignore_index=True).dropna(subset=["team_id", "club_name_raw"]).drop_duplicates()
+
+
+def _load_exact_name_match_candidates(processed_root, resolved: pd.DataFrame) -> pd.DataFrame:
+    """team_id -> club_id for team_ids not yet resolved, whose club_name_raw
+    exactly matches another team_id's club_name_raw that IS already
+    resolved (any source, including this same run's own direct-source
+    candidates - see caller). No name-matching heuristics beyond exact
+    string equality - this is the same reasoning already used to dedupe
+    clubs.csv by club_id (codigo_club confirmed identical across every team
+    of a club), just applied in the team_id -> club_id direction instead.
+
+    A club_name_raw group with more than one distinct club_id among its
+    resolved members is a genuine collision (should not happen given that
+    reasoning) - skipped and logged, never guessed at.
+    """
+    name_map = _load_all_teams_name_map(processed_root)
+    if name_map.empty or resolved.empty:
+        return pd.DataFrame(columns=_MAP_COLUMNS)
+
+    named = name_map.merge(
+        resolved[["team_id", "club_id", "source_url", "scraped_at"]], on="team_id", how="left",
+    )
+
+    rows: list[dict] = []
+    for club_name_raw, group in named.groupby("club_name_raw"):
+        resolved_rows = group.dropna(subset=["club_id"])
+        if resolved_rows.empty:
+            continue
+        distinct_clubs = resolved_rows["club_id"].unique()
+        if len(distinct_clubs) != 1:
+            logger.warning(
+                "team_clubs: exact_name_match skipping club_name_raw=%r - %d distinct club_ids "
+                "among resolved siblings (%s), refusing to guess",
+                club_name_raw, len(distinct_clubs), list(distinct_clubs),
+            )
+            continue
+        rep = resolved_rows.iloc[0]
+        for team_id in group.loc[group["club_id"].isna(), "team_id"]:
+            rows.append(dict(
+                team_id=team_id, club_id=rep["club_id"], source="exact_name_match",
+                source_url=rep["source_url"], scraped_at=rep["scraped_at"],
+            ))
+    return pd.DataFrame(rows, columns=_MAP_COLUMNS) if rows else pd.DataFrame(columns=_MAP_COLUMNS)
+
+
 def _seed_known_mappings(settings: Settings) -> int:
     """Idempotent: adds any team_id -> club_id mapping already derivable for
-    free from club_teams.csv/clubs.csv to team_club_map.csv, skipping
-    team_ids already present. Returns the number of rows added."""
+    free - no live fetch - to team_club_map.csv, skipping team_ids already
+    present. Two layers: club_teams.csv/clubs.csv direct copies, then
+    exact_name_match propagation over the result of that first layer (so a
+    club newly seeded this run immediately unlocks its exact-name siblings
+    too, in the same pass). Returns the number of rows added."""
     processed_root = settings.processed_root
     map_path = processed_root / "team_club_map.csv"
-    existing_ids: set[str] = set()
+    existing_df = pd.DataFrame(columns=_MAP_COLUMNS)
     if map_path.exists():
-        existing_ids = set(pd.read_csv(map_path, usecols=["team_id"], dtype=str)["team_id"].dropna())
+        existing_df = pd.read_csv(map_path, dtype=str, keep_default_na=True)
+    existing_ids: set[str] = set(existing_df["team_id"].dropna())
 
-    candidates = pd.concat(
+    direct_candidates = pd.concat(
         [_load_known_club_teams(processed_root), _load_known_clubs_representatives(processed_root)],
         ignore_index=True,
     )
-    if candidates.empty:
-        return 0
+    direct_candidates = direct_candidates.dropna(subset=["team_id", "club_id"])
+    direct_candidates = direct_candidates[~direct_candidates["team_id"].isin(existing_ids)]
+    direct_candidates = direct_candidates.drop_duplicates(subset="team_id", keep="first")
+
+    resolved_so_far = pd.concat(
+        [existing_df[["team_id", "club_id", "source_url", "scraped_at"]], direct_candidates],
+        ignore_index=True,
+    ).drop_duplicates(subset="team_id", keep="first")
+    name_match_candidates = _load_exact_name_match_candidates(processed_root, resolved_so_far)
+
+    candidates = pd.concat([direct_candidates, name_match_candidates], ignore_index=True)
     candidates = candidates.dropna(subset=["team_id", "club_id"])
     candidates = candidates[~candidates["team_id"].isin(existing_ids)]
     candidates = candidates.drop_duplicates(subset="team_id", keep="first")

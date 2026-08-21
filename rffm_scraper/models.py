@@ -137,6 +137,12 @@ class TeamClubMapping(Row):
       - "clubs_representative": copied from some season's clubs.csv, where
         this team_id was the representative_team_id for its club_name_raw
         group.
+      - "exact_name_match": this team_id's own /fichaequipo/ never resolved
+        (or was never fetched), but another team_id with the *exact same*
+        club_name_raw string already resolved to a club_id via one of the
+        sources above - propagated with no name-matching heuristics beyond
+        exact string equality. Skipped (not guessed at) whenever a
+        club_name_raw group has more than one distinct resolved club_id.
     """
 
     team_id: str
