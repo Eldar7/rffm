@@ -105,27 +105,19 @@ class Data:
         print("Loading base tables...", file=sys.stderr)
         self.club_teams = pd.read_parquet(root / "club_teams.parquet")
         self.clubs_extended = pd.read_parquet(root / "clubs_extended.parquet")
-        self.competitions = pd.read_parquet(root / "competitions.parquet")
-        self.team_group_membership = pd.read_parquet(root / "team_group_membership.parquet")
-        self.standings = pd.read_parquet(root / "standings.parquet")
-        self.teams = pd.read_parquet(root / "teams.parquet")
+        self.competitions = self._load_glob("competitions")
+        self.team_group_membership = self._load_glob("team_group_membership")
+        self.standings = self._load_glob("standings")
 
-        # team_id -> club_id, deduped (see DATA_DICTIONARY.md's "current
-        # state" recipe - club_teams is an append-only snapshot log; today
-        # there's exactly one snapshot so this is a no-op, but stays correct
-        # once more snapshots accumulate).
-        current_club_teams = (
-            self.club_teams.sort_values("scraped_at").groupby(["club_id", "team_id"]).tail(1)
-        )
-        # A team_id should belong to one club; if the site ever reassigns one
-        # (shouldn't happen - team_id is club-scoped on the site), keep the
-        # most-recently-seen mapping.
-        self.team_to_club = (
-            current_club_teams.sort_values("scraped_at")
-            .drop_duplicates(subset="team_id", keep="last")
-            .set_index("team_id")["club_id"]
-        )
-        self._supplement_team_to_club_from_teams_csv()
+        # team_id -> club_id: the authoritative backfilled map (see
+        # rffm_scraper/team_club_pipeline.py - fichaclub roster + direct
+        # fichaequipo fetches + a verified exact-name-match layer + a
+        # handful of manually-reviewed rows). Replaces this script's earlier
+        # club_teams.parquet + club_name_raw fallback entirely now that the
+        # real fix landed upstream - ~84% of all team_ids resolve here
+        # directly, no name-matching heuristics needed in this script at all.
+        team_club_map = pd.read_csv(root.parent / "rffm" / "team_club_map.csv", dtype={"team_id": "int64", "club_id": "int64"})
+        self.team_to_club = team_club_map.set_index("team_id")["club_id"]
 
         # competition_id -> tier, category_base, phase_label (regular season only).
         # Deliberately excludes competitions.season - team_group_membership
@@ -151,35 +143,7 @@ class Data:
         print("Loading match_cards...", file=sys.stderr)
         self.cards = self._load_glob("match_cards")
         print("Loading matches (for cards-per-match denominator)...", file=sys.stderr)
-        self.matches = pd.read_parquet(root / "matches.parquet")
-
-    def _supplement_team_to_club_from_teams_csv(self) -> None:
-        """`club_teams.parquet`'s `equipos_club` roster is not always complete
-        (confirmed live: Union de Aravaca's own team_id 4937443, a real
-        PREBENJAMIN 'B' squad that played real matches, is simply absent from
-        its club's /fichaclub/ team list - understating its 2021-2022 cohort
-        by more than half, 14 vs the real 29). Fix: within each season's
-        teams.csv, every team_id sharing one `club_name_raw` is the same club
-        (verified repeatedly for Aravaca/Union across 10 seasons of sponsor
-        renames) - so if ANY team in that group already resolved to a
-        club_id via club_teams, propagate it to the rest of the group too.
-        """
-        teams = self.teams.copy()
-        teams["club_id"] = teams["team_id"].map(self.team_to_club)
-        known = teams.dropna(subset=["club_id"])
-        # club_name_raw -> the (should-be-singular) club_id its known members resolved to
-        name_to_club = known.groupby("club_name_raw")["club_id"].agg(lambda s: s.mode().iat[0])
-        unresolved = teams[teams["club_id"].isna()].copy()
-        unresolved["inferred_club_id"] = unresolved["club_name_raw"].map(name_to_club)
-        filled = unresolved.dropna(subset=["inferred_club_id"])
-        if len(filled):
-            addition = filled.drop_duplicates("team_id").set_index("team_id")["inferred_club_id"]
-            self.team_to_club = pd.concat([self.team_to_club, addition])
-            print(
-                f"  -> supplemented {len(addition)} team_id -> club_id mappings "
-                f"missing from club_teams.parquet, via club_name_raw fallback",
-                file=sys.stderr,
-            )
+        self.matches = self._load_glob("matches")
 
     def _load_glob(self, subdir: str) -> pd.DataFrame:
         paths = sorted(glob.glob(str(self.root / subdir / "*.parquet")))
