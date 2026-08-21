@@ -125,11 +125,16 @@ def norm_id(v):
 
 
 def abs_crest_url(path):
+    """Crest/escudo images are served from appweb.rffm.es, NOT www.rffm.es —
+    the www host returns HTTP 200 with an HTML placeholder page for these
+    paths (no error, so a wrong host here fails silently: the <img> just
+    never renders, further hidden by the onerror handlers on crest <img>
+    tags). Verified directly against a real crest_url from clubs.csv."""
     if not isinstance(path, str) or not path.strip():
         return None
     if path.startswith("http"):
         return path
-    return "https://www.rffm.es" + path
+    return "https://appweb.rffm.es" + path
 
 
 def clean(v):

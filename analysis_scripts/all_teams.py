@@ -45,7 +45,7 @@ from pathlib import Path
 import pandas as pd
 
 from club_division_map import (CAT_LABEL_ES, CAT_LABEL_RU, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER,
-                                GT_SHORT, TIER_OF)
+                                GT_SHORT, TIER_OF, abs_crest_url)
 from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
 from team_cards import build_club_team_cards, list_seasons, norm_id
 
@@ -135,7 +135,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
 
 
 def build_club_meta(season: str) -> dict[str, dict]:
-    """club_name_raw -> {web, loc, prov}, from the opt-in clubs.csv
+    """club_name_raw -> {web, loc, prov, crest}, from the opt-in clubs.csv
     enrichment (correspondence address, not a stadium — see
     DATA_DICTIONARY.md). Missing entirely for a season that hasn't had
     enrich_clubs.py run, or for a club that crawl never resolved — both
@@ -143,13 +143,16 @@ def build_club_meta(season: str) -> dict[str, dict]:
     p = BASE / season / "clubs.csv"
     if not p.exists():
         return {}
-    df = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "portal_web", "locality", "province"])
+    df = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "portal_web", "locality", "province", "crest_url"])
     out: dict[str, dict] = {}
     for row in df.itertuples(index=False):
         name = clean(row.club_name_raw)
         if not name:
             continue
-        out[name] = {"web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province)}
+        out[name] = {
+            "web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province),
+            "crest": abs_crest_url(clean(row.crest_url)),
+        }
     return out
 
 
@@ -326,6 +329,7 @@ tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:var(--accent-soft);}
 td.name-cell{font-weight:600; color:var(--ink);}
 td.comp-cell{max-width:16rem; overflow:hidden; text-overflow:ellipsis;}
+.club-crest-ic{width:16px; height:16px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:0.35rem;}
 .tier-chip{ display:inline-block; font-size:0.7rem; font-weight:700; padding:0.08rem 0.45rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
 .n-note{color:var(--ink-faint); font-size:0.85em;}
@@ -459,6 +463,7 @@ let CUR_SEASON = null;
 const SEASON_CACHE = {}; // season -> Promise<{rows, clubs}>
 let ALL_DIVS = new Set();
 let RESTORING = false;
+let CUR_CLUB_META = {}; // club name -> {web, loc, prov, crest}, set each render() from payload.clubs
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -516,8 +521,10 @@ function rowHtml(r) {
   const posDisplay = r.pos ? (r.size ? `${r.pos}/${r.size}` : r.pos) : '—';
   const posSort = (r.pos && r.size) ? (Number(r.size) - Number(r.pos) + 1) / Number(r.size) : '';
   const stDisplay = (r.st === null || r.st === undefined) ? '—' : `${Math.round(r.st * 100)}%`;
+  const crest = (CUR_CLUB_META[r.club] || {}).crest;
+  const crestHtml = crest ? `<img class="club-crest-ic" src="${crest}" alt="" onerror="this.remove()">` : '';
   return `<tr>
-    <td class="name-cell" data-col="club" data-v="${esc(r.club)}"><a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
+    <td class="name-cell" data-col="club" data-v="${esc(r.club)}">${crestHtml}<a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
     <td data-col="team" data-v="${esc(r.team)}"><a href="${teamCardUrl(r)}">${esc(r.team)}</a></td>
     <td data-col="cat" data-v="${esc(catText)}">${esc(catText)}</td>
     <td data-col="div" data-v="${esc(divText)}"><span class="tier-chip">${esc(divText)}</span></td>
@@ -549,6 +556,7 @@ async function render() {
   tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].loading}</td></tr>`;
   const payload = await loadSeason(CUR_SEASON);
   if (myToken !== RENDER_TOKEN) return;
+  CUR_CLUB_META = payload.clubs || {};
 
   const seenDivs = [...new Set(payload.rows.map(r => r.div))].sort((a, b) => {
     const ra = DIV_ORDER.indexOf(a), rb = DIV_ORDER.indexOf(b);
