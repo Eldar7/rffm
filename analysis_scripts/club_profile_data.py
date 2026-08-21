@@ -35,7 +35,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from club_division_map import DIV_CODE, GT_CODE
+from club_division_map import DIV_CODE, GT_CODE, abs_crest_url
 from site_theme import club_slug_map
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -196,6 +196,28 @@ def club_payload(career: pd.DataFrame, clubs: dict[str, dict], target_key: str) 
         "teams": team_names,
         "players": players,
     }
+
+
+def build_crest_lookup(seasons: list[str]) -> dict[str, str]:
+    """club_key -> absolute crest URL, from each season's opt-in clubs.csv
+    enrichment. Keyed by club_key(club_name_raw) — the same cosmetic-only
+    fold used everywhere else in this module — first season that resolves a
+    given club wins, since a crest doesn't change season to season. A club
+    clubs.csv never crawled successfully just has no entry here, same as
+    every other opt-in field on this page."""
+    lookup: dict[str, str] = {}
+    for season in seasons:
+        p = BASE / season / "clubs.csv"
+        if not p.exists():
+            continue
+        clubs = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "crest_url"])
+        for r in clubs.itertuples(index=False):
+            name = clean(r.club_name_raw)
+            crest = abs_crest_url(clean(r.crest_url))
+            if not name or not crest:
+                continue
+            lookup.setdefault(club_key(name), crest)
+    return lookup
 
 
 def build_players_lookup(seasons: list[str]) -> dict[str, tuple[str, str | None]]:
