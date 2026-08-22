@@ -440,7 +440,15 @@ re-crawl of enrichment data needed.
   `clubs`/`club_profiles`.
 - **`team_club_gap_reasons.csv`** (`team_id` PK, also `team_club_pipeline.py`)
   — classifies *why* each `team_id` still absent from `team_club_map.csv`
-  has no `club_id`, instead of leaving that ~16% residual gap unexplained.
+  has no `club_id`, instead of leaving that residual gap unexplained (see
+  `DATA_FINDINGS.md`'s "two different % done numbers" for the actual
+  resolution-rate vs. gap-explanation-rate figures - they measure
+  different things, don't conflate them). For per-`reason` precision
+  numbers (some rules are near-airtight, one is closer to a coin flip -
+  see `university_team`) and worked examples with real `team_id`s and
+  calendario links, see `TEAM_CLUB_GAP_REASONS.md` - a deliberately
+  separate, not-auto-loaded file; only open it when actually working with
+  this classification.
   Cross-season like `team_club_map.csv`, but a **fully recomputed snapshot
   on every `team_clubs` run**, not upserted or append-only - a `team_id`
   that gets resolved next run simply stops appearing here. Derived purely

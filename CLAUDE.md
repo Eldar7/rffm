@@ -176,6 +176,13 @@ file per concern, and every other file links instead of re-describing.
   join traps, patterns that look like bugs but aren't, and genuine quality
   issues discovered through real queries. Add entries here instead of
   re-investigating the same surprises.
+- **`TEAM_CLUB_GAP_REASONS.md`** — the one deliberate exception to "one
+  file per concern, not per table": a full per-`reason` validation
+  writeup (precision numbers, worked examples) for
+  `team_club_gap_reasons.csv` specifically, split out of `DATA_FINDINGS.md`
+  so that reading *that* file for an unrelated finding doesn't also load
+  this. Not auto-loaded, not linked from here — reached only via
+  `DATA_DICTIONARY.md`/`DATA_FINDINGS.md`'s pointers, on demand.
 
 If you're about to add a column description to this file, or a paragraph
 explaining *how the crawler works* to `DATA_DICTIONARY.md`, or *what a

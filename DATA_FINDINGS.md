@@ -136,6 +136,48 @@ just no connection to anything else in this dataset).
 
 ---
 
+## team_club_map.csv / team_club_gap_reasons.csv — two different "% done" numbers, don't conflate them
+
+There are two unrelated coverage metrics for this pipeline; a query or a
+status update that only says "84%" or "99%" without naming which one is
+ambiguous and has already caused confusion once - always name the metric.
+
+- **Resolution rate: how many `team_id`s have a `club_id` at all.**
+  `len(team_club_map.csv) / (len(team_club_map.csv) + len(team_club_gap_reasons.csv))`
+  = 14,281 / 16,921 = **84.4%**. This is *the* headline number for "is the
+  team→club mapping done" - started at 51% (8,168/16,143) before this
+  pipeline existed, using only `clubs.csv`'s one-representative-per-club
+  sampling.
+- **Gap-explanation rate: of the ~16% still without a `club_id`, how much
+  has a documented structural reason** (`team_club_gap_reasons.csv`'s
+  `reason` column, anything but `unexplained`) vs. is a genuine,
+  currently-unresolved mystery (`unexplained`). 2,617 / 2,640 = **99.1%**
+  explained, 23 rows (0.9%) still `unexplained` - deliberately left as-is,
+  see that column's docstring in `models.py`.
+
+These measure different populations (all `team_id`s vs. only the
+unresolved ones) and answering "how done is this" with just one of them
+reads as a much bigger or much smaller number than reality depending on
+which one gets dropped - always state both together, or name which one is
+being quoted.
+
+For a full per-`reason` breakdown (how precise each classification rule
+actually is, with real `team_id` examples and calendario links - some
+rules are ~100% precise, `university_team` is closer to a coin flip), see
+`TEAM_CLUB_GAP_REASONS.md` - kept as a separate file on purpose so reading
+*this* file for an unrelated finding doesn't also load that whole
+writeup.
+
+```python
+import pandas as pd
+m = pd.read_csv("output/processed/rffm/team_club_map.csv", dtype=str)
+g = pd.read_csv("output/processed/rffm/team_club_gap_reasons.csv", dtype=str)
+resolution_rate = len(m) / (len(m) + len(g))
+gap_explained_rate = (g["reason"] != "unexplained").mean()
+```
+
+---
+
 ## club_profile.html — a club renamed across seasons can show up as two clubs
 
 **Symptom:** Searching the club picker on `club_profile.html` for a club
