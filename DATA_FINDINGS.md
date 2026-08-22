@@ -161,6 +161,13 @@ reads as a much bigger or much smaller number than reality depending on
 which one gets dropped - always state both together, or name which one is
 being quoted.
 
+For a full per-`reason` breakdown (how precise each classification rule
+actually is, with real `team_id` examples and calendario links - some
+rules are ~100% precise, `university_team` is closer to a coin flip), see
+`TEAM_CLUB_GAP_REASONS.md` - kept as a separate file on purpose so reading
+*this* file for an unrelated finding doesn't also load that whole
+writeup.
+
 ```python
 import pandas as pd
 m = pd.read_csv("output/processed/rffm/team_club_map.csv", dtype=str)
