@@ -68,6 +68,33 @@ def clean(v) -> str | None:
     return v or None
 
 
+def safe_map(s: pd.Series, func) -> pd.Series:
+    """`Series.map(func)` where func can return None - NOT safe to use
+    directly, and not obvious why: pandas 3.x infers the RESULT column's
+    dtype too, and for an all-string(-or-None) result it aggressively
+    infers `StringDtype`, under which a returned `None` silently becomes a
+    raw Python `float('nan')` instead of staying `None`/`pd.NA` - happens
+    the moment `.map()` returns, before the result is even assigned
+    anywhere (confirmed: `.dtype` on a bare `.map()` result already reads
+    "str"). Every `norm_id`/`clean` call in this file hit this - both the
+    ones assigned straight into a DataFrame column (matches["hid"] etc.)
+    and the ones fed straight into `dict(zip(...))` without ever touching a
+    DataFrame column - `zip()` iterates the already-corrupted Series either
+    way. Same root cause as rffm_data.py's `_stringify()` fix (see its
+    docstring) - fixed the same way: never construct a Series pandas could
+    dtype-infer over `func`'s output. Unlike `_stringify()`, `func` here is
+    an arbitrary callable (norm_id/clean), not always-`str()`, so there's
+    no numpy `.astype()` shortcut to vectorize it with - this still calls
+    `func` once per element in a Python loop. Iterating a plain numpy
+    object array (`.to_numpy()`) rather than the pandas Series directly at
+    least skips pandas' per-element access overhead; the tables this file
+    calls it on (teams/standings/matches, thousands not hundreds-of-
+    thousands of rows) are small enough that this hasn't been worth
+    optimizing further."""
+    arr = s.to_numpy(dtype=object, copy=False)
+    return pd.Series([func(v) for v in arr], index=s.index, dtype=object)
+
+
 def clean_int(v) -> int | None:
     v = clean(v)
     if v is None:
@@ -90,14 +117,15 @@ def build_season_club_teams(season: str) -> dict[str, dict[str, dict]]:
     comps = data.read_table("competitions", season=season)
     standings = data.read_table("standings", season=season)
 
-    tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"].map(clean)))
-    tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"].map(clean)))
-    tid_to_suffix = dict(zip(teams["team_id"].map(norm_id), teams["squad_suffix"].map(clean)))
+    team_id_norm = safe_map(teams["team_id"], norm_id)
+    tid_to_club = dict(zip(team_id_norm, safe_map(teams["club_name_raw"], clean)))
+    tid_to_name = dict(zip(team_id_norm, safe_map(teams["team"], clean)))
+    tid_to_suffix = dict(zip(team_id_norm, safe_map(teams["squad_suffix"], clean)))
     comp_by_id = {row.competition_id: row for row in comps.itertuples(index=False)}
 
     standings = standings.copy()
-    standings["gid"] = standings["group_id"].map(norm_id)
-    standings["tid"] = standings["team_id"].map(norm_id)
+    standings["gid"] = safe_map(standings["group_id"], norm_id)
+    standings["tid"] = safe_map(standings["team_id"], norm_id)
     group_size = standings.groupby("gid")["tid"].nunique().to_dict()
     standing_by_team_group: dict[tuple[str, str], dict] = {}
     for s in standings.itertuples(index=False):
@@ -112,8 +140,8 @@ def build_season_club_teams(season: str) -> dict[str, dict[str, dict]]:
         }
 
     matches = matches.copy()
-    matches["hid"] = matches["home_team_id"].map(norm_id)
-    matches["aid"] = matches["away_team_id"].map(norm_id)
+    matches["hid"] = safe_map(matches["home_team_id"], norm_id)
+    matches["aid"] = safe_map(matches["away_team_id"], norm_id)
 
     club_teams: dict[str, dict[str, dict]] = {}
     sides = (("hid", "aid", "home_team", "away_team", "home_score", "away_score", True),
