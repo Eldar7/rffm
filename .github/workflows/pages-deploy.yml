@@ -43,6 +43,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Rebuild players.parquet
+        # output/processed/rffm_parquet/players.parquet is deliberately
+        # gitignored (see .gitignore / build_parquet.py docstring) - every
+        # other table under rffm_parquet/ is committed by parquet-build.yml
+        # and present on checkout, but this one is regenerated from the
+        # git-tracked players_current.csv. build_site.py's v2/* pages (e.g.
+        # weird_scores_report_v2.py) read it via rffm_data.py and fail with
+        # FileNotFoundError on a fresh checkout without this step. Fast:
+        # --players-only skips the full per-season CSV scan.
+        run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --players-only
+
       - name: Build site
         run: python analysis_scripts/build_site.py --output-dir site
 
