@@ -15,8 +15,9 @@ live, deployed proof the migration reproduces the CSV-driven site exactly),
 team_card.html + its team-participation-map data (team_participation_map_v2
 — the "Карта участия" tab: how one squad moved through divisions within a
 season and across seasons, core-data-only so it needs no acta_partido
-enrichment), and club_division_map.html (adds the squads-over-seasons grid
-that reads the same team-participation data). Skipped with a message if
+enrichment), club_division_map.html (adds the squads-over-seasons grid
+that reads the same team-participation data), and club_profile.html (donor-
+club/alumni-career view, linked from both of the above). Skipped with a message if
 output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
 
@@ -39,6 +40,7 @@ import weird_scores_report_v2
 import team_cards_v2
 import club_division_map_v2
 import team_participation_map_v2
+import club_profile_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -331,6 +333,9 @@ def main():
 
         print("Building v2/club_division_map.html (squads-over-seasons grid)...")
         club_division_map_v2.build_all(v2_dir)
+
+        print("Building v2/club_profile.html (linked from team_card.html / club_division_map.html)...")
+        club_profile_v2.build_all(v2_dir)
     else:
         print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")
