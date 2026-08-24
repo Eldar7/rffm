@@ -20,10 +20,10 @@ that reads the same team-participation data), club_profile.html (donor-
 club/alumni-career view, linked from both of the above), team_card.html's
 "Состав" roster x matches tab (team_rosters_v2), player_card.html (donor-
 club-style per-player registration/career view, linked from team_card.html's
-roster), and player_card.html's own "Карта участия" tab (participation_map_v2
+roster), player_card.html's own "Карта участия" tab (participation_map_v2
 — per-match acta_partido facts, the player-level analog of
-team_participation_map_v2). Skipped with a message if
-output/processed/rffm_parquet/ hasn't been built yet
+team_participation_map_v2), all_players.html, and all_teams.html. Skipped
+with a message if output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
 
 Usage:
@@ -49,6 +49,8 @@ import club_profile_v2
 import team_rosters_v2
 import participation_map_v2
 import player_cards_v2
+import all_players_v2
+import all_teams_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -353,6 +355,12 @@ def main():
 
         print("Building v2/player_card.html's Карта участия tab data (participation_map_v2)...")
         participation_map_v2.build_all(v2_dir)
+
+        print("Building v2/all_players.html...")
+        all_players_v2.build_all(v2_dir)
+
+        print("Building v2/all_teams.html...")
+        all_teams_v2.build_all(v2_dir)
     else:
         print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")
