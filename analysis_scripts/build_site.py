@@ -22,8 +22,10 @@ club/alumni-career view, linked from both of the above), team_card.html's
 club-style per-player registration/career view, linked from team_card.html's
 roster), player_card.html's own "Карта участия" tab (participation_map_v2
 — per-match acta_partido facts, the player-level analog of
-team_participation_map_v2), all_players.html, and all_teams.html. Skipped
-with a message if output/processed/rffm_parquet/ hasn't been built yet
+team_participation_map_v2), all_players.html, all_teams.html, and
+season_comparison.html — the full set of _v2 report generators this
+project has written now all build into v2/. Skipped with a message if
+output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
 
 Usage:
@@ -51,6 +53,7 @@ import participation_map_v2
 import player_cards_v2
 import all_players_v2
 import all_teams_v2
+import season_comparison_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -361,6 +364,10 @@ def main():
 
         print("Building v2/all_teams.html...")
         all_teams_v2.build_all(v2_dir)
+
+        print(f"Building v2/season_comparison.html ({len(season_comparison_v2.SEASONS)} seasons)...")
+        sc_data_v2 = season_comparison_v2.load_all_data()
+        (v2_dir / "season_comparison.html").write_text(season_comparison_v2.build_html(sc_data_v2), encoding="utf-8")
     else:
         print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")
