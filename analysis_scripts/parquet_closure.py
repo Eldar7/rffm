@@ -50,6 +50,7 @@ Usage:
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -125,6 +126,46 @@ def log_family_closed_seasons(manifest: pd.DataFrame | None = None) -> set[str]:
     return set.intersection(*per_stage) if per_stage else set()
 
 
+PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
+
+# Every season-partitioned table this scheme covers except the two merged
+# log families (handled separately via log_family_closed_seasons) and
+# `players` (out of scope - see module docstring).
+LOG_FAMILY_TABLES = {"crawl_log", "data_quality_report"}
+
+
+def committable_paths(parquet_dir: Path = PARQUET_DIR, manifest: pd.DataFrame | None = None) -> list[Path]:
+    """Every Parquet file that is safe to `git add` under the open/closed
+    policy right now: one <table>/<season>.parquet per CLOSED season of a
+    table in TABLE_STAGE, plus crawl_log/data_quality_report's own (stricter)
+    closure. Returns only files that actually exist on disk (this function
+    doesn't build anything - run build_parquet.py first). Deliberately
+    excludes players.parquet (out of scope, separate --players-only
+    mechanism) and anything under a table not listed here at all."""
+    m = manifest if manifest is not None else load_manifest()
+    paths: list[Path] = []
+
+    for table in TABLE_STAGE:
+        table_dir = parquet_dir / table
+        if not table_dir.is_dir():
+            continue
+        for season in sorted(table_closed_seasons(table, m)):
+            f = table_dir / f"{season}.parquet"
+            if f.exists():
+                paths.append(f)
+
+    for table in LOG_FAMILY_TABLES:
+        table_dir = parquet_dir / table
+        if not table_dir.is_dir():
+            continue
+        for season in sorted(log_family_closed_seasons(m)):
+            f = table_dir / f"{season}.parquet"
+            if f.exists():
+                paths.append(f)
+
+    return paths
+
+
 def report(stage_filter: str | None = None, table_filter: str | None = None) -> None:
     m = load_manifest()
     if table_filter:
@@ -150,9 +191,31 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--stage", choices=ALL_STAGES, help="Report just this stage")
     parser.add_argument("--table", choices=sorted(TABLE_STAGE), help="Report just this table's owning stage")
+    parser.add_argument(
+        "--list-committable", action="store_true",
+        help="Print one repo-relative path per line for every Parquet file that's safe to "
+             "`git add` right now (closed (season,stage) only) - for parquet-build.yml's git "
+             "add step, e.g.: python analysis_scripts/parquet_closure.py --list-committable | "
+             "xargs -r git add",
+    )
+    parser.add_argument(
+        "--parquet-dir", default=str(PARQUET_DIR),
+        help="Only used with --list-committable - defaults to output/processed/rffm_parquet",
+    )
     args = parser.parse_args()
+
+    if args.list_committable:
+        repo_root = Path(__file__).parent.parent
+        for f in committable_paths(Path(args.parquet_dir)):
+            print(f.relative_to(repo_root))
+        return
+
     report(args.stage, args.table)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BrokenPipeError:
+        # e.g. `--list-committable | head` - the reader closed early, not an error.
+        sys.stderr.close()
