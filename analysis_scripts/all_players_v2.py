@@ -135,7 +135,7 @@ def build_season_performance(season: str) -> dict[str, dict]:
     serialized itself, but what build_season_all_players() needs to split
     a team's results into "matches with this player" vs "without" for the
     result-influence columns below."""
-    categories = data.list_categories("match_lineups", season) if (BASE / season / "match_lineups").exists() else []
+    categories = data.list_categories("match_lineups", season)
     perf: dict[str, dict] = {}
 
     def entry(pid: str) -> dict:
@@ -477,7 +477,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <nav class="nav-row">
-      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="../all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
       <a href="all_teams.html" data-i18n="nav_teams">Все команды</a>
       <a class="is-here" data-i18n="nav_players">Все игроки</a>
     </nav>
