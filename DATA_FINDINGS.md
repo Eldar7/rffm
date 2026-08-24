@@ -411,3 +411,40 @@ sampled team, and easy to re-freshen via `--force-refetch` — see
 `OPERATIONS.md`).
 
 ---
+
+## club_scorecard/*.csv is a WIP draft for a future club-metrics web page
+
+**What it is:** `output/processed/rffm_analysis/club_scorecard/club_cohort.csv`
+and `club_level.csv` are the batched-across-all-685-clubs output of
+`analysis_scripts/club_scorecard.py` (added in `78da433` — "the metrics
+catalog from the Aravaca/Union investigation, computed for any club or
+batched across all 685"). The catalog is genuinely rich — size/structure,
+division ceiling, retention curves (in-club vs in-football, per age
+category from its own founding-cohort season), elite-reach split (in-club
+vs after leaving), current top-team homegrown %, transfer balance between
+clubs, squad continuity, discipline, playing-time equity (Gini), result
+volatility — see the script's own module docstring for the full design
+rationale (club identity resolved via `club_id`/`club_teams.parquet`, not
+fragile `club_name_raw` string matching; a real bug found along the way —
+Union de Aravaca's team_id 4937443 was missing from its own `/fichaclub/`
+roster, understating a cohort by more than half).
+
+**Project owner's stated intent: these CSVs are a draft/precursor for a
+future club-metrics page on the site**, not a table meant to be queried or
+converted long-term as-is — `club_scorecard.py` is a CLI script today, not
+yet ported to the `build_all(out_dir)` report-generator pattern every other
+`analysis_scripts/*.py` page follows (reading via `rffm_data.py` from
+Parquet, writing HTML+JSON straight into the site build). Once that port
+happens, these specific CSV files stop being needed at all — the page
+would compute the same catalog on demand from the already-converted core
+Parquet tables, the same way `club_profile.html`/`club_division_map.html`
+already do.
+
+**Consequence:** out of scope for the CSV↔Parquet open/closed policy above
+— not because of any (season, stage) closure question, but because it
+isn't meant to persist as a data table at all. Not built into a page here;
+this entry exists so a future session finds this context (and the design
+notes already in `club_scorecard.py`'s own docstring) instead of
+re-deriving "why does this exist, should it move to Parquet" from scratch.
+
+---
