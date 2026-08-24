@@ -24,10 +24,24 @@ Parquet and deletes its source CSVs is a separate, explicit, human-triggered
 step - see build_parquet.py's --close flag - and must never run
 unattended/on a schedule (project owner's explicit instruction).
 
-club_profiles (clubs_extended.csv/club_teams.csv) is deliberately excluded
-from this whole scheme - it's not season-scoped (season="ALL" in the
-manifest, a cross-season append-only log re-fetched indefinitely via
-enrich_club_profiles.py --force-refetch), so "closed" doesn't apply to it.
+club_profiles (clubs_extended.csv/club_teams.csv) has no "closed" concept
+at all - it's not season-scoped (season="ALL" in the manifest, a
+cross-season append-only log re-fetched indefinitely via
+enrich_club_profiles.py --force-refetch). That's not a carve-out from this
+scheme: it means club_profiles is ALWAYS open under the same rule everything
+else follows (open -> CSV/log stays git-tracked, Parquet never committed,
+generated on demand only) - no special-casing needed, "never closes" and
+"not currently closed" collapse to the same treatment. Same reasoning
+applies to the "clubs" stage even though it IS season-scoped: it sits at
+complete_with_failures for every season (OPERATIONS.md: these failures are
+often permanent/structural - phantom teams, university teams - not a
+transient gap worth retrying) and may also keep getting manual corrections
+indefinitely, so it never reaches strict "complete" either and, correctly,
+never closes under this same rule - deliberately not special-cased to
+treat complete_with_failures as "good enough" for this one stage, despite
+its small size (checked: 1.6MB CSV / 720KB Parquet total across all 10
+seasons) - project owner's call: perpetually-refinable data never gets its
+Parquet committed, regardless of how cheap a rewrite would be.
 
 Usage:
     python analysis_scripts/parquet_closure.py            # full report
@@ -45,10 +59,22 @@ MANIFEST = BASE / "coverage_manifest.csv"
 
 ALL_STAGES = ["core", "acta_partido", "fichajugador", "clubs"]
 
-# Parquet table name -> owning coverage_manifest.csv stage. Anything not
-# listed here (players - cross-season deduped, handled separately from
-# season-based closure; clubs_extended/club_teams - see module docstring)
-# is out of scope for this open/closed scheme entirely.
+# club_profiles (clubs_extended.csv/club_teams.csv) shows status=="complete"
+# in the manifest right now - but that means "the last run finished", not
+# "this data is closed": enrich_club_profiles.py --force-refetch is a
+# deliberate, expected, repeatable refresh (not a failure-retry like
+# retry_check.py), so a "complete" club_profiles run can always be
+# superseded by a fresher one. Hardcoded to never close regardless of what
+# the manifest says, rather than trusting stage_closed_seasons()'s generic
+# status=="complete" check here - that check is correct for core/acta_
+# partido/fichajugador/clubs (a genuine "no more crawling scheduled"
+# signal for those) but would be wrong here.
+STAGES_THAT_NEVER_CLOSE = {"club_profiles"}
+
+# Parquet table name -> owning coverage_manifest.csv stage. `players` is
+# the one table out of scope for this whole scheme - cross-season deduped,
+# already handled by its own gitignored/regenerate-on-demand precedent
+# (players.parquet / players_current.csv), unrelated to season closure.
 TABLE_STAGE = {
     "matches": "core", "standings": "core", "scorers": "core", "groups": "core",
     "competitions": "core", "team_group_membership": "core",
@@ -59,6 +85,7 @@ TABLE_STAGE = {
     "players_by_season": "fichajugador",
     "match_lineups": "acta_partido", "match_goals": "acta_partido", "match_cards": "acta_partido",
     "match_staff": "acta_partido", "match_officials": "acta_partido",
+    "clubs_extended": "club_profiles", "club_teams": "club_profiles",
 }
 
 
@@ -68,7 +95,10 @@ def load_manifest() -> pd.DataFrame:
 
 def stage_closed_seasons(stage: str, manifest: pd.DataFrame | None = None) -> set[str]:
     """Every season where `stage` is fully closed - every category_base row
-    for (season, stage) has status == 'complete'."""
+    for (season, stage) has status == 'complete'. Always empty for a stage
+    in STAGES_THAT_NEVER_CLOSE, regardless of what the manifest says."""
+    if stage in STAGES_THAT_NEVER_CLOSE:
+        return set()
     m = manifest if manifest is not None else load_manifest()
     sub = m[m["stage"] == stage]
     closed = set()
@@ -81,8 +111,8 @@ def stage_closed_seasons(stage: str, manifest: pd.DataFrame | None = None) -> se
 def table_closed_seasons(table: str, manifest: pd.DataFrame | None = None) -> set[str]:
     stage = TABLE_STAGE.get(table)
     if stage is None:
-        raise ValueError(f"{table!r} has no known stage mapping (players/clubs_extended/"
-                          f"club_teams are deliberately out of scope - see module docstring)")
+        raise ValueError(f"{table!r} has no known stage mapping (players is deliberately "
+                          f"out of scope - see module docstring)")
     return stage_closed_seasons(stage, manifest)
 
 
@@ -112,6 +142,8 @@ def report(stage_filter: str | None = None, table_filter: str | None = None) -> 
     if not stage_filter and not table_filter:
         print(f"\ncrawl_log/data_quality_report (need ALL 4 stages closed): "
               f"{sorted(log_family_closed_seasons(m))}")
+        print("stage=club_profiles   never closes (clubs_extended/club_teams - "
+              "see STAGES_THAT_NEVER_CLOSE)")
 
 
 def main():
