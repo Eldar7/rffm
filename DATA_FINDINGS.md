@@ -327,6 +327,48 @@ decade, not a crawl defect. Expected; don't re-investigate as a bug. See
 
 ---
 
+## career_analysis_*.csv / player_career.xlsx are stray notebook output, not a maintained table
+
+**Symptom:** `output/processed/rffm/career_analysis_disappeared.csv`,
+`career_analysis_out_career.csv`, `career_analysis_out_jumps.csv`,
+`career_analysis_top_tier_profile.csv`, and `player_career.xlsx` sit in the
+repo, git-tracked, with no generator in `analysis_scripts/` — grepping the
+whole directory for their filenames or `.xlsx`/`career_analysis` turns up
+nothing. Looks like an orphaned pipeline output missing its script.
+
+**It isn't part of the pipeline at all.** These are hand-run Jupyter
+notebook output: `notebooks/player_career.ipynb` builds a per-player
+career table (seasons/categories/divisions/clubs/teams/competitions as
+list columns) and writes it to `player_career.xlsx`
+(`out.to_excel(out_path, index=False)`); `notebooks/career_analysis.ipynb`
+reads that `.xlsx` back in (`pd.read_excel`) and derives the four
+`career_analysis_*.csv` files from it — exploratory career-trajectory
+analysis, not anything `build_site.py`/`analysis_scripts/*.py` reads or
+regenerates. `analysis_scripts/player_career.py` is unrelated despite the
+similar name — a small, current helper for a completely different stat
+("X/Y seasons played") used by `player_card.html`/`team_card.html`.
+
+**How they ended up committed is its own small mystery.** All five files
+(plus the three `notebooks/*.ipynb` themselves) first appear in one commit,
+`770a78e` (2026-08-13), authored by `rffm-crawl-bot` with the message
+*"rffm-crawl checkpoint: fichajugador PREBENJAMIN (49000/75007)"* — an
+automated crawl-progress checkpoint that, unrelatedly, also added 775 files
+in one shot (34.5M insertions), including essentially the entire
+`analysis_scripts/` directory and every root doc. Reads as the bot's commit
+step sweeping up whatever was sitting in the working tree at that moment
+(a parallel interactive/notebook session's untracked output included)
+rather than a deliberate, reviewed addition of these specific files.
+
+**Consequence:** out of scope for the CSV↔Parquet conversion policy above
+entirely — there's no pipeline stage/generator to apply the open/closed
+rule to, and no evidence anyone currently relies on these files being
+present. Not deleted here (that's a separate, deliberate decision for the
+project owner, same caution as CSV deletion in the open/closed policy) -
+this entry exists so a future session doesn't re-investigate "where's the
+generator for career_analysis_*.csv" as if it were a real gap.
+
+---
+
 ## clubs.csv vs clubs_extended.csv — where they agree, where they don't, and why
 
 **Symptom:** for the ~671 clubs present in both 2025-2026's `clubs.csv`
