@@ -309,7 +309,7 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     print(f"  {len(profiles)} distinct players")
 
     for season in build_seasons:
-        if not (BASE / season / "player_competition_participation.csv").exists():
+        if season not in data.list_seasons("player_competition_participation"):
             print(f"Skipping all-players for {season}: no participation data")
             continue
         print(f"Building all-players data for season {season}")
