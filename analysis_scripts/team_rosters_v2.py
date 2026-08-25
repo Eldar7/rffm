@@ -2,10 +2,19 @@
 """
 v2 PROOF-OF-CONCEPT: identical to team_rosters.py except build_team_rosters()
 sources match_lineups/match_goals/match_cards/players from output/processed/
-rffm_parquet/ via rffm_data.read_table() instead of pd.read_csv(). Imports
-player_career_v2 (not player_career) so the career-index computation stays on
-the Parquet path too. list_seasons() is unchanged - reads coverage_manifest.csv,
-which isn't part of the Parquet ETL.
+rffm_parquet/ via rffm_data.read_table() instead of pd.read_csv(). Reads
+read_table("players_by_season", season=...), not the deduped
+read_table("players") - v1 read this season's own players.csv, and
+confirmed on real data that a player's recorded name spelling can genuinely
+change between seasons (RFFM's own site started serving some players'
+names without diacritics from 2024-2025 onward), so the deduped table's
+"latest name wins" pick would show an old season's roster under a spelling
+that didn't exist yet that season - this module is the sole source for
+team_card.html's roster tab now (team_rosters.py's build is no longer
+called from build_site.py), so there's no v1 fallback to mask this.
+Imports player_career_v2 (not player_career) so the career-index
+computation stays on the Parquet path too. list_seasons() is unchanged -
+reads coverage_manifest.csv, which isn't part of the Parquet ETL.
 
 Roster x matches participation matrix for the Team Card: for every match a
 team played (already listed by team_cards.py), who dressed, who started vs.
@@ -77,7 +86,7 @@ CARD_LABEL_ES = {"amarilla": "amarilla", "roja": "roja", "doble_amarilla": "dobl
 
 
 def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None) -> dict[str, dict]:
-    players = data.read_table("players")
+    players = data.read_table("players_by_season", season=season)
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
     career_lookup = career_lookup or {}
 

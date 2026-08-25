@@ -3,9 +3,15 @@
 v2 PROOF-OF-CONCEPT: identical to player_cards.py except build_season_shards()
 sources player_competition_participation/players/competitions from
 output/processed/rffm_parquet/ via rffm_data.read_table() instead of
-pd.read_csv(). Imports build_club_team_cards/norm_id from team_cards_v2 and
-player_career from player_career_v2 so build_career_shards() also stays on
-the Parquet path.
+pd.read_csv(). Uses read_table("players_by_season", season=...), not the
+deduped read_table("players") - v1 reads this season's own players.csv, and
+confirmed on real data that a player's recorded name spelling can genuinely
+change between seasons (RFFM's own site started serving some players'
+names without diacritics from 2024-2025 onward), so the deduped table's
+"latest name wins" pick would show an old season's page under a spelling
+that didn't exist yet that season. Imports build_club_team_cards/norm_id
+from team_cards_v2 and player_career from player_career_v2 so
+build_career_shards() also stays on the Parquet path.
 
 Player card: which team(s)/division(s) a player was registered to, per
 season — from player_competition_participation.csv (opt-in fichajugador
@@ -68,7 +74,7 @@ def shard_of(player_id: str) -> int:
 
 def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     part = data.read_table("player_competition_participation", season=season)
-    players = data.read_table("players")
+    players = data.read_table("players_by_season", season=season)
     comps = data.read_table("competitions", season=season)
 
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
