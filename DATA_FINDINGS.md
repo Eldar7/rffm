@@ -359,13 +359,13 @@ step sweeping up whatever was sitting in the working tree at that moment
 (a parallel interactive/notebook session's untracked output included)
 rather than a deliberate, reviewed addition of these specific files.
 
-**Consequence:** out of scope for the CSV↔Parquet conversion policy above
-entirely — there's no pipeline stage/generator to apply the open/closed
-rule to, and no evidence anyone currently relies on these files being
-present. Not deleted here (that's a separate, deliberate decision for the
-project owner, same caution as CSV deletion in the open/closed policy) -
-this entry exists so a future session doesn't re-investigate "where's the
-generator for career_analysis_*.csv" as if it were a real gap.
+**Consequence:** out of scope for the CSV↔Parquet policy (`PARQUET_
+CLOSURE.md`) entirely — there's no pipeline stage/generator to apply the
+open/closed rule to, and no evidence anyone currently relies on these
+files being present. Not deleted here (that's a separate, deliberate
+decision for the project owner, same caution as CSV deletion in that
+policy) - this entry exists so a future session doesn't re-investigate
+"where's the generator for career_analysis_*.csv" as if it were a real gap.
 
 ---
 
@@ -440,9 +440,10 @@ would compute the same catalog on demand from the already-converted core
 Parquet tables, the same way `club_profile.html`/`club_division_map.html`
 already do.
 
-**Consequence:** out of scope for the CSV↔Parquet open/closed policy above
-— not because of any (season, stage) closure question, but because it
-isn't meant to persist as a data table at all. Not built into a page here;
+**Consequence:** out of scope for the CSV↔Parquet policy (`PARQUET_
+CLOSURE.md`) — not because of any (season, stage) closure question, but
+because it isn't meant to persist as a data table at all. Not built into
+a page here;
 this entry exists so a future session finds this context (and the design
 notes already in `club_scorecard.py`'s own docstring) instead of
 re-deriving "why does this exist, should it move to Parquet" from scratch.

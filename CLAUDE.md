@@ -173,8 +173,17 @@ file per concern, and every other file links instead of re-describing.
   join traps, patterns that look like bugs but aren't, and genuine quality
   issues discovered through real queries. Add entries here instead of
   re-investigating the same surprises.
+- **`PARQUET_CLOSURE.md`** — the CSV↔Parquet *git storage* policy: which
+  of the two copies actually gets committed for a given table/season, when,
+  and why (not the data model itself — that's `DATA_DICTIONARY.md`; not
+  crawl/`coverage_manifest.csv` mechanics — that's `OPERATIONS.md`, just
+  the thing this file's policy reads to decide "closed"). Only relevant for
+  pipeline/infra work (`build_parquet.py`, `parquet_closure.py`,
+  `parquet-build.yml`, the SessionStart hooks) — not needed for an
+  ordinary query.
 
 If you're about to add a column description to this file, or a paragraph
-explaining *how the crawler works* to `DATA_DICTIONARY.md`, or *what a
-column means* to `OPERATIONS.md` — that's the signal it belongs in a
-different file instead. Link to it, don't copy it.
+explaining *how the crawler works* to `DATA_DICTIONARY.md`, *what a
+column means* to `OPERATIONS.md`, or *which git commit does what to the
+Parquet copy* anywhere but `PARQUET_CLOSURE.md` — that's the signal it
+belongs in a different file instead. Link to it, don't copy it.
