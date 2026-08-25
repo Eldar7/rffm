@@ -29,7 +29,7 @@ across however many competition-rows that team has.
 Unlike all_players.py, there's no need to shard by category: team/club
 counts run in the low thousands per season (vs. 150k+ players), small
 enough to ship as one JSON per season — data/all_teams_<season>.json,
-{"rows": [...], "clubs": {club_name: {web, loc, prov}}}. all_clubs.py
+{"rows": [...], "clubs": {club_name: {web, loc, prov, crest}}}. all_clubs.py
 reads this SAME file client-side and aggregates it by club instead of
 shipping a second, redundant dataset — see that module's docstring.
 
