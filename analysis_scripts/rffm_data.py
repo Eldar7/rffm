@@ -179,10 +179,8 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
 
-def read_table(name: str, season: str | None = None, category: str | None = None) -> pd.DataFrame:
-    """Returns a DataFrame shaped like the original per-season/per-category
-    CSV read. `season`/`category` are ignored where the table doesn't carry
-    that dimension (e.g. players is global; flat tables have no category)."""
+@lru_cache(maxsize=None)
+def _read_table_cached(name: str, season: str | None, category: str | None) -> pd.DataFrame:
     if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         if season is None:
             raise ValueError(f"{name} is season-sharded on disk - season= is required")
@@ -206,6 +204,34 @@ def read_table(name: str, season: str | None = None, category: str | None = None
         df = df.drop(columns=["category_base"])
 
     return _stringify(df)
+
+
+def read_table(name: str, season: str | None = None, category: str | None = None) -> pd.DataFrame:
+    """Returns a DataFrame shaped like the original per-season/per-category
+    CSV read. `season`/`category` are ignored where the table doesn't carry
+    that dimension (e.g. players is global; flat tables have no category).
+
+    Cached (process-lifetime, keyed on the exact name/season/category triple)
+    - measured motivation: _stringify() alone costs ~5.5s for a single
+    (table, season, category) combination at typical match_lineups size, and
+    up to 6 different _v2.py report generators independently call read_table
+    with the IDENTICAL (name, season, category) during one build_site.py run
+    (each doing its own join against match_lineups/match_goals/match_cards -
+    see PARQUET_CLOSURE.md's sibling investigation into where site-build time
+    actually goes). The raw Parquet read was already cached one layer down
+    (_load/_load_sharded_season), but re-running _stringify() on every call
+    was not - this closes that gap.
+
+    Always returns `.copy()`, never the cached object directly: audited
+    (grep) and confirmed several report generators mutate a read_table()
+    result's columns in place (e.g. weird_scores_report_v2.py's
+    `goals["minute"] = pd.to_numeric(...)` runs directly on the DataFrame
+    read_table returned, no intervening copy) - sharing the cached object
+    across callers would let one report's in-place edit corrupt what every
+    other report sees for the same (name, season, category). Measured the
+    copy cost specifically to make sure it doesn't eat the win: ~85ms for a
+    DataFrame that costs ~5.5s to rebuild from scratch, ~65x cheaper."""
+    return _read_table_cached(name, season, category).copy()
 
 
 def list_categories(name: str, season: str) -> list[str]:
