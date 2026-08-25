@@ -93,6 +93,11 @@ SEASON_PARTITIONED_TABLES = {
 
 @lru_cache(maxsize=None)
 def _load(name: str) -> pd.DataFrame:
+    # Unbounded is fine here (unlike the two caches below): this is only
+    # ever called for the small, flat, cross-season table names in
+    # NO_SEASON_COLUMN_IN_ORIGINAL/etc. (players, clubs_extended, ...) -
+    # bounded by how many *table names* exist, not by season count, so it
+    # can never accumulate the way a per-season cache does.
     path = PARQUET_DIR / f"{name}.parquet"
     if not path.exists():
         raise FileNotFoundError(
@@ -103,8 +108,16 @@ def _load(name: str) -> pd.DataFrame:
     return pd.read_parquet(path)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=96)
 def _load_sharded_season(name: str, season: str) -> pd.DataFrame | None:
+    # Bounded (unlike the module's original maxsize=None here) - see
+    # _read_table_cached's docstring for why maxsize=None across a 10-season
+    # build_site.py run is what actually OOM-killed a real CI runner (15GB
+    # RAM ceiling, confirmed via df/free logging added to pages-deploy.yml).
+    # This layer's raw Parquet loads are individually cheap (compact
+    # category/Int16/Int32 dtypes - a whole season of match_lineups across
+    # every category is ~65MB), so 96 is generous headroom over one season's
+    # ~20-30 distinct (name, season) entries, not a tight bound.
     path = PARQUET_DIR / name / f"{season}.parquet"
     if not path.exists():
         return None
@@ -200,7 +213,7 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=64)
 def _read_table_cached(name: str, season: str | None, category: str | None) -> pd.DataFrame:
     if name in SHARDED_TABLES or name in SEASON_PARTITIONED_TABLES:
         if season is None:
@@ -232,7 +245,7 @@ def read_table(name: str, season: str | None = None, category: str | None = None
     CSV read. `season`/`category` are ignored where the table doesn't carry
     that dimension (e.g. players is global; flat tables have no category).
 
-    Cached (process-lifetime, keyed on the exact name/season/category triple)
+    Cached (LRU, maxsize=64, keyed on the exact name/season/category triple)
     - measured motivation: _stringify() alone costs ~5.5s for a single
     (table, season, category) combination at typical match_lineups size, and
     up to 6 different _v2.py report generators independently call read_table
@@ -242,6 +255,21 @@ def read_table(name: str, season: str | None = None, category: str | None = None
     actually goes). The raw Parquet read was already cached one layer down
     (_load/_load_sharded_season), but re-running _stringify() on every call
     was not - this closes that gap.
+
+    Bounded, not maxsize=None: _stringify()'s output is real Python
+    str/None per cell, not the compact category/Int16/Int32 dtypes the
+    underlying Parquet read caches - measured one season's stringified
+    match_lineups/match_goals/match_cards alone (every category) at ~1.4GB.
+    An unbounded cache across a 10-season build_site.py run is exactly what
+    OOM-killed a real CI runner (confirmed via df/free logging added to
+    pages-deploy.yml: RAM climbed from ~1GB to the 15GB ceiling over ~20
+    minutes, runner killed by "shutdown signal" rather than a clean Python
+    MemoryError). 64 comfortably covers one season's ~20-30 distinct
+    (name, season, category) entries - the intra-season, cross-generator
+    reuse this cache exists for - while bounding steady-state memory to
+    roughly 1-2 seasons' worth instead of all 10 at once. A season that
+    scrolls out of the LRU window just pays the ~5.5s rebuild again, not a
+    correctness cost.
 
     Always returns `.copy()`, never the cached object directly: audited
     (grep) and confirmed several report generators mutate a read_table()
