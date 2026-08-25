@@ -70,7 +70,7 @@ CARD_LABEL_ES = {"amarilla": "amarilla", "roja": "roja", "doble_amarilla": "dobl
 
 def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None) -> dict[str, dict]:
     d = BASE / season
-    players = pd.read_csv(d / "players.csv", dtype=str)
+    players = pd.read_csv(d / "players.csv", dtype=object)
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
     career_lookup = career_lookup or {}
 
@@ -85,7 +85,7 @@ def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None
 
     for cat in categories:
         lf = lineups_dir / f"{cat}.csv"
-        lu = pd.read_csv(lf, dtype=str)
+        lu = pd.read_csv(lf, dtype=object)
         for row in lu.itertuples(index=False):
             tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
             if not (tid and mid and pid):
@@ -113,7 +113,7 @@ def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None
 
         gf = d / "match_goals" / f"{cat}.csv"
         if gf.exists():
-            goals = pd.read_csv(gf, dtype=str)
+            goals = pd.read_csv(gf, dtype=object)
             for row in goals.itertuples(index=False):
                 tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
                 if not (tid and mid and pid) or tid not in rosters:
@@ -124,7 +124,7 @@ def build_team_rosters(season: str, career_lookup: dict[str, dict] | None = None
 
         cf = d / "match_cards" / f"{cat}.csv"
         if cf.exists():
-            cards = pd.read_csv(cf, dtype=str)
+            cards = pd.read_csv(cf, dtype=object)
             for row in cards.itertuples(index=False):
                 tid, mid, pid = norm_id(row.team_id), row.match_id, row.player_id
                 if not (tid and mid and pid) or tid not in rosters:
