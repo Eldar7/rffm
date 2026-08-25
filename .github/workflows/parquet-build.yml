@@ -12,8 +12,22 @@ name: Build and commit Parquet tables
 # deleted. This workflow only ever adds/updates files under
 # output/processed/rffm_parquet/, so the old data and the old site
 # (pages-deploy.yml, entirely CSV-driven) are unaffected either way.
-# Removing the CSVs, once the Parquet copy is trusted, is a separate,
-# deliberate decision for later - not something this workflow does.
+#
+# Only CLOSED (season, stage) Parquet files get committed - see
+# analysis_scripts/parquet_closure.py's module docstring for the full
+# open/closed policy. build_parquet.py still builds every table for every
+# season into the runner's local output-dir (site-build/query code needs
+# all of it), but this workflow's git-add step only stages the subset
+# parquet_closure.py --list-committable says is closed, so an in-progress
+# season/stage never gets a committed Parquet snapshot (and never needs
+# one - see build_parquet.py's --players-only precedent, which this
+# generalizes: a table nobody has closed yet is regenerated on demand by
+# whatever build/session needs it, not persisted to git history).
+#
+# Closing a (season, stage) - committing its final Parquet AND deleting
+# its source CSV in the same action - is a SEPARATE, deliberately manual
+# step (project owner's explicit instruction: never automatic, only on
+# explicit request) - not something this workflow does on its own, ever.
 #
 # Manual dispatch only for now (no cron) until the migration is verified
 # end to end - see the "v2" site build in pages-deploy.yml that renders
@@ -51,12 +65,12 @@ jobs:
           git config user.name "rffm-parquet-bot"
           git config user.email "actions@github.com"
 
-          git add output/processed/rffm_parquet
+          python analysis_scripts/parquet_closure.py --list-committable | xargs -r git add
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No changes to commit (nothing newly closed since the last run)."
             exit 0
           fi
-          git commit -m "parquet-build: refresh output/processed/rffm_parquet from current CSVs"
+          git commit -m "parquet-build: refresh closed-season Parquet tables"
 
           for attempt in 1 2 3 4 5; do
             git fetch origin main

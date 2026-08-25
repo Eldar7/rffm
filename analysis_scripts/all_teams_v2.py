@@ -78,7 +78,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     team_card.html's computeStability() uses client-side for one team;
     computed here once per team instead so a season-wide table doesn't
     need to fetch and recompute it 1000+ times in the browser."""
-    if not (BASE / season / "match_lineups").exists() or not (BASE / season / "matches.csv").exists():
+    if season not in data.list_seasons("match_lineups") or season not in data.list_seasons("matches"):
         return {}
     m = data.read_table("matches", season=season)[["match_id", "match_date", "status"]]
     # A missing match_date reads back as float NaN even under dtype=str (pandas'
@@ -343,7 +343,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <nav class="nav-row">
-      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="../all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
       <a class="is-here" data-i18n="nav_teams">Все команды</a>
       <a href="all_players.html" data-i18n="nav_players">Все игроки</a>
     </nav>

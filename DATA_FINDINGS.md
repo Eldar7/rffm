@@ -327,6 +327,48 @@ decade, not a crawl defect. Expected; don't re-investigate as a bug. See
 
 ---
 
+## career_analysis_*.csv / player_career.xlsx are stray notebook output, not a maintained table
+
+**Symptom:** `output/processed/rffm/career_analysis_disappeared.csv`,
+`career_analysis_out_career.csv`, `career_analysis_out_jumps.csv`,
+`career_analysis_top_tier_profile.csv`, and `player_career.xlsx` sit in the
+repo, git-tracked, with no generator in `analysis_scripts/` — grepping the
+whole directory for their filenames or `.xlsx`/`career_analysis` turns up
+nothing. Looks like an orphaned pipeline output missing its script.
+
+**It isn't part of the pipeline at all.** These are hand-run Jupyter
+notebook output: `notebooks/player_career.ipynb` builds a per-player
+career table (seasons/categories/divisions/clubs/teams/competitions as
+list columns) and writes it to `player_career.xlsx`
+(`out.to_excel(out_path, index=False)`); `notebooks/career_analysis.ipynb`
+reads that `.xlsx` back in (`pd.read_excel`) and derives the four
+`career_analysis_*.csv` files from it — exploratory career-trajectory
+analysis, not anything `build_site.py`/`analysis_scripts/*.py` reads or
+regenerates. `analysis_scripts/player_career.py` is unrelated despite the
+similar name — a small, current helper for a completely different stat
+("X/Y seasons played") used by `player_card.html`/`team_card.html`.
+
+**How they ended up committed is its own small mystery.** All five files
+(plus the three `notebooks/*.ipynb` themselves) first appear in one commit,
+`770a78e` (2026-08-13), authored by `rffm-crawl-bot` with the message
+*"rffm-crawl checkpoint: fichajugador PREBENJAMIN (49000/75007)"* — an
+automated crawl-progress checkpoint that, unrelatedly, also added 775 files
+in one shot (34.5M insertions), including essentially the entire
+`analysis_scripts/` directory and every root doc. Reads as the bot's commit
+step sweeping up whatever was sitting in the working tree at that moment
+(a parallel interactive/notebook session's untracked output included)
+rather than a deliberate, reviewed addition of these specific files.
+
+**Consequence:** out of scope for the CSV↔Parquet policy (`PARQUET_
+CLOSURE.md`) entirely — there's no pipeline stage/generator to apply the
+open/closed rule to, and no evidence anyone currently relies on these
+files being present. Not deleted here (that's a separate, deliberate
+decision for the project owner, same caution as CSV deletion in that
+policy) - this entry exists so a future session doesn't re-investigate
+"where's the generator for career_analysis_*.csv" as if it were a real gap.
+
+---
+
 ## clubs.csv vs clubs_extended.csv — where they agree, where they don't, and why
 
 **Symptom:** for the ~671 clubs present in both 2025-2026's `clubs.csv`
@@ -367,5 +409,43 @@ bug in either fetch. If you need a club's current address, prefer
 `clubs_extended.csv` (sourced from the club's own profile rather than one
 sampled team, and easy to re-freshen via `--force-refetch` — see
 `OPERATIONS.md`).
+
+---
+
+## club_scorecard/*.csv is a WIP draft for a future club-metrics web page
+
+**What it is:** `output/processed/rffm_analysis/club_scorecard/club_cohort.csv`
+and `club_level.csv` are the batched-across-all-685-clubs output of
+`analysis_scripts/club_scorecard.py` (added in `78da433` — "the metrics
+catalog from the Aravaca/Union investigation, computed for any club or
+batched across all 685"). The catalog is genuinely rich — size/structure,
+division ceiling, retention curves (in-club vs in-football, per age
+category from its own founding-cohort season), elite-reach split (in-club
+vs after leaving), current top-team homegrown %, transfer balance between
+clubs, squad continuity, discipline, playing-time equity (Gini), result
+volatility — see the script's own module docstring for the full design
+rationale (club identity resolved via `club_id`/`club_teams.parquet`, not
+fragile `club_name_raw` string matching; a real bug found along the way —
+Union de Aravaca's team_id 4937443 was missing from its own `/fichaclub/`
+roster, understating a cohort by more than half).
+
+**Project owner's stated intent: these CSVs are a draft/precursor for a
+future club-metrics page on the site**, not a table meant to be queried or
+converted long-term as-is — `club_scorecard.py` is a CLI script today, not
+yet ported to the `build_all(out_dir)` report-generator pattern every other
+`analysis_scripts/*.py` page follows (reading via `rffm_data.py` from
+Parquet, writing HTML+JSON straight into the site build). Once that port
+happens, these specific CSV files stop being needed at all — the page
+would compute the same catalog on demand from the already-converted core
+Parquet tables, the same way `club_profile.html`/`club_division_map.html`
+already do.
+
+**Consequence:** out of scope for the CSV↔Parquet policy (`PARQUET_
+CLOSURE.md`) — not because of any (season, stage) closure question, but
+because it isn't meant to persist as a data table at all. Not built into
+a page here;
+this entry exists so a future session finds this context (and the design
+notes already in `club_scorecard.py`'s own docstring) instead of
+re-deriving "why does this exist, should it move to Parquet" from scratch.
 
 ---

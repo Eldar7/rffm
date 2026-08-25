@@ -277,7 +277,7 @@ HTML = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RFFM — странные счета, доминаторы и аутсайдеры</title>
-<a class="back" href="index.html" style="display:inline-block;margin:16px 0 0 20px">&larr; RFFM data</a>
+<a class="back" href="../index.html" style="display:inline-block;margin:16px 0 0 20px">&larr; RFFM data</a>
 %FONT_LINKS%
 %THEME_INIT%
 <style>%CSS%

@@ -15,8 +15,16 @@ live, deployed proof the migration reproduces the CSV-driven site exactly),
 team_card.html + its team-participation-map data (team_participation_map_v2
 — the "Карта участия" tab: how one squad moved through divisions within a
 season and across seasons, core-data-only so it needs no acta_partido
-enrichment), and club_division_map.html (adds the squads-over-seasons grid
-that reads the same team-participation data). Skipped with a message if
+enrichment), club_division_map.html (adds the squads-over-seasons grid
+that reads the same team-participation data), club_profile.html (donor-
+club/alumni-career view, linked from both of the above), team_card.html's
+"Состав" roster x matches tab (team_rosters_v2), player_card.html (donor-
+club-style per-player registration/career view, linked from team_card.html's
+roster), player_card.html's own "Карта участия" tab (participation_map_v2
+— per-match acta_partido facts, the player-level analog of
+team_participation_map_v2), all_players.html, all_teams.html, and
+season_comparison.html — the full set of _v2 report generators this
+project has written now all build into v2/. Skipped with a message if
 output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
 
@@ -39,6 +47,13 @@ import weird_scores_report_v2
 import team_cards_v2
 import club_division_map_v2
 import team_participation_map_v2
+import club_profile_v2
+import team_rosters_v2
+import participation_map_v2
+import player_cards_v2
+import all_players_v2
+import all_teams_v2
+import season_comparison_v2
 import competition_structure
 import team_cards
 import team_rosters
@@ -331,6 +346,28 @@ def main():
 
         print("Building v2/club_division_map.html (squads-over-seasons grid)...")
         club_division_map_v2.build_all(v2_dir)
+
+        print("Building v2/club_profile.html (linked from team_card.html / club_division_map.html)...")
+        club_profile_v2.build_all(v2_dir)
+
+        print("Building v2/team_card.html's Состав tab data (team_rosters_v2)...")
+        team_rosters_v2.build_all(v2_dir)
+
+        print("Building v2/player_card.html (linked from team_card.html's roster)...")
+        player_cards_v2.build_all(v2_dir)
+
+        print("Building v2/player_card.html's Карта участия tab data (participation_map_v2)...")
+        participation_map_v2.build_all(v2_dir)
+
+        print("Building v2/all_players.html...")
+        all_players_v2.build_all(v2_dir)
+
+        print("Building v2/all_teams.html...")
+        all_teams_v2.build_all(v2_dir)
+
+        print(f"Building v2/season_comparison.html ({len(season_comparison_v2.SEASONS)} seasons)...")
+        sc_data_v2 = season_comparison_v2.load_all_data()
+        (v2_dir / "season_comparison.html").write_text(season_comparison_v2.build_html(sc_data_v2), encoding="utf-8")
     else:
         print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")

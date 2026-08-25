@@ -301,7 +301,7 @@ tr:nth-child(even) td { background: var(--row-hover); }
 </head>
 <body>
 
-<a class="back" href="index.html">&larr; RFFM data</a>
+<a class="back" href="../index.html">&larr; RFFM data</a>
 <div class="masthead-row">
   <div>
     <h1><span data-i18n="h1">RFFM — сравнение сезонов</span></h1>

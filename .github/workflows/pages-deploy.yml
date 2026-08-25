@@ -54,6 +54,21 @@ jobs:
         # --players-only skips the full per-season CSV scan.
         run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --players-only
 
+      - name: Rebuild open (season, stage) Parquet tables
+        # parquet-build.yml only ever commits Parquet for a CLOSED
+        # (season, stage) - see that workflow's comments and
+        # analysis_scripts/parquet_closure.py's module docstring. Every
+        # still-open one (e.g. this season's core data while it's being
+        # crawled, or an older season's acta_partido/fichajugador that
+        # hasn't finished every category yet) is missing from a fresh
+        # checkout entirely and needs regenerating here too, or
+        # build_site.py's v2/* pages hit the same FileNotFoundError this
+        # workflow already got bitten by once for players.parquet.
+        # --open-only skips every already-closed season (already correct
+        # on disk via git checkout) so this stays fast (~2 min measured)
+        # instead of the ~9 min a full rebuild takes.
+        run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --open-only
+
       - name: Build site
         run: python analysis_scripts/build_site.py --output-dir site
 
