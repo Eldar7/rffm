@@ -30,6 +30,25 @@ in it (not split per season) — team counts per club are small enough (see
 build_all()'s own printed totals) that splitting further would only add
 fetches for no size benefit.
 
+The "which club" grouping is itself real work, not a simple string match:
+club_name_raw (teams.csv) is a per-SEASON cosmetic display name, not a
+stable identity — a real case in this data, club_id 1011: teams.csv shows
+"ARAVACA C.F." in 2021-2022, "ARAVACA C.F. - Bhhs Spain" in 2022-2024, then
+"ARAVACA C.F. - CEIBA" in 2024-2026, all the same real club. Grouping by
+that raw string (an earlier version of this file did exactly that) splits
+one club's history across one file per era. build_season_club_id_map()
+resolves the real, stable RFFM club_id via clubs.csv's
+representative_team_id — NOT by joining clubs.csv's own club_name_raw
+column, which stays fixed to the club's official name and never shows the
+sponsor-suffixed variants at all (confirmed: "ARAVACA C.F. - CEIBA" never
+appears as a clubs.csv row, in any season) — the same resolution
+club_division_map_v2.py already relies on for crest/website/address, for
+the identical reason. club_id coverage isn't total (clubs.csv is opt-in,
+resolves roughly half of clubs any given season — PARQUET_CLOSURE.md), so
+a team_id whose club_id never resolves falls back to its own most-recent
+club_name_raw, same as before — a rename can still fragment history for
+those, a known limitation shared with club_profile_data.py's club_key().
+
 club_division_map.py's TIER_OF stays the single source of truth for
 division-tier vocabulary — this module imports the constant (not a CSV
 read) rather than redefining it.
@@ -214,35 +233,75 @@ def build_season_club_teams(season: str) -> dict[str, dict[str, dict]]:
     return club_teams
 
 
+def build_season_club_id_map(season: str) -> dict[str, str]:
+    """This season's club_name_raw (as teams.csv shows it THAT season) ->
+    the real RFFM club_id, via clubs.csv's representative_team_id — not a
+    direct club_name_raw string join against clubs.csv, which does not
+    work: clubs.csv's own club_name_raw column is the club's fixed,
+    official name and does NOT track a season's cosmetic sponsor-suffixed
+    display name (confirmed on real data — see build_all()'s docstring
+    note: clubs.csv shows "ARAVACA C.F." for club_id 1011 in every season
+    from 2016-2017 to 2025-2026 even while teams.csv's own name for that
+    same club_id changed twice in that window; the literal strings
+    "ARAVACA C.F. - Bhhs Spain"/"ARAVACA C.F. - CEIBA" never appear in
+    clubs.csv at all). representative_team_id bridges this correctly
+    because it's a real team_id, always present in THAT season's own
+    teams.csv under whatever name that season actually shows — the exact
+    mechanism club_division_map_v2.py already uses for the same reason
+    (its "club identity (crest, website, ...)" section) — see there for
+    the "always resolves with no collisions" confirmation."""
+    teams = data.read_table("teams", season=season)
+    tid_to_club = dict(zip(safe_map(teams["team_id"], norm_id), safe_map(teams["club_name_raw"], clean)))
+    clubs = data.read_table("clubs", season=season)
+    out: dict[str, str] = {}
+    for row in clubs.itertuples(index=False):
+        name = tid_to_club.get(norm_id(row.representative_team_id))
+        cid = clean(row.club_id)
+        if name and cid:
+            out[name] = cid
+    return out
+
+
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     seasons = seasons or list_core_seasons()
     print(f"Building team participation map for seasons: {', '.join(seasons)}")
 
-    # team_id -> {team, suffix, club, stints: [...]} — grouped by team_id
-    # FIRST, globally across every season, NOT by club_name_raw: a club's
-    # raw name can (and does) change between seasons — sponsor-suffix churn,
-    # e.g. a real case in this data: team_id 300394 played under "ARAVACA
-    # C.F." in 2021-2022, "ARAVACA C.F. - Bhhs Spain" in 2022-2024, and
-    # "ARAVACA C.F. - CEIBA" in 2024-2026 — same team_id the whole time.
-    # Grouping by raw club name first (as this looked before) fragments one
-    # team's history across three separate output files, one per era, each
-    # showing only that era's seasons — the file a viewer opens under the
-    # CURRENT club name would only ever show the current era. team_id is
-    # the stable identity (this module's whole premise); club_name_raw is
-    # only used, after the fact, to pick which file a team's FULL history
-    # gets written under — the MOST RECENT season's name (seasons are
-    # processed chronologically, so the last write into `club` wins).
+    # team_id -> {team, suffix, club, club_id, slugs: set[str], stints: [...]}
+    # Grouped by team_id FIRST, globally across every season, NOT by
+    # club_name_raw: a club's raw name can (and does) change between
+    # seasons — sponsor-suffix churn, e.g. a real case in this data:
+    # team_id 300394 played under "ARAVACA C.F." in 2021-2022, "ARAVACA
+    # C.F. - Bhhs Spain" in 2022-2024, and "ARAVACA C.F. - CEIBA" in
+    # 2024-2026 — same team_id the whole time. team_id is the stable
+    # identity this whole module is built on; `club`/`club_id`/`slugs`
+    # below only decide which output FILE a team's full history is written
+    # under (and findable from) — never used to decide whether two seasons
+    # belong to the same team, which team_id already answers on its own.
     merged: dict[str, dict] = {}
     for season in seasons:
         season_teams = build_season_club_teams(season)
+        cid_by_name = build_season_club_id_map(season)
+        # Same club_slug_map() call, over the same per-season name universe,
+        # that team_cards_v2.py/club_division_map_v2.py themselves use to
+        # build a link INTO this data — computed fresh per season (not
+        # once globally) so a slug this file gets written under is always
+        # byte-identical to what a link from that specific season's page
+        # actually points at, even in a rare same-season base-slug collision.
+        slug_of_name = club_slug_map(sorted(season_teams.keys()))
         for club, teams_of_club in season_teams.items():
+            cid = cid_by_name.get(club)
+            slug = slug_of_name[club]
             for tid, team_rec in teams_of_club.items():
                 out_rec = merged.setdefault(tid, {
-                    "team": team_rec["team"], "suffix": team_rec["suffix"], "club": club, "stints": [],
+                    "team": team_rec["team"], "suffix": team_rec["suffix"],
+                    "club": club, "club_id": None, "slugs": set(), "stints": [],
                 })
                 out_rec["team"] = team_rec["team"]  # keep the most-recent season's display name
                 out_rec["suffix"] = team_rec["suffix"] or out_rec["suffix"]
                 out_rec["club"] = club  # ditto — most-recent season's club name
+                if cid and out_rec["club_id"] is None:
+                    out_rec["club_id"] = cid  # first resolved club_id wins — stable identity, doesn't matter which season found it
+                out_rec["slugs"].add(slug)
                 out_rec["stints"].extend(team_rec["stints"])
         print(f"  {season} done")
 
@@ -250,22 +309,39 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
         team_rec["stints"].sort(
             key=lambda s: (s["matches"][0]["date"] or "9999-99-99") if s["matches"] else "9999-99-99")
 
-    slug_by_club = club_slug_map(sorted({team_rec["club"] for team_rec in merged.values()}))
-    by_club: dict[str, dict[str, dict]] = {}
-    for tid, team_rec in merged.items():
-        club = team_rec.pop("club")
-        by_club.setdefault(club, {})[tid] = team_rec
+    # Group team_ids into real-club buckets: by club_id (RFFM's own stable
+    # identity) when resolved, else by the team's own most-recent
+    # club_name_raw — the fallback only matters for the clubs.csv stage's
+    # coverage gap (opt-in, "complete_with_failures" forever — see
+    # PARQUET_CLOSURE.md — roughly half of clubs each season, measured);
+    # a rename can still fragment one of those, a known limitation shared
+    # with club_profile_data.py's club_key(). A resolved club_id, once
+    # found for a team_id in ANY season, is treated as authoritative for
+    # every season of that same team_id, even ones that didn't themselves
+    # resolve one — team_id is already the same real squad throughout.
+    buckets: dict[str, dict] = {}
+    for tid, rec in merged.items():
+        key = f"cid:{rec['club_id']}" if rec["club_id"] else f"name:{rec['club']}"
+        b = buckets.setdefault(key, {"teams": {}, "slugs": set(), "display": rec["club"], "_latest": ""})
+        b["teams"][tid] = {"team": rec["team"], "suffix": rec["suffix"], "stints": rec["stints"]}
+        b["slugs"] |= rec["slugs"]
+        latest = max((s["season"] for s in rec["stints"]), default="")
+        if latest >= b["_latest"]:
+            b["_latest"] = latest
+            b["display"] = rec["club"]  # the name attached to whichever team's stints reach furthest
 
     data_dir = out_dir / "data" / "team_participation"
     data_dir.mkdir(parents=True, exist_ok=True)
-    total_teams = 0
-    for club, teams_of_club in by_club.items():
-        payload = {"club": club, "teams": teams_of_club}
-        (data_dir / f"{slug_by_club[club]}.json").write_text(
-            json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-            encoding="utf-8")
-        total_teams += len(teams_of_club)
-    print(f"  {len(by_club)} clubs, {total_teams} squads written to {data_dir}")
+    total_teams, total_files = 0, 0
+    for bucket in buckets.values():
+        payload = {"club": bucket["display"], "teams": bucket["teams"]}
+        text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+        for slug in bucket["slugs"]:
+            (data_dir / f"{slug}.json").write_text(text, encoding="utf-8")
+            total_files += 1
+        total_teams += len(bucket["teams"])
+    print(f"  {len(buckets)} clubs ({total_files} name-slug files, some clubs written under >1 historical "
+          f"slug), {total_teams} squads written to {data_dir}")
 
 
 def main():
