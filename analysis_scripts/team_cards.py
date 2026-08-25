@@ -8,23 +8,25 @@ fichaequipo page), and the base this project's future roster×matches
 participation matrix (see the docstring note at the bottom of this file)
 will build on.
 
-Data volume forced two scoping decisions:
-  - one JSON per (season, club) under <output-dir>/data/team_cards_<season>/
-    <slug>.json — not one file per team_id (9000+ teams in 2025-2026 alone)
-    and not one season-wide bundle (matches.csv alone runs 28-53 MB/season).
-    Splitting by club keeps each fetch down to one club's own teams, loaded
-    lazily only when a team card is opened. club_division_map.py computes
-    the exact same slug for the same club name via site_theme.club_slug_map(),
-    so a link built there always resolves to the file built here.
-  - build_all() defaults to the latest season only, not every crawled season
-    like club_division_map.py — 8 seasons of team-card JSON would run
-    450+ MB. A team-card link for an older season degrades to "no data"
-    instead of the build shipping a half-gigabyte artifact; pass --season
-    explicitly to build another one.
+Data volume: one JSON per (season, club) under
+<output-dir>/data/team_cards_<season>/<slug>.json — not one file per
+team_id (9000+ teams in 2025-2026 alone) and not one season-wide bundle
+(matches.csv alone runs 28-53 MB/season). Splitting by club keeps each
+fetch down to one club's own teams, loaded lazily only when a team card
+is opened. club_division_map.py computes the exact same slug for the
+same club name via site_theme.club_slug_map(), so a link built there
+always resolves to the file built here.
+
+build_all() here only builds the HTML/JS/CSS shell (team_card.html) - the
+per-season per-club data (~450MB+ of JSON across 8 seasons) used to be
+built by this module too, but is confirmed content-identical to
+team_cards_v2.py's Parquet-sourced copy, so this page fetches that single
+shared copy (v2/data/team_cards_<season>/...) instead of building a
+second one - see build_all() and team_cards_v2.py's own build_all(), both
+called from build_site.py.
 
 Usage:
     python analysis_scripts/team_cards.py
-    python analysis_scripts/team_cards.py --season 2025-2026 --output-dir reports
 """
 
 import argparse
@@ -35,7 +37,7 @@ import pandas as pd
 
 from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
-                         THEME_SWITCH_JS, club_slug_map, switch_row_html)
+                         THEME_SWITCH_JS, switch_row_html)
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -942,7 +944,8 @@ async function main() {
   }
   let payload;
   try {
-    const res = await fetch(`data/team_cards_${season}/${clubSlug}.json`);
+    // v2/data/... - see build_all()'s docstring note for why.
+    const res = await fetch(`v2/data/team_cards_${season}/${clubSlug}.json`);
     payload = await res.json();
   } catch (e) {
     document.getElementById('matchBody').innerHTML =
@@ -1002,39 +1005,22 @@ def build_html() -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM team-card data + page")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM team-card page (data comes from team_cards_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    # Every crawled season, by default — player_card.html's "show all
-    # seasons" view links into this per-season JSON for any season a player
-    # was registered in, not just the latest, so a latest-season-only build
-    # left every older-season row pointing at data that was never published
-    # (silently blank "Сводка", dead team-card links). ~450MB+ of JSON across
-    # 8 seasons (matches.csv alone is 28-53 MB per season) is the accepted
-    # cost; pass --season explicitly for a cheaper single-season build.
-    seasons = seasons or list_seasons()
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season per-club data used to be
+    # built here too (looping every crawled season, ~450MB+ of JSON across
+    # 8 seasons), but confirmed content-identical to team_cards_v2.py's
+    # Parquet-sourced copy (see build_site.py's v2 section), so this page's
+    # own fetch now points at that single shared copy (v2/data/...) instead
+    # of building a second one - see loadSeason() below.
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "team_card.html").write_text(build_html(), encoding="utf-8")
-
-    for season in seasons:
-        print(f"Building team cards for season {season}")
-        club_teams = build_club_team_cards(season)
-        slugs = club_slug_map(sorted(club_teams.keys()))
-        data_dir = out_dir / "data" / f"team_cards_{season}"
-        data_dir.mkdir(parents=True, exist_ok=True)
-        for club, teams_of_club in club_teams.items():
-            payload = {"club": club, "season": season, "teams": teams_of_club}
-            (data_dir / f"{slugs[club]}.json").write_text(
-                json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-                encoding="utf-8")
-        print(f"  {len(club_teams)} clubs written to {data_dir}")
 
 
 if __name__ == "__main__":

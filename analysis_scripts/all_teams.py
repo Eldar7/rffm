@@ -483,7 +483,8 @@ function allClubsUrl(r) {
 
 function loadSeason(season) {
   if (!SEASON_CACHE[season]) {
-    SEASON_CACHE[season] = fetch(`data/all_teams_${season}.json`)
+    // v2/data/... - see build_all()'s docstring note for why.
+    SEASON_CACHE[season] = fetch(`v2/data/all_teams_${season}.json`)
       .then(res => res.ok ? res.json() : { rows: [], clubs: {} })
       .catch(() => ({ rows: [], clubs: {} }));
   }
@@ -674,31 +675,23 @@ def build_html(seasons: list[str]) -> str:
             .replace("%DATATABLE_JS%", DATATABLE_JS))
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season data used to be built
+    # here too, but confirmed content-identical to all_teams_v2.py's
+    # Parquet-sourced copy, so this page (and all_clubs.html, the other
+    # consumer of this data) fetches that single shared copy (v2/data/...)
+    # instead of building a second one - see loadSeason() below.
     all_seasons = list_seasons()
-    build_seasons = seasons or all_seasons
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "all_teams.html").write_text(build_html(all_seasons), encoding="utf-8")
 
-    data_dir = out_dir / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-    for season in build_seasons:
-        print(f"Building all-teams data for season {season}")
-        rows = build_team_rows(season)
-        clubs = build_club_meta(season)
-        text = json.dumps({"rows": rows, "clubs": clubs}, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
-        (data_dir / f"all_teams_{season}.json").write_text(text, encoding="utf-8")
-        print(f"  {len(rows)} team-competition rows, {len(clubs)} clubs with metadata ({len(text) / 1024:.0f} KB)")
-
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM all-teams browser")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM all-teams browser page (data comes from all_teams_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
 if __name__ == "__main__":

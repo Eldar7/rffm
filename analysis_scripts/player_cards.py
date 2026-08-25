@@ -128,23 +128,16 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
 
 
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
+    # Only the HTML/JS/CSS shell - the per-season participation shards and
+    # the career-seasons (X/Y) shards used to be built here too, but
+    # confirmed content-identical to player_cards_v2.py's Parquet-sourced
+    # copies (once player_cards_v2.py's player-name lookup was fixed to be
+    # season-accurate - see its own build_season_shards()), so this page
+    # fetches those single shared copies (v2/data/...) instead of building
+    # a second one - see loadRoster()/pmFetchSeason() etc. above.
     seasons = seasons or list_participation_seasons()
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "player_card.html").write_text(build_html(seasons), encoding="utf-8")
-
-    for season in seasons:
-        print(f"Building player participation shards for season {season}")
-        shards = build_season_shards(season)
-        data_dir = out_dir / "data" / f"player_participation_{season}"
-        data_dir.mkdir(parents=True, exist_ok=True)
-        for shard_id, payload in shards.items():
-            (data_dir / f"{shard_id}.json").write_text(
-                json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-                encoding="utf-8")
-        print(f"  {sum(len(p) for p in shards.values())} players across {len(shards)} shards written to {data_dir}")
-
-    print("Building player career-seasons index (X/Y seasons played)...")
-    build_career_shards(out_dir, seasons)
 
 
 def build_career_shards(out_dir: Path, seasons: list[str]) -> None:
@@ -490,7 +483,11 @@ const PM_PHASE_FILTERS = ['none','brightness(0.82)','brightness(0.66) saturate(1
 function pmShardOf(pid){ return parseInt(pid,10) % SHARD_MOD; }
 async function pmFetchSeason(season, pid){
   try {
-    const res = await fetch(`data/participation_map_${season}/${pmShardOf(pid)}.json`);
+    // v2/data/... - participation_map.py (v1) no longer builds its own
+    // copy of this (see build_site.py); participation_map_v2's copy
+    // (Parquet-sourced, season-accurate player names) is the only one,
+    // shared by this page via the relative path from site root.
+    const res = await fetch(`v2/data/participation_map_${season}/${pmShardOf(pid)}.json`);
     if (!res.ok) return undefined;
     const data = await res.json();
     return data[pid] || null;
@@ -1309,7 +1306,8 @@ async function fetchShard(season, pid) {
   const key = `${season}/${shard}`;
   if (!(key in SHARD_CACHE)) {
     try {
-      const res = await fetch(`data/player_participation_${season}/${shard}.json`);
+      // v2/data/... - see build_all()'s docstring note for why.
+      const res = await fetch(`v2/data/player_participation_${season}/${shard}.json`);
       SHARD_CACHE[key] = res.ok ? await res.json() : null;
     } catch (e) {
       SHARD_CACHE[key] = null;
@@ -1373,10 +1371,10 @@ async function fetchTeamRosterAndMatches(season, clubSlug, teamId) {
   if (!(key in TEAM_DATA_CACHE)) {
     TEAM_DATA_CACHE[key] = (async () => {
       try {
-        // v2/data/... - see team_cards.py's loadRoster() for why.
+        // v2/data/... for both - see team_cards.py's loadRoster() for why.
         const [rosterRes, cardRes] = await Promise.all([
           fetch(`v2/data/team_rosters_${season}/${teamId}.json`),
-          fetch(`data/team_cards_${season}/${clubSlug}.json`),
+          fetch(`v2/data/team_cards_${season}/${clubSlug}.json`),
         ]);
         const roster = rosterRes.ok ? await rosterRes.json() : { lineups: {} };
         const card = cardRes.ok ? await cardRes.json() : { teams: {} };
@@ -1397,7 +1395,8 @@ async function fetchTeamRosterAndMatches(season, clubSlug, teamId) {
 async function fetchPlayerSeasons(pid) {
   const shard = parseInt(pid, 10) % SHARD_MOD;
   try {
-    const res = await fetch(`data/player_seasons/${shard}.json`);
+    // v2/data/... - see build_all()'s docstring note for why.
+    const res = await fetch(`v2/data/player_seasons/${shard}.json`);
     if (!res.ok) return null;
     const data = await res.json();
     return data[pid] || null;

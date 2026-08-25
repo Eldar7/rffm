@@ -69,7 +69,6 @@ import season_comparison_v2
 import competition_structure
 import team_cards
 import player_cards
-import participation_map
 import club_profile
 import all_players
 import all_teams
@@ -321,9 +320,6 @@ def main():
 
     print("Building player_card.html...")
     player_cards.build_all(out_dir)
-
-    print("Building participation-map data...")
-    participation_map.build_all(out_dir)
 
     print("Building club_profile.html...")
     club_profile.build_all(out_dir)
