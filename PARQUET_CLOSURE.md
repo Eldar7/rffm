@@ -20,7 +20,12 @@ for that, and links here for the rest).
 | **Open** `(season, stage)` | CSV (copy of record) | Never — regenerated on demand |
 | **Never closes** (`clubs`, `club_profiles` stages) | CSV, forever | Never |
 | **Structurally out of scope** (`players`) | `players_current.csv`, forever | Never (gitignored, always regenerated) |
+| **The index this policy reads** (`coverage_manifest.csv`) | CSV, forever | n/a — not a data table, this file has no Parquet copy at all |
 | **Not a pipeline table at all** | whatever it is, untouched | n/a — this policy doesn't apply |
+
+`coverage_manifest.csv` stays CSV for a different reason than everything
+else above: it's tiny, and its whole value is being directly `git diff`-able
+in a PR — a Parquet copy would work against that, not for it.
 
 ## Table → owning stage
 
