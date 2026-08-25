@@ -1154,7 +1154,8 @@ document.addEventListener('keydown', e => {
 
 async function loadSeason(season) {
   document.getElementById('tbody').innerHTML = `<tr><td class="empty-state">${LANG[CURLANG].loading}</td></tr>`;
-  const res = await fetch('data/club_map_' + season + '.json');
+  // v2/data/... - see build_all()'s docstring note for why.
+  const res = await fetch('v2/data/club_map_' + season + '.json');
   DATA = await res.json();
   COLUMNS = DATA.columns;
   CLUBS = DATA.clubs;
@@ -1315,27 +1316,21 @@ def build_html(seasons: list[str]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM club x division matrix report")
-    parser.add_argument("--season", default=None, help="build only this season's data file (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM club x division matrix report page (data comes from club_division_map_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    seasons = seasons or list_seasons()
-    data_dir = out_dir / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-
-    for season in seasons:
-        print(f"Building club/division map data for season {season}")
-        data = load_data(season)
-        print(f"  {len(data['clubs'])} clubs, {len(data['columns'])} columns")
-        (data_dir / f"club_map_{season}.json").write_text(
-            json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
-
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season matrix data used to be
+    # built here too, but confirmed content-identical to
+    # club_division_map_v2.py's Parquet-sourced copy, so this page fetches
+    # that single shared copy (v2/data/...) instead of building a second
+    # one - see loadSeason()'s fetch() call above.
+    seasons = list_seasons()
+    out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "club_division_map.html").write_text(build_html(seasons), encoding="utf-8")
     print(f"Report written to {out_dir / 'club_division_map.html'}")
 

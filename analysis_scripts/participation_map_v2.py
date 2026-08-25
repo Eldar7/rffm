@@ -3,11 +3,15 @@
 v2 PROOF-OF-CONCEPT: identical to participation_map.py except
 build_season_shards() sources players/teams/standings/competitions/matches/
 match_lineups/match_goals/match_cards from output/processed/rffm_parquet/ via
-rffm_data.read_table() instead of pd.read_csv(). Uses the global (deduped)
-read_table("players") - safe here since this function only builds a
-player_id -> name/birth_year lookup dict, the pattern rffm_data.py documents
-as fine for the deduped table (unlike player_career.py's season-order-
-sensitive earliest-birth_year logic).
+rffm_data.read_table() instead of pd.read_csv(). Uses
+read_table("players_by_season", season=...) - NOT the deduped
+read_table("players") - because v1 reads this season's own players.csv, and
+the two aren't interchangeable for player_name the way they are for
+birth_year: confirmed on real data that a player's recorded name spelling
+can genuinely change between seasons (a diacritics change RFFM's own site
+started serving from 2024-2025 onward for some players), so the deduped
+table's "latest name wins" pick would silently show a 2018-2019 page's
+player under a spelling that didn't exist yet in 2018-2019.
 
 Per-player, per-match participation facts for the "Карта участия" tab on
 player_card.html: for every match a player actually appears in
@@ -99,7 +103,7 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     if not (BASE / season / "match_lineups").exists():
         return {}
 
-    players = data.read_table("players")
+    players = data.read_table("players_by_season", season=season)
     pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
 
