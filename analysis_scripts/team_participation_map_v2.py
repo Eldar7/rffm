@@ -218,37 +218,54 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     seasons = seasons or list_core_seasons()
     print(f"Building team participation map for seasons: {', '.join(seasons)}")
 
-    # club_name_raw -> {team_id: {team, suffix, stints: [...]}}
-    merged: dict[str, dict[str, dict]] = {}
+    # team_id -> {team, suffix, club, stints: [...]} — grouped by team_id
+    # FIRST, globally across every season, NOT by club_name_raw: a club's
+    # raw name can (and does) change between seasons — sponsor-suffix churn,
+    # e.g. a real case in this data: team_id 300394 played under "ARAVACA
+    # C.F." in 2021-2022, "ARAVACA C.F. - Bhhs Spain" in 2022-2024, and
+    # "ARAVACA C.F. - CEIBA" in 2024-2026 — same team_id the whole time.
+    # Grouping by raw club name first (as this looked before) fragments one
+    # team's history across three separate output files, one per era, each
+    # showing only that era's seasons — the file a viewer opens under the
+    # CURRENT club name would only ever show the current era. team_id is
+    # the stable identity (this module's whole premise); club_name_raw is
+    # only used, after the fact, to pick which file a team's FULL history
+    # gets written under — the MOST RECENT season's name (seasons are
+    # processed chronologically, so the last write into `club` wins).
+    merged: dict[str, dict] = {}
     for season in seasons:
         season_teams = build_season_club_teams(season)
         for club, teams_of_club in season_teams.items():
-            club_rec = merged.setdefault(club, {})
             for tid, team_rec in teams_of_club.items():
-                out_rec = club_rec.setdefault(tid, {
-                    "team": team_rec["team"], "suffix": team_rec["suffix"], "stints": [],
+                out_rec = merged.setdefault(tid, {
+                    "team": team_rec["team"], "suffix": team_rec["suffix"], "club": club, "stints": [],
                 })
                 out_rec["team"] = team_rec["team"]  # keep the most-recent season's display name
                 out_rec["suffix"] = team_rec["suffix"] or out_rec["suffix"]
+                out_rec["club"] = club  # ditto — most-recent season's club name
                 out_rec["stints"].extend(team_rec["stints"])
         print(f"  {season} done")
 
-    for club_rec in merged.values():
-        for team_rec in club_rec.values():
-            team_rec["stints"].sort(
-                key=lambda s: (s["matches"][0]["date"] or "9999-99-99") if s["matches"] else "9999-99-99")
+    for team_rec in merged.values():
+        team_rec["stints"].sort(
+            key=lambda s: (s["matches"][0]["date"] or "9999-99-99") if s["matches"] else "9999-99-99")
 
-    slug_by_club = club_slug_map(sorted(merged.keys()))
+    slug_by_club = club_slug_map(sorted({team_rec["club"] for team_rec in merged.values()}))
+    by_club: dict[str, dict[str, dict]] = {}
+    for tid, team_rec in merged.items():
+        club = team_rec.pop("club")
+        by_club.setdefault(club, {})[tid] = team_rec
+
     data_dir = out_dir / "data" / "team_participation"
     data_dir.mkdir(parents=True, exist_ok=True)
     total_teams = 0
-    for club, teams_of_club in merged.items():
+    for club, teams_of_club in by_club.items():
         payload = {"club": club, "teams": teams_of_club}
         (data_dir / f"{slug_by_club[club]}.json").write_text(
             json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
             encoding="utf-8")
         total_teams += len(teams_of_club)
-    print(f"  {len(merged)} clubs, {total_teams} squads written to {data_dir}")
+    print(f"  {len(by_club)} clubs, {total_teams} squads written to {data_dir}")
 
 
 def main():
