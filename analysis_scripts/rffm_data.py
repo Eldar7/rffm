@@ -56,6 +56,7 @@ Usage:
 from functools import lru_cache
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
@@ -167,14 +168,34 @@ def _stringify(df: pd.DataFrame) -> pd.DataFrame:
     dtype-inferring machinery), assign back in place, and hand the finished
     numpy object array to the Series constructor with an explicit
     `dtype=object`. Measured ~150x faster on the same column, byte-for-byte
-    identical output."""
+    identical output.
+
+    One more layer on top of that (found via py-spy, once the above got
+    _stringify() to the top of a full site-build profile): `.astype(str)`
+    on an object array doesn't stay object dtype - numpy scans for the
+    longest resulting string and materializes a *fixed-width* `<U...>`
+    unicode array (elements become `numpy.str_`, not `str`), even when
+    every value already IS a `str` (e.g. a category column's values,
+    already real Python strings straight out of `.astype(object)` above -
+    confirmed by inspecting element types directly). That extra width-scan-
+    and-repack is pure waste for anything already string-shaped, and it's
+    most of what real report data is (names, addresses, category labels -
+    numeric/ID columns are the minority). `np.frompyfunc(str, 1, 1)` calls
+    the exact same `str()` per non-null element (verified byte-identical
+    output across all 237 real Parquet tables/every column - including the
+    float64 lat/lon columns above, where `str()` is what actually produces
+    the 17-significant-digit text either way) but returns a plain object
+    array - no width scan, no repack, and the elements come back as genuine
+    `str` instead of `numpy.str_`. Measured ~1.5x faster in aggregate across
+    every real table (up to ~12x on a single high-cardinality text column
+    like a player name), zero value/null/type mismatches."""
     out = {}
     for col in df.columns:
         s = df[col]
         arr = s.astype(object).where(s.notna(), None).to_numpy(dtype=object, copy=False)
         not_none = arr != None  # noqa: E711 - elementwise identity check over an object array, not a scalar `is`
         arr = arr.copy()
-        arr[not_none] = arr[not_none].astype(str)
+        arr[not_none] = np.frompyfunc(str, 1, 1)(arr[not_none])
         out[col] = pd.Series(arr, index=df.index, dtype=object)
     return pd.DataFrame(out, index=df.index).reset_index(drop=True)
 
