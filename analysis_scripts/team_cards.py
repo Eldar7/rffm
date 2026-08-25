@@ -42,7 +42,7 @@ MANIFEST = BASE / "coverage_manifest.csv"
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -75,10 +75,10 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     (position/played/W-D-L/goals/points), for the Team Card's per-competition
     summary panel."""
     d = BASE / season
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
 
     tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
@@ -105,34 +105,43 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     club_teams: dict[str, dict[str, dict]] = {}
     sides = (("hid", "aid", "home_team", "away_team", "home_score", "away_score", True),
              ("aid", "hid", "away_team", "home_team", "away_score", "home_score", False))
-    for _, r in matches.iterrows():
+    # itertuples() instead of iterrows(): iterrows() rebuilds a fresh,
+    # dtype-coerced Series per row (measured as the actual hot path here via
+    # py-spy - sanitize_array/StringArray construction dominating the
+    # profile), itertuples() hands back a plain namedtuple with no such
+    # per-row construction cost. The one thing iterrows() gave for free that
+    # itertuples() doesn't - r[col_name] with a column name held in a
+    # variable - becomes getattr(r, col_name); every matches.csv column
+    # used below is a valid Python identifier (checked directly), so this is
+    # a mechanical swap, not a behavior change.
+    for r in matches.itertuples(index=False):
         for tid_col, opp_col, _own_name_col, opp_name_col, sf_col, sa_col, is_home in sides:
-            tid = r[tid_col]
+            tid = getattr(r, tid_col)
             if not tid:
                 continue
             club = tid_to_club.get(tid)
             if not club:
                 continue
-            opp_tid = r[opp_col]
-            opp_name = clean(tid_to_name.get(opp_tid)) or clean(r[opp_name_col])
-            sf, sa = clean(r[sf_col]), clean(r[sa_col])
+            opp_tid = getattr(r, opp_col)
+            opp_name = clean(tid_to_name.get(opp_tid)) or clean(getattr(r, opp_name_col))
+            sf, sa = clean(getattr(r, sf_col)), clean(getattr(r, sa_col))
             result = None
-            if r["is_finished"] == "True" and sf is not None and sa is not None:
+            if r.is_finished == "True" and sf is not None and sa is not None:
                 try:
                     fsf, fsa = float(sf), float(sa)
                     result = "W" if fsf > fsa else ("L" if fsf < fsa else "D")
                 except ValueError:
                     pass
             entry = {
-                "match_id": clean(r["match_id"]),
-                "date": clean(r["match_date"]), "time": clean(r["match_time"]),
+                "match_id": clean(r.match_id),
+                "date": clean(r.match_date), "time": clean(r.match_time),
                 "home": is_home, "opp": opp_name, "opp_tid": clean(opp_tid),
-                "sf": sf, "sa": sa, "result": result, "status": clean(r["status"]),
-                "comp": clean(r["competition"]), "comp_id": clean(r["competition_id"]),
-                "grp": clean(r["group"]), "group_id": clean(r["group_id"]),
-                "gt": clean(r["game_type"]), "gt_id": clean(r["game_type_id"]),
-                "phase": clean(r["phase_label"]), "matchday": clean(r["matchday_label"]),
-                "season_id": clean(r["season_id"]),
+                "sf": sf, "sa": sa, "result": result, "status": clean(r.status),
+                "comp": clean(r.competition), "comp_id": clean(r.competition_id),
+                "grp": clean(r.group), "group_id": clean(r.group_id),
+                "gt": clean(r.game_type), "gt_id": clean(r.game_type_id),
+                "phase": clean(r.phase_label), "matchday": clean(r.matchday_label),
+                "season_id": clean(r.season_id),
             }
             team_rec = club_teams.setdefault(club, {}).setdefault(tid, {
                 "name": clean(tid_to_name.get(tid)) or tid, "matches": [], "competitions": {},
@@ -867,7 +876,11 @@ async function loadRoster() {
   status.textContent = LANG[CURLANG].loading;
   status.style.display = '';
   try {
-    const res = await fetch(`data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
+    // v2/data/..., not data/... - team_rosters.py (v1) no longer builds its
+    // own copy of this (see build_site.py); v2/team_card.html's copy (built
+    // from Parquet, correct "seasons eligible" Y for every player) is the
+    // only one, shared by this page via the relative path from site root.
+    const res = await fetch(`v2/data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
     if (!res.ok) throw new Error('not found');
     ROSTER_PAYLOAD = await res.json();
   } catch (e) {

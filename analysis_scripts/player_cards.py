@@ -42,7 +42,7 @@ SHARD_MOD = 100
 
 
 def list_participation_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     ok = m[(m["stage"] == "fichajugador") & (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(ok["season"].unique().tolist())
 
@@ -60,9 +60,9 @@ def shard_of(player_id: str) -> int:
 
 def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    players = pd.read_csv(d / "players.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    players = pd.read_csv(d / "players.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
 
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
     pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
@@ -1364,7 +1364,7 @@ function summaryText(s) {
 }
 
 // Roster (lineups) + match list for one team, fetched from the same JSON
-// team_card.html/team_rosters.py already build — nothing new to crawl or
+// team_card.html/team_rosters_v2.py already build — nothing new to crawl or
 // pre-aggregate, just two more consumers of existing lazily-loaded data.
 // Cached per (season, club, team) since a player can have more than one
 // participation row for the same team (e.g. league + cup registrations).
@@ -1373,8 +1373,9 @@ async function fetchTeamRosterAndMatches(season, clubSlug, teamId) {
   if (!(key in TEAM_DATA_CACHE)) {
     TEAM_DATA_CACHE[key] = (async () => {
       try {
+        // v2/data/... - see team_cards.py's loadRoster() for why.
         const [rosterRes, cardRes] = await Promise.all([
-          fetch(`data/team_rosters_${season}/${teamId}.json`),
+          fetch(`v2/data/team_rosters_${season}/${teamId}.json`),
           fetch(`data/team_cards_${season}/${clubSlug}.json`),
         ]);
         const roster = rosterRes.ok ? await rosterRes.json() : { lineups: {} };

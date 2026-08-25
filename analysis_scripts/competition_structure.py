@@ -479,7 +479,7 @@ def month_index(ts) -> int:
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -490,8 +490,8 @@ def compute_timing(season: str) -> dict:
     end_m, n} spans, computed straight from this season's real match dates —
     not hand-authored, so it stays correct as new seasons get crawled."""
     d = BASE / season
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
     matches["match_date"] = pd.to_datetime(matches["match_date"], errors="coerce")
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level", "is_femenino"]]
     matches = matches.join(comp_meta, on="competition_id")
@@ -550,7 +550,7 @@ def build_examples_index(season: str) -> dict:
     competition names from this season's competitions.csv — lets each tier
     card show which actual RFFM tournaments live at that rung, instead of
     just the abstract division_level name."""
-    comps = pd.read_csv(BASE / season / "competitions.csv", dtype=str)
+    comps = pd.read_csv(BASE / season / "competitions.csv", dtype=object)
     comps = comps[comps["phase_label"] == "regular_season"]
     comps["is_fem_bool"] = comps["is_femenino"] == "True"
     idx: dict[tuple, list[str]] = {}

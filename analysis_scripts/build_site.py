@@ -17,16 +17,28 @@ team_card.html + its team-participation-map data (team_participation_map_v2
 season and across seasons, core-data-only so it needs no acta_partido
 enrichment), club_division_map.html (adds the squads-over-seasons grid
 that reads the same team-participation data), club_profile.html (donor-
-club/alumni-career view, linked from both of the above), team_card.html's
-"Состав" roster x matches tab (team_rosters_v2), player_card.html (donor-
-club-style per-player registration/career view, linked from team_card.html's
-roster), player_card.html's own "Карта участия" tab (participation_map_v2
-— per-match acta_partido facts, the player-level analog of
-team_participation_map_v2), all_players.html, all_teams.html, and
-season_comparison.html — the full set of _v2 report generators this
+club/alumni-career view, linked from both of the above), player_card.html
+(donor-club-style per-player registration/career view, linked from
+team_card.html's roster), player_card.html's own "Карта участия" tab
+(participation_map_v2 — per-match acta_partido facts, the player-level
+analog of team_participation_map_v2), all_players.html, all_teams.html,
+and season_comparison.html — the full set of _v2 report generators this
 project has written now all build into v2/. Skipped with a message if
 output/processed/rffm_parquet/ hasn't been built yet
 (analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
+
+One exception to "sitting next to, not replacing": team_card.html's
+"Состав" roster x matches tab is v2-only (team_rosters_v2) even on the v1
+page - v1's team_rosters.py isn't called here any more. Confirmed on real
+data that the two weren't actually identical (only reordering, like every
+other v1/v2 pair) - v1's birth_year read carries the CSVs' ".0" float-
+serialization artifact, which silently drops the roster's "seasons
+eligible" (Y) stat to None for ~18.6k players; team_rosters_v2's Parquet
+read cleans that via real int typing. Building only the v2 copy is a
+correctness fix for those players on top of halving this step's cost/site
+size. v1's team_card.html and player_card.html fetch the shared JSON via a
+v2/data/... relative path (patched into their JS); v2/team_card.html's own
+fetch is unchanged, since it already lived at that same physical location.
 
 Usage:
     python analysis_scripts/build_site.py --output-dir site
@@ -56,7 +68,6 @@ import all_teams_v2
 import season_comparison_v2
 import competition_structure
 import team_cards
-import team_rosters
 import player_cards
 import participation_map
 import club_profile
@@ -307,7 +318,6 @@ def main():
 
     print("Building team_card.html...")
     team_cards.build_all(out_dir)
-    team_rosters.build_all(out_dir)
 
     print("Building player_card.html...")
     player_cards.build_all(out_dir)
@@ -350,7 +360,19 @@ def main():
         print("Building v2/club_profile.html (linked from team_card.html / club_division_map.html)...")
         club_profile_v2.build_all(v2_dir)
 
-        print("Building v2/team_card.html's Состав tab data (team_rosters_v2)...")
+        # The v1 team_card.html/player_card.html also fetch this data (via
+        # a v2/data/... relative path, patched into their JS below) - v1's
+        # own team_rosters.py used to build a byte-different second copy
+        # here (site/data/team_rosters_<season>/) for them, but confirmed
+        # non-identical on real data (not just reordering): its birth_year
+        # read carries the ".0" float-serialization artifact documented in
+        # rffm_data.py's module docstring, which silently drops the "seasons
+        # eligible" (Y) denominator to None for ~18.6k players whose Y this
+        # path computes correctly via real int typing. Building only this
+        # copy is a real correctness fix for those players, not just
+        # deduplication - and halves this step's site-build cost/site size,
+        # since the two copies were otherwise identical.
+        print("Building team_card.html/v2/team_card.html's Состав tab data (team_rosters_v2)...")
         team_rosters_v2.build_all(v2_dir)
 
         print("Building v2/player_card.html (linked from team_card.html's roster)...")

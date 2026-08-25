@@ -79,9 +79,9 @@ def load_all_data() -> dict:
 
     for season in SEASONS:
         d = BASE / season
-        matches   = pd.read_csv(d / "matches.csv", dtype=str)
-        teams     = pd.read_csv(d / "teams.csv", dtype=str)
-        comps     = pd.read_csv(d / "competitions.csv", dtype=str)
+        matches   = pd.read_csv(d / "matches.csv", dtype=object)
+        teams     = pd.read_csv(d / "teams.csv", dtype=object)
+        comps     = pd.read_csv(d / "competitions.csv", dtype=object)
 
         comps["category_base"]   = comps["category_base"].fillna("OTHER")
         comps["division_level"]  = comps["division_level"].fillna("OTHER")
