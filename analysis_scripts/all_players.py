@@ -79,9 +79,9 @@ def build_career_profiles(seasons: list[str]) -> dict[str, dict]:
         comps_path = d / "competitions.csv"
         if not (part_path.exists() and players_path.exists() and comps_path.exists()):
             continue
-        part = pd.read_csv(part_path, dtype=str, usecols=["player_id", "team_id", "club_name_raw", "competition_id"])
-        players = pd.read_csv(players_path, dtype=str, usecols=["player_id", "birth_year"])
-        comps = pd.read_csv(comps_path, dtype=str, usecols=["competition_id", "category_base"])
+        part = pd.read_csv(part_path, dtype=object, usecols=["player_id", "team_id", "club_name_raw", "competition_id"])
+        players = pd.read_csv(players_path, dtype=object, usecols=["player_id", "birth_year"])
+        comps = pd.read_csv(comps_path, dtype=object, usecols=["competition_id", "category_base"])
         pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
         part = part.merge(comps, on="competition_id", how="left")
         for row in part.itertuples(index=False):
@@ -135,7 +135,7 @@ def build_season_performance(season: str) -> dict[str, dict]:
 
     for cat in categories:
         lineup_keys: set[tuple[str, str]] = set()
-        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=str)
+        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=object)
         for row in lu.itertuples(index=False):
             pid, mid = row.player_id, row.match_id
             if not pid or not mid:
@@ -153,14 +153,14 @@ def build_season_performance(season: str) -> dict[str, dict]:
 
         gf = d / "match_goals" / f"{cat}.csv"
         if gf.exists():
-            goals = pd.read_csv(gf, dtype=str)
+            goals = pd.read_csv(gf, dtype=object)
             for row in goals.itertuples(index=False):
                 if (row.match_id, row.player_id) in lineup_keys:
                     perf[row.player_id]["goals"] += 1
 
         cf = d / "match_cards" / f"{cat}.csv"
         if cf.exists():
-            cards = pd.read_csv(cf, dtype=str)
+            cards = pd.read_csv(cf, dtype=object)
             for row in cards.itertuples(index=False):
                 key = (row.match_id, row.player_id)
                 if key not in lineup_keys:
@@ -211,9 +211,9 @@ def compute_result_influence(team_matches: list[dict], played_mids: set[str]) ->
 def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons: list[str],
                               coverage: dict[tuple[str, str], str]) -> dict[str, list[dict]]:
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    players = pd.read_csv(d / "players.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    players = pd.read_csv(d / "players.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
     part = part.join(comp_meta, on="competition_id")
 

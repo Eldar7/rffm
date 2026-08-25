@@ -43,7 +43,7 @@ MANIFEST = BASE / "coverage_manifest.csv"
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     ok = m[(m["stage"] == "fichajugador") & (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(ok["season"].unique().tolist())
 
@@ -84,8 +84,8 @@ def load_season_rows(season: str) -> pd.DataFrame:
     """One row per player x competition-registration for `season`, tagged
     with category/division/game type from competitions.csv."""
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level", "game_type"]]
     part = part.join(comp_meta, on="competition_id")
     part["season"] = season
@@ -210,7 +210,7 @@ def build_crest_lookup(seasons: list[str]) -> dict[str, str]:
         p = BASE / season / "clubs.csv"
         if not p.exists():
             continue
-        clubs = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "crest_url"])
+        clubs = pd.read_csv(p, dtype=object, usecols=["club_name_raw", "crest_url"])
         for r in clubs.itertuples(index=False):
             name = clean(r.club_name_raw)
             crest = abs_crest_url(clean(r.crest_url))
@@ -231,7 +231,7 @@ def build_players_lookup(seasons: list[str]) -> dict[str, tuple[str, str | None]
         p = BASE / season / "players.csv"
         if not p.exists():
             continue
-        players = pd.read_csv(p, dtype=str, usecols=["player_id", "player_name", "birth_year"])
+        players = pd.read_csv(p, dtype=object, usecols=["player_id", "player_name", "birth_year"])
         for r in players.itertuples(index=False):
             if r.player_id in lookup:
                 continue

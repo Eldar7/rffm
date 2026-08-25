@@ -48,7 +48,7 @@ def list_core_seasons() -> list[str]:
     """Every season with core data, regardless of acta_partido coverage —
     a season the player was active in but with no protocols still needs to
     appear on the map's season axis (as a placeholder), not vanish."""
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -91,23 +91,23 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     if not lineups_dir.exists():
         return {}
 
-    players = pd.read_csv(d / "players.csv", dtype=str)
+    players = pd.read_csv(d / "players.csv", dtype=object)
     pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
 
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
     tid_to_team = {norm_id(row.team_id): {"team": clean(row.team), "club": clean(row.club_name_raw)}
                    for row in teams.itertuples(index=False)}
 
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
     group_sizes = standings.groupby("group_id")["team_id"].count().to_dict()
     pos_by_group_team = {(clean(row.group_id), norm_id(row.team_id)): clean_int(row.position)
                           for row in standings.itertuples(index=False)}
 
-    competitions = pd.read_csv(d / "competitions.csv", dtype=str)
+    competitions = pd.read_csv(d / "competitions.csv", dtype=object)
     comp_by_id = {row.competition_id: row for row in competitions.itertuples(index=False)}
 
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
     match_by_id: dict[str, dict] = {}
     for row in matches.itertuples(index=False):
         match_by_id[row.match_id] = {
@@ -146,19 +146,19 @@ def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     shards: dict[int, dict[str, dict]] = {}
 
     for cat in categories:
-        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=str)
+        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=object)
 
         goals_count: dict[tuple[str, str], int] = {}
         gf = d / "match_goals" / f"{cat}.csv"
         if gf.exists():
-            for row in pd.read_csv(gf, dtype=str).itertuples(index=False):
+            for row in pd.read_csv(gf, dtype=object).itertuples(index=False):
                 key = (row.match_id, row.player_id)
                 goals_count[key] = goals_count.get(key, 0) + 1
 
         cards_map: dict[tuple[str, str], list[str]] = {}
         cf = d / "match_cards" / f"{cat}.csv"
         if cf.exists():
-            for row in pd.read_csv(cf, dtype=str).itertuples(index=False):
+            for row in pd.read_csv(cf, dtype=object).itertuples(index=False):
                 label = clean(getattr(row, "card_type_label", None))
                 if label:
                     key = (row.match_id, row.player_id)

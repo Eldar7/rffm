@@ -76,8 +76,8 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     matches_path = d / "matches.csv"
     if not lineups_dir.exists() or not matches_path.exists():
         return {}
-    m = pd.read_csv(matches_path, dtype=str, usecols=["match_id", "match_date", "status"])
-    # A missing match_date reads back as float NaN even under dtype=str (pandas'
+    m = pd.read_csv(matches_path, dtype=object, usecols=["match_id", "match_date", "status"])
+    # A missing match_date reads back as float NaN even under dtype=object (pandas'
     # universal missing-value marker) — NaN is truthy in Python, so the `or`
     # fallback below wouldn't catch it and a NaN sort key would collide with
     # the str ones from every other match. Coerce to None here so it does.
@@ -91,7 +91,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     cards_by_team: dict[str, dict[str, int]] = {}
 
     for cat in categories:
-        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=str,
+        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=object,
                           usecols=["match_id", "team_id", "player_id", "is_starter"])
         for row in lu.itertuples(index=False):
             tid, pid = norm_id(row.team_id), clean(row.player_id)
@@ -103,7 +103,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
 
         cp = d / "match_cards" / f"{cat}.csv"
         if cp.exists():
-            cc = pd.read_csv(cp, dtype=str, usecols=["team_id", "card_type_label"])
+            cc = pd.read_csv(cp, dtype=object, usecols=["team_id", "card_type_label"])
             for row in cc.itertuples(index=False):
                 tid = norm_id(row.team_id)
                 if not tid:
@@ -143,7 +143,7 @@ def build_club_meta(season: str) -> dict[str, dict]:
     p = BASE / season / "clubs.csv"
     if not p.exists():
         return {}
-    df = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "portal_web", "locality", "province", "crest_url"])
+    df = pd.read_csv(p, dtype=object, usecols=["club_name_raw", "portal_web", "locality", "province", "crest_url"])
     out: dict[str, dict] = {}
     for row in df.itertuples(index=False):
         name = clean(row.club_name_raw)
@@ -168,7 +168,7 @@ def _result_tally(matches: list[dict]) -> dict:
 
 def build_team_rows(season: str) -> list[dict]:
     d = BASE / season
-    comps = pd.read_csv(d / "competitions.csv", dtype=str, usecols=["competition_id", "category_base"])
+    comps = pd.read_csv(d / "competitions.csv", dtype=object, usecols=["competition_id", "category_base"])
     comp_id_to_cat = dict(zip(comps["competition_id"], comps["category_base"]))
 
     club_teams = build_club_team_cards(season)

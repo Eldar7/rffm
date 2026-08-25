@@ -104,7 +104,7 @@ def gt_code(gt: str) -> str:
 
 def list_seasons() -> list[str]:
     """Every season whose core crawl is complete, per coverage_manifest.csv."""
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -148,13 +148,13 @@ def clean(v):
 
 def load_data(season: str) -> dict:
     d = BASE / season
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    venues = pd.read_csv(d / "venues.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    venues = pd.read_csv(d / "venues.csv", dtype=object)
     clubs_path = d / "clubs.csv"
-    clubs_df = pd.read_csv(clubs_path, dtype=str) if clubs_path.exists() else None
+    clubs_df = pd.read_csv(clubs_path, dtype=object) if clubs_path.exists() else None
 
     comps["category_base"] = comps["category_base"].fillna("OTHER")
     comps["division_level"] = comps["division_level"].fillna("OTHER")

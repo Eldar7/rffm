@@ -42,7 +42,7 @@ SHARD_MOD = 100
 
 
 def list_participation_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     ok = m[(m["stage"] == "fichajugador") & (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(ok["season"].unique().tolist())
 
@@ -60,9 +60,9 @@ def shard_of(player_id: str) -> int:
 
 def build_season_shards(season: str) -> dict[int, dict[str, dict]]:
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    players = pd.read_csv(d / "players.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    players = pd.read_csv(d / "players.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
 
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
     pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))

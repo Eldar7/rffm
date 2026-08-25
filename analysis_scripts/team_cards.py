@@ -42,7 +42,7 @@ MANIFEST = BASE / "coverage_manifest.csv"
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -75,10 +75,10 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     (position/played/W-D-L/goals/points), for the Team Card's per-competition
     summary panel."""
     d = BASE / season
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
 
     tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
