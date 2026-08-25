@@ -12,40 +12,44 @@ parquet_closure.py`, `.github/workflows/parquet-build.yml`, or either
 query (`DATA_DICTIONARY.md`'s "Two copies of the data" section is enough
 for that, and links here for the rest).
 
-## The core rule, in one line per case
+## The rule
 
-- **Closed** `(season, stage)` → its Parquet file is committed to git;
-  its source CSV eventually gets deleted (manually — see "Closing" below).
-- **Open** `(season, stage)` → its Parquet file is **never committed** —
-  regenerated on demand instead. The source CSV stays the git-tracked
-  copy of record.
-- **Never closes, by design** — `clubs.csv` (stage `clubs`) and
-  `clubs_extended.csv`/`club_teams.csv` (stage `club_profiles`): always
-  open, same treatment as above, forever. See "Why some data never
-  closes" below.
-- **Structurally out of scope** — `players.csv`/`players_current.csv`:
-  deduped to one row per `player_id` across all seasons, so there's no
-  per-season partition for "closed" to even apply to. Its own precedent
-  predates this whole policy (see "Where this started" below) and still
-  works differently: `players_current.csv` is the permanent git-tracked
-  canonical source; `players.parquet` is gitignored and rebuilt on demand,
-  always — not because it's "open", but because it can't be partitioned
-  at all.
-- **Not a table at all** — `career_analysis_*.csv`/`player_career.xlsx`
-  (stray Jupyter notebook output, no pipeline generator) and
-  `club_scorecard/*.csv` (a WIP draft for a future site page, meant to stop
-  existing as a standalone file once that page exists). Neither is
-  produced by anything this policy governs — see their entries in
-  `DATA_FINDINGS.md` for the full story on each.
-- **`coverage_manifest.csv` itself** stays CSV, permanently, for a
-  different reason entirely: it's the tiny, cross-season index this whole
-  policy reads to decide everything else, and its value is being directly
-  `git diff`-able in a PR — not part of this scheme, just adjacent to it.
+| Case | Git-tracked copy | Parquet ever committed? |
+|---|---|---|
+| **Closed** `(season, stage)` | none — CSV deleted once closed | Yes, once, treated as final |
+| **Open** `(season, stage)` | CSV (copy of record) | Never — regenerated on demand |
+| **Never closes** (`clubs`, `club_profiles` stages) | CSV, forever | Never |
+| **Structurally out of scope** (`players`) | `players_current.csv`, forever | Never (gitignored, always regenerated) |
+| **Not a pipeline table at all** | whatever it is, untouched | n/a — this policy doesn't apply |
+
+## Table → owning stage
+
+From `analysis_scripts/parquet_closure.py`'s `TABLE_STAGE` — the live
+source of truth if this table ever drifts from the code:
+
+| Stage | Tables |
+|---|---|
+| `core` | `matches`, `standings`, `scorers`, `groups`, `competitions`, `team_group_membership`, `teams`, `venues`, `game_types`, `seasons`, `manifest_groups`, `manifest_pages`, `manifest_endpoints` |
+| `acta_partido` | `match_lineups`, `match_goals`, `match_cards`, `match_staff`, `match_officials` |
+| `fichajugador` | `player_competition_participation`, `player_season_stats`, `players_by_season` |
+| `clubs` | `clubs` |
+| `club_profiles` (never closes) | `clubs_extended`, `club_teams` |
+| n/a — merged log families | `crawl_log`, `data_quality_report` (need core **and** acta_partido **and** fichajugador **and** clubs all closed for that season — one file mixes all four) |
+| n/a — structurally exempt | `players` (see "Where this started" below) |
+
+## Current status (snapshot — re-run for the live answer)
+
+`python analysis_scripts/parquet_closure.py`. As of 2026-08-25:
+
+| Stage | Closed | Still open |
+|---|---|---|
+| `core` | all 10 seasons | — |
+| `acta_partido` | 8/9 | 2017-2018 |
+| `fichajugador` | 3/9 | 2017-2018, 2021-2022, 2022-2023, 2023-2024, 2024-2025, 2025-2026 |
+| `clubs` | 0/10 | all 10 (see "Why some data never closes") |
+| `club_profiles` | never applicable | always |
 
 ## How "closed" is actually decided
-
-`analysis_scripts/parquet_closure.py` is the one place this logic lives —
-read its module docstring for the full reasoning; summarized:
 
 - A `(season, stage)` is closed when `coverage_manifest.csv` shows
   `status == "complete"` for **every** `category_base` row of that pair —
@@ -64,13 +68,9 @@ read its module docstring for the full reasoning; summarized:
   done, since it means restructuring already-committed files. Revisit if
   a single long-tail category routinely holds a whole season open for
   months.)
-- `crawl_log`/`data_quality_report` merge all four stages' rows for a
-  season into one Parquet file each (`log_family` column) — the strictest
-  case, closed only once `core` **and** `acta_partido` **and**
-  `fichajugador` **and** `clubs` are all closed for that season.
-- Check the live state any time: `python analysis_scripts/
-  parquet_closure.py` (`--table <name>` / `--stage <stage>` to narrow it).
-  Read-only — never writes, commits, or deletes anything.
+- Read-only, safe anytime: `python analysis_scripts/parquet_closure.py`
+  (`--table <name>` / `--stage <stage>` to narrow it). Never writes,
+  commits, or deletes anything.
 
 ## Why some data never closes
 
@@ -85,8 +85,8 @@ because the concept of "finished" doesn't apply to them:
   tiny either way (1.6MB CSV / 720KB Parquet total across all 10 seasons,
   measured) — deliberately **not** special-cased to treat
   `complete_with_failures` as "good enough" despite the negligible size;
-  the project owner's call was that perpetually-refinable data never gets
-  its Parquet committed, full stop, size notwithstanding.
+  perpetually-refinable data never gets its Parquet committed, full stop,
+  size notwithstanding.
 - **`club_profiles` stage (`clubs_extended.csv`/`club_teams.csv`).** No
   season dimension at all, and a `"complete"` manifest row here means only
   "the last `enrich_club_profiles.py` run finished" — `--force-refetch` is
@@ -98,99 +98,103 @@ because the concept of "finished" doesn't apply to them:
 
 ## Old seasons keep changing — "old" is not "closed"
 
-It's tempting to assume an old season is settled. It usually isn't, for
-the enrichment stages specifically: `acta_partido`/`fichajugador` crawls
-run per-category, sequentially, and can take months or years to finish a
-single season — the 2017-2018 season's `acta_partido` stage was still
-being actively crawled as late as August 2026, nine years after that
-season was played. `coverage_manifest.csv`'s `status` for that specific
-`(season, stage)` is the only signal that matters here — never the
-season's calendar age. A season's `core` data (matches/standings/teams)
-usually does settle once every fixture is played, which is why `core` is
-closed for all 10 seasons as of this writing — but `acta_partido`/
-`fichajugador` for that same season can (and currently do) stay open for
-years afterward.
+`acta_partido`/`fichajugador` crawls run per-category, sequentially, and
+can take months or years to finish a single season — the 2017-2018
+season's `acta_partido` stage was still being actively crawled as late as
+August 2026, nine years after that season was played.
+`coverage_manifest.csv`'s `status` for that specific `(season, stage)` is
+the only signal that matters — never the season's calendar age. `core`
+data (matches/standings/teams) usually does settle once every fixture is
+played (all 10 seasons are closed there as of this writing), but
+`acta_partido`/`fichajugador` for the same season can, and currently do,
+stay open for years afterward.
 
 ## Site builds and sessions: filling in what git doesn't have
 
-Because an open `(season, stage)`'s Parquet file is never committed, a
-plain `git clone` of this repo is missing it entirely — anything that
-reads it (`rffm_data.py`, `analysis_scripts/*_v2.py`, an ad hoc DuckDB
-query) needs it regenerated locally first, or hits `FileNotFoundError`.
-Two places do that regeneration, at two different speeds:
+An open `(season, stage)`'s Parquet file is never committed, so a plain
+`git clone` is missing it — anything reading it needs it regenerated
+locally first, or hits `FileNotFoundError`.
 
-- **`.claude/hooks/session-start.sh`** (sync, ~4s) — rebuilds only
-  `players.parquet` (`build_parquet.py --players-only`), since that one's
-  always missing on a fresh checkout regardless of open/closed status
-  (see "structurally out of scope" above).
-- **`.claude/hooks/session-start-open.sh`** (async, ~2min measured) —
-  rebuilds every currently-open `(season, stage)` (`build_parquet.py
-  --open-only`, which skips every already-closed season/table since
-  that's already correct on disk via git checkout — ~4x faster than a
-  full rebuild, which takes ~9min). Async because 2 minutes is too long to
-  block every session start on; the accepted trade-off is a query in the
-  first couple of minutes could race a still-open table, while every
-  closed season has zero wait regardless.
-- **`.github/workflows/pages-deploy.yml`** runs both rebuild steps
-  synchronously before `build_site.py` — CI can afford the wait, and a
-  partial site build (missing a report because its data wasn't ready) is
-  worse than a slower one.
+| What | Rebuilds | Mode | Speed |
+|---|---|---|---|
+| `.claude/hooks/session-start.sh` | `players.parquet` only | sync | ~4s |
+| `.claude/hooks/session-start-open.sh` | every open `(season, stage)` | async | ~2min |
+| `pages-deploy.yml` (both steps) | both of the above | sync | ~2min combined |
 
-`rffm_data.py`/`analysis_scripts/*_v2.py` never know or care whether a
-given Parquet file they're reading came from a git-committed closed
-season or a just-regenerated open one — the read path is identical either
-way. That's deliberate: the open/closed distinction is entirely a
-git-storage decision, invisible to every report generator.
+`--open-only` skips every already-closed season/table (already correct on
+disk via git checkout) — ~4x faster than a full rebuild (~9min). The
+SessionStart hook is async because 2 minutes is too long to block every
+session start on; the accepted trade-off is a query in the first couple of
+minutes could race a still-open table, while every closed season has zero
+wait regardless. CI runs both synchronously instead — a partial site build
+is worse than a slower one. Either way, `rffm_data.py`/`analysis_scripts/
+*_v2.py` never know or care whether a Parquet file they're reading came
+from git or was just regenerated on demand — the read path is identical.
 
-## What this buys — the actual git-history-compression argument
+## The git-history goal: one birth-commit per file, zero diffs, ever
 
-The measured motivation for all of the above, not just a stylistic
-preference: a committed Parquet file is a zstd-compressed binary blob, and
-git cannot delta binary blobs the way it deltas text — a full rewrite,
-full size, no useful diff, on every commit that touches it. Two concrete
-numbers from this project's own history:
+The measured motivation for this whole policy: a committed Parquet file is
+a zstd-compressed binary blob, and git cannot delta binary blobs the way
+it deltas text — appending a second commit that touches the same file is a
+full rewrite, full size, no useful diff, forever bloating repo history.
+Two numbers from this project's own history: partitioning by season alone
+means an unchanged season's file is byte-identical across rebuilds (zero
+diff); `players.parquet` — deduped cross-season, can't be partitioned at
+all — was measured to cost noticeably more in git history committed as
+Parquet than the *same data* committed as CSV, despite the CSV being ~4x
+bigger per snapshot (`build_parquet.py`'s `PLAYERS_CURRENT_CSV` comment
+has the exact figures).
 
-- Partitioning by season alone (already in place before this policy)
-  means an unchanged season's file is byte-identical across rebuilds, so
-  git sees zero diff for it — only a season whose data actually changed
-  produces a new commit-worthy file.
-- `players.parquet` — deduped cross-season, can't be partitioned by season
-  at all — was measured to cost noticeably more in git history committed
-  as Parquet than the *same data* committed as CSV, despite the CSV being
-  ~4x bigger per snapshot (see `build_parquet.py`'s `PLAYERS_CURRENT_CSV`
-  comment for the exact figures). That comparison is what this whole
-  policy generalizes: **don't commit a Parquet file at all until you're
-  confident it will never need touching again** — write it to git history
-  exactly once, ever, instead of repeatedly during however long a season
-  takes to finish crawling.
+**The goal this policy is working toward: every committed Parquet file
+should have exactly one commit in its entire git history — the commit
+that created it — and never a second.** Closing late (only once
+`coverage_manifest.csv` is strictly `"complete"`) is what makes that
+achievable in the first place: a file committed too early and then
+touched again by a routine commit is exactly the diff-cost this exists to
+avoid.
 
-Prior to this policy, `parquet-build.yml` committed every table's Parquet
-on every run regardless of open/closed status — so an in-progress season
-still got a fresh commit each time (bounded to that one season's own
-partition file, not the whole table, but still real, repeated churn for
-however many months/years that season's enrichment stays open). Now that
-commit simply doesn't happen until the data is closed.
+**If a closed file ever does need to change** (a bug in
+`build_parquet.py`'s type-handling, a `(season, stage)` closed prematurely
+that turns out to need a correction) — the fix is **not** a new commit on
+top of it. That would leave two versions in reachable history, the exact
+outcome this policy exists to prevent. The fix is to **rewrite git history**
+so the original birth-commit is amended/replaced in place (interactive
+rebase, or an equivalent history-rewriting tool) and force-pushed, so
+that file's history still shows exactly one version, ever — as if the
+corrected content had been the only thing ever committed.
+
+**This is a destructive operation on shared history** — the same class of
+risk as any other force-push, and more consequential than the plain "close
+= commit + delete CSV" action above, since it invalidates history anyone
+else has already based work on. It follows the exact same rule as
+closing and CSV deletion: **only ever on the project owner's explicit,
+specific request, never automatically, never inferred, never bundled into
+a routine workflow run.** Expected to be rare in practice — if closing is
+only ever done once `coverage_manifest.csv` is genuinely `"complete"` (the
+whole point of the strict rule above), a closed file needing correction at
+all should be the exception, not something this policy routinely triggers.
 
 ## Closing a `(season, stage)`
 
 Committing its final Parquet **and** deleting its now-redundant source CSV
-in the same action. This is a **separate, always-manual step** — never run
-from `parquet-build.yml` or any scheduled workflow, never inferred
+in the same action. A **separate, always-manual step** — never run from
+`parquet-build.yml` or any scheduled workflow, never inferred
 automatically, only on the project owner's explicit request, every time.
 `parquet_closure.py`'s detector (above) identifies what's *eligible* to
 close; the action that actually performs a close does not exist yet as of
-this writing — deliberately not built ahead of being asked for, per the
-same "never automatic" instruction.
+this writing — deliberately not built ahead of being asked for.
 
 ## Where this started
 
-`players.parquet`/`players_current.csv` (see "structurally out of scope"
-above) is the original, narrower instance of this pattern — gitignored
-Parquet, regenerate-on-demand, canonical CSV — that predates the general
-open/closed policy and motivated it. The generalization to every other
-table happened after a real production incident: `.github/workflows/
-pages-deploy.yml` started reading `players.parquet` via a new v2 report
-page and failed with `FileNotFoundError` on every run, because a fresh CI
-checkout never had it (gitignored, and nothing rebuilt it before the site
-build ran). Fixing that one table's gap directly led to asking the same
-question of every other table — which is this document.
+`players.parquet`/`players_current.csv` is the original, narrower instance
+of this pattern — gitignored Parquet, regenerate-on-demand, canonical CSV
+— that predates the general open/closed policy and motivated it. It still
+works slightly differently from everything else in the table above: it's
+not "open", it's structurally exempt (deduped cross-season, no season
+partition to close). The generalization to every other table happened
+after a real production incident: `pages-deploy.yml` started reading
+`players.parquet` via a new v2 report page and failed with
+`FileNotFoundError` on every run, because a fresh CI checkout never had it
+(gitignored, nothing rebuilt it before the site build ran). Fixing that
+one table's gap directly led to asking the same question of every other
+table — which is this document.
