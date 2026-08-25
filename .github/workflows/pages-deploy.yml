@@ -69,8 +69,31 @@ jobs:
         # instead of the ~9 min a full rebuild takes.
         run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --open-only
 
+      - name: Log disk/memory before build
+        # Diagnostic only - the previous run (#54) was killed by an
+        # external "runner has received a shutdown signal" mid-build
+        # rather than a clean Python error, which is the GitHub Actions
+        # hosted-runner symptom of the VM itself running out of disk or
+        # memory. Nothing here explains WHICH one from the job log alone,
+        # so log both before the heaviest step to have a real number to
+        # compare against once this run also gets killed (or doesn't).
+        run: df -h / && echo --- && free -h
+
       - name: Build site
-        run: python analysis_scripts/build_site.py --output-dir site
+        run: |
+          # Same diagnostic as above, but sampled every 60s DURING the
+          # build and interleaved into this step's own live log - a
+          # separate post-hoc step (even "if: always()") wouldn't run if
+          # the runner gets torn down externally again like run #54, but
+          # this step's streamed stdout survives up to the moment of the
+          # kill either way.
+          (while true; do echo "=== $(date -u +%H:%M:%S) ==="; df -h /; free -h; sleep 60; done) &
+          MONITOR_PID=$!
+          python analysis_scripts/build_site.py --output-dir site
+          kill "$MONITOR_PID" 2>/dev/null || true
+
+      - name: Log disk/memory after build
+        run: df -h / && echo --- && free -h && du -sh site
 
       - name: Build Parquet tables
         run: python analysis_scripts/build_parquet.py --output-dir site/data/parquet
