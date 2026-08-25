@@ -876,7 +876,11 @@ async function loadRoster() {
   status.textContent = LANG[CURLANG].loading;
   status.style.display = '';
   try {
-    const res = await fetch(`data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
+    // v2/data/..., not data/... - team_rosters.py (v1) no longer builds its
+    // own copy of this (see build_site.py); v2/team_card.html's copy (built
+    // from Parquet, correct "seasons eligible" Y for every player) is the
+    // only one, shared by this page via the relative path from site root.
+    const res = await fetch(`v2/data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
     if (!res.ok) throw new Error('not found');
     ROSTER_PAYLOAD = await res.json();
   } catch (e) {

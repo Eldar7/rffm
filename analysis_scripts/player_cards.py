@@ -1364,7 +1364,7 @@ function summaryText(s) {
 }
 
 // Roster (lineups) + match list for one team, fetched from the same JSON
-// team_card.html/team_rosters.py already build — nothing new to crawl or
+// team_card.html/team_rosters_v2.py already build — nothing new to crawl or
 // pre-aggregate, just two more consumers of existing lazily-loaded data.
 // Cached per (season, club, team) since a player can have more than one
 // participation row for the same team (e.g. league + cup registrations).
@@ -1373,8 +1373,9 @@ async function fetchTeamRosterAndMatches(season, clubSlug, teamId) {
   if (!(key in TEAM_DATA_CACHE)) {
     TEAM_DATA_CACHE[key] = (async () => {
       try {
+        // v2/data/... - see team_cards.py's loadRoster() for why.
         const [rosterRes, cardRes] = await Promise.all([
-          fetch(`data/team_rosters_${season}/${teamId}.json`),
+          fetch(`v2/data/team_rosters_${season}/${teamId}.json`),
           fetch(`data/team_cards_${season}/${clubSlug}.json`),
         ]);
         const roster = rosterRes.ok ? await rosterRes.json() : { lineups: {} };
