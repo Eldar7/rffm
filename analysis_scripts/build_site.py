@@ -66,6 +66,7 @@ import player_cards_v2
 import all_players_v2
 import all_teams_v2
 import season_comparison_v2
+import club_scorecard_site
 import competition_structure
 import team_cards
 import player_cards
@@ -232,6 +233,11 @@ CARDS_RU = [
         "title": "Все клубы",
         "desc": "То же самое, но по клубам: сумма очков/игр всех команд клуба, взвешенные очки/игру и разница мячей, лучший дивизион, число лидирующих команд.",
     },
+    {
+        "href": "v2/club_scorecard.html",
+        "title": "Кантера",
+        "desc": "Кто реально растит своих: размер, потолок, доля алюмни, дошедших до элиты — своя школа или пришли готовыми — удержание по поколениям и баланс трансферов, по всем 685 клубам.",
+    },
 ]
 CARDS_ES = [
     "Marcadores extraños, dominadores y colistas",
@@ -250,6 +256,8 @@ CARDS_ES = [
     "Partidos, G-E-P, puntos/partido, diferencia de goles, posición en el grupo, plantilla y estabilidad de cada equipo y competición — con filtros por temporada/edad/división y orden por cualquier columna.",
     "Todos los clubes",
     "Lo mismo, pero por club: suma de puntos/partidos de todos sus equipos, puntos/partido y diferencia de goles ponderados, mejor división, número de equipos líderes.",
+    "La Cantera",
+    "Quién realmente forma a los suyos: tamaño, techo, qué parte de los alumni llega a élite — cantera propia o ya formados — retención por generación y saldo de fichajes, en los 685 clubes.",
 ]
 
 
@@ -386,6 +394,10 @@ def main():
         print(f"Building v2/season_comparison.html ({len(season_comparison_v2.SEASONS)} seasons)...")
         sc_data_v2 = season_comparison_v2.load_all_data()
         (v2_dir / "season_comparison.html").write_text(season_comparison_v2.build_html(sc_data_v2), encoding="utf-8")
+
+        print("Building v2/club_scorecard.html (\"Кантера\" - youth-development scorecard, all clubs)...")
+        cs_data = club_scorecard_site.load_all_data()
+        (v2_dir / "club_scorecard.html").write_text(club_scorecard_site.build_html(cs_data), encoding="utf-8")
     else:
         print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
               "(run analysis_scripts/build_parquet.py first)")

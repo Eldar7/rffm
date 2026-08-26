@@ -570,6 +570,65 @@ def compute_all(data: Data) -> tuple[pd.DataFrame, pd.DataFrame]:
     return club_level, club_cohort
 
 
+def to_compact_json(club_level: pd.DataFrame, club_cohort: pd.DataFrame) -> dict:
+    """club_level/club_cohort -> the compact {clubs: [...], cohort: {club_id: [...]}}
+    shape the site report (club_scorecard_site.py) embeds client-side. Short keys +
+    rounded floats to keep the embedded payload small (~1.6MB for 685 clubs)."""
+
+    def r(x, nd=1):
+        return None if pd.isna(x) else round(float(x), nd)
+
+    def ri(x):
+        return None if pd.isna(x) else int(x)
+
+    clubs = []
+    for _, row in club_level.iterrows():
+        clubs.append({
+            "id": ri(row["club_id"]), "n": row["club_name"],
+            "teams": ri(row["teams_latest_season"]), "players": ri(row["players_latest_season"]),
+            "trend": r(row["headcount_trend_slope"], 2),
+            "ctier": ri(row["ceiling_tier"]), "cdiv": row["ceiling_division"] if isinstance(row["ceiling_division"], str) else None,
+            "ccat": row["ceiling_category"] if isinstance(row["ceiling_category"], str) else None,
+            "cseason": row["ceiling_season"] if isinstance(row["ceiling_season"], str) else None,
+            "curTeams": ri(row["teams_current_season"]), "curTier": ri(row["best_tier_current_season"]),
+            "left": ri(row["players_left"]), "joined": ri(row["players_joined"]), "net": ri(row["net_flow"]),
+            "first": row["first_season_seen"] if isinstance(row["first_season_seen"], str) else None,
+            "last": row["last_season_seen"] if isinstance(row["last_season_seen"], str) else None,
+            "span": ri(row["seasons_span"]), "present": ri(row["seasons_present"]), "cont": r(row["continuity_pct"]),
+            "sanction": r(row["avg_sanction_points_per_season"], 2), "cards": ri(row["total_cards"]),
+            "matchesAll": ri(row["matches_played_alltime"]), "cardsPm": r(row["cards_per_match"], 3),
+            "gini": r(row["avg_playing_time_gini"], 3), "volat": r(row["best_tier_std_dev"], 2),
+            "seasonsData": ri(row["seasons_with_data"]), "alumni": ri(row["alumni_pool_n"]),
+            "eliteInN": ri(row["elite_in_club_n"]), "eliteInPct": r(row["elite_in_club_pct"]),
+            "eliteAfterN": ri(row["elite_after_leaving_n"]), "eliteAfterPct": r(row["elite_after_leaving_pct"]),
+            "eliteAnyN": ri(row["elite_any_n"]), "eliteAnyPct": r(row["elite_any_pct"]),
+            "homegrownN": ri(row["elite_homegrown_n"]), "homegrownUnk": ri(row["elite_homegrown_data_unknown_n"]),
+            "homegrownPct": r(row["elite_homegrown_pct_of_known"]),
+            "topTier": ri(row["top_team_tier"]), "topCat": row["top_team_category"] if isinstance(row["top_team_category"], str) else None,
+            "topN": ri(row["top_team_n"]), "topHomeN": ri(row["top_team_homegrown_n"]),
+            "topHomePct": r(row["top_team_homegrown_pct_of_known"]),
+        })
+
+    cohort: dict[str, list] = {}
+    for _, row in club_cohort.iterrows():
+        cid = str(ri(row["club_id"]))
+        cohort.setdefault(cid, []).append({
+            "cat": row["category"], "cs": row["cohort_season"], "n": ri(row["n"]), "h": ri(row["horizon_years"]),
+            "rc": ri(row["retained_in_club"]), "rcPct": r(row["retained_in_club_pct"]),
+            "rf": ri(row["retained_in_football"]), "rfPct": r(row["retained_in_football_pct"]),
+        })
+
+    return {"clubs": clubs, "cohort": cohort}
+
+
+def load_all_data() -> dict:
+    """Entry point for build_site.py: recompute everything from Parquet and
+    return the compact JSON payload club_scorecard_site.build_html() embeds."""
+    data = Data()
+    club_level, club_cohort = compute_all(data)
+    return to_compact_json(club_level, club_cohort)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--club-id", type=int, help="Show results for one club_id only")
