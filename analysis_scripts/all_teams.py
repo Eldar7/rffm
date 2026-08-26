@@ -29,7 +29,7 @@ across however many competition-rows that team has.
 Unlike all_players.py, there's no need to shard by category: team/club
 counts run in the low thousands per season (vs. 150k+ players), small
 enough to ship as one JSON per season — data/all_teams_<season>.json,
-{"rows": [...], "clubs": {club_name: {web, loc, prov}}}. all_clubs.py
+{"rows": [...], "clubs": {club_name: {web, loc, prov, crest}}}. all_clubs.py
 reads this SAME file client-side and aggregates it by club instead of
 shipping a second, redundant dataset — see that module's docstring.
 
@@ -45,7 +45,7 @@ from pathlib import Path
 import pandas as pd
 
 from club_division_map import (CAT_LABEL_ES, CAT_LABEL_RU, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER,
-                                GT_SHORT, TIER_OF)
+                                GT_SHORT, TIER_OF, abs_crest_url)
 from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
 from team_cards import build_club_team_cards, list_seasons, norm_id
 
@@ -76,8 +76,8 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     matches_path = d / "matches.csv"
     if not lineups_dir.exists() or not matches_path.exists():
         return {}
-    m = pd.read_csv(matches_path, dtype=str, usecols=["match_id", "match_date", "status"])
-    # A missing match_date reads back as float NaN even under dtype=str (pandas'
+    m = pd.read_csv(matches_path, dtype=object, usecols=["match_id", "match_date", "status"])
+    # A missing match_date reads back as float NaN even under dtype=object (pandas'
     # universal missing-value marker) — NaN is truthy in Python, so the `or`
     # fallback below wouldn't catch it and a NaN sort key would collide with
     # the str ones from every other match. Coerce to None here so it does.
@@ -91,7 +91,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     cards_by_team: dict[str, dict[str, int]] = {}
 
     for cat in categories:
-        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=str,
+        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=object,
                           usecols=["match_id", "team_id", "player_id", "is_starter"])
         for row in lu.itertuples(index=False):
             tid, pid = norm_id(row.team_id), clean(row.player_id)
@@ -103,7 +103,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
 
         cp = d / "match_cards" / f"{cat}.csv"
         if cp.exists():
-            cc = pd.read_csv(cp, dtype=str, usecols=["team_id", "card_type_label"])
+            cc = pd.read_csv(cp, dtype=object, usecols=["team_id", "card_type_label"])
             for row in cc.itertuples(index=False):
                 tid = norm_id(row.team_id)
                 if not tid:
@@ -135,7 +135,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
 
 
 def build_club_meta(season: str) -> dict[str, dict]:
-    """club_name_raw -> {web, loc, prov}, from the opt-in clubs.csv
+    """club_name_raw -> {web, loc, prov, crest}, from the opt-in clubs.csv
     enrichment (correspondence address, not a stadium — see
     DATA_DICTIONARY.md). Missing entirely for a season that hasn't had
     enrich_clubs.py run, or for a club that crawl never resolved — both
@@ -143,13 +143,16 @@ def build_club_meta(season: str) -> dict[str, dict]:
     p = BASE / season / "clubs.csv"
     if not p.exists():
         return {}
-    df = pd.read_csv(p, dtype=str, usecols=["club_name_raw", "portal_web", "locality", "province"])
+    df = pd.read_csv(p, dtype=object, usecols=["club_name_raw", "portal_web", "locality", "province", "crest_url"])
     out: dict[str, dict] = {}
     for row in df.itertuples(index=False):
         name = clean(row.club_name_raw)
         if not name:
             continue
-        out[name] = {"web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province)}
+        out[name] = {
+            "web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province),
+            "crest": abs_crest_url(clean(row.crest_url)),
+        }
     return out
 
 
@@ -165,7 +168,7 @@ def _result_tally(matches: list[dict]) -> dict:
 
 def build_team_rows(season: str) -> list[dict]:
     d = BASE / season
-    comps = pd.read_csv(d / "competitions.csv", dtype=str, usecols=["competition_id", "category_base"])
+    comps = pd.read_csv(d / "competitions.csv", dtype=object, usecols=["competition_id", "category_base"])
     comp_id_to_cat = dict(zip(comps["competition_id"], comps["category_base"]))
 
     club_teams = build_club_team_cards(season)
@@ -326,6 +329,7 @@ tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:var(--accent-soft);}
 td.name-cell{font-weight:600; color:var(--ink);}
 td.comp-cell{max-width:16rem; overflow:hidden; text-overflow:ellipsis;}
+.club-crest-ic{width:16px; height:16px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:0.35rem;}
 .tier-chip{ display:inline-block; font-size:0.7rem; font-weight:700; padding:0.08rem 0.45rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
 .n-note{color:var(--ink-faint); font-size:0.85em;}
@@ -459,6 +463,7 @@ let CUR_SEASON = null;
 const SEASON_CACHE = {}; // season -> Promise<{rows, clubs}>
 let ALL_DIVS = new Set();
 let RESTORING = false;
+let CUR_CLUB_META = {}; // club name -> {web, loc, prov, crest}, set each render() from payload.clubs
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -478,7 +483,8 @@ function allClubsUrl(r) {
 
 function loadSeason(season) {
   if (!SEASON_CACHE[season]) {
-    SEASON_CACHE[season] = fetch(`data/all_teams_${season}.json`)
+    // v2/data/... - see build_all()'s docstring note for why.
+    SEASON_CACHE[season] = fetch(`v2/data/all_teams_${season}.json`)
       .then(res => res.ok ? res.json() : { rows: [], clubs: {} })
       .catch(() => ({ rows: [], clubs: {} }));
   }
@@ -516,8 +522,10 @@ function rowHtml(r) {
   const posDisplay = r.pos ? (r.size ? `${r.pos}/${r.size}` : r.pos) : '—';
   const posSort = (r.pos && r.size) ? (Number(r.size) - Number(r.pos) + 1) / Number(r.size) : '';
   const stDisplay = (r.st === null || r.st === undefined) ? '—' : `${Math.round(r.st * 100)}%`;
+  const crest = (CUR_CLUB_META[r.club] || {}).crest;
+  const crestHtml = crest ? `<img class="club-crest-ic" src="${crest}" alt="" onerror="this.remove()">` : '';
   return `<tr>
-    <td class="name-cell" data-col="club" data-v="${esc(r.club)}"><a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
+    <td class="name-cell" data-col="club" data-v="${esc(r.club)}">${crestHtml}<a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
     <td data-col="team" data-v="${esc(r.team)}"><a href="${teamCardUrl(r)}">${esc(r.team)}</a></td>
     <td data-col="cat" data-v="${esc(catText)}">${esc(catText)}</td>
     <td data-col="div" data-v="${esc(divText)}"><span class="tier-chip">${esc(divText)}</span></td>
@@ -549,6 +557,7 @@ async function render() {
   tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].loading}</td></tr>`;
   const payload = await loadSeason(CUR_SEASON);
   if (myToken !== RENDER_TOKEN) return;
+  CUR_CLUB_META = payload.clubs || {};
 
   const seenDivs = [...new Set(payload.rows.map(r => r.div))].sort((a, b) => {
     const ra = DIV_ORDER.indexOf(a), rb = DIV_ORDER.indexOf(b);
@@ -666,31 +675,23 @@ def build_html(seasons: list[str]) -> str:
             .replace("%DATATABLE_JS%", DATATABLE_JS))
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season data used to be built
+    # here too, but confirmed content-identical to all_teams_v2.py's
+    # Parquet-sourced copy, so this page (and all_clubs.html, the other
+    # consumer of this data) fetches that single shared copy (v2/data/...)
+    # instead of building a second one - see loadSeason() below.
     all_seasons = list_seasons()
-    build_seasons = seasons or all_seasons
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "all_teams.html").write_text(build_html(all_seasons), encoding="utf-8")
 
-    data_dir = out_dir / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-    for season in build_seasons:
-        print(f"Building all-teams data for season {season}")
-        rows = build_team_rows(season)
-        clubs = build_club_meta(season)
-        text = json.dumps({"rows": rows, "clubs": clubs}, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
-        (data_dir / f"all_teams_{season}.json").write_text(text, encoding="utf-8")
-        print(f"  {len(rows)} team-competition rows, {len(clubs)} clubs with metadata ({len(text) / 1024:.0f} KB)")
-
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM all-teams browser")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM all-teams browser page (data comes from all_teams_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
 if __name__ == "__main__":

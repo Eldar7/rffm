@@ -35,7 +35,7 @@ across however many competition-rows that team has.
 Unlike all_players.py, there's no need to shard by category: team/club
 counts run in the low thousands per season (vs. 150k+ players), small
 enough to ship as one JSON per season — data/all_teams_<season>.json,
-{"rows": [...], "clubs": {club_name: {web, loc, prov}}}. all_clubs.py
+{"rows": [...], "clubs": {club_name: {web, loc, prov, crest}}}. all_clubs.py
 reads this SAME file client-side and aggregates it by club instead of
 shipping a second, redundant dataset — see that module's docstring.
 
@@ -51,7 +51,7 @@ from pathlib import Path
 import pandas as pd
 
 from club_division_map import (CAT_LABEL_ES, CAT_LABEL_RU, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER,
-                                GT_SHORT, TIER_OF)
+                                GT_SHORT, TIER_OF, abs_crest_url)
 from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
 import rffm_data as data
 from team_cards_v2 import build_club_team_cards, list_seasons, norm_id
@@ -78,7 +78,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     team_card.html's computeStability() uses client-side for one team;
     computed here once per team instead so a season-wide table doesn't
     need to fetch and recompute it 1000+ times in the browser."""
-    if not (BASE / season / "match_lineups").exists() or not (BASE / season / "matches.csv").exists():
+    if season not in data.list_seasons("match_lineups") or season not in data.list_seasons("matches"):
         return {}
     m = data.read_table("matches", season=season)[["match_id", "match_date", "status"]]
     # A missing match_date reads back as float NaN even under dtype=str (pandas'
@@ -139,7 +139,7 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
 
 
 def build_club_meta(season: str) -> dict[str, dict]:
-    """club_name_raw -> {web, loc, prov}, from the opt-in clubs.csv
+    """club_name_raw -> {web, loc, prov, crest}, from the opt-in clubs.csv
     enrichment (correspondence address, not a stadium — see
     DATA_DICTIONARY.md). Missing entirely for a season that hasn't had
     enrich_clubs.py run, or for a club that crawl never resolved — both
@@ -147,13 +147,16 @@ def build_club_meta(season: str) -> dict[str, dict]:
     df = data.read_table("clubs", season=season)
     if df.empty:
         return {}
-    df = df[["club_name_raw", "portal_web", "locality", "province"]]
+    df = df[["club_name_raw", "portal_web", "locality", "province", "crest_url"]]
     out: dict[str, dict] = {}
     for row in df.itertuples(index=False):
         name = clean(row.club_name_raw)
         if not name:
             continue
-        out[name] = {"web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province)}
+        out[name] = {
+            "web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province),
+            "crest": abs_crest_url(clean(row.crest_url)),
+        }
     return out
 
 
@@ -329,6 +332,7 @@ tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:var(--accent-soft);}
 td.name-cell{font-weight:600; color:var(--ink);}
 td.comp-cell{max-width:16rem; overflow:hidden; text-overflow:ellipsis;}
+.club-crest-ic{width:16px; height:16px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:0.35rem;}
 .tier-chip{ display:inline-block; font-size:0.7rem; font-weight:700; padding:0.08rem 0.45rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
 .n-note{color:var(--ink-faint); font-size:0.85em;}
@@ -343,7 +347,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <nav class="nav-row">
-      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="../all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
       <a class="is-here" data-i18n="nav_teams">Все команды</a>
       <a href="all_players.html" data-i18n="nav_players">Все игроки</a>
     </nav>
@@ -462,6 +466,7 @@ let CUR_SEASON = null;
 const SEASON_CACHE = {}; // season -> Promise<{rows, clubs}>
 let ALL_DIVS = new Set();
 let RESTORING = false;
+let CUR_CLUB_META = {}; // club name -> {web, loc, prov, crest}, set each render() from payload.clubs
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -519,8 +524,10 @@ function rowHtml(r) {
   const posDisplay = r.pos ? (r.size ? `${r.pos}/${r.size}` : r.pos) : '—';
   const posSort = (r.pos && r.size) ? (Number(r.size) - Number(r.pos) + 1) / Number(r.size) : '';
   const stDisplay = (r.st === null || r.st === undefined) ? '—' : `${Math.round(r.st * 100)}%`;
+  const crest = (CUR_CLUB_META[r.club] || {}).crest;
+  const crestHtml = crest ? `<img class="club-crest-ic" src="${crest}" alt="" onerror="this.remove()">` : '';
   return `<tr>
-    <td class="name-cell" data-col="club" data-v="${esc(r.club)}"><a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
+    <td class="name-cell" data-col="club" data-v="${esc(r.club)}">${crestHtml}<a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
     <td data-col="team" data-v="${esc(r.team)}"><a href="${teamCardUrl(r)}">${esc(r.team)}</a></td>
     <td data-col="cat" data-v="${esc(catText)}">${esc(catText)}</td>
     <td data-col="div" data-v="${esc(divText)}"><span class="tier-chip">${esc(divText)}</span></td>
@@ -552,6 +559,7 @@ async function render() {
   tbody.innerHTML = `<tr><td class="empty-state" colspan="22">${LANG[CURLANG].loading}</td></tr>`;
   const payload = await loadSeason(CUR_SEASON);
   if (myToken !== RENDER_TOKEN) return;
+  CUR_CLUB_META = payload.clubs || {};
 
   const seenDivs = [...new Set(payload.rows.map(r => r.div))].sort((a, b) => {
     const ra = DIV_ORDER.indexOf(a), rb = DIV_ORDER.indexOf(b);

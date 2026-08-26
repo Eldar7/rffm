@@ -455,6 +455,16 @@ def main():
              "deduped, git-tracked players_current.csv (gitignored, so a fresh checkout "
              "won't have it) - skips every other table. Fast: no per-season scan/dedupe.",
     )
+    parser.add_argument(
+        "--open-only", action="store_true",
+        help="Only rebuild (table, season) combinations that parquet_closure.py says are "
+             "NOT closed - a fresh checkout already has every closed one committed via git, "
+             "and parquet-build.yml never commits an open one (see that workflow's comments), "
+             "so this is what a fresh session/build needs to materialize locally. Much "
+             "faster than a full run since it skips re-reading/re-writing every already-"
+             "closed season's CSVs. Does not touch players.parquet - use --players-only "
+             "together with this (or run it separately) for that.",
+    )
     args = parser.parse_args()
 
     out_dir = Path(__file__).parent.parent / args.output_dir
@@ -463,6 +473,94 @@ def main():
     if args.players_only:
         print(f"Rebuilding players.parquet only, from {PLAYERS_CURRENT_CSV}:")
         rebuild_players_parquet_from_csv(out_dir, args.compression_level)
+        return
+
+    if args.open_only:
+        import parquet_closure as pc
+
+        all_seasons = list_seasons()
+        manifest = pc.load_manifest()
+        total_parquet_bytes = 0
+
+        def write_partitioned_open(table_name: str, df: pd.DataFrame | None, n_open: int):
+            nonlocal total_parquet_bytes
+            if df is None or df.empty:
+                print(f"  skip {table_name}: no open data ({n_open} open season(s))")
+                return
+            table_dir = out_dir / table_name
+            table_dir.mkdir(parents=True, exist_ok=True)
+            season_key = df["season"].astype(str).where(df["season"].notna(), "ALL")
+            total_rows = total_bytes_this_table = n_files = 0
+            for season_val, sub in df.groupby(season_key, observed=True):
+                if sub.empty:
+                    continue
+                f = table_dir / f"{season_val}.parquet"
+                sub.to_parquet(f, compression="zstd", compression_level=args.compression_level, index=False)
+                size = f.stat().st_size
+                total_parquet_bytes += size
+                total_bytes_this_table += size
+                total_rows += len(sub)
+                n_files += 1
+            print(f"  {table_name:<32} {total_rows:>9,} rows -> {total_bytes_this_table / 1e6:8.2f} MB "
+                  f"across {n_files}/{n_open} open season(s)")
+
+        print(f"Open-only rebuild ({len(all_seasons)} seasons total) - "
+              f"only (table, season) pairs parquet_closure.py says aren't closed yet:")
+
+        for name in FLAT_TABLES:
+            table = name.removesuffix(".csv")
+            open_seasons = [s for s in all_seasons if s not in pc.table_closed_seasons(table, manifest)]
+            write_partitioned_open(table, build_flat_table(name, open_seasons), len(open_seasons))
+
+        for name in PER_SEASON_TABLES:
+            table = name.removesuffix(".csv")
+            open_seasons = [s for s in all_seasons if s not in pc.table_closed_seasons(table, manifest)]
+            write_partitioned_open(table, build_per_season_table(name, open_seasons), len(open_seasons))
+
+        fj_open = [s for s in all_seasons if s not in pc.stage_closed_seasons("fichajugador", manifest)]
+        write_partitioned_open("players_by_season", build_per_season_table("players.csv", fj_open), len(fj_open))
+
+        for dirname in SHARDED_DIRS:
+            open_seasons = [s for s in all_seasons if s not in pc.table_closed_seasons(dirname, manifest)]
+            total_rows = total_bytes_this_table = 0
+            for season in open_seasons:
+                df = build_sharded_season(dirname, season)
+                if df is None or df.empty:
+                    continue
+                season_dir = out_dir / dirname
+                season_dir.mkdir(parents=True, exist_ok=True)
+                out = season_dir / f"{season}.parquet"
+                df.to_parquet(out, compression="zstd", compression_level=args.compression_level, index=False)
+                size = out.stat().st_size
+                total_parquet_bytes += size
+                total_bytes_this_table += size
+                total_rows += len(df)
+            print(f"  {dirname:<32} {total_rows:>9,} rows -> {total_bytes_this_table / 1e6:8.2f} MB "
+                  f"across {len(open_seasons)}/{len(all_seasons)} open season(s)")
+
+        # club_profiles (clubs_extended/club_teams) never closes - see
+        # parquet_closure.py's STAGES_THAT_NEVER_CLOSE - so always rebuilt here.
+        print("Cross-season tables (club_profiles - never closes, always rebuilt):")
+        for name in CROSS_SEASON_TABLES:
+            table = name.removesuffix(".csv")
+            df = build_cross_season_table(name)
+            if df is None or df.empty:
+                print(f"  skip {table}: no data")
+                continue
+            f = out_dir / f"{table}.parquet"
+            df.to_parquet(f, compression="zstd", compression_level=args.compression_level, index=False)
+            size = f.stat().st_size
+            total_parquet_bytes += size
+            print(f"  {table:<32} {len(df):>9,} rows -> {size / 1e6:8.2f} MB")
+
+        log_open = [s for s in all_seasons if s not in pc.log_family_closed_seasons(manifest)]
+        write_partitioned_open("crawl_log", build_family_log_table(
+            CRAWL_LOG_FAMILIES, log_open, CROSS_SEASON_CRAWL_LOG_FAMILY), len(log_open))
+        write_partitioned_open("data_quality_report", build_family_log_table(
+            DATA_QUALITY_REPORT_FAMILIES, log_open, CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY), len(log_open))
+
+        print(f"\nOpen-only total: {total_parquet_bytes / 1e6:.0f} MB Parquet written "
+              f"(not committed by parquet-build.yml - see that workflow)")
         return
 
     seasons = list_seasons()

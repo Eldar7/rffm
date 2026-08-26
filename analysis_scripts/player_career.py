@@ -49,13 +49,13 @@ def categories_for_age(age: int) -> tuple[str, ...]:
 
 
 def list_fichajugador_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     ok = m[(m["stage"] == "fichajugador") & (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(ok["season"].unique().tolist())
 
 
 def load_fichajugador_coverage() -> dict[tuple[str, str], str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     fj = m[m["stage"] == "fichajugador"]
     return {(row.season, row.category_base): row.status for row in fj.itertuples(index=False)}
 
@@ -76,8 +76,8 @@ def compute_career_index(seasons: list[str] | None = None) -> dict[str, dict]:
         players_path = d / "players.csv"
         if not (part_path.exists() and players_path.exists()):
             continue
-        part = pd.read_csv(part_path, dtype=str, usecols=["player_id"])
-        players = pd.read_csv(players_path, dtype=str, usecols=["player_id", "birth_year"])
+        part = pd.read_csv(part_path, dtype=object, usecols=["player_id"])
+        players = pd.read_csv(players_path, dtype=object, usecols=["player_id", "birth_year"])
         pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
         for pid in part["player_id"].dropna().unique():
             c = career.setdefault(pid, {"birth_year": None, "seasons": set()})

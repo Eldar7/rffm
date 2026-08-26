@@ -168,7 +168,15 @@ def compact_enrichment(season: str, category: str) -> dict | None:
     everything section 07 needs, minus the full per-match lineup table
     (too large to ship; only the is_goalkeeper flag it provides is kept,
     joined directly onto each goal row, and only the per-player appearance
-    *count* it provides, not every row)."""
+    *count* it provides, not every row).
+
+    Player names come from read_table("players_by_season", season=...), not
+    the deduped read_table("players") - the original reads this season's own
+    players.csv, and confirmed on real data that a player's recorded name
+    spelling can genuinely change between seasons (RFFM's own site started
+    serving some players' names without diacritics from 2024-2025 onward),
+    so the deduped table's "latest name wins" pick would have broken this
+    file's whole reason for existing: proving the migration is lossless."""
     goals = data.read_table("match_goals", season=season, category=category)
     if goals.empty:
         return None
@@ -182,7 +190,7 @@ def compact_enrichment(season: str, category: str) -> dict | None:
     lineups = data.read_table("match_lineups", season=season, category=category)
     if lineups.empty:
         lineups = pd.DataFrame(columns=["match_id", "team_id", "player_id", "is_goalkeeper"])
-    players = data.read_table("players")
+    players = data.read_table("players_by_season", season=season)
     if not players.empty:
         name_map = dict(zip(players["player_id"], players["player_name"]))
     else:
@@ -277,7 +285,7 @@ HTML = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RFFM — странные счета, доминаторы и аутсайдеры</title>
-<a class="back" href="index.html" style="display:inline-block;margin:16px 0 0 20px">&larr; RFFM data</a>
+<a class="back" href="../index.html" style="display:inline-block;margin:16px 0 0 20px">&larr; RFFM data</a>
 %FONT_LINKS%
 %THEME_INIT%
 <style>%CSS%

@@ -8,23 +8,25 @@ fichaequipo page), and the base this project's future roster×matches
 participation matrix (see the docstring note at the bottom of this file)
 will build on.
 
-Data volume forced two scoping decisions:
-  - one JSON per (season, club) under <output-dir>/data/team_cards_<season>/
-    <slug>.json — not one file per team_id (9000+ teams in 2025-2026 alone)
-    and not one season-wide bundle (matches.csv alone runs 28-53 MB/season).
-    Splitting by club keeps each fetch down to one club's own teams, loaded
-    lazily only when a team card is opened. club_division_map.py computes
-    the exact same slug for the same club name via site_theme.club_slug_map(),
-    so a link built there always resolves to the file built here.
-  - build_all() defaults to the latest season only, not every crawled season
-    like club_division_map.py — 8 seasons of team-card JSON would run
-    450+ MB. A team-card link for an older season degrades to "no data"
-    instead of the build shipping a half-gigabyte artifact; pass --season
-    explicitly to build another one.
+Data volume: one JSON per (season, club) under
+<output-dir>/data/team_cards_<season>/<slug>.json — not one file per
+team_id (9000+ teams in 2025-2026 alone) and not one season-wide bundle
+(matches.csv alone runs 28-53 MB/season). Splitting by club keeps each
+fetch down to one club's own teams, loaded lazily only when a team card
+is opened. club_division_map.py computes the exact same slug for the
+same club name via site_theme.club_slug_map(), so a link built there
+always resolves to the file built here.
+
+build_all() here only builds the HTML/JS/CSS shell (team_card.html) - the
+per-season per-club data (~450MB+ of JSON across 8 seasons) used to be
+built by this module too, but is confirmed content-identical to
+team_cards_v2.py's Parquet-sourced copy, so this page fetches that single
+shared copy (v2/data/team_cards_<season>/...) instead of building a
+second one - see build_all() and team_cards_v2.py's own build_all(), both
+called from build_site.py.
 
 Usage:
     python analysis_scripts/team_cards.py
-    python analysis_scripts/team_cards.py --season 2025-2026 --output-dir reports
 """
 
 import argparse
@@ -35,14 +37,14 @@ import pandas as pd
 
 from club_division_map import DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
-                         THEME_SWITCH_JS, club_slug_map, switch_row_html)
+                         THEME_SWITCH_JS, switch_row_html)
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -75,10 +77,10 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     (position/played/W-D-L/goals/points), for the Team Card's per-competition
     summary panel."""
     d = BASE / season
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
 
     tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
@@ -105,34 +107,43 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     club_teams: dict[str, dict[str, dict]] = {}
     sides = (("hid", "aid", "home_team", "away_team", "home_score", "away_score", True),
              ("aid", "hid", "away_team", "home_team", "away_score", "home_score", False))
-    for _, r in matches.iterrows():
+    # itertuples() instead of iterrows(): iterrows() rebuilds a fresh,
+    # dtype-coerced Series per row (measured as the actual hot path here via
+    # py-spy - sanitize_array/StringArray construction dominating the
+    # profile), itertuples() hands back a plain namedtuple with no such
+    # per-row construction cost. The one thing iterrows() gave for free that
+    # itertuples() doesn't - r[col_name] with a column name held in a
+    # variable - becomes getattr(r, col_name); every matches.csv column
+    # used below is a valid Python identifier (checked directly), so this is
+    # a mechanical swap, not a behavior change.
+    for r in matches.itertuples(index=False):
         for tid_col, opp_col, _own_name_col, opp_name_col, sf_col, sa_col, is_home in sides:
-            tid = r[tid_col]
+            tid = getattr(r, tid_col)
             if not tid:
                 continue
             club = tid_to_club.get(tid)
             if not club:
                 continue
-            opp_tid = r[opp_col]
-            opp_name = clean(tid_to_name.get(opp_tid)) or clean(r[opp_name_col])
-            sf, sa = clean(r[sf_col]), clean(r[sa_col])
+            opp_tid = getattr(r, opp_col)
+            opp_name = clean(tid_to_name.get(opp_tid)) or clean(getattr(r, opp_name_col))
+            sf, sa = clean(getattr(r, sf_col)), clean(getattr(r, sa_col))
             result = None
-            if r["is_finished"] == "True" and sf is not None and sa is not None:
+            if r.is_finished == "True" and sf is not None and sa is not None:
                 try:
                     fsf, fsa = float(sf), float(sa)
                     result = "W" if fsf > fsa else ("L" if fsf < fsa else "D")
                 except ValueError:
                     pass
             entry = {
-                "match_id": clean(r["match_id"]),
-                "date": clean(r["match_date"]), "time": clean(r["match_time"]),
+                "match_id": clean(r.match_id),
+                "date": clean(r.match_date), "time": clean(r.match_time),
                 "home": is_home, "opp": opp_name, "opp_tid": clean(opp_tid),
-                "sf": sf, "sa": sa, "result": result, "status": clean(r["status"]),
-                "comp": clean(r["competition"]), "comp_id": clean(r["competition_id"]),
-                "grp": clean(r["group"]), "group_id": clean(r["group_id"]),
-                "gt": clean(r["game_type"]), "gt_id": clean(r["game_type_id"]),
-                "phase": clean(r["phase_label"]), "matchday": clean(r["matchday_label"]),
-                "season_id": clean(r["season_id"]),
+                "sf": sf, "sa": sa, "result": result, "status": clean(r.status),
+                "comp": clean(r.competition), "comp_id": clean(r.competition_id),
+                "grp": clean(r.group), "group_id": clean(r.group_id),
+                "gt": clean(r.game_type), "gt_id": clean(r.game_type_id),
+                "phase": clean(r.phase_label), "matchday": clean(r.matchday_label),
+                "season_id": clean(r.season_id),
             }
             team_rec = club_teams.setdefault(club, {}).setdefault(tid, {
                 "name": clean(tid_to_name.get(tid)) or tid, "matches": [], "competitions": {},
@@ -867,7 +878,11 @@ async function loadRoster() {
   status.textContent = LANG[CURLANG].loading;
   status.style.display = '';
   try {
-    const res = await fetch(`data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
+    // v2/data/..., not data/... - team_rosters.py (v1) no longer builds its
+    // own copy of this (see build_site.py); v2/team_card.html's copy (built
+    // from Parquet, correct "seasons eligible" Y for every player) is the
+    // only one, shared by this page via the relative path from site root.
+    const res = await fetch(`v2/data/team_rosters_${CUR_SEASON}/${CUR_TEAM_ID}.json`);
     if (!res.ok) throw new Error('not found');
     ROSTER_PAYLOAD = await res.json();
   } catch (e) {
@@ -929,7 +944,8 @@ async function main() {
   }
   let payload;
   try {
-    const res = await fetch(`data/team_cards_${season}/${clubSlug}.json`);
+    // v2/data/... - see build_all()'s docstring note for why.
+    const res = await fetch(`v2/data/team_cards_${season}/${clubSlug}.json`);
     payload = await res.json();
   } catch (e) {
     document.getElementById('matchBody').innerHTML =
@@ -989,39 +1005,22 @@ def build_html() -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM team-card data + page")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM team-card page (data comes from team_cards_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    # Every crawled season, by default — player_card.html's "show all
-    # seasons" view links into this per-season JSON for any season a player
-    # was registered in, not just the latest, so a latest-season-only build
-    # left every older-season row pointing at data that was never published
-    # (silently blank "Сводка", dead team-card links). ~450MB+ of JSON across
-    # 8 seasons (matches.csv alone is 28-53 MB per season) is the accepted
-    # cost; pass --season explicitly for a cheaper single-season build.
-    seasons = seasons or list_seasons()
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season per-club data used to be
+    # built here too (looping every crawled season, ~450MB+ of JSON across
+    # 8 seasons), but confirmed content-identical to team_cards_v2.py's
+    # Parquet-sourced copy (see build_site.py's v2 section), so this page's
+    # own fetch now points at that single shared copy (v2/data/...) instead
+    # of building a second one - see loadSeason() below.
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "team_card.html").write_text(build_html(), encoding="utf-8")
-
-    for season in seasons:
-        print(f"Building team cards for season {season}")
-        club_teams = build_club_team_cards(season)
-        slugs = club_slug_map(sorted(club_teams.keys()))
-        data_dir = out_dir / "data" / f"team_cards_{season}"
-        data_dir.mkdir(parents=True, exist_ok=True)
-        for club, teams_of_club in club_teams.items():
-            payload = {"club": club, "season": season, "teams": teams_of_club}
-            (data_dir / f"{slugs[club]}.json").write_text(
-                json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-                encoding="utf-8")
-        print(f"  {len(club_teams)} clubs written to {data_dir}")
 
 
 if __name__ == "__main__":

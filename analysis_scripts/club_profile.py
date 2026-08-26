@@ -58,6 +58,7 @@ def build_all(out_dir: Path) -> None:
     career = cpd.build_career(seasons)
     clubs = cpd.club_index(career)
     lookup = cpd.build_players_lookup(seasons)
+    crest_lookup = cpd.build_crest_lookup(seasons)
     print(f"  {len(career)} participation rows, {len(clubs)} clubs, {len(lookup)} players")
 
     data_dir = out_dir / "data"
@@ -72,6 +73,7 @@ def build_all(out_dir: Path) -> None:
     for i, key in enumerate(clubs, start=1):
         payload = cpd.club_payload(career, clubs, key)
         cpd.attach_player_names(payload, lookup)
+        payload["crest"] = crest_lookup.get(key)
         text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         total_bytes += len(text)
         (club_dir / f"{clubs[key]['slug']}.json").write_text(text, encoding="utf-8")
@@ -337,6 +339,8 @@ p.foot{ color:var(--ink-faint); font-size:0.8rem; margin:-0.9rem 0 0; }
 /* ── selected-club header ── */
 .club-head{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:0.8rem;
   background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1rem 1.3rem; box-shadow:var(--shadow); }
+.club-head-main{ display:flex; align-items:center; gap:0.7rem; }
+.club-head-crest{ width:44px; height:44px; object-fit:contain; border-radius:8px; background:var(--bg); flex:none; }
 .club-head .nm{ font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:clamp(1.1rem,2.2vw,1.5rem); }
 .club-head .sub{ font-size:0.82rem; color:var(--ink-soft); margin-top:0.2rem; }
 .club-head .count{ font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--accent); font-weight:700; white-space:nowrap; }
@@ -552,10 +556,12 @@ async function selectClub(entry) {
 
 function renderClubHead() {
   const el = document.getElementById('clubHead');
+  const crestHtml = CLUB.crest
+    ? '<img class="club-head-crest" src="' + CLUB.crest + '" alt="" onerror="this.remove()">' : '';
   el.innerHTML =
-    '<div><div class="nm">' + esc(CLUB.display) + '</div>' +
+    '<div class="club-head-main">' + crestHtml + '<div><div class="nm">' + esc(CLUB.display) + '</div>' +
     '<div class="sub">' + CLUB.seasons_active[0] + '–' + CLUB.seasons_active[CLUB.seasons_active.length - 1] +
-    ' · ' + Object.keys(CLUB.players).length + ' ' + T('count_players', 'игроков за всё время') + '</div></div>' +
+    ' · ' + Object.keys(CLUB.players).length + ' ' + T('count_players', 'игроков за всё время') + '</div></div></div>' +
     '<div class="count" id="clubHeadCount"></div>';
 }
 

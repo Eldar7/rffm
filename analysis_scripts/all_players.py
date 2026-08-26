@@ -79,9 +79,9 @@ def build_career_profiles(seasons: list[str]) -> dict[str, dict]:
         comps_path = d / "competitions.csv"
         if not (part_path.exists() and players_path.exists() and comps_path.exists()):
             continue
-        part = pd.read_csv(part_path, dtype=str, usecols=["player_id", "team_id", "club_name_raw", "competition_id"])
-        players = pd.read_csv(players_path, dtype=str, usecols=["player_id", "birth_year"])
-        comps = pd.read_csv(comps_path, dtype=str, usecols=["competition_id", "category_base"])
+        part = pd.read_csv(part_path, dtype=object, usecols=["player_id", "team_id", "club_name_raw", "competition_id"])
+        players = pd.read_csv(players_path, dtype=object, usecols=["player_id", "birth_year"])
+        comps = pd.read_csv(comps_path, dtype=object, usecols=["competition_id", "category_base"])
         pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
         part = part.merge(comps, on="competition_id", how="left")
         for row in part.itertuples(index=False):
@@ -135,7 +135,7 @@ def build_season_performance(season: str) -> dict[str, dict]:
 
     for cat in categories:
         lineup_keys: set[tuple[str, str]] = set()
-        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=str)
+        lu = pd.read_csv(lineups_dir / f"{cat}.csv", dtype=object)
         for row in lu.itertuples(index=False):
             pid, mid = row.player_id, row.match_id
             if not pid or not mid:
@@ -153,14 +153,14 @@ def build_season_performance(season: str) -> dict[str, dict]:
 
         gf = d / "match_goals" / f"{cat}.csv"
         if gf.exists():
-            goals = pd.read_csv(gf, dtype=str)
+            goals = pd.read_csv(gf, dtype=object)
             for row in goals.itertuples(index=False):
                 if (row.match_id, row.player_id) in lineup_keys:
                     perf[row.player_id]["goals"] += 1
 
         cf = d / "match_cards" / f"{cat}.csv"
         if cf.exists():
-            cards = pd.read_csv(cf, dtype=str)
+            cards = pd.read_csv(cf, dtype=object)
             for row in cards.itertuples(index=False):
                 key = (row.match_id, row.player_id)
                 if key not in lineup_keys:
@@ -211,9 +211,9 @@ def compute_result_influence(team_matches: list[dict], played_mids: set[str]) ->
 def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons: list[str],
                               coverage: dict[tuple[str, str], str]) -> dict[str, list[dict]]:
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    players = pd.read_csv(d / "players.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    players = pd.read_csv(d / "players.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
     part = part.join(comp_meta, on="competition_id")
 
@@ -291,31 +291,17 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
     return shards
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season per-category data used to
+    # be built here too (looping every fichajugador-covered season, plus a
+    # cross-season career-profiles pass just to feed it), but confirmed
+    # content-identical to all_players_v2.py's Parquet-sourced copy (once
+    # its player-name lookup was fixed to be season-accurate), so this page
+    # fetches that single shared copy (v2/data/...) instead of building a
+    # second one - see loadShard() below.
     all_seasons = player_career.list_fichajugador_seasons()
-    build_seasons = seasons or all_seasons
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "all_players.html").write_text(build_html(all_seasons), encoding="utf-8")
-
-    print(f"Computing career profiles across {len(all_seasons)} season(s)...")
-    profiles = build_career_profiles(all_seasons)
-    coverage = player_career.load_fichajugador_coverage()
-    print(f"  {len(profiles)} distinct players")
-
-    for season in build_seasons:
-        if not (BASE / season / "player_competition_participation.csv").exists():
-            print(f"Skipping all-players for {season}: no participation data")
-            continue
-        print(f"Building all-players data for season {season}")
-        shards = build_season_all_players(season, profiles, all_seasons, coverage)
-        data_dir = out_dir / "data" / f"all_players_{season}"
-        data_dir.mkdir(parents=True, exist_ok=True)
-        for cat, records in shards.items():
-            (data_dir / f"{cat}.json").write_text(
-                json.dumps(records, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
-                encoding="utf-8")
-        total = sum(len(r) for r in shards.values())
-        print(f"  {total} players across {len(shards)} categories written to {data_dir}")
 
 
 I18N_ES = {
@@ -624,7 +610,8 @@ function firstYear(fs) {
 async function fetchCategoryShard(season, cat) {
   const key = `${season}/${cat}`;
   if (!(key in SHARD_CACHE)) {
-    SHARD_CACHE[key] = fetch(`data/all_players_${season}/${cat}.json`)
+    // v2/data/... - see build_all()'s docstring note for why.
+    SHARD_CACHE[key] = fetch(`v2/data/all_players_${season}/${cat}.json`)
       .then(res => res.ok ? res.json() : [])
       .catch(() => []);
   }
@@ -832,13 +819,11 @@ def build_html(seasons: list[str]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM all-players browser")
-    parser.add_argument("--season", default=None, help="build only this season's data (default: every fichajugador-covered season)")
+    parser = argparse.ArgumentParser(description="RFFM all-players browser page (data comes from all_players_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
 if __name__ == "__main__":

@@ -92,7 +92,7 @@ def clean(v):
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -114,9 +114,9 @@ def compact_matches(season: str) -> list[dict]:
     game type this project tracks — compact fields for client-side filtering
     and recomputation (sections 01-06)."""
     d = BASE / season
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
 
     comps["division_level"] = comps["division_level"].fillna("OTHER")
     div_by_comp = comps.set_index("competition_id")["division_level"]
@@ -162,22 +162,22 @@ def compact_enrichment(season: str, category: str) -> dict | None:
     gpath = d / "match_goals" / f"{category}.csv"
     if not gpath.exists():
         return None
-    goals = pd.read_csv(gpath, dtype=str)
+    goals = pd.read_csv(gpath, dtype=object)
     if goals.empty:
         return None
 
     cpath = d / "match_cards" / f"{category}.csv"
-    cards = pd.read_csv(cpath, dtype=str) if cpath.exists() else pd.DataFrame(
+    cards = pd.read_csv(cpath, dtype=object) if cpath.exists() else pd.DataFrame(
         columns=["match_id", "team_id", "player_id", "minute", "card_type_label"])
     opath = d / "match_officials" / f"{category}.csv"
-    officials = pd.read_csv(opath, dtype=str) if opath.exists() else pd.DataFrame(
+    officials = pd.read_csv(opath, dtype=object) if opath.exists() else pd.DataFrame(
         columns=["match_id", "official_kind", "official_id", "official_name"])
     lpath = d / "match_lineups" / f"{category}.csv"
-    lineups = pd.read_csv(lpath, dtype=str) if lpath.exists() else pd.DataFrame(
+    lineups = pd.read_csv(lpath, dtype=object) if lpath.exists() else pd.DataFrame(
         columns=["match_id", "team_id", "player_id", "is_goalkeeper"])
     ppath = d / "players.csv"
     if ppath.exists():
-        players = pd.read_csv(ppath, dtype=str)
+        players = pd.read_csv(ppath, dtype=object)
         name_map = dict(zip(players["player_id"], players["player_name"]))
     else:
         name_map = {}

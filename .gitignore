@@ -56,7 +56,15 @@ wheels/
 # IDE
 .vscode/
 .idea/
-.claude/
+# .claude/ is mostly personal/local IDE state, but settings.json and
+# hooks/ are the repo's own SessionStart hook config (regenerates the
+# gitignored players.parquet on session start - see .claude/hooks/
+# session-start.sh) and need to be git-tracked for future sessions to
+# pick them up, per Claude Code's session-start-hook convention.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/hooks/**
 *.swp
 *.swo
 *~

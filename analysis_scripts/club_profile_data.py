@@ -35,7 +35,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from club_division_map import DIV_CODE, GT_CODE
+from club_division_map import DIV_CODE, GT_CODE, abs_crest_url
 from site_theme import club_slug_map
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -43,7 +43,7 @@ MANIFEST = BASE / "coverage_manifest.csv"
 
 
 def list_seasons() -> list[str]:
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     ok = m[(m["stage"] == "fichajugador") & (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(ok["season"].unique().tolist())
 
@@ -84,8 +84,8 @@ def load_season_rows(season: str) -> pd.DataFrame:
     """One row per player x competition-registration for `season`, tagged
     with category/division/game type from competitions.csv."""
     d = BASE / season
-    part = pd.read_csv(d / "player_competition_participation.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
+    part = pd.read_csv(d / "player_competition_participation.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level", "game_type"]]
     part = part.join(comp_meta, on="competition_id")
     part["season"] = season
@@ -198,6 +198,28 @@ def club_payload(career: pd.DataFrame, clubs: dict[str, dict], target_key: str) 
     }
 
 
+def build_crest_lookup(seasons: list[str]) -> dict[str, str]:
+    """club_key -> absolute crest URL, from each season's opt-in clubs.csv
+    enrichment. Keyed by club_key(club_name_raw) — the same cosmetic-only
+    fold used everywhere else in this module — first season that resolves a
+    given club wins, since a crest doesn't change season to season. A club
+    clubs.csv never crawled successfully just has no entry here, same as
+    every other opt-in field on this page."""
+    lookup: dict[str, str] = {}
+    for season in seasons:
+        p = BASE / season / "clubs.csv"
+        if not p.exists():
+            continue
+        clubs = pd.read_csv(p, dtype=object, usecols=["club_name_raw", "crest_url"])
+        for r in clubs.itertuples(index=False):
+            name = clean(r.club_name_raw)
+            crest = abs_crest_url(clean(r.crest_url))
+            if not name or not crest:
+                continue
+            lookup.setdefault(club_key(name), crest)
+    return lookup
+
+
 def build_players_lookup(seasons: list[str]) -> dict[str, tuple[str, str | None]]:
     """player_id -> (name, birth_year), built ONCE from every season's
     players.csv and reused across every club's payload — attach_player_names()
@@ -209,7 +231,7 @@ def build_players_lookup(seasons: list[str]) -> dict[str, tuple[str, str | None]
         p = BASE / season / "players.csv"
         if not p.exists():
             continue
-        players = pd.read_csv(p, dtype=str, usecols=["player_id", "player_name", "birth_year"])
+        players = pd.read_csv(p, dtype=object, usecols=["player_id", "player_name", "birth_year"])
         for r in players.itertuples(index=False):
             if r.player_id in lookup:
                 continue

@@ -164,6 +164,7 @@ tbody td{ border-bottom:1px solid var(--line); padding:0.42rem 0.65rem; vertical
 tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:var(--accent-soft);}
 td.name-cell{font-weight:600; color:var(--ink);}
+.club-crest-ic{width:16px; height:16px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:0.35rem;}
 .profile-link{font-size:0.78rem; margin-left:0.4rem;}
 .tier-chip{ display:inline-block; font-size:0.7rem; font-weight:700; padding:0.08rem 0.45rem; border-radius:999px;
   background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
@@ -312,7 +313,9 @@ function divTier(d) { const t = TIER_OF[d]; return (t === null || t === undefine
 
 function loadSeason(season) {
   if (!SEASON_CACHE[season]) {
-    SEASON_CACHE[season] = fetch(`data/all_teams_${season}.json`)
+    // v2/data/... - all_teams.py (v1) no longer builds its own copy of
+    // this (see build_site.py); all_teams_v2's copy is the only one.
+    SEASON_CACHE[season] = fetch(`v2/data/all_teams_${season}.json`)
       .then(res => res.ok ? res.json() : { rows: [], clubs: {} })
       .catch(() => ({ rows: [], clubs: {} }));
   }
@@ -380,6 +383,7 @@ function aggregateClubs(rows, clubMeta) {
       st: stVals.length ? stVals.reduce((a, b) => a + b, 0) / stVals.length : null,
       yc: teamStats.reduce((a, t) => a + t.yc, 0), rc: teamStats.reduce((a, t) => a + t.rc, 0), dyc: teamStats.reduce((a, t) => a + t.dyc, 0),
       loc: meta.loc || null,
+      crest: meta.crest || null,
     };
   });
 }
@@ -398,9 +402,10 @@ function rowHtml(c) {
   const gdpg = c.pl ? c.gd / c.pl : null;
   const sqDisplay = c.sq === null ? '—' : c.sq.toFixed(1);
   const stDisplay = c.st === null ? '—' : `${Math.round(c.st * 100)}%`;
+  const crestHtml = c.crest ? `<img class="club-crest-ic" src="${c.crest}" alt="" onerror="this.remove()">` : '';
   return `<tr>
     <td class="name-cell" data-col="club" data-v="${esc(c.club)}">
-      <a href="${allTeamsUrl(c)}">${esc(c.club)}</a>
+      ${crestHtml}<a href="${allTeamsUrl(c)}">${esc(c.club)}</a>
       <a class="profile-link" href="${clubProfileUrl(c)}" title="Профиль клуба">&rarr;</a>
     </td>
     <td data-col="cats" data-v="${c.cats}">${c.cats}</td>

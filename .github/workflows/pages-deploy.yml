@@ -43,8 +43,57 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Rebuild players.parquet
+        # output/processed/rffm_parquet/players.parquet is deliberately
+        # gitignored (see .gitignore / build_parquet.py docstring) - every
+        # other table under rffm_parquet/ is committed by parquet-build.yml
+        # and present on checkout, but this one is regenerated from the
+        # git-tracked players_current.csv. build_site.py's v2/* pages (e.g.
+        # weird_scores_report_v2.py) read it via rffm_data.py and fail with
+        # FileNotFoundError on a fresh checkout without this step. Fast:
+        # --players-only skips the full per-season CSV scan.
+        run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --players-only
+
+      - name: Rebuild open (season, stage) Parquet tables
+        # parquet-build.yml only ever commits Parquet for a CLOSED
+        # (season, stage) - see that workflow's comments and
+        # analysis_scripts/parquet_closure.py's module docstring. Every
+        # still-open one (e.g. this season's core data while it's being
+        # crawled, or an older season's acta_partido/fichajugador that
+        # hasn't finished every category yet) is missing from a fresh
+        # checkout entirely and needs regenerating here too, or
+        # build_site.py's v2/* pages hit the same FileNotFoundError this
+        # workflow already got bitten by once for players.parquet.
+        # --open-only skips every already-closed season (already correct
+        # on disk via git checkout) so this stays fast (~2 min measured)
+        # instead of the ~9 min a full rebuild takes.
+        run: python analysis_scripts/build_parquet.py --output-dir output/processed/rffm_parquet --open-only
+
+      - name: Log disk/memory before build
+        # Diagnostic only - the previous run (#54) was killed by an
+        # external "runner has received a shutdown signal" mid-build
+        # rather than a clean Python error, which is the GitHub Actions
+        # hosted-runner symptom of the VM itself running out of disk or
+        # memory. Nothing here explains WHICH one from the job log alone,
+        # so log both before the heaviest step to have a real number to
+        # compare against once this run also gets killed (or doesn't).
+        run: df -h / && echo --- && free -h
+
       - name: Build site
-        run: python analysis_scripts/build_site.py --output-dir site
+        run: |
+          # Same diagnostic as above, but sampled every 60s DURING the
+          # build and interleaved into this step's own live log - a
+          # separate post-hoc step (even "if: always()") wouldn't run if
+          # the runner gets torn down externally again like run #54, but
+          # this step's streamed stdout survives up to the moment of the
+          # kill either way.
+          (while true; do echo "=== $(date -u +%H:%M:%S) ==="; df -h /; free -h; sleep 60; done) &
+          MONITOR_PID=$!
+          python analysis_scripts/build_site.py --output-dir site
+          kill "$MONITOR_PID" 2>/dev/null || true
+
+      - name: Log disk/memory after build
+        run: df -h / && echo --- && free -h && du -sh site
 
       - name: Build Parquet tables
         run: python analysis_scripts/build_parquet.py --output-dir site/data/parquet

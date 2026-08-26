@@ -7,9 +7,13 @@ pd.read_csv(). build_career_profiles() uses read_table("players_by_season",
 season=...) - not the deduped table - since its "first non-empty birth_year
 across seasons" logic is season-order-sensitive, same pattern as
 player_career.py (imported here as player_career_v2). build_season_all_players()
-uses the global read_table("players") since it's a plain per-season name/
-birth_year lookup, order-independent. Imports build_club_team_cards/norm_id
-from team_cards_v2, not team_cards.
+also uses read_table("players_by_season", season=...), not the deduped
+table - confirmed on real data that a player's recorded name spelling can
+genuinely change between seasons (RFFM's own site started serving some
+players' names without diacritics from 2024-2025 onward), so the deduped
+table's "latest name wins" pick would show an old season's page under a
+spelling that didn't exist yet that season. Imports build_club_team_cards/
+norm_id from team_cards_v2, not team_cards.
 
 All-players browser: every player this project has fichajugador data for,
 one row each, with every per-player metric this project already computes
@@ -135,7 +139,7 @@ def build_season_performance(season: str) -> dict[str, dict]:
     serialized itself, but what build_season_all_players() needs to split
     a team's results into "matches with this player" vs "without" for the
     result-influence columns below."""
-    categories = data.list_categories("match_lineups", season) if (BASE / season / "match_lineups").exists() else []
+    categories = data.list_categories("match_lineups", season)
     perf: dict[str, dict] = {}
 
     def entry(pid: str) -> dict:
@@ -218,7 +222,7 @@ def compute_result_influence(team_matches: list[dict], played_mids: set[str]) ->
 def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons: list[str],
                               coverage: dict[tuple[str, str], str]) -> dict[str, list[dict]]:
     part = data.read_table("player_competition_participation", season=season)
-    players = data.read_table("players")
+    players = data.read_table("players_by_season", season=season)
     comps = data.read_table("competitions", season=season)
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
     part = part.join(comp_meta, on="competition_id")
@@ -309,7 +313,7 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     print(f"  {len(profiles)} distinct players")
 
     for season in build_seasons:
-        if not (BASE / season / "player_competition_participation.csv").exists():
+        if season not in data.list_seasons("player_competition_participation"):
             print(f"Skipping all-players for {season}: no participation data")
             continue
         print(f"Building all-players data for season {season}")
@@ -477,7 +481,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <nav class="nav-row">
-      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="../all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
       <a href="all_teams.html" data-i18n="nav_teams">Все команды</a>
       <a class="is-here" data-i18n="nav_players">Все игроки</a>
     </nav>

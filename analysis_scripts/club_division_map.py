@@ -104,7 +104,7 @@ def gt_code(gt: str) -> str:
 
 def list_seasons() -> list[str]:
     """Every season whose core crawl is complete, per coverage_manifest.csv."""
-    m = pd.read_csv(MANIFEST, dtype=str)
+    m = pd.read_csv(MANIFEST, dtype=object)
     core = m[(m["stage"] == "core") & (m["category_base"] == "ALL") &
              (m["status"].isin(["complete", "complete_with_failures"]))]
     return sorted(core["season"].unique().tolist())
@@ -125,11 +125,16 @@ def norm_id(v):
 
 
 def abs_crest_url(path):
+    """Crest/escudo images are served from appweb.rffm.es, NOT www.rffm.es —
+    the www host returns HTTP 200 with an HTML placeholder page for these
+    paths (no error, so a wrong host here fails silently: the <img> just
+    never renders, further hidden by the onerror handlers on crest <img>
+    tags). Verified directly against a real crest_url from clubs.csv."""
     if not isinstance(path, str) or not path.strip():
         return None
     if path.startswith("http"):
         return path
-    return "https://www.rffm.es" + path
+    return "https://appweb.rffm.es" + path
 
 
 def clean(v):
@@ -143,13 +148,13 @@ def clean(v):
 
 def load_data(season: str) -> dict:
     d = BASE / season
-    teams = pd.read_csv(d / "teams.csv", dtype=str)
-    comps = pd.read_csv(d / "competitions.csv", dtype=str)
-    standings = pd.read_csv(d / "standings.csv", dtype=str)
-    matches = pd.read_csv(d / "matches.csv", dtype=str)
-    venues = pd.read_csv(d / "venues.csv", dtype=str)
+    teams = pd.read_csv(d / "teams.csv", dtype=object)
+    comps = pd.read_csv(d / "competitions.csv", dtype=object)
+    standings = pd.read_csv(d / "standings.csv", dtype=object)
+    matches = pd.read_csv(d / "matches.csv", dtype=object)
+    venues = pd.read_csv(d / "venues.csv", dtype=object)
     clubs_path = d / "clubs.csv"
-    clubs_df = pd.read_csv(clubs_path, dtype=str) if clubs_path.exists() else None
+    clubs_df = pd.read_csv(clubs_path, dtype=object) if clubs_path.exists() else None
 
     comps["category_base"] = comps["category_base"].fillna("OTHER")
     comps["division_level"] = comps["division_level"].fillna("OTHER")
@@ -1149,7 +1154,8 @@ document.addEventListener('keydown', e => {
 
 async function loadSeason(season) {
   document.getElementById('tbody').innerHTML = `<tr><td class="empty-state">${LANG[CURLANG].loading}</td></tr>`;
-  const res = await fetch('data/club_map_' + season + '.json');
+  // v2/data/... - see build_all()'s docstring note for why.
+  const res = await fetch('v2/data/club_map_' + season + '.json');
   DATA = await res.json();
   COLUMNS = DATA.columns;
   CLUBS = DATA.clubs;
@@ -1310,27 +1316,21 @@ def build_html(seasons: list[str]) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RFFM club x division matrix report")
-    parser.add_argument("--season", default=None, help="build only this season's data file (default: every season with a complete core crawl)")
+    parser = argparse.ArgumentParser(description="RFFM club x division matrix report page (data comes from club_division_map_v2.py - see build_all())")
     parser.add_argument("--output-dir", default="reports")
     args = parser.parse_args()
 
-    seasons = [args.season] if args.season else None
-    build_all(Path(__file__).parent.parent / args.output_dir, seasons)
+    build_all(Path(__file__).parent.parent / args.output_dir)
 
 
-def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
-    seasons = seasons or list_seasons()
-    data_dir = out_dir / "data"
-    data_dir.mkdir(parents=True, exist_ok=True)
-
-    for season in seasons:
-        print(f"Building club/division map data for season {season}")
-        data = load_data(season)
-        print(f"  {len(data['clubs'])} clubs, {len(data['columns'])} columns")
-        (data_dir / f"club_map_{season}.json").write_text(
-            json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
-
+def build_all(out_dir: Path) -> None:
+    # Only the HTML/JS/CSS shell - the per-season matrix data used to be
+    # built here too, but confirmed content-identical to
+    # club_division_map_v2.py's Parquet-sourced copy, so this page fetches
+    # that single shared copy (v2/data/...) instead of building a second
+    # one - see loadSeason()'s fetch() call above.
+    seasons = list_seasons()
+    out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "club_division_map.html").write_text(build_html(seasons), encoding="utf-8")
     print(f"Report written to {out_dir / 'club_division_map.html'}")
 
