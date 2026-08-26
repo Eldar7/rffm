@@ -555,9 +555,12 @@ def main():
 
         log_open = [s for s in all_seasons if s not in pc.log_family_closed_seasons(manifest)]
         write_partitioned_open("crawl_log", build_family_log_table(
-            CRAWL_LOG_FAMILIES, log_open, CROSS_SEASON_CRAWL_LOG_FAMILY), len(log_open))
+            CRAWL_LOG_FAMILIES, log_open,
+            [CROSS_SEASON_CRAWL_LOG_FAMILY, CROSS_SEASON_TEAM_CLUBS_CRAWL_LOG_FAMILY]
+        ), len(log_open))
         write_partitioned_open("data_quality_report", build_family_log_table(
-            DATA_QUALITY_REPORT_FAMILIES, log_open, CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY), len(log_open))
+            DATA_QUALITY_REPORT_FAMILIES, log_open, [CROSS_SEASON_DATA_QUALITY_REPORT_FAMILY]
+        ), len(log_open))
 
         print(f"\nOpen-only total: {total_parquet_bytes / 1e6:.0f} MB Parquet written "
               f"(not committed by parquet-build.yml - see that workflow)")
