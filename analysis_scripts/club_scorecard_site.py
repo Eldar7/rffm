@@ -133,14 +133,18 @@ main{ padding-top:32px; }
 .toggle input{ accent-color:var(--accent); }
 .result-count{ font-size:12px; color:var(--ink-faint); margin-left:auto; font-family:'JetBrains Mono',monospace; }
 
-.table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--surface); }
+.table-scroll{ overflow:auto; max-height:72vh; border:1px solid var(--line); border-radius:8px; background:var(--surface); }
 table{ width:100%; border-collapse:collapse; min-width:900px; }
-thead th{ position:sticky; top:53px; z-index:5; background:var(--surface-2); text-align:left;
+thead th{ position:sticky; top:0; z-index:5; background:var(--surface-2); text-align:left;
   font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.05em;
   color:var(--ink-faint); padding:9px 11px; border-bottom:1px solid var(--line); white-space:nowrap; cursor:pointer; user-select:none; }
 thead th:hover{ color:var(--ink); }
 thead th.num{ text-align:right; }
 thead th .arrow{ opacity:0; margin-left:3px; }
+thead th .help{ display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px;
+  margin-left:5px; border-radius:50%; border:1px solid var(--line-strong); color:var(--ink-faint);
+  font-family:'PT Sans',sans-serif; font-size:9.5px; font-weight:700; text-transform:none; cursor:help; }
+thead th .help:hover{ color:var(--accent-strong); border-color:var(--accent-strong); }
 thead th.sorted .arrow{ opacity:1; color:var(--accent); }
 tbody td{ padding:8px 11px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:middle; }
 tbody td.num{ text-align:right; }
@@ -243,14 +247,14 @@ a.back{ font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--acc
       <table>
         <thead>
           <tr>
-            <th data-key="n" data-i18n="col_club">Клуб<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="teams" data-i18n="col_teams">Команд сейчас<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="alumni" data-i18n="col_alumni">Alumni (n)<span class="arrow">&#9662;</span></th>
-            <th data-key="ctier" data-i18n="col_ceiling">Потолок<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="eliteAnyPct" data-i18n="col_elite">% дошёл до элиты<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="homegrownPct" data-i18n="col_home">% элиты — своя школа<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="cont" data-i18n="col_cont">Стабильность<span class="arrow">&#9662;</span></th>
-            <th class="num" data-key="net" data-i18n="col_net">Баланс трансферов<span class="arrow">&#9662;</span></th>
+            <th data-key="n" data-i18n="col_club">Клуб<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="teams" data-i18n="col_teams">Команд сейчас<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="alumni" data-i18n="col_alumni">Alumni (n)<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th data-key="ctier" data-i18n="col_ceiling">Потолок<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="eliteAnyPct" data-i18n="col_elite">% дошёл до элиты<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="homegrownPct" data-i18n="col_home">% элиты — своя школа<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="cont" data-i18n="col_cont">Стабильность<span class="help">?</span><span class="arrow">&#9662;</span></th>
+            <th class="num" data-key="net" data-i18n="col_net">Баланс трансферов<span class="help">?</span><span class="arrow">&#9662;</span></th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -358,6 +362,37 @@ let LANG = "ru";
 function T(){ return STRINGS[LANG]; }
 function CAT(){ return LANG === "ru" ? CAT_RU : CAT_ES; }
 function TIER(){ return LANG === "ru" ? TIER_RU : TIER_ES; }
+
+const COL_HELP = {
+  ru: {
+    n: "Клик по строке — раскрыть детали клуба: динамика по сезонам, переходы, разбивка по возрастам.",
+    teams: "Сколько команд клуба играет в текущем сезоне (2025/26).",
+    alumni: "Все игроки, хоть раз попавшие в протокол матча за этот клуб — за всю историю данных (2016–2026).",
+    ctier: "Самый высокий дивизион, которого клуб когда-либо достигал — любая команда, любой сезон, не обязательно сейчас.",
+    eliteAnyPct: "Доля alumni, кто хоть раз играл в топ-2 дивизиона (элита) — в этом клубе или уже в другом после ухода.",
+    homegrownPct: "Из тех, кто дошёл до элиты: доля, чьё первое появление в данных — именно в этом клубе, в возрасте Дебютанте/Пребенхамин.",
+    cont: "Доля сезонов между первым и последним появлением клуба в данных, когда у него была хотя бы одна команда — насколько непрерывно он существовал.",
+    net: "Игроков пришло минус ушло между сезонами, по всей истории. Плюс — клуб чаще принимает, чем отдаёт.",
+  },
+  es: {
+    n: "Clic en la fila — detalle del club: evolución por temporada, fichajes, desglose por categorías.",
+    teams: "Cuántos equipos del club juegan en la temporada actual (2025/26).",
+    alumni: "Todos los jugadores que aparecieron alguna vez en un acta del club, en toda la historia de datos (2016–2026).",
+    ctier: "La división más alta que el club alcanzó alguna vez — cualquier equipo, cualquier temporada, no necesariamente ahora.",
+    eliteAnyPct: "Porcentaje de alumni que jugó alguna vez en el top-2 de divisiones (élite) — en este club o ya en otro tras salir.",
+    homegrownPct: "De los que llegaron a la élite: porcentaje cuya primera aparición registrada fue en este club, en edad Debutante/Prebenjamín.",
+    cont: "Porcentaje de temporadas, entre la primera y la última aparición del club en los datos, en las que tuvo al menos un equipo — continuidad.",
+    net: "Jugadores que llegaron menos los que se fueron, entre temporadas, en toda la historia. Positivo = el club recibe más de lo que cede.",
+  },
+};
+function applyColHelp(){
+  document.querySelectorAll("thead th[data-key]").forEach(th=>{
+    const help = COL_HELP[LANG][th.dataset.key];
+    if(!help) return;
+    const span = th.querySelector(".help");
+    if(span) span.title = help;
+  });
+}
 function fmtPct(v){ return (v===null||v===undefined) ? "—" : v.toFixed(1)+"%"; }
 function fmtN(v){ return (v===null||v===undefined) ? "—" : v.toLocaleString(LANG==="ru"?"ru-RU":"es-ES"); }
 
@@ -527,7 +562,8 @@ function sparkline(rows){
 function renderAll(){ renderStats(); renderHighlights(); renderTable(); }
 
 document.querySelectorAll("thead th[data-key]").forEach(th=>{
-  th.addEventListener("click", ()=>{
+  th.addEventListener("click", (e)=>{
+    if(e.target.classList.contains("help")) return;
     const key = th.dataset.key;
     if(sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = -1; }
     renderTable();
@@ -549,10 +585,12 @@ document.querySelectorAll(".lang-opt").forEach(btn=>{
     document.getElementById("search").placeholder = T().searchPh;
     openId = null;
     renderAll();
+    applyColHelp();
   });
 });
 
 renderAll();
+applyColHelp();
 </script>
 %THEME_SWITCH_INLINE%
 </body>
