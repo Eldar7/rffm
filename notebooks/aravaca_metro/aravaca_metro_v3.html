@@ -1040,6 +1040,7 @@ const ZOOM_MIN = 0.25, ZOOM_MAX = 3, ZOOM_STEP = 0.1;
 let zoomLevel = 1;
 const zoomWrap = document.getElementById('zoomWrap');
 const zoomPct = document.getElementById('zoomPct');
+const canvasWrapEl = document.getElementById('canvasWrap');
 function applyZoom() {
   zoomWrap.style.transform = `scale(${zoomLevel})`;
   zoomPct.textContent = Math.round(zoomLevel * 100) + '%';
@@ -1047,21 +1048,43 @@ function applyZoom() {
     d.style.top = (parseFloat(d.dataset.baseTop) * zoomLevel) + 'px';
   });
 }
-function setZoom(z) {
-  zoomLevel = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+// Zoom anchored on a viewport point (clientX/clientY) — compensates
+// canvas-wrap's scroll so that point stays visually still, instead of
+// always scaling away from the top-left corner (transform-origin: 0 0)
+// regardless of where the pinch/click happened.
+function setZoomAt(z, clientX, clientY) {
+  const newZ = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  if (newZ === zoomLevel) return;
+  const wrapRect = canvasWrapEl.getBoundingClientRect();
+  const localX = clientX - wrapRect.left, localY = clientY - wrapRect.top;
+  const ratio = newZ / zoomLevel;
+  const newScrollLeft = (canvasWrapEl.scrollLeft + localX) * ratio - localX;
+  const newScrollTop = (canvasWrapEl.scrollTop + localY) * ratio - localY;
+  zoomLevel = newZ;
   applyZoom();
+  canvasWrapEl.scrollLeft = newScrollLeft;
+  canvasWrapEl.scrollTop = newScrollTop;
+}
+function setZoom(z) {
+  // no specific input point (button click) — anchor on the middle of
+  // whatever's currently visible, not the top-left corner.
+  const wrapRect = canvasWrapEl.getBoundingClientRect();
+  setZoomAt(z, wrapRect.left + wrapRect.width / 2, wrapRect.top + wrapRect.height / 2);
 }
 document.getElementById('zoomIn').addEventListener('click', () => setZoom(zoomLevel + ZOOM_STEP));
 document.getElementById('zoomOut').addEventListener('click', () => setZoom(zoomLevel - ZOOM_STEP));
 zoomPct.addEventListener('click', () => setZoom(1));
 
-// two-finger pinch zoom (touch devices) — one-finger touch keeps doing the
-// browser's native pan/scroll on canvas-wrap untouched; only a 2-touch
-// gesture is intercepted and preventDefault'd, so it never fights the pan.
-const canvasWrapEl = document.getElementById('canvasWrap');
+// two-finger pinch zoom (touch devices), anchored on the pinch midpoint —
+// one-finger touch keeps doing the browser's native pan/scroll on
+// canvas-wrap untouched; only a 2-touch gesture is intercepted and
+// preventDefault'd, so it never fights the pan.
 let pinchStartDist = null, pinchStartZoom = 1;
 function touchDist(touches) {
   return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+}
+function touchMid(touches) {
+  return {x: (touches[0].clientX + touches[1].clientX) / 2, y: (touches[0].clientY + touches[1].clientY) / 2};
 }
 canvasWrapEl.addEventListener('touchstart', (ev) => {
   if (ev.touches.length === 2) {
@@ -1072,7 +1095,8 @@ canvasWrapEl.addEventListener('touchstart', (ev) => {
 canvasWrapEl.addEventListener('touchmove', (ev) => {
   if (ev.touches.length === 2 && pinchStartDist) {
     ev.preventDefault();
-    setZoom(pinchStartZoom * (touchDist(ev.touches) / pinchStartDist));
+    const mid = touchMid(ev.touches);
+    setZoomAt(pinchStartZoom * (touchDist(ev.touches) / pinchStartDist), mid.x, mid.y);
   }
 }, {passive: false});
 canvasWrapEl.addEventListener('touchend', (ev) => {

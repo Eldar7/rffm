@@ -149,8 +149,24 @@ has nothing to show right now.
   disables the browser's own page-level pinch-zoom, so a tablet user had no
   way to zoom in fullscreen. Fixed with `touchstart`/`touchmove`/`touchend`
   listeners on `#canvasWrap` that track two-touch distance and feed the
-  ratio into `setZoom()`; `touchmove` only calls `preventDefault()` when
+  ratio into zoom; `touchmove` only calls `preventDefault()` when
   `ev.touches.length === 2`, so one-finger touchmove events fall through
   untouched and native pan keeps working (verified with synthetic
   `TouchEvent`s in Playwright: 2-touch move is cancelled and drives zoom,
   1-touch move is not cancelled and leaves zoom alone).
+- **Zoom anchoring.** First cut of pinch always scaled from `transform-origin:
+  0 0` (top-left), so pinching over any other part of the diagram visibly
+  yanked it toward the corner instead of zooming into the pinched spot —
+  same root cause would've hit a future scroll-wheel zoom too, since neither
+  is a property of the input device, it's `setZoom()` never taking a point.
+  Replaced with `setZoomAt(z, clientX, clientY)`: reads `#canvasWrap`'s
+  current `scrollLeft`/`scrollTop`, and after changing `zoomLevel` solves for
+  the new scroll offset that keeps the content under `(clientX, clientY)`
+  pinned to that same viewport position (`newScroll = (oldScroll + local) *
+  (newZoom/oldZoom) - local`). Pinch anchors on the two-touch midpoint,
+  recomputed every `touchmove` so a pinch that drifts sideways tracks
+  correctly; the `−`/`+`/`%` buttons (no input point to anchor on) anchor on
+  the center of whatever's currently visible in `#canvasWrap`, instead of
+  jumping to the corner. Verified by computing the expected post-zoom scroll
+  offset from the same formula and diffing against the actual one after a
+  synthetic pinch (sub-pixel match).
