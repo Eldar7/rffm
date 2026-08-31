@@ -1055,6 +1055,30 @@ document.getElementById('zoomIn').addEventListener('click', () => setZoom(zoomLe
 document.getElementById('zoomOut').addEventListener('click', () => setZoom(zoomLevel - ZOOM_STEP));
 zoomPct.addEventListener('click', () => setZoom(1));
 
+// two-finger pinch zoom (touch devices) — one-finger touch keeps doing the
+// browser's native pan/scroll on canvas-wrap untouched; only a 2-touch
+// gesture is intercepted and preventDefault'd, so it never fights the pan.
+const canvasWrapEl = document.getElementById('canvasWrap');
+let pinchStartDist = null, pinchStartZoom = 1;
+function touchDist(touches) {
+  return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+}
+canvasWrapEl.addEventListener('touchstart', (ev) => {
+  if (ev.touches.length === 2) {
+    pinchStartDist = touchDist(ev.touches);
+    pinchStartZoom = zoomLevel;
+  }
+}, {passive: true});
+canvasWrapEl.addEventListener('touchmove', (ev) => {
+  if (ev.touches.length === 2 && pinchStartDist) {
+    ev.preventDefault();
+    setZoom(pinchStartZoom * (touchDist(ev.touches) / pinchStartDist));
+  }
+}, {passive: false});
+canvasWrapEl.addEventListener('touchend', (ev) => {
+  if (ev.touches.length < 2) pinchStartDist = null;
+});
+
 render();
 
 // ---------------- fullscreen toggle ----------------

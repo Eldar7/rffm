@@ -143,3 +143,14 @@ has nothing to show right now.
   `dataset.baseTop`, and `applyZoom()` recomputes `style.top = baseTop *
   zoomLevel` on every zoom change (and once at the end of every `render()`,
   so a pivot switch mid-zoom keeps both the zoom level and label alignment).
+  On a tablet, one-finger pan across the canvas worked from day one (it's
+  just `canvas-wrap`'s native `overflow: auto` scroll) but two-finger pinch
+  did nothing — there was no pinch handling at all, and fullscreen mode
+  disables the browser's own page-level pinch-zoom, so a tablet user had no
+  way to zoom in fullscreen. Fixed with `touchstart`/`touchmove`/`touchend`
+  listeners on `#canvasWrap` that track two-touch distance and feed the
+  ratio into `setZoom()`; `touchmove` only calls `preventDefault()` when
+  `ev.touches.length === 2`, so one-finger touchmove events fall through
+  untouched and native pan keeps working (verified with synthetic
+  `TouchEvent`s in Playwright: 2-touch move is cancelled and drives zoom,
+  1-touch move is not cancelled and leaves zoom alone).
