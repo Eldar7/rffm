@@ -141,6 +141,24 @@
 
   body.fauxfs { position: fixed; inset: 0; z-index: 2147483647; }
 
+  /* legend collapses in fullscreen by default (frees vertical space for the
+     canvas) behind a toggle that only appears while fullscreen is active */
+  .legend-toggle-btn {
+    display: none;
+    margin-left: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+  }
+  .legend-toggle-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  body.is-fullscreen .legend-toggle-btn { display: inline-block; }
+  body.is-fullscreen.legend-collapsed .legend { display: none; }
+
   /* ---------------- pivot selector ---------------- */
   .pivot-bar {
     flex: 0 0 auto;
@@ -383,6 +401,7 @@
   <span class="lbl">Punto de partida</span>
   <div class="pivot-btns" id="pivotBtns"></div>
   <span class="pivot-hint" id="pivotHint"></span>
+  <button class="legend-toggle-btn" id="legendToggleBtn">Mostrar leyenda</button>
 </div>
 
 <div class="legend">
@@ -1039,12 +1058,23 @@ zoomPct.addEventListener('click', () => setZoom(1));
 render();
 
 // ---------------- fullscreen toggle ----------------
+// Fullscreen keeps the header/pivot-bar/side-panel visible, but the legend
+// (5 groups, wraps to multiple rows) collapses by default to give the
+// canvas more room, behind a toggle that only shows up while fullscreen is
+// active. `is-fullscreen` tracks the mode itself; `legend-collapsed` is the
+// independent, user-toggleable state within it — reset (collapsed) on every
+// fresh entry, left alone on entry/exit-fullscreen no-ops.
 const fsBtn = document.getElementById('fsBtn');
+const legendToggleBtn = document.getElementById('legendToggleBtn');
 function isFullscreenActive() { return !!document.fullscreenElement || document.body.classList.contains('fauxfs'); }
-function updateFsBtn() {
+function syncFullscreenState() {
   const on = isFullscreenActive();
+  const wasOn = document.body.classList.contains('is-fullscreen');
+  if (on && !wasOn) document.body.classList.add('is-fullscreen', 'legend-collapsed');
+  else if (!on) document.body.classList.remove('is-fullscreen', 'legend-collapsed');
   fsBtn.textContent = on ? '⤦ Salir de pantalla completa' : '⛶ Pantalla completa';
   fsBtn.setAttribute('aria-pressed', String(on));
+  legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
 }
 fsBtn.addEventListener('click', async () => {
   if (isFullscreenActive()) {
@@ -1059,7 +1089,11 @@ fsBtn.addEventListener('click', async () => {
     }
     if (!ok) document.body.classList.add('fauxfs');
   }
-  updateFsBtn();
+  syncFullscreenState();
 });
-document.addEventListener('fullscreenchange', updateFsBtn);
+legendToggleBtn.addEventListener('click', () => {
+  document.body.classList.toggle('legend-collapsed');
+  legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
+});
+document.addEventListener('fullscreenchange', syncFullscreenState);
 </script>

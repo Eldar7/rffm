@@ -116,9 +116,18 @@ has nothing to show right now.
 - **Fullscreen + zoom (built).** `#fsBtn` in the header calls
   `document.documentElement.requestFullscreen()`, falling back to a CSS-only
   `body.fauxfs { position: fixed; inset: 0; z-index: max }` maximize if the
-  real Fullscreen API throws (e.g. a host that blocks it) — nothing else is
-  hidden in either mode, per an explicit ask to keep header/pivot-bar/legend/
-  side-panel all visible. Zoom is `−`/`%`/`+` buttons (10% steps, 25%–300%,
+  real Fullscreen API throws (e.g. a host that blocks it) — confirmed
+  working as real OS-level fullscreen on the published claude.ai artifact,
+  so the fauxfs path is a fallback only, never the common case there.
+  First cut kept the legend visible in fullscreen per an explicit initial
+  ask, but the legend (5 groups, wraps to multiple rows) ate too much of
+  the newly-gained vertical space — revised to collapse it by default on
+  entering fullscreen behind a `#legendToggleBtn` ("Mostrar/Ocultar
+  leyenda") that only appears while `body.is-fullscreen` is set; header and
+  pivot-bar stay put either way. `legend-collapsed` is reset (re-collapsed)
+  on every fresh fullscreen entry but left alone across re-renders (pivot
+  switches) within the same fullscreen session. Zoom is `−`/`%`/`+` buttons
+  (10% steps, 25%–300%,
   click `%` to reset to 100%) that set `transform: scale()` on `#zoomWrap`
   (wraps only the `<svg>`). This was **not** a coordinate-math problem in the
   end: `resolveHit()`'s `mousemove`/`click` handlers key off `ev.target` +
