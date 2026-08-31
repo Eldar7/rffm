@@ -36,18 +36,19 @@ stable identity — a real case in this data, club_id 1011: teams.csv shows
 "ARAVACA C.F." in 2021-2022, "ARAVACA C.F. - Bhhs Spain" in 2022-2024, then
 "ARAVACA C.F. - CEIBA" in 2024-2026, all the same real club. Grouping by
 that raw string (an earlier version of this file did exactly that) splits
-one club's history across one file per era. build_season_club_id_map()
-resolves the real, stable RFFM club_id via clubs.csv's
-representative_team_id — NOT by joining clubs.csv's own club_name_raw
-column, which stays fixed to the club's official name and never shows the
-sponsor-suffixed variants at all (confirmed: "ARAVACA C.F. - CEIBA" never
-appears as a clubs.csv row, in any season) — the same resolution
-club_division_map_v2.py already relies on for crest/website/address, for
-the identical reason. club_id coverage isn't total (clubs.csv is opt-in,
-resolves roughly half of clubs any given season — PARQUET_CLOSURE.md), so
-a team_id whose club_id never resolves falls back to its own most-recent
-club_name_raw, same as before — a rename can still fragment history for
-those, a known limitation shared with club_profile_data.py's club_key().
+one club's history across one file per era. Resolves the real, stable RFFM
+club_id from `output/processed/rffm/team_club_map.csv` (the `team_clubs`
+crawl stage — TEAM_CLUB_GAP_REASONS.md/DATA_FINDINGS.md — a direct
+team_id -> club_id table, ~84% of team_ids resolved, mostly via each
+club's own /fichaclub roster page, not name matching at all) — a strictly
+better source than an earlier version of this fix, which derived club_id
+per-season via clubs.csv's representative_team_id column and only
+resolved roughly half of clubs. A team_id whose club_id still isn't in
+team_club_map.csv (the unresolved ~16% — see TEAM_CLUB_GAP_REASONS.md for
+why: mostly phantom/placeholder teams, not real gaps) falls back to its
+own most-recent club_name_raw, same as before — a rename can still
+fragment history for those, a known limitation shared with
+club_profile_data.py's club_key().
 
 club_division_map.py's TIER_OF stays the single source of truth for
 division-tier vocabulary — this module imports the constant (not a CSV
@@ -233,33 +234,24 @@ def build_season_club_teams(season: str) -> dict[str, dict[str, dict]]:
     return club_teams
 
 
-def build_season_club_id_map(season: str) -> dict[str, str]:
-    """This season's club_name_raw (as teams.csv shows it THAT season) ->
-    the real RFFM club_id, via clubs.csv's representative_team_id — not a
-    direct club_name_raw string join against clubs.csv, which does not
-    work: clubs.csv's own club_name_raw column is the club's fixed,
-    official name and does NOT track a season's cosmetic sponsor-suffixed
-    display name (confirmed on real data — see build_all()'s docstring
-    note: clubs.csv shows "ARAVACA C.F." for club_id 1011 in every season
-    from 2016-2017 to 2025-2026 even while teams.csv's own name for that
-    same club_id changed twice in that window; the literal strings
-    "ARAVACA C.F. - Bhhs Spain"/"ARAVACA C.F. - CEIBA" never appear in
-    clubs.csv at all). representative_team_id bridges this correctly
-    because it's a real team_id, always present in THAT season's own
-    teams.csv under whatever name that season actually shows — the exact
-    mechanism club_division_map_v2.py already uses for the same reason
-    (its "club identity (crest, website, ...)" section) — see there for
-    the "always resolves with no collisions" confirmation."""
-    teams = data.read_table("teams", season=season)
-    tid_to_club = dict(zip(safe_map(teams["team_id"], norm_id), safe_map(teams["club_name_raw"], clean)))
-    clubs = data.read_table("clubs", season=season)
-    out: dict[str, str] = {}
-    for row in clubs.itertuples(index=False):
-        name = tid_to_club.get(norm_id(row.representative_team_id))
-        cid = clean(row.club_id)
-        if name and cid:
-            out[name] = cid
-    return out
+TEAM_CLUB_MAP_CSV = BASE / "team_club_map.csv"
+
+
+def load_team_club_map() -> dict[str, str]:
+    """team_id -> club_id, straight from the `team_clubs` crawl stage
+    (output/processed/rffm/team_club_map.csv — TEAM_CLUB_GAP_REASONS.md/
+    DATA_FINDINGS.md): a direct table, resolved mostly by matching each
+    team_id against its club's own /fichaclub roster page, not by any
+    club_name_raw join — so it's immune to the sponsor-suffix churn this
+    module's docstring describes, and needs no per-season lookup at all
+    (team_id is already this whole module's stable identity; this table
+    just tells you which real club each one belongs to). ~84% of team_ids
+    resolved as of this writing; the rest fall back to build_all()'s
+    most-recent-club_name_raw grouping (see there)."""
+    if not TEAM_CLUB_MAP_CSV.exists():
+        return {}
+    m = pd.read_csv(TEAM_CLUB_MAP_CSV, dtype=str)
+    return dict(zip(safe_map(m["team_id"], norm_id), safe_map(m["club_id"], clean)))
 
 
 def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
@@ -277,10 +269,11 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     # below only decide which output FILE a team's full history is written
     # under (and findable from) — never used to decide whether two seasons
     # belong to the same team, which team_id already answers on its own.
+    team_to_club_id = load_team_club_map()
+
     merged: dict[str, dict] = {}
     for season in seasons:
         season_teams = build_season_club_teams(season)
-        cid_by_name = build_season_club_id_map(season)
         # Same club_slug_map() call, over the same per-season name universe,
         # that team_cards_v2.py/club_division_map_v2.py themselves use to
         # build a link INTO this data — computed fresh per season (not
@@ -289,18 +282,15 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
         # actually points at, even in a rare same-season base-slug collision.
         slug_of_name = club_slug_map(sorted(season_teams.keys()))
         for club, teams_of_club in season_teams.items():
-            cid = cid_by_name.get(club)
             slug = slug_of_name[club]
             for tid, team_rec in teams_of_club.items():
                 out_rec = merged.setdefault(tid, {
                     "team": team_rec["team"], "suffix": team_rec["suffix"],
-                    "club": club, "club_id": None, "slugs": set(), "stints": [],
+                    "club": club, "club_id": team_to_club_id.get(tid), "slugs": set(), "stints": [],
                 })
                 out_rec["team"] = team_rec["team"]  # keep the most-recent season's display name
                 out_rec["suffix"] = team_rec["suffix"] or out_rec["suffix"]
                 out_rec["club"] = club  # ditto — most-recent season's club name
-                if cid and out_rec["club_id"] is None:
-                    out_rec["club_id"] = cid  # first resolved club_id wins — stable identity, doesn't matter which season found it
                 out_rec["slugs"].add(slug)
                 out_rec["stints"].extend(team_rec["stints"])
         print(f"  {season} done")
@@ -310,15 +300,12 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
             key=lambda s: (s["matches"][0]["date"] or "9999-99-99") if s["matches"] else "9999-99-99")
 
     # Group team_ids into real-club buckets: by club_id (RFFM's own stable
-    # identity) when resolved, else by the team's own most-recent
-    # club_name_raw — the fallback only matters for the clubs.csv stage's
-    # coverage gap (opt-in, "complete_with_failures" forever — see
-    # PARQUET_CLOSURE.md — roughly half of clubs each season, measured);
+    # identity, from team_club_map.csv) when resolved, else by the team's
+    # own most-recent club_name_raw — the fallback only matters for
+    # team_club_map.csv's ~16% unresolved gap (TEAM_CLUB_GAP_REASONS.md —
+    # mostly phantom/placeholder teams, not real clubs missing coverage);
     # a rename can still fragment one of those, a known limitation shared
-    # with club_profile_data.py's club_key(). A resolved club_id, once
-    # found for a team_id in ANY season, is treated as authoritative for
-    # every season of that same team_id, even ones that didn't themselves
-    # resolve one — team_id is already the same real squad throughout.
+    # with club_profile_data.py's club_key().
     buckets: dict[str, dict] = {}
     for tid, rec in merged.items():
         key = f"cid:{rec['club_id']}" if rec["club_id"] else f"name:{rec['club']}"
