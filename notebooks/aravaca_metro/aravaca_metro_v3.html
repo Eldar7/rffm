@@ -952,7 +952,7 @@ function render() {
     const fmt = /11/.test(s.game_type || '') ? 'Fútbol-11' : 'Fútbol-7';
     const teamTitle = `Aravaca C.F. "${s.letter}"`;
     const teamHeading = (s.club_slug && s.team_id)
-      ? `<a href="https://eldar7.github.io/rffm/team_card.html?season=${encodeURIComponent(s.season)}&club=${encodeURIComponent(s.club_slug)}&team=${encodeURIComponent(s.team_id)}" target="_blank" rel="noopener" title="Abrir carta de participación del equipo">${teamTitle}</a>`
+      ? `<a href="https://eldar7.github.io/rffm/v2/team_card.html?season=${encodeURIComponent(s.season)}&club=${encodeURIComponent(s.club_slug)}&team=${encodeURIComponent(s.team_id)}" target="_blank" rel="noopener" title="Abrir carta de participación del equipo (incluye la pestaña Mapa de participación)">${teamTitle}</a>`
       : teamTitle;
     html += `<h2>${teamHeading}</h2><div class="meta">${s.season} · ${CAT_FULL[s.category_base]||s.category_base} · ${s.division_level} · ${fmt}</div>`;
     if (s._offTrack !== 0) {

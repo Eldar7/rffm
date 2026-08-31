@@ -111,6 +111,15 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Team-card deep link fixed.** The "Abrir carta de participación del
+  equipo" link in the side panel pointed at the root `team_card.html`
+  (`analysis_scripts/team_cards.py`, v1 — only a Matches/Roster tab pair),
+  not `v2/team_card.html` (`analysis_scripts/team_cards_v2.py` — adds the
+  third "Mapa de participación" tab, backed by
+  `analysis_scripts/team_participation_map_v2.py`'s per-club JSON).
+  `build_site.py` publishes both under the same site (v1 at the root, v2
+  under `/v2/`) with identical `season`/`club`/`team` query params, so the
+  fix was just the path, not the params.
 - Data is fully converged and clean: 32 stations, 251 links, 68 exits (50
   vanished / 18 left to another club), 1 genuine intra-season transfer.
 - **Fullscreen + zoom (built).** `#fsBtn` in the header calls
