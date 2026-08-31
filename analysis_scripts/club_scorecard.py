@@ -105,27 +105,23 @@ class Data:
         print("Loading base tables...", file=sys.stderr)
         self.club_teams = pd.read_parquet(root / "club_teams.parquet")
         self.clubs_extended = pd.read_parquet(root / "clubs_extended.parquet")
-        self.competitions = pd.read_parquet(root / "competitions.parquet")
-        self.team_group_membership = pd.read_parquet(root / "team_group_membership.parquet")
-        self.standings = pd.read_parquet(root / "standings.parquet")
-        self.teams = pd.read_parquet(root / "teams.parquet")
+        self.competitions = self._load_glob("competitions")
+        self.team_group_membership = self._load_glob("team_group_membership")
+        self.standings = self._load_glob("standings")
 
-        # team_id -> club_id, deduped (see DATA_DICTIONARY.md's "current
-        # state" recipe - club_teams is an append-only snapshot log; today
-        # there's exactly one snapshot so this is a no-op, but stays correct
-        # once more snapshots accumulate).
-        current_club_teams = (
-            self.club_teams.sort_values("scraped_at").groupby(["club_id", "team_id"]).tail(1)
-        )
-        # A team_id should belong to one club; if the site ever reassigns one
-        # (shouldn't happen - team_id is club-scoped on the site), keep the
-        # most-recently-seen mapping.
-        self.team_to_club = (
-            current_club_teams.sort_values("scraped_at")
-            .drop_duplicates(subset="team_id", keep="last")
-            .set_index("team_id")["club_id"]
-        )
-        self._supplement_team_to_club_from_teams_csv()
+        # team_id -> club_id: the authoritative backfilled map (see
+        # rffm_scraper/team_club_pipeline.py - fichaclub roster + direct
+        # fichaequipo fetches + a verified exact-name-match layer + a
+        # handful of manually-reviewed rows). Replaces this script's earlier
+        # club_teams.parquet + club_name_raw fallback entirely now that the
+        # real fix landed upstream - ~84% of all team_ids resolve here
+        # directly, no name-matching heuristics needed in this script at all.
+        team_club_map = pd.read_csv(root.parent / "rffm" / "team_club_map.csv", dtype={"team_id": "int64", "club_id": "Int64"})
+        # Int64 (nullable, capital-I) rather than int64 - team_id.map() below
+        # produces NaN for every unresolved team_id, which would silently
+        # upcast a plain int64 Series to float64 (club_id showing as
+        # "1011.0") the moment any lookup misses.
+        self.team_to_club = team_club_map.set_index("team_id")["club_id"]
 
         # competition_id -> tier, category_base, phase_label (regular season only).
         # Deliberately excludes competitions.season - team_group_membership
@@ -151,35 +147,7 @@ class Data:
         print("Loading match_cards...", file=sys.stderr)
         self.cards = self._load_glob("match_cards")
         print("Loading matches (for cards-per-match denominator)...", file=sys.stderr)
-        self.matches = pd.read_parquet(root / "matches.parquet")
-
-    def _supplement_team_to_club_from_teams_csv(self) -> None:
-        """`club_teams.parquet`'s `equipos_club` roster is not always complete
-        (confirmed live: Union de Aravaca's own team_id 4937443, a real
-        PREBENJAMIN 'B' squad that played real matches, is simply absent from
-        its club's /fichaclub/ team list - understating its 2021-2022 cohort
-        by more than half, 14 vs the real 29). Fix: within each season's
-        teams.csv, every team_id sharing one `club_name_raw` is the same club
-        (verified repeatedly for Aravaca/Union across 10 seasons of sponsor
-        renames) - so if ANY team in that group already resolved to a
-        club_id via club_teams, propagate it to the rest of the group too.
-        """
-        teams = self.teams.copy()
-        teams["club_id"] = teams["team_id"].map(self.team_to_club)
-        known = teams.dropna(subset=["club_id"])
-        # club_name_raw -> the (should-be-singular) club_id its known members resolved to
-        name_to_club = known.groupby("club_name_raw")["club_id"].agg(lambda s: s.mode().iat[0])
-        unresolved = teams[teams["club_id"].isna()].copy()
-        unresolved["inferred_club_id"] = unresolved["club_name_raw"].map(name_to_club)
-        filled = unresolved.dropna(subset=["inferred_club_id"])
-        if len(filled):
-            addition = filled.drop_duplicates("team_id").set_index("team_id")["inferred_club_id"]
-            self.team_to_club = pd.concat([self.team_to_club, addition])
-            print(
-                f"  -> supplemented {len(addition)} team_id -> club_id mappings "
-                f"missing from club_teams.parquet, via club_name_raw fallback",
-                file=sys.stderr,
-            )
+        self.matches = self._load_glob("matches")
 
     def _load_glob(self, subdir: str) -> pd.DataFrame:
         paths = sorted(glob.glob(str(self.root / subdir / "*.parquet")))
@@ -600,6 +568,65 @@ def compute_all(data: Data) -> tuple[pd.DataFrame, pd.DataFrame]:
     club_cohort = club_cohort.merge(data.clubs_extended[["club_id", "club_name"]].drop_duplicates(), on="club_id", how="left")
 
     return club_level, club_cohort
+
+
+def to_compact_json(club_level: pd.DataFrame, club_cohort: pd.DataFrame) -> dict:
+    """club_level/club_cohort -> the compact {clubs: [...], cohort: {club_id: [...]}}
+    shape the site report (club_scorecard_site.py) embeds client-side. Short keys +
+    rounded floats to keep the embedded payload small (~1.6MB for 685 clubs)."""
+
+    def r(x, nd=1):
+        return None if pd.isna(x) else round(float(x), nd)
+
+    def ri(x):
+        return None if pd.isna(x) else int(x)
+
+    clubs = []
+    for _, row in club_level.iterrows():
+        clubs.append({
+            "id": ri(row["club_id"]), "n": row["club_name"],
+            "teams": ri(row["teams_latest_season"]), "players": ri(row["players_latest_season"]),
+            "trend": r(row["headcount_trend_slope"], 2),
+            "ctier": ri(row["ceiling_tier"]), "cdiv": row["ceiling_division"] if isinstance(row["ceiling_division"], str) else None,
+            "ccat": row["ceiling_category"] if isinstance(row["ceiling_category"], str) else None,
+            "cseason": row["ceiling_season"] if isinstance(row["ceiling_season"], str) else None,
+            "curTeams": ri(row["teams_current_season"]), "curTier": ri(row["best_tier_current_season"]),
+            "left": ri(row["players_left"]), "joined": ri(row["players_joined"]), "net": ri(row["net_flow"]),
+            "first": row["first_season_seen"] if isinstance(row["first_season_seen"], str) else None,
+            "last": row["last_season_seen"] if isinstance(row["last_season_seen"], str) else None,
+            "span": ri(row["seasons_span"]), "present": ri(row["seasons_present"]), "cont": r(row["continuity_pct"]),
+            "sanction": r(row["avg_sanction_points_per_season"], 2), "cards": ri(row["total_cards"]),
+            "matchesAll": ri(row["matches_played_alltime"]), "cardsPm": r(row["cards_per_match"], 3),
+            "gini": r(row["avg_playing_time_gini"], 3), "volat": r(row["best_tier_std_dev"], 2),
+            "seasonsData": ri(row["seasons_with_data"]), "alumni": ri(row["alumni_pool_n"]),
+            "eliteInN": ri(row["elite_in_club_n"]), "eliteInPct": r(row["elite_in_club_pct"]),
+            "eliteAfterN": ri(row["elite_after_leaving_n"]), "eliteAfterPct": r(row["elite_after_leaving_pct"]),
+            "eliteAnyN": ri(row["elite_any_n"]), "eliteAnyPct": r(row["elite_any_pct"]),
+            "homegrownN": ri(row["elite_homegrown_n"]), "homegrownUnk": ri(row["elite_homegrown_data_unknown_n"]),
+            "homegrownPct": r(row["elite_homegrown_pct_of_known"]),
+            "topTier": ri(row["top_team_tier"]), "topCat": row["top_team_category"] if isinstance(row["top_team_category"], str) else None,
+            "topN": ri(row["top_team_n"]), "topHomeN": ri(row["top_team_homegrown_n"]),
+            "topHomePct": r(row["top_team_homegrown_pct_of_known"]),
+        })
+
+    cohort: dict[str, list] = {}
+    for _, row in club_cohort.iterrows():
+        cid = str(ri(row["club_id"]))
+        cohort.setdefault(cid, []).append({
+            "cat": row["category"], "cs": row["cohort_season"], "n": ri(row["n"]), "h": ri(row["horizon_years"]),
+            "rc": ri(row["retained_in_club"]), "rcPct": r(row["retained_in_club_pct"]),
+            "rf": ri(row["retained_in_football"]), "rfPct": r(row["retained_in_football_pct"]),
+        })
+
+    return {"clubs": clubs, "cohort": cohort}
+
+
+def load_all_data() -> dict:
+    """Entry point for build_site.py: recompute everything from Parquet and
+    return the compact JSON payload club_scorecard_site.build_html() embeds."""
+    data = Data()
+    club_level, club_cohort = compute_all(data)
+    return to_compact_json(club_level, club_cohort)
 
 
 def main() -> None:

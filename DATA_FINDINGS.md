@@ -36,6 +36,146 @@ correctly deduped in the published `clubs.csv` (first-fetched row kept).
 They are not duplicates in the data — they are the same real-world club
 fielding multiple teams.
 
+**Update (team_club_map.csv):** the finding above is specifically about the
+one *representative* team_id per `club_name_raw` group failing to resolve
+- it does not mean every other team of that same club also fails. Live
+spot-checks found real cases where a non-representative sibling team (same
+club, different `club_name_raw` spelling - e.g. "A.D. ARGANDA CLUB DE
+FUTBOL 'B'" vs the already-resolved "A.D. ARGANDA C.F.") resolved fine on
+its own `/fichaequipo/` page. `enrich_team_clubs.py`/`team_club_map.csv`
+targets every team_id, not just representatives, and closes most of that
+gap - see `DATA_DICTIONARY.md`'s `team_club_map.csv` entry. The 326 figure
+above should not be read as "326 permanently unresolvable clubs" - re-check
+against `team_club_map.csv` first.
+
+---
+
+## team_club_map.csv — `exact_name_match` false-positive on RFFM's placeholder team names (caught and fixed)
+
+**Symptom (transient, already fixed - recorded so nobody re-discovers it the
+hard way):** a first version of the `exact_name_match` seeding layer
+(`team_club_pipeline.py`) briefly resolved all ~1,265 `team_id`s named
+literally `"Equipo Casa (No asignado)"` / `"Equipo Fuera (No asignado)"` to
+the *same* `club_id` - a single, real club that a nonsensical-looking
+coincidence had connected them all to.
+
+**Root cause:** `"Equipo Casa/Fuera (No asignado)"` is RFFM's own generic
+placeholder label for a bye/no-show slot, reused *verbatim* as
+`club_name_raw` across ~700-800 genuinely unrelated `team_id`s in different
+groups/seasons - it is not a real club identity the way every other
+`club_name_raw` value is. One specific `team_id` in that giant group,
+`17145319`, was a placeholder in 2016-2021 but got reassigned by RFFM to a
+real team ("C.D.E. AUPA - CIUDAD DE BOADILLA MENTEMA 'D'") starting
+2022-2023 - a genuine, separately-confirmed case of RFFM reusing a numeric
+`team_id` for a completely different real-world team over time (see the
+`team_id` reuse note below). The moment `17145319` had *any* resolved
+`club_id`, exact-string matching on the shared placeholder text handed that
+same `club_id` to every other "No asignado" slot - a real false positive,
+not hypothetical, caught by manually reviewing the resulting mapping before
+this was documented.
+
+**Fix:** `_NON_CLUB_NAME_PATTERN` in `team_club_pipeline.py` excludes
+`club_name_raw` values matching `"No asignado"` or `"^Finalista "` (the
+latter a bracket-TBD placeholder with the same reuse risk, verified small
+but excluded on the same principle) from `exact_name_match` entirely. These
+`team_id`s are correctly left unresolved - they're RFFM's own synthetic
+bye/no-show slot, not a club to find (see the gap-classification work this
+enables, if/when that table exists).
+
+## `team_id` gets reused by RFFM for a completely different real-world team over time
+
+Confirmed twice independently, both in `DIVISION DE HONOR DE JUVENILES`:
+- `team_id=7208996` was `"Equipo Fuera (No asignado)"` in 2017-2018, then
+  `"UCAM UNIVERSIDAD CATOLICA DE MURCIA C.F."` in 2019-2020/2020-2021 - same
+  numeric id, same competition/group, different real entity.
+- `team_id=17145319` was `"Equipo Casa (No asignado)"` through 2021-2022,
+  then a real team ("C.D.E. AUPA...") from 2022-2023 onward (see the
+  `exact_name_match` false-positive above - this is the id that caused it).
+
+Implication: `team_id` is a stable identity *most* of the time (the premise
+`team_club_map.csv`'s whole cross-season design relies on), but not an
+absolute guarantee - RFFM appears to recycle a numeric slot, at minimum,
+when it was previously a synthetic "No asignado" placeholder rather than a
+real registered team. No evidence found (yet) of two *different real*
+teams sharing a `team_id` over time - only placeholder-to-real reuse.
+
+## team_club_map.csv `source="manual_review"` rows — evidence per row
+
+Four `team_id`s resolved by human review during analysis, not by any
+automated source - `club_name_raw` drifted too far from their real club's
+registered spelling for `exact_name_match`'s exact-string rule to catch,
+but independent evidence confirms the connection. Documented individually
+per the `manual_review` source's own requirement (`models.py`):
+
+- **`18310554` ("FUTURO VELILLA F. S.") → `club_id=16661239`.** Evidence:
+  shares the exact same `venue_id=16974273` ("P.M. VELILLA DE SAN ANTONIO
+  (futbol sala)") with the already-resolved `team_id=17155544`
+  ("FUTURO VELILLA") across every season both appear.
+- **`18439756` ("BRISTOL ATLETICO PIOVERA") → `club_id=17896583`.**
+  Evidence: identical name (letter-for-letter) to the already-resolved
+  `team_id=18586495` ("C.D. BRISTOL ATLÉTICO PIOVERA") - only the "C.D."
+  prefix differs.
+- **`18377739` ("C.D. MEJORADA") → `club_id=16660812`.** Evidence:
+  `team_id` is consecutive with the already-resolved `team_id=18377738`
+  ("MEJORADA") and `17155564`... `18377737` (PREBENJAMIN/BENJAMIN/ALEVIN of
+  the same club, same 2016-2017 season) - a classic same-batch
+  multi-category registration.
+- **`17156256` ("OROQUIETA-ESPINILLO 'B'") → `club_id=16660505`.**
+  Evidence: identical name modulo the hyphen, to the already-resolved
+  `team_id=17148357` ("OROQUIETA ESPINILLO").
+
+**Deliberately excluded from this batch** (found candidates, not confident
+enough to add): `18408082` ("C.D.E. ESCUELA BREOGÁN") - `"C.D. ESCUELA
+BREOGAN"` (note: no accent) is a genuine multi-branch academy with ~50
+`team_id`s across dozens of Madrid venues; no venue/season/category overlap
+found to pin down which specific branch `18408082` belongs to, so it stays
+unresolved rather than guess. `18345500` ("SPORTING ALTO DE EXTREMADURA")
+- no candidate found at all (see its own investigation above/below - a
+genuinely real, single-season, three-match cup run with a distinct crest,
+just no connection to anything else in this dataset).
+
+---
+
+## team_club_map.csv / team_club_gap_reasons.csv — two different "% done" numbers, don't conflate them
+
+There are two unrelated coverage metrics for this pipeline; a query or a
+status update that only says "84%" or "99%" without naming which one is
+ambiguous and has already caused confusion once - always name the metric.
+
+- **Resolution rate: how many `team_id`s have a `club_id` at all.**
+  `len(team_club_map.csv) / (len(team_club_map.csv) + len(team_club_gap_reasons.csv))`
+  = 14,281 / 16,921 = **84.4%**. This is *the* headline number for "is the
+  team→club mapping done" - started at 51% (8,168/16,143) before this
+  pipeline existed, using only `clubs.csv`'s one-representative-per-club
+  sampling.
+- **Gap-explanation rate: of the ~16% still without a `club_id`, how much
+  has a documented structural reason** (`team_club_gap_reasons.csv`'s
+  `reason` column, anything but `unexplained`) vs. is a genuine,
+  currently-unresolved mystery (`unexplained`). 2,617 / 2,640 = **99.1%**
+  explained, 23 rows (0.9%) still `unexplained` - deliberately left as-is,
+  see that column's docstring in `models.py`.
+
+These measure different populations (all `team_id`s vs. only the
+unresolved ones) and answering "how done is this" with just one of them
+reads as a much bigger or much smaller number than reality depending on
+which one gets dropped - always state both together, or name which one is
+being quoted.
+
+For a full per-`reason` breakdown (how precise each classification rule
+actually is, with real `team_id` examples and calendario links - some
+rules are ~100% precise, `university_team` is closer to a coin flip), see
+`TEAM_CLUB_GAP_REASONS.md` - kept as a separate file on purpose so reading
+*this* file for an unrelated finding doesn't also load that whole
+writeup.
+
+```python
+import pandas as pd
+m = pd.read_csv("output/processed/rffm/team_club_map.csv", dtype=str)
+g = pd.read_csv("output/processed/rffm/team_club_gap_reasons.csv", dtype=str)
+resolution_rate = len(m) / (len(m) + len(g))
+gap_explained_rate = (g["reason"] != "unexplained").mean()
+```
+
 ---
 
 ## club_profile.html — a club renamed across seasons can show up as two clubs

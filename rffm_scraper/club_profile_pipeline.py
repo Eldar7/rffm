@@ -7,11 +7,15 @@ here returns club: null, confirmed live) and returns every team the club has
 ever fielded, not just the one team club_pipeline.py happened to sample.
 
 Targets are the UNION of club_id across every season's already-committed
-output/processed/rffm/<season>/clubs.csv (cross-season, not season-scoped -
-a club identity isn't a per-season concept any more than it's an
-age-bracket one, see club_pipeline.py). This project already has 10 seasons
-of clubs.csv committed, so this pipeline never needs to run core/clubs
-itself - it just reads whatever club_ids those already produced. Outputs
+output/processed/rffm/<season>/clubs.csv PLUS output/processed/rffm/
+team_club_map.csv (cross-season, not season-scoped - a club identity isn't
+a per-season concept any more than it's an age-bracket one, see
+club_pipeline.py). team_club_map.csv (rffm_scraper/team_club_pipeline.py)
+routinely knows club_ids clubs.csv never found, since it resolves every
+team_id instead of one representative per club_name_raw group - see that
+module's docstring. This project already has 10 seasons of clubs.csv
+committed, so this pipeline never needs to run core/clubs itself - it just
+reads whatever club_ids those already produced. Outputs
 live at the processed root (output/processed/rffm/clubs_extended.csv etc.),
 alongside coverage_manifest.csv, not inside any one season's directory - see
 CLAUDE.md's "Why one file"/README's storage-layout rationale for why
@@ -95,10 +99,20 @@ def _load_target_club_ids(settings: Settings) -> list[str]:
     for path in clubs_files:
         df = pd.read_csv(path, usecols=["club_id"], dtype=str, keep_default_na=True)
         all_ids.update(df["club_id"].dropna())
+    # team_club_map.csv (rffm_scraper/team_club_pipeline.py) resolves every
+    # team_id, not just one representative per club_name_raw group like
+    # clubs.csv - so it routinely finds club_ids clubs.csv never did (a team
+    # whose club_name_raw was never picked as a representative). Union it in
+    # so those clubs get a /fichaclub/ profile too, not just a bare club_id.
+    team_club_map_path = settings.processed_root / "team_club_map.csv"
+    if team_club_map_path.exists():
+        df = pd.read_csv(team_club_map_path, usecols=["club_id"], dtype=str, keep_default_na=True)
+        all_ids.update(df["club_id"].dropna())
     if not all_ids:
         raise RuntimeError(
-            "No output/processed/rffm/*/clubs.csv files found - run main.py + "
-            "enrich_clubs.py for at least one season before club profile enrichment."
+            "No output/processed/rffm/*/clubs.csv or team_club_map.csv found - run main.py + "
+            "enrich_clubs.py (or enrich_team_clubs.py) for at least one season before club "
+            "profile enrichment."
         )
     return sorted(all_ids)
 

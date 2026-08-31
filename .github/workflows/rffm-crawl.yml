@@ -1,5 +1,5 @@
 name: RFFM crawl
-run-name: "${{ inputs.stage }} ${{ inputs.stage == 'club_profiles' && 'cross-season' || inputs.season_label }} / ${{ inputs.stage == 'core' && (inputs.all_categories && 'ALL' || 'priority') || (inputs.stage == 'clubs' || inputs.stage == 'club_profiles') && 'ALL' || inputs.scope_category }}"
+run-name: "${{ inputs.stage }} ${{ inputs.stage == 'club_profiles' && 'cross-season' || inputs.season_label }} / ${{ inputs.stage == 'core' && (inputs.all_categories && 'ALL' || 'priority') || (inputs.stage == 'clubs' || inputs.stage == 'team_clubs' || inputs.stage == 'club_profiles') && 'ALL' || inputs.scope_category }}"
 
 # Manually-dispatched crawl job for any stage. Deliberately dispatch-only for
 # now (no `schedule:` trigger yet) - add a cron once this has been watched
@@ -35,10 +35,11 @@ on:
           - acta_partido
           - fichajugador
           - clubs
+          - team_clubs
           - club_profiles
         default: core
       scope_category:
-        description: "Category scope for acta_partido/fichajugador (ignored for core, clubs, and club_profiles, which each cover every configured category/season in one pass)"
+        description: "Category scope for acta_partido/fichajugador (ignored for core, clubs, team_clubs, and club_profiles, which each cover every configured category/season in one pass)"
         required: false
         default: "PREBENJAMIN"
       all_categories:
@@ -83,7 +84,11 @@ concurrency:
   # fixed "ALL" key regardless of season_label - two dispatches with
   # different season_label values would otherwise land in different
   # concurrency groups and race on the same clubs_extended.csv/club_teams.csv.
-  group: rffm-crawl-${{ inputs.stage == 'club_profiles' && 'ALL' || inputs.season_label }}-${{ inputs.stage }}
+  # team_clubs is the same story even though its TARGET list is season-scoped
+  # (this season's teams.csv): its outputs (team_club_map.csv,
+  # team_clubs_crawl_log.csv) are shared cross-season files, written by
+  # every season's run - see team_club_pipeline.py's module docstring.
+  group: rffm-crawl-${{ (inputs.stage == 'club_profiles' || inputs.stage == 'team_clubs') && 'ALL' || inputs.season_label }}-${{ inputs.stage }}
   cancel-in-progress: false
 
 jobs:
@@ -200,6 +205,21 @@ jobs:
           fi
           python3 enrich_clubs.py --log-level INFO $extra
 
+      - name: Run team-clubs enrichment
+        # Season_label picks this run's TARGET list (this season's teams.csv
+        # team_ids), but the outputs (team_club_map.csv,
+        # team_clubs_crawl_log.csv) are shared cross-season files, like
+        # club_profiles below - see team_club_pipeline.py's module docstring.
+        if: inputs.stage == 'team_clubs'
+        env:
+          RFFM_GIT_PUSH_BRANCH: ${{ steps.run_branch.outputs.branch }}
+        run: |
+          extra=""
+          if [ "${{ inputs.workers }}" != "0" ] && [ -n "${{ inputs.workers }}" ]; then
+            extra="--workers ${{ inputs.workers }}"
+          fi
+          python3 enrich_team_clubs.py --log-level INFO $extra
+
       - name: Run club-profiles enrichment
         # Cross-season (see club_profile_pipeline.py) - season_label is
         # ignored, not passed through. Default (no extra flags) is a
@@ -232,7 +252,7 @@ jobs:
           # kill the crawler process instantly, so make sure nothing is
           # still writing to output/processed/*.csv before the git snapshot
           # below.
-          pkill -9 -f "enrich_acta.py|enrich_players.py|enrich_clubs.py|enrich_club_profiles.py|main.py" 2>/dev/null || true
+          pkill -9 -f "enrich_acta.py|enrich_players.py|enrich_clubs.py|enrich_team_clubs.py|enrich_club_profiles.py|main.py" 2>/dev/null || true
           sleep 2
 
           # The real, confirmed cause of "cannot rebase: You have unstaged
@@ -250,7 +270,7 @@ jobs:
           git checkout -- config.yaml
 
           scope_desc="${{ inputs.scope_category }}"
-          if [ "${{ inputs.stage }}" = "core" ] || [ "${{ inputs.stage }}" = "clubs" ] || [ "${{ inputs.stage }}" = "club_profiles" ]; then
+          if [ "${{ inputs.stage }}" = "core" ] || [ "${{ inputs.stage }}" = "clubs" ] || [ "${{ inputs.stage }}" = "team_clubs" ] || [ "${{ inputs.stage }}" = "club_profiles" ]; then
             scope_desc="ALL"
           fi
           season_desc="${{ inputs.season_label }}"

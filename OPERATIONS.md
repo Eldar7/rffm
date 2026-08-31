@@ -12,10 +12,10 @@ worth restating so they don't get silently broken.
 
 ## Dependency order
 
-Five entrypoints. `enrich_clubs.py` only depends on step 1 (not on
-`enrich_acta.py`), so it can run any time after `main.py` - it's listed
-third here only because it's the newer addition, not because of an ordering
-requirement:
+Six entrypoints. `enrich_clubs.py`/`enrich_team_clubs.py` only depend on
+step 1 (not on `enrich_acta.py`), so either can run any time after
+`main.py` - they're listed third/fourth here only because they're newer
+additions, not because of an ordering requirement:
 
 1. `main.py` → `rffm_scraper/pipeline.py` — competitions/groups/teams/
    matches/venues/standings/scorers. Not category-scoped. ~20 min/season.
@@ -33,7 +33,29 @@ requirement:
    `club_name_raw` in `teams.csv` is a target regardless of category. One
    representative team per club, so the target count is roughly
    `teams.csv`'s row count divided by teams-per-club, not one request per
-   team - a few hundred requests, not thousands.
+   team - a few hundred requests, not thousands. Because it samples one
+   representative per `club_name_raw` group, it leaves real coverage gaps
+   when that grouping doesn't reliably pick a team that resolves (name
+   drift between teams of the same club) - see step 3b.
+3b. `enrich_team_clubs.py` → `rffm_scraper/team_club_pipeline.py` —
+   complete `team_id -> club_id` resolution, output/processed/rffm/
+   team_club_map.csv. Same source page as step 3 (`/fichaequipo/<team_id>`,
+   same `enrichment.fetch_fichaequipo` opt-in), but targets **every**
+   not-yet-resolved `team_id` in the current season's `teams.csv`, not one
+   representative per club. Most targets resolve for free from already-
+   collected `club_teams.csv`/`clubs.csv` (no live fetch) - see the
+   module's docstring for the seeding step; only the genuine remaining gap
+   needs a live request. Unlike step 3, this stage is cross-season for its
+   outputs and resumability (a `team_id` is a stable identity across
+   seasons, so it's fetched at most once ever, not once per season it
+   appears in) even though its per-run *target list* is still this
+   season's `teams.csv` - see the module docstring for the full reasoning.
+   Also (re)writes `team_club_gap_reasons.csv` at the end of every run - a
+   fully recomputed classification of why each `team_id` still unresolved
+   after this run has no `club_id` (technical no-show, FASE ZONAL,
+   non-federated local cup, ...), not tied to this run's own targets - see
+   `DATA_DICTIONARY.md`. Queued automatically per season in
+   `crawl-all.yml`'s plan, unlike step 5 below.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups/<category>.csv`
    (needs step 2 done first for the categories it targets). Same order of
@@ -41,20 +63,22 @@ requirement:
 5. `enrich_club_profiles.py` → `rffm_scraper/club_profile_pipeline.py` —
    full club profile + every team a club has ever fielded, from
    `/fichaclub/<club_id>`. Reads every season's already-committed
-   `clubs.csv` (cross-season, so it needs step 3 done for at least one
-   season, not all of them - the target list is just whatever `club_id`s
-   are currently known). Manually dispatched only - deliberately **not**
-   part of `crawl-all.yml`'s self-chaining per-season backfill plan (see
-   that section below), since it isn't a "run once per season" step the
-   way the other four are; it's closer to a periodically-refreshable
-   snapshot of current site state. A few hundred requests, well under an
-   hour even serial.
+   `clubs.csv` **plus** `team_club_map.csv` (cross-season, so it needs step
+   3 or 3b done for at least one season, not all of them - the target list
+   is just whatever `club_id`s are currently known from either source).
+   Manually dispatched only - deliberately **not** part of
+   `crawl-all.yml`'s self-chaining per-season backfill plan (see that
+   section below), since it isn't a "run once per season" step the way the
+   others are; it's closer to a periodically-refreshable snapshot of
+   current site state. A few hundred requests, well under an hour even
+   serial.
 
 `config.yaml`'s `target.season_label` picks the season (not CLI-overridable
 — see the workflow walkthrough below for why that matters);
 `enrichment.acta_partido.scope_category` / `enrichment.fichajugador.scope_category`
 pick the category, overridable per-run via each entrypoint's `--scope`
-flag. `enrich_clubs.py` has no `--scope` - see point 3 above.
+flag. `enrich_clubs.py`/`enrich_team_clubs.py` have no `--scope` - see
+points 3/3b above.
 
 ## Storage layout
 
@@ -114,7 +138,8 @@ here (see "Checking progress" below).
 - **Trigger**: `workflow_dispatch` only (no `schedule:` cron yet —
   deliberate, add one once this has run cleanly a few times).
 - **Inputs**: `season_label` (free text, must exist in the site's
-  `/api/seasons`), `stage` (`core`/`acta_partido`/`fichajugador`/`clubs`),
+  `/api/seasons`), `stage` (`core`/`acta_partido`/`fichajugador`/`clubs`/
+  `team_clubs`/`club_profiles`),
   `scope_category` (free text, ignored for `core`), `workers` (integer,
   default 0 = use `config.yaml` value; ignored for `core`). Currently
   `config.yaml` defaults all three enrichment stages to `workers: 8`.
@@ -140,14 +165,16 @@ New season: dispatch `core` once (this also produces `venues.csv`) →
 dispatch `acta_partido` with `scope_category=<category>`, re-dispatching the
 same inputs until `coverage_manifest.csv` shows
 `complete`/`complete_with_failures` for that row → dispatch `fichajugador`
-the same way. `clubs` only needs `core` done first and can be dispatched any
-time after it (independently of `acta_partido`/`fichajugador`, and only
-once per season - it covers every category in one pass, `scope_category` is
-ignored), same re-dispatch-until-complete pattern for resuming an
-interrupted run. Widening an already-`core`'d season to a new category:
-skip straight to `acta_partido`/`fichajugador` with the new
-`scope_category` (`clubs` needs no re-dispatch - it was never
-category-scoped to begin with).
+the same way. `clubs` and `team_clubs` only need `core` done first and can
+each be dispatched any time after it (independently of `acta_partido`/
+`fichajugador`, and only once per season - both cover every category in one
+pass, `scope_category` is ignored), same re-dispatch-until-complete pattern
+for resuming an interrupted run. Widening an already-`core`'d season to a
+new category: skip straight to `acta_partido`/`fichajugador` with the new
+`scope_category` (`clubs`/`team_clubs` need no re-dispatch - neither was
+ever category-scoped to begin with). `next_crawl_step.py`/`crawl-all.yml`
+already queue `team_clubs` automatically right after `clubs` for every
+season in the plan - manual dispatch is only for one-off/out-of-order runs.
 
 `club_profiles` is dispatched separately from the per-season sequence
 above, whenever you want (`season_label`/`scope_category` inputs are both
@@ -208,16 +235,27 @@ manifest is the single source of truth, not any runner-local state).
 Ordered newest-to-oldest, full sequence per season:
 
 ```
-core (--all-categories) → clubs → acta_partido × 10 categories → fichajugador × 10 categories
+core (--all-categories) → clubs → team_clubs → acta_partido × 10 categories → fichajugador × 10 categories
 ```
 
 Categories in priority order: BENJAMIN, PREBENJAMIN, ALEVIN, INFANTIL,
 CADETE, JUVENIL, AFICIONADO, SENIOR, VETERANOS, UNIVERSITARIO. OTHER
 (cup/copa competitions) is excluded — no meaningful acta/fichajugador data.
 
+`team_clubs` is queued automatically, right after `clubs`, for every season
+in this plan - unlike `club_profiles` below, it's a "run once per season
+until complete" step the same way `clubs`/`acta_partido`/`fichajugador`
+are, even though its outputs are cross-season files (see
+`team_club_pipeline.py`'s module docstring and "Dependency order" above).
+`next_crawl_step.py` also self-heals a season whose `team_clubs` step was
+already marked complete but later grew new, unresolved `team_id`s (e.g. a
+`core` re-crawl widened that season's `teams.csv`) - see
+`_seasons_needing_team_clubs_recrawl()` in
+`.github/scripts/next_crawl_step.py`.
+
 `club_profiles` is deliberately **not** in this plan - it's a cross-season,
 manually-dispatched stage (see "Dependency order" above), not a
-"run once per season until complete" step the way the other four are.
+"run once per season until complete" step the way the others are.
 `next_crawl_step.py` never queues it; dispatch it yourself via
 `rffm-crawl.yml`'s `club_profiles` stage whenever you want a backfill/refresh.
 
@@ -423,13 +461,16 @@ targets were attempted but produced no output. Two failure modes exist:
 HTTP 200 but `__NEXT_DATA__` was absent or empty at fetch time (transient
 rendering issue on the site). The data is often available if you re-fetch.
 
-**clubs** — no failed log row exists. The pipeline writes success=True for
-every HTTP fetch that returned a page; `missing` is computed as
-`target_team_ids − done_ids`. Missing means the page had no `codigo_club`
-in `pageProps.team` — either a structural gap (phantom teams, university
-teams, newly registered school clubs — see `DATA_FINDINGS.md`) or a
-transient rendering issue. The distinction matters: structural gaps are
-permanent and not worth retrying.
+**clubs / team_clubs** — no failed log row exists in either. The pipeline
+writes success=True for every HTTP fetch that returned a page; `missing` is
+computed as `target_team_ids − done_ids`. Missing means the page had no
+`codigo_club` in `pageProps.team` — either a structural gap (phantom teams,
+university teams, newly registered school clubs — see `DATA_FINDINGS.md`)
+or a transient rendering issue. The distinction matters: structural gaps
+are permanent and not worth retrying. `team_clubs`' `done_ids` is
+cross-season (`team_clubs_crawl_log.csv`/`team_club_map.csv` at the
+processed root, not per season) - see `team_club_pipeline.py`'s module
+docstring.
 
 ### `analysis_scripts/retry_check.py`
 
@@ -456,6 +497,8 @@ What `--fix` does per stage type:
   retryable IDs → pipeline sees them as not-yet-attempted on next run.
 - **clubs**: deletes the `success=True` log rows for retryable team_ids →
   pipeline re-fetches them (they fall out of `done_ids`).
+- **team_clubs**: same idea, but against the cross-season
+  `team_clubs_crawl_log.csv` at the processed root, not a per-season file.
 
 Both: reset the manifest row to `status=partial` so the orchestrator queues
 the stage again.
