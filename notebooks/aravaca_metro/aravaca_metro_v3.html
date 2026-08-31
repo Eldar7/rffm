@@ -115,6 +115,32 @@
   .stats-row { display: flex; gap: 22px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-dim); }
   .stats-row b { color: var(--ink); font-weight: 500; }
 
+  /* ---------------- view controls (zoom + fullscreen) ---------------- */
+  .view-controls { display: flex; align-items: center; gap: 14px; }
+  .zoom-group { display: flex; align-items: center; gap: 2px; font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .zoom-btn, .fs-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    padding: 5px 9px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .zoom-btn:hover, .fs-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .zoom-pct {
+    min-width: 42px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-dim);
+  }
+  .zoom-pct:hover { color: var(--ink); }
+  .fs-btn { display: flex; align-items: center; gap: 5px; }
+
+  body.fauxfs { position: fixed; inset: 0; z-index: 2147483647; }
+
   /* ---------------- pivot selector ---------------- */
   .pivot-bar {
     flex: 0 0 auto;
@@ -185,6 +211,7 @@
   /* ---------------- main area ---------------- */
   .main { flex: 1 1 auto; display: flex; min-height: 0; }
   .canvas-wrap { flex: 1 1 auto; overflow: auto; position: relative; padding: 18px 40px 40px 100px; }
+  .zoom-wrap { display: inline-block; position: relative; transform-origin: 0 0; }
   .canal-labels { position: absolute; left: 0; top: 18px; width: 96px; pointer-events: none; }
   .canal-label {
     position: absolute;
@@ -341,7 +368,15 @@
       <div class="sub" id="subTitle">2021-22 → 2025-26 · una cohorte, cinco años</div>
     </div>
   </div>
-  <div class="stats-row" id="statsRow"></div>
+  <div class="view-controls">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="zoom-group">
+      <button class="zoom-btn" id="zoomOut" title="Alejar" aria-label="Alejar">−</button>
+      <span class="zoom-pct" id="zoomPct" title="Restablecer al 100%" role="button">100%</span>
+      <button class="zoom-btn" id="zoomIn" title="Acercar" aria-label="Acercar">+</button>
+    </div>
+    <button class="fs-btn" id="fsBtn" aria-pressed="false">⛶ Pantalla completa</button>
+  </div>
 </header>
 
 <div class="pivot-bar">
@@ -391,7 +426,9 @@
 <div class="main">
   <div class="canvas-wrap" id="canvasWrap">
     <div class="canal-labels" id="canalLabels"></div>
-    <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="zoom-wrap" id="zoomWrap">
+      <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
   </div>
   <div class="panel" id="panel">
     <div class="panel-empty"><span class="big">⚑</span>Pasa el cursor sobre un jugador o un equipo — o haz clic para fijarlo.</div>
@@ -630,10 +667,11 @@ function render() {
   for (let b = 0; b < NUM_BANDS; b++) {
     const d = document.createElement('div');
     d.className = 'canal-label';
-    d.style.top = (layout.bandY[b] + layout.bandMaxHeight[b] / 2 - 40) + 'px';
+    d.dataset.baseTop = layout.bandY[b] + layout.bandMaxHeight[b] / 2 - 40;
     d.textContent = TIER_NAMES[b];
     canalLabels.appendChild(d);
   }
+  applyZoom();
 
   // season headers (span the season's full lane width) + lane dividers/labels
   const headerLayer = el('g', {});
@@ -973,5 +1011,55 @@ Object.keys(PIVOTS).forEach(key => {
 });
 document.getElementById('pivotHint').textContent = PIVOTS[activePivot].hint;
 
+// ---------------- zoom control ----------------
+// Only the zoom-wrap (the SVG) is scaled via transform; canal-labels stay in
+// their fixed, unscaled left gutter (canvas-wrap's padding-left doesn't
+// scale) and instead have their per-band `top` rescaled here from the
+// unscaled value render() stores in data-base-top, so they track each
+// band's vertical position at any zoom level without clipping sideways.
+const ZOOM_MIN = 0.25, ZOOM_MAX = 3, ZOOM_STEP = 0.1;
+let zoomLevel = 1;
+const zoomWrap = document.getElementById('zoomWrap');
+const zoomPct = document.getElementById('zoomPct');
+function applyZoom() {
+  zoomWrap.style.transform = `scale(${zoomLevel})`;
+  zoomPct.textContent = Math.round(zoomLevel * 100) + '%';
+  document.querySelectorAll('.canal-label').forEach(d => {
+    d.style.top = (parseFloat(d.dataset.baseTop) * zoomLevel) + 'px';
+  });
+}
+function setZoom(z) {
+  zoomLevel = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  applyZoom();
+}
+document.getElementById('zoomIn').addEventListener('click', () => setZoom(zoomLevel + ZOOM_STEP));
+document.getElementById('zoomOut').addEventListener('click', () => setZoom(zoomLevel - ZOOM_STEP));
+zoomPct.addEventListener('click', () => setZoom(1));
+
 render();
+
+// ---------------- fullscreen toggle ----------------
+const fsBtn = document.getElementById('fsBtn');
+function isFullscreenActive() { return !!document.fullscreenElement || document.body.classList.contains('fauxfs'); }
+function updateFsBtn() {
+  const on = isFullscreenActive();
+  fsBtn.textContent = on ? '⤦ Salir de pantalla completa' : '⛶ Pantalla completa';
+  fsBtn.setAttribute('aria-pressed', String(on));
+}
+fsBtn.addEventListener('click', async () => {
+  if (isFullscreenActive()) {
+    if (document.fullscreenElement) {
+      try { await document.exitFullscreen(); } catch {}
+    }
+    document.body.classList.remove('fauxfs');
+  } else {
+    let ok = false;
+    if (document.documentElement.requestFullscreen) {
+      try { await document.documentElement.requestFullscreen(); ok = true; } catch {}
+    }
+    if (!ok) document.body.classList.add('fauxfs');
+  }
+  updateFsBtn();
+});
+document.addEventListener('fullscreenchange', updateFsBtn);
 </script>

@@ -113,11 +113,24 @@ has nothing to show right now.
 
 - Data is fully converged and clean: 32 stations, 251 links, 68 exits (50
   vanished / 18 left to another club), 1 genuine intra-season transfer.
-- **Next requested feature (not yet built):** fullscreen toggle for the
-  canvas + a zoom control for the diagram itself (not the browser). The
-  canvas is `<svg id="svg">` inside `.canvas-wrap` (`overflow: auto`), sized
-  to content in `render()`. Zoom is best done via CSS `transform: scale()`
-  on the SVG (or a wrapper around it) with a slider/+−, keeping the existing
-  `mousemove`/`click` handlers on `svg` working — they currently read
-  `getBoundingClientRect()`/event coordinates directly, which a `transform`
-  scale can throw off if not accounted for.
+- **Fullscreen + zoom (built).** `#fsBtn` in the header calls
+  `document.documentElement.requestFullscreen()`, falling back to a CSS-only
+  `body.fauxfs { position: fixed; inset: 0; z-index: max }` maximize if the
+  real Fullscreen API throws (e.g. a host that blocks it) — nothing else is
+  hidden in either mode, per an explicit ask to keep header/pivot-bar/legend/
+  side-panel all visible. Zoom is `−`/`%`/`+` buttons (10% steps, 25%–300%,
+  click `%` to reset to 100%) that set `transform: scale()` on `#zoomWrap`
+  (wraps only the `<svg>`). This was **not** a coordinate-math problem in the
+  end: `resolveHit()`'s `mousemove`/`click` handlers key off `ev.target` +
+  `closest()`, not `getBoundingClientRect()`, and the browser's hit-testing
+  already accounts for CSS transforms, so hover/click needed no changes and
+  keep working at any zoom (verified with Playwright at 100%/150%). The one
+  real gotcha was `#canalLabels` (the vertical band-name overlay) — it's a
+  plain HTML div, a *sibling* of `#zoomWrap`, not inside it, because
+  `canvas-wrap`'s `padding-left: 100px` gutter it lives in does **not**
+  scale; nesting it inside the scaled wrapper was tried first and clips it
+  off-screen above ~104% zoom (its `left` offset scales but the gutter
+  doesn't). Instead `render()` stores each label's unscaled y in
+  `dataset.baseTop`, and `applyZoom()` recomputes `style.top = baseTop *
+  zoomLevel` on every zoom change (and once at the end of every `render()`,
+  so a pivot switch mid-zoom keeps both the zoom level and label alignment).
