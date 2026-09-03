@@ -266,6 +266,7 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
         cats_present = sorted(by_cat)
 
         names = ci.club_display_names()
+        slugs = ci.club_slugs()
         club_ids = {m["hc"] for m in matches} | {m["ac"] for m in matches}
         club_ids.discard(None)
         meta = {
@@ -273,6 +274,12 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
             "divs": sorted(set(m["div"] for m in matches)),
             "gts": sorted(set(m["gt"] for m in matches)),
             "clubs": {cid: names.get(cid) or f"club {cid}" for cid in club_ids},
+            # club_profile.html's "Соперничества" section lives at the same
+            # club_id-based slug for every club (club_identity.py) - lets
+            # the client link "see the full history between these two clubs"
+            # straight into it (?club=<hc slug>&opp=<ac slug>#rivalrySection)
+            # without a second lookup.
+            "club_slugs": {cid: slugs.get(cid) for cid in club_ids if slugs.get(cid)},
         }
         (data_dir / f"weird_scores_{season}_meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
@@ -386,6 +393,7 @@ let CURSEASON = SEASONS[SEASONS.length - 1];
 let MATCHES = [];
 let META = null;
 let CLUB_NAMES = {}; // club_id -> display name, set from META.clubs on each season load
+let CLUB_SLUGS = {}; // club_id -> club_profile.html slug, set from META.club_slugs on each season load
 const STATE = { cats: new Set(), divs: new Set(), gts: new Set(), seeded: false };
 const ENRICH_CACHE = {};
 
@@ -407,6 +415,16 @@ function teamLink(tid, name) { const n = esc(name); return tid ? `<a href="https
 function matchLink(mid, text) { return `<a href="https://www.rffm.es/acta-partido/${mid}" target="_blank" rel="noopener">${text}</a>`; }
 function playerLink(pid, name) { const n = esc(name || pid); return pid ? `<a href="https://www.rffm.es/fichajugador/${pid}" target="_blank" rel="noopener">${n}</a>` : n; }
 function scoreTxt(m) { return `${m.hs}:${m.as}`; }
+// "See the full history between these two clubs" - straight into
+// club_profile.html's Соперничества section (club_profile_v2.py's ?opp=
+// deep link), null when either side's club_id has no club_profile.html
+// page at all (e.g. an adult-only category club_identity.py resolved but
+// club_profile_data_v2.py never profiled - see that module's docstring).
+function rivalryUrl(hc, ac) {
+  const hs = CLUB_SLUGS[hc], as_ = CLUB_SLUGS[ac];
+  if (!hs || !as_ || hc === ac) return null;
+  return `club_profile.html?club=${encodeURIComponent(hs)}&opp=${encodeURIComponent(as_)}#rivalrySection`;
+}
 function fmtN(n) { return n.toLocaleString(CURLANG === 'ru' ? 'ru-RU' : 'es-ES'); }
 
 const T = {
@@ -419,6 +437,7 @@ const T = {
     s1: 'сыгранных матчей', s2: 'гола за матч в среднем', s3: n => `разгромов с разницей &ge;${n} мячей`, s4: 'матчей 0:0',
     h01: 'Самый дикий счёт сезона', l01: 'Разница результата, невероятная даже по меркам детской лиги, где счёт формируется свободно.',
     h01m2: n => `${n} мячей разницы в одном матче`,
+    rivalryLabel: 'история встреч клубов &rarr;',
     h02: n => `Топ&#8209;${n} самых разгромных матчей`, l02: 'По абсолютной разнице мячей среди завершённых игр сезона в выбранных фильтрах.',
     th_date: 'Дата', th_home: 'Хозяева', th_score: 'Счёт', th_away: 'Гости', th_comp: 'Турнир', th_match: 'Матч',
     h03: 'Другая крайность: нулевые ничьи', l03: (n, avg) => `${n} ${ruPlural(n,'матч','матча','матчей')} закончились 0:0 &mdash; при среднем счёте ${avg} гола за игру это статистическая редкость. И есть матчи, где всё решалось в перестрелке с равным счётом.`,
@@ -467,6 +486,7 @@ const T = {
     s1: 'partidos disputados', s2: 'goles de media por partido', s3: n => `goleadas con diferencia &ge;${n} goles`, s4: 'partidos 0:0',
     h01: 'El marcador más disparatado de la temporada', l01: 'Una diferencia de resultado difícil de creer incluso para los estándares de la liga infantil, donde el marcador se forma libremente.',
     h01m2: n => `${n} goles de diferencia en un solo partido`,
+    rivalryLabel: 'historial entre estos clubes &rarr;',
     h02: n => `Top ${n} goleadas más abultadas`, l02: 'Por diferencia absoluta de goles entre los partidos finalizados con los filtros elegidos.',
     th_date: 'Fecha', th_home: 'Local', th_score: 'Resultado', th_away: 'Visitante', th_comp: 'Competición', th_match: 'Partido',
     h03: 'El otro extremo: empates a cero', l03: (n, avg) => `${n} partidos terminaron 0:0 &mdash; con una media de ${avg} goles por partido, es una rareza estadística. Y hay partidos que se decidieron en un intercambio de goles con marcador igualado.`,
@@ -552,6 +572,7 @@ function renderSec01(t, matches) {
       <div class="hero-meta">
         <span>${esc(w.d)} &middot; ${esc(w.comp)}, ${esc(w.grp)}</span>
         <span>${t.h01m2(margin)}</span>
+        ${rivalryUrl(w.hc, w.ac) ? `<span><a href="${rivalryUrl(w.hc, w.ac)}" target="_blank" rel="noopener">${t.rivalryLabel}</a></span>` : ''}
       </div>
     </div>
   </section>`;
@@ -561,9 +582,10 @@ function renderSec02(t, matches) {
   const top = matches.slice().sort((a, b) => Math.abs(b.hs - b.as) - Math.abs(a.hs - a.as)).slice(0, TOP_BLOWOUTS);
   const rows = top.map((m, i) => {
     const cls = m.hs >= m.as ? 'win' : 'lose';
+    const rUrl = rivalryUrl(m.hc, m.ac);
     return `<tr><td class="rank">${i + 1}</td><td class="meta">${esc(m.d)}</td><td>${teamLink(m.hid, m.h)}</td>
       <td class="score ${cls}">${matchLink(m.id, scoreTxt(m))}</td><td>${teamLink(m.aid, m.a)}</td>
-      <td class="meta">${esc(m.comp)}, ${esc(m.grp)}</td></tr>`;
+      <td class="meta">${esc(m.comp)}, ${esc(m.grp)}${rUrl ? ` &middot; <a href="${rUrl}" target="_blank" rel="noopener">${t.rivalryLabel}</a>` : ''}</td></tr>`;
   }).join('');
   return `<section>
     <div class="section-head"><h2>${t.h02(TOP_BLOWOUTS)}</h2><span class="n">02</span></div>
@@ -922,6 +944,7 @@ async function loadSeason(season) {
   const metaRes = await fetch(`data/weird_scores_${season}_meta.json`);
   META = await metaRes.json();
   CLUB_NAMES = META.clubs || {};
+  CLUB_SLUGS = META.club_slugs || {};
 
   const activeCats = [...STATE.cats].filter(c => META.categories.includes(c));
   if (!STATE.seeded || !activeCats.length) {

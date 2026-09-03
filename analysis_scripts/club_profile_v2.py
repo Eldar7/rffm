@@ -249,7 +249,7 @@ HTML = r"""<!DOCTYPE html>
       <div class="chart-wrap"><div id="pathsDiv" style="width:100%;min-height:520px"></div></div>
     </section>
 
-    <section>
+    <section id="rivalrySection">
       <div class="section-head"><h2><span data-i18n="h_rivals">Соперничества</span></h2></div>
       <p class="scope-note"><span class="mark">i</span> <span data-i18n="rivals_note">Из полного краула матчей (все сезоны 2016/17&ndash;2025/26 &mdash; шире, чем сезоны заявок выше) &mdash; составы клуба сведены по единому club_id, а не по имени, поэтому смена спонсора/названия клуба здесь не создаёт второй клуб.</span></p>
       <div class="stats" id="rivalStats"></div>
@@ -553,7 +553,14 @@ async function init() {
       CLUB_INDEX.find(c => c.display.toLowerCase() === nameLower) ||
       CLUB_INDEX.find(c => (c.variants || []).some(v => v.toLowerCase() === nameLower));
   }
-  if (entry) selectClub(entry);
+  // ?opp=<slug> - a cross-link straight into one rivalry (e.g. from
+  // weird_scores.html's "see the full history" link on a highlighted
+  // match) - opens the club-vs-club modal once RIVALS has loaded, scrolled
+  // to the Соперничества section. Only honored on this initial deep-link,
+  // never re-applied on a later manual club pick (wireSearch()/wireStaticControls()
+  // call selectClub() with no second argument, which skips this).
+  const opp = params.get('opp');
+  if (entry) selectClub(entry, opp);
 }
 
 function wireSearch() {
@@ -598,7 +605,7 @@ function wireSearch() {
   });
 }
 
-async function selectClub(entry) {
+async function selectClub(entry, openOppSlug) {
   document.getElementById('pickHint').style.display = 'none';
   document.getElementById('app').style.display = '';
   document.getElementById('clubHead').innerHTML = '<div class="sub">' + (isEs() ? 'Cargando…' : 'Загрузка…') + '</div>';
@@ -630,6 +637,14 @@ async function selectClub(entry) {
   renderFilterBar();
   renderChips();
   renderAll();
+
+  if (openOppSlug && RIVALS) {
+    const opp = RIVALS.opponents.find(o => o.slug === openOppSlug);
+    if (opp) {
+      document.getElementById('rivalrySection').scrollIntoView({ block: 'start' });
+      openRivalMatchup(opp.club_id);
+    }
+  }
 }
 
 /* ============================= club header ============================= */
