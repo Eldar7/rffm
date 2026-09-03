@@ -29,6 +29,7 @@ import json
 from pathlib import Path
 
 import club_profile_data_v2 as cpd
+import club_rivalries_data_v2 as crd
 from club_division_map import CAT_LABEL_ES, CATEGORIES, DIV_CODE, DIV_LABEL_ES, GT_CODE, TIER_OF
 from site_theme import FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
@@ -83,6 +84,9 @@ def build_all(out_dir: Path) -> None:
         if i % 200 == 0:
             print(f"  {i}/{len(clubs)}...")
     print(f"  done, {total_bytes / 1e6:.0f} MB across {len(clubs)} club files")
+
+    print("Building rivalries data (Соперничества tab)...")
+    crd.build_all(out_dir, profiled_club_ids=set(clubs.keys()))
 
     (out_dir / "club_profile.html").write_text(build_html(seasons), encoding="utf-8")
 
@@ -148,6 +152,18 @@ I18N_ES = {
     "player_from": "Llegó de {club} en la temporada {season}.",
     "player_gap": "Llegó tras un hueco sin datos; club previo desconocido.",
     "th_season": "Temporada", "th_club_row": "Club", "th_team_row": "Equipo", "th_cat_row": "Categoría", "th_div_row": "División",
+    "h_rivals": "Rivalidades",
+    "rivals_note": "Del histórico completo de partidos (todas las temporadas 2016/17&ndash;2025/26 &mdash; más amplio que "
+                   "las temporadas de inscripción de arriba) &mdash; los equipos del club se agrupan por club_id único, "
+                   "no por nombre, así que un cambio de patrocinador/nombre no crea un segundo club aquí.",
+    "rivals_search": "Buscar rival…",
+    "rivals_none": "No hay datos de partidos para este club.",
+    "th_opp": "Rival", "th_m": "PJ", "th_wdl": "G-E-P", "th_goals": "Goles",
+    "l_matches": "Partidos", "l_opponents": "Rivales", "l_wdl": "G-E-P", "l_goals": "Goles",
+    "count_matches": "partidos",
+    "h_squads": "Equipos", "th_team_pair": "Pareja de equipos",
+    "th_date": "Fecha", "th_score": "Resultado", "th_where": "Dónde", "th_venue": "Campo",
+    "l_home": "Local", "l_away": "Visitante",
     "footer": 'Construido a partir de <code>output/processed/rffm/*/player_competition_participation.csv</code> '
               '(temporadas 2018-2019 a 2025-2026). No existe un <code>transfers.csv</code> — un club anterior/posterior '
               'solo se muestra cuando el jugador tiene inscripción confirmada en dos temporadas consecutivas; un hueco '
@@ -231,6 +247,29 @@ HTML = r"""<!DOCTYPE html>
       <p class="scope-note"><span class="mark">i</span> <span data-i18n="paths_note">Ось Y: категория (блок) и дивизион внутри неё &mdash; уровни сравнимы только внутри одной категории, а не между разными категориями.</span></p>
       <p class="foot" id="pathsCapNote"></p>
       <div class="chart-wrap"><div id="pathsDiv" style="width:100%;min-height:520px"></div></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2><span data-i18n="h_rivals">Соперничества</span></h2></div>
+      <p class="scope-note"><span class="mark">i</span> <span data-i18n="rivals_note">Из полного краула матчей (все сезоны 2016/17&ndash;2025/26 &mdash; шире, чем сезоны заявок выше) &mdash; составы клуба сведены по единому club_id, а не по имени, поэтому смена спонсора/названия клуба здесь не создаёт второй клуб.</span></p>
+      <div class="stats" id="rivalStats"></div>
+      <div class="section-head" style="border:none;padding:0;margin:0.9rem 0 0.5rem;">
+        <input type="text" id="rivalSearch" class="path-search" data-i18n-ph="rivals_search" placeholder="Найти соперника&hellip;" autocomplete="off" style="margin-left:0">
+      </div>
+      <div class="table-shell">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th><span data-i18n="th_opp">Соперник</span></th>
+              <th class="num"><span data-i18n="th_m">И</span></th>
+              <th class="num"><span data-i18n="th_wdl">В-Н-П</span></th>
+              <th class="num"><span data-i18n="th_goals">Мячи</span></th>
+            </tr></thead>
+            <tbody id="rivalTbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="foot" id="rivalEmptyNote" style="display:none"></p>
     </section>
 
   </div>
@@ -426,6 +465,28 @@ tbody tr{ cursor:pointer; }
 .status-new{ color:var(--gold); } .status-new .status-dot{ background:var(--gold); }
 .status-left{ color:var(--pos-red); } .status-left .status-dot{ background:var(--pos-red); }
 
+/* ---- rivalries (Соперничества) ---- */
+tr.rival-row{ cursor:pointer; }
+tr.rival-row:hover td{ background:var(--row-hover); }
+tr.rival-row td.opp-name{ display:flex; align-items:center; gap:0.4rem; }
+tr.rival-row .opp-bar{ height:4px; border-radius:2px; background:var(--line); overflow:hidden; width:4.5rem; flex:none; }
+tr.rival-row .opp-bar i{ display:block; height:100%; background:var(--accent); }
+.wdl{ font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.wdl .w{ color:var(--accent); } .wdl .d{ color:var(--teal); } .wdl .l{ color:var(--pos-red); }
+.crumb{ font-size:0.78rem; color:var(--ink-soft); margin-bottom:0.6rem; }
+.crumb a{ color:var(--accent); cursor:pointer; text-decoration:none; } .crumb a:hover{ text-decoration:underline; }
+.score-band{ display:flex; align-items:center; justify-content:center; gap:1.1rem; margin:0.4rem 0 0.8rem; }
+.score-band .side{ font-family:'Oswald',sans-serif; font-weight:700; text-transform:uppercase; font-size:0.95rem; text-align:center; flex:1; }
+.score-band .side.us{ color:var(--accent); }
+.score-band .num{ font-family:ui-monospace,monospace; font-weight:700; font-size:2.1rem; white-space:nowrap; color:var(--ink); }
+.score-band .num .colon{ color:var(--ink-soft); padding:0 0.15rem; }
+.wdl-bar{ display:flex; height:8px; border-radius:4px; overflow:hidden; margin-bottom:0.8rem; background:var(--line); }
+.wdl-bar span{ height:100%; }
+.wdl-bar .w{ background:var(--accent); } .wdl-bar .d{ background:var(--teal); } .wdl-bar .l{ background:var(--pos-red); }
+.rival-clickable{ cursor:pointer; }
+.rival-clickable:hover td{ background:var(--row-hover); }
+.log-table td.venue{ color:var(--ink-soft); font-size:0.78rem; }
+
 @media (max-width: 720px){
   header.masthead > .switch-row{ position:static; margin-bottom:0.5rem; }
   .filter-row{ flex-direction:column; }
@@ -439,6 +500,7 @@ PAGE_JS = r"""
 
 let CLUB_INDEX = [];
 let CLUB = null;          // current club payload (see club_profile_data.club_payload())
+let RIVALS = null;        // current club's rivalries payload (club_rivalries_data_v2.build_club_payload()) - null if none
 let SELF = null;          // CLUB.self — which "clubs" entry IS the target club
 let filters = { seasons: null, cats: null, teams: null };  // null = "all"
 let direction = 'in';     // 'in' = donors, 'out' = destinations
@@ -481,8 +543,15 @@ async function init() {
   // index, so a name match here is more reliable than trusting their slug.
   let entry = slug ? CLUB_INDEX.find(c => c.slug === slug) : null;
   if (!entry && name) {
+    const nameLower = name.toLowerCase();
+    // `display` is this club's CURRENT canonical name (club_identity.py) -
+    // a cross-link built from a page that hasn't been migrated off its own
+    // per-season name grouping yet can carry an older sponsor-era spelling,
+    // so also check `variants` (every raw spelling club_identity.py has
+    // ever seen for this club_id) before giving up.
     entry = CLUB_INDEX.find(c => c.display === name) ||
-      CLUB_INDEX.find(c => c.display.toLowerCase() === name.toLowerCase());
+      CLUB_INDEX.find(c => c.display.toLowerCase() === nameLower) ||
+      CLUB_INDEX.find(c => (c.variants || []).some(v => v.toLowerCase() === nameLower));
   }
   if (entry) selectClub(entry);
 }
@@ -538,12 +607,22 @@ async function selectClub(entry) {
   url.searchParams.set('club', entry.slug);
   history.replaceState(null, '', url);
 
-  const res = await fetch('data/club_profile/' + entry.slug + '.json');
-  CLUB = await res.json();
+  const [profileRes, rivalsRes] = await Promise.all([
+    fetch('data/club_profile/' + entry.slug + '.json'),
+    // Separate file, separate fetch, on purpose - rivalries.py's club_id
+    // universe/season range is wider than this page's fichajugador-scoped
+    // one (see club_rivalries_data_v2.py's module docstring), and a club
+    // with no match history at all (rare, but possible) 404s here rather
+    // than existing as an empty file - see renderRivals()'s RIVALS===null case.
+    fetch('data/rivalries/' + entry.slug + '.json').catch(() => null),
+  ]);
+  CLUB = await profileRes.json();
+  RIVALS = (rivalsRes && rivalsRes.ok) ? await rivalsRes.json() : null;
   SELF = CLUB.self;
   filters = { seasons: null, cats: null, teams: null };
   direction = 'in'; flowView = 'sankey'; pathHighlight = '';
   document.getElementById('pathSearch').value = '';
+  document.getElementById('rivalSearch').value = '';
   document.querySelectorAll('#dirToggle .seg-opt').forEach(b => b.classList.toggle('is-active', b.dataset.dir === 'in'));
   document.querySelectorAll('#flowViewToggle .seg-opt').forEach(b => b.classList.toggle('is-active', b.dataset.view === 'sankey'));
 
@@ -1017,6 +1096,118 @@ function applyPathHighlight() {
   Plotly.restyle(el, { opacity: opacities });
 }
 
+/* ============================= rivalries ============================= */
+
+function wdlBar(w, d, l) {
+  const total = Math.max(1, w + d + l);
+  return '<div class="wdl-bar"><span class="w" style="width:' + (w / total * 100) + '%"></span>' +
+    '<span class="d" style="width:' + (d / total * 100) + '%"></span>' +
+    '<span class="l" style="width:' + (l / total * 100) + '%"></span></div>';
+}
+
+function wdlText(w, d, l) {
+  return '<span class="wdl"><span class="w">' + w + '</span>-<span class="d">' + d + '</span>-<span class="l">' + l + '</span></span>';
+}
+
+function breakdownTable(rows, keyField, keyLabel) {
+  if (!rows.length) return '';
+  return '<div class="table-shell" style="margin-top:0.6rem"><div class="table-scroll" style="max-height:12rem"><table><thead><tr>' +
+    '<th>' + esc(keyLabel) + '</th><th class="num">' + T('th_m', 'И') + '</th><th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r[keyField]) + '</td><td class="num">' + r.matches + '</td>' +
+      '<td class="num">' + wdlText(r.wins, r.draws, r.losses) + '</td>' +
+      '<td class="num">' + r.goals_for + ':' + r.goals_against + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+}
+
+function renderRivals() {
+  const wrap = document.getElementById('rivalStats');
+  const tbody = document.getElementById('rivalTbody');
+  const note = document.getElementById('rivalEmptyNote');
+  if (!RIVALS) {
+    wrap.innerHTML = ''; tbody.innerHTML = '';
+    note.style.display = 'block';
+    note.textContent = T('rivals_none', 'Нет данных о матчах для этого клуба.');
+    return;
+  }
+  note.style.display = 'none';
+  wrap.innerHTML = [
+    [RIVALS.matches, T('l_matches', 'Матчей')],
+    [RIVALS.opponents.length, T('l_opponents', 'Соперников')],
+    [RIVALS.wins + '-' + RIVALS.draws + '-' + RIVALS.losses, T('l_wdl', 'В-Н-П')],
+    [RIVALS.goals_for + ':' + RIVALS.goals_against, T('l_goals', 'Мячи')],
+  ].map(([val, label]) => '<div class="stat"><div class="n">' + val + '</div><div class="l">' + esc(label) + '</div></div>').join('');
+
+  const q = (document.getElementById('rivalSearch').value || '').trim().toLowerCase();
+  const opps = q ? RIVALS.opponents.filter(o => o.display.toLowerCase().includes(q)) : RIVALS.opponents;
+  const maxM = RIVALS.opponents.length ? RIVALS.opponents[0].matches : 1;
+  tbody.innerHTML = opps.map(o => {
+    const pct = Math.max(4, Math.round(o.matches / maxM * 100));
+    return '<tr class="rival-row" data-opp="' + o.club_id + '">' +
+      '<td class="opp-name">' + esc(o.display) + '<span class="opp-bar"><i style="width:' + pct + '%"></i></span></td>' +
+      '<td class="num">' + o.matches + '</td>' +
+      '<td class="num">' + wdlText(o.wins, o.draws, o.losses) + '</td>' +
+      '<td class="num">' + o.goals_for + ':' + o.goals_against + '</td>' +
+      '</tr>';
+  }).join('');
+  tbody.querySelectorAll('tr[data-opp]').forEach(tr => tr.addEventListener('click', () => openRivalMatchup(+tr.dataset.opp)));
+}
+
+function openRivalMatchup(oppId) {
+  const opp = RIVALS.opponents.find(o => o.club_id === oppId);
+  if (!opp) return;
+  const teamRows = [...opp.team_pairs].sort((a, b) => b.matches - a.matches);
+  const card = document.getElementById('playerModalCard');
+  card.innerHTML = '<button type="button" class="modal-close" id="modalCloseBtn">&times;</button>' +
+    '<h3>' + esc(RIVALS.display) + ' &mdash; ' + esc(opp.display) + '</h3>' +
+    '<div class="modal-sub">' + opp.matches + ' ' + T('count_matches', 'матчей') + '</div>' +
+    '<div class="score-band"><div class="side us">' + esc(RIVALS.display) + '</div>' +
+    '<div class="num">' + opp.goals_for + '<span class="colon">:</span>' + opp.goals_against + '</div>' +
+    '<div class="side">' + esc(opp.display) + '</div></div>' +
+    wdlBar(opp.wins, opp.draws, opp.losses) +
+    breakdownTable(opp.by_season, 'season', T('th_season', 'Сезон')) +
+    breakdownTable(opp.by_category, 'category', T('th_cat_row', 'Категория')) +
+    '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_squads', 'Составы') + '</h3>' +
+    '<div class="table-shell"><div class="table-scroll" style="max-height:16rem"><table><thead><tr>' +
+    '<th>' + T('th_team_pair', 'Пара команд') + '</th><th class="num">' + T('th_m', 'И') + '</th>' +
+    '<th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
+    teamRows.map((tp, i) => '<tr class="rival-clickable" data-i="' + i + '"><td>' + esc(tp.team_us_name) + ' &ndash; ' + esc(tp.team_them_name) + '</td>' +
+      '<td class="num">' + tp.matches + '</td><td class="num">' + wdlText(tp.wins, tp.draws, tp.losses) + '</td>' +
+      '<td class="num">' + tp.goals_for + ':' + tp.goals_against + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+  card.querySelectorAll('tr[data-i]').forEach(tr => tr.addEventListener('click', () => openTeamPairView(oppId, +tr.dataset.i)));
+  document.getElementById('modalCloseBtn').addEventListener('click', hideModal);
+  showModal();
+}
+
+function openTeamPairView(oppId, tpIndex) {
+  const opp = RIVALS.opponents.find(o => o.club_id === oppId);
+  const tp = opp && [...opp.team_pairs].sort((a, b) => b.matches - a.matches)[tpIndex];
+  if (!tp) return;
+  const log = [...tp.log].sort((a, b) => a.date < b.date ? 1 : -1);
+  const card = document.getElementById('playerModalCard');
+  card.innerHTML = '<button type="button" class="modal-close" id="modalCloseBtn">&times;</button>' +
+    '<div class="crumb"><a id="backToMatchup">' + esc(RIVALS.display) + ' &mdash; ' + esc(opp.display) + '</a> / ' +
+    esc(tp.team_us_name) + ' &ndash; ' + esc(tp.team_them_name) + '</div>' +
+    '<h3>' + esc(tp.team_us_name) + ' &mdash; ' + esc(tp.team_them_name) + '</h3>' +
+    '<div class="modal-sub">' + tp.matches + ' ' + T('count_matches', 'матчей') + '</div>' +
+    '<div class="score-band"><div class="side us">' + esc(tp.team_us_name) + '</div>' +
+    '<div class="num">' + tp.goals_for + '<span class="colon">:</span>' + tp.goals_against + '</div>' +
+    '<div class="side">' + esc(tp.team_them_name) + '</div></div>' +
+    wdlBar(tp.wins, tp.draws, tp.losses) +
+    '<div class="table-shell"><div class="table-scroll log-table" style="max-height:18rem"><table><thead><tr>' +
+    '<th>' + T('th_date', 'Дата') + '</th><th>' + T('th_season', 'Сезон') + '</th><th>' + T('th_cat_row', 'Категория') + '</th>' +
+    '<th class="num">' + T('th_score', 'Счёт') + '</th><th>' + T('th_where', 'Где') + '</th><th>' + T('th_venue', 'Поле') + '</th>' +
+    '</tr></thead><tbody>' +
+    log.map(m => '<tr><td>' + esc(m.date) + '</td><td>' + esc(m.season) + '</td><td>' + esc(m.category) + '</td>' +
+      '<td class="num">' + m.for + ':' + m.against + '</td>' +
+      '<td>' + (m.home ? T('l_home', 'Дома') : T('l_away', 'Выезд')) + '</td>' +
+      '<td class="venue">' + esc(m.venue || '—') + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+  document.getElementById('backToMatchup').addEventListener('click', () => openRivalMatchup(oppId));
+  document.getElementById('modalCloseBtn').addEventListener('click', hideModal);
+  showModal();
+}
+
 /* ============================= player modal ============================= */
 
 function showModal() { document.getElementById('playerModalBackdrop').classList.remove('hidden'); }
@@ -1076,6 +1267,7 @@ function renderAll() {
   renderFlow(roster);
   renderRoster(roster);
   renderPaths(roster);
+  renderRivals();
 }
 
 function wireStaticControls() {
@@ -1094,6 +1286,7 @@ function wireStaticControls() {
   document.getElementById('pathSearch').addEventListener('input', (e) => {
     pathHighlight = e.target.value; applyPathHighlight();
   });
+  document.getElementById('rivalSearch').addEventListener('input', renderRivals);
   document.getElementById('playerModalBackdrop').addEventListener('click', (e) => {
     if (e.target.id === 'playerModalBackdrop') hideModal();
   });

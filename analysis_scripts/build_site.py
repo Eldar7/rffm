@@ -206,7 +206,7 @@ CARDS_RU = [
     {
         "href": "club_profile.html",
         "title": "Профиль клуба",
-        "desc": "Выберите клуб — откуда пришли и куда уходят игроки, состав по категориям/командам, путь каждого игрока по клубам и дивизионам.",
+        "desc": "Выберите клуб — откуда пришли и куда уходят игроки, состав по категориям/командам, путь каждого игрока по клубам и дивизионам, и с кем и как клуб играл за всю историю — вплоть до конкретных матчей между двумя составами.",
     },
     {
         "href": "competition_structure.html",
@@ -245,7 +245,7 @@ CARDS_ES = [
     "Mapa de clubes por división",
     "Matriz de posiciones de clubes en todas las edades y divisiones, con sedes reales y escudos de los clubes.",
     "Perfil de club",
-    "Elige un club: de dónde llegaron y a dónde se fueron sus jugadores, la plantilla por categoría/equipo, y el camino de cada jugador por clubes y divisiones.",
+    "Elige un club: de dónde llegaron y a dónde se fueron sus jugadores, la plantilla por categoría/equipo, el camino de cada jugador por clubes y divisiones, y contra quién y cómo ha jugado el club en toda su historia — hasta los partidos concretos entre dos plantillas.",
     "Pirámide de ligas de la RFFM",
     "Para cada edad/sexo/tipo de juego: la escalera completa de divisiones, ascensos/descensos, la salida a la RFEF y el calendario de fases de la temporada.",
     "Comparación entre temporadas",
