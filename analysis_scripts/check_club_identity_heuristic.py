@@ -40,16 +40,19 @@ HERE = Path(__file__).parent
 # migration starting - remove an entry the moment that file switches to
 # club_identity.resolve()/attach_club_id(). Keep alphabetical.
 ALLOWLIST = {
+    # v1 - not migrated on purpose (see the club_identity.py rollout
+    # discussion): the project plans to retire v1 entirely rather than
+    # maintain the heuristic fix in two places. Every _v2 counterpart is
+    # migrated - this list should never grow, only shrink to empty as v1
+    # itself goes away.
     "all_players.py",
     "club_division_map.py",
-    "club_profile_data.py",  # v1, superseded by the now-migrated club_profile_data_v2.py
-    "debutante_analysis.py",
+    "club_profile_data.py",  # superseded by the now-migrated club_profile_data_v2.py
     "player_cards.py",
     "season_comparison.py",
-    "season_comparison_v2.py",
     "team_cards.py",
     "weird_scores_report.py",
-    "weird_scores_report_v2.py",
+    "debutante_analysis.py",  # ad hoc one-off script, not part of the site build
 }
 
 # A file legitimately reading/re-deriving club_name_raw for reasons that

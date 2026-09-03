@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 import rffm_data as data
 from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
@@ -96,12 +97,21 @@ def load_all_data() -> dict:
         matches["hid"] = matches["home_team_id"].map(norm_id)
         matches["aid"] = matches["away_team_id"].map(norm_id)
         teams["tid"]   = teams["team_id"].map(norm_id)
-        tid_to_club    = dict(zip(teams["tid"], teams["club_name_raw"]))
+        # club_id (club_identity.py - team_club_map.csv, ground truth from
+        # RFFM's own site) rather than club_name_raw: two team_ids of the
+        # SAME club can carry slightly different raw name text within one
+        # season (a mid-season rebrand not yet applied to every squad's
+        # row), which would otherwise inflate "distinct clubs this season"
+        # by one for every such mismatch.
+        tid_to_club_id = {tid: ci.resolve(tid) for tid in teams["tid"].dropna().unique()}
+        names = ci.club_display_names()
 
         # Build per-season club index (sorted, deduplicatable in JS)
-        season_club_list = sorted(teams["club_name_raw"].dropna().unique().tolist())
+        season_club_ids = sorted({cid for cid in tid_to_club_id.values() if cid is not None},
+                                  key=lambda cid: names.get(cid) or "")
+        season_club_list = [names.get(cid) or f"club {cid}" for cid in season_club_ids]
         season_clubs[season] = season_club_list
-        club_to_idx = {c: i for i, c in enumerate(season_club_list)}
+        club_to_idx = {cid: i for i, cid in enumerate(season_club_ids)}
 
         # Women competitions
         fem_comp_ids = set(comps.loc[comps["is_fem"], "competition_id"].tolist())
@@ -137,7 +147,7 @@ def load_all_data() -> dict:
                 wm_gt = int(mb_gt["competition_id"].isin(fem_comp_ids).sum())
 
                 team_ids_gt = set(mb_gt["hid"].dropna()) | set(mb_gt["aid"].dropna())
-                clubs_set_gt = {tid_to_club[t] for t in team_ids_gt if t in tid_to_club}
+                clubs_set_gt = {tid_to_club_id[t] for t in team_ids_gt if tid_to_club_id.get(t) is not None}
                 ci_gt = sorted({club_to_idx[c] for c in clubs_set_gt if c in club_to_idx})
                 vi_count_gt = int(mb_gt["venue_id"].dropna().nunique())
                 venue_ids_gt = sorted(mb_gt["venue_id"].dropna().unique().tolist())

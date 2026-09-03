@@ -3,13 +3,20 @@
 v2 PROOF-OF-CONCEPT: identical to weird_scores_report.py except its two
 data-reading functions (compact_matches, compact_enrichment) source from
 output/processed/rffm_parquet/ via rffm_data.read_table() instead of
-pd.read_csv() on output/processed/rffm/<season>/*.csv. Everything else
-(HTML/JS/CSS building, list_seasons, build_all) is byte-for-byte the
-original - only the two read functions differ, so this file's output can
-be diffed against the original's to confirm the migration is lossless.
-Kept as a separate file (not a flag on the original) so the CSV-driven
-site is never at risk of this change - see build_site.py for how it's
-wired into a separate site/v2/ output alongside the untouched original.
+pd.read_csv() on output/processed/rffm/<season>/*.csv. Kept as a separate
+file (not a flag on the original) so the CSV-driven site is never at risk
+of this change - see build_site.py for how it's wired into a separate
+site/v2/ output alongside the untouched original.
+
+One deliberate departure from that "otherwise byte-for-byte" parity:
+compact_matches()'s "hc"/"ac" (home/away club) fields hold club_id (via
+club_identity.py - team_club_map.csv, ground truth from RFFM's own site),
+not club_name_raw text like the original - club-level aggregation
+(clubAgg(), the "intra-club derby" section) needs a real identity, not a
+name that can differ between two teams of the same club within one
+season. compact_matches() also now writes a small "clubs" (club_id ->
+display name) lookup into each season's _meta.json for the client to
+resolve ids back to display text - see CLUB_NAMES in the JS below.
 
 "Странные счета, доминаторы и аутсайдеры" — the RFFM weird-scores report.
 
@@ -41,6 +48,7 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 import rffm_data as data
 from site_theme import CSS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
@@ -142,20 +150,23 @@ def compact_matches(season: str) -> list[dict]:
     played["aid"] = played["away_team_id"].map(norm_id)
 
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
-    tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
+    tid_to_club_id = {tid: ci.resolve(tid) for tid in teams["team_id"].map(norm_id).dropna().unique()}
     played["home_name"] = played["hid"].map(tid_to_name).fillna(played["home_team"])
     played["away_name"] = played["aid"].map(tid_to_name).fillna(played["away_team"])
-    played["home_club"] = played["hid"].map(tid_to_club)
-    played["away_club"] = played["aid"].map(tid_to_club)
+    played["home_club"] = played["hid"].map(tid_to_club_id)
+    played["away_club"] = played["aid"].map(tid_to_club_id)
     played["divc"] = played["division_level"].map(DIV_CODE)
     played["gtc"] = played["game_type"].map(gt_code)
+
+    def club_id_or_none(v) -> int | None:
+        return int(v) if pd.notna(v) else None
 
     out = []
     for r in played.to_dict("records"):
         out.append({
             "id": r["match_id"], "d": clean(r["match_date"]),
-            "h": clean(r["home_name"]) or "?", "hid": r["hid"], "hc": clean(r["home_club"]),
-            "a": clean(r["away_name"]) or "?", "aid": r["aid"], "ac": clean(r["away_club"]),
+            "h": clean(r["home_name"]) or "?", "hid": r["hid"], "hc": club_id_or_none(r["home_club"]),
+            "a": clean(r["away_name"]) or "?", "aid": r["aid"], "ac": club_id_or_none(r["away_club"]),
             "hs": int(r["hs"]), "as": int(r["as_"]),
             "comp": clean(r["competition"]), "grp": clean(r["group"]),
             "cat": r["category"], "div": r["divc"], "gt": r["gtc"],
@@ -254,10 +265,14 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
             by_cat.setdefault(m["cat"], []).append(m)
         cats_present = sorted(by_cat)
 
+        names = ci.club_display_names()
+        club_ids = {m["hc"] for m in matches} | {m["ac"] for m in matches}
+        club_ids.discard(None)
         meta = {
             "season": season, "categories": cats_present,
             "divs": sorted(set(m["div"] for m in matches)),
             "gts": sorted(set(m["gt"] for m in matches)),
+            "clubs": {cid: names.get(cid) or f"club {cid}" for cid in club_ids},
         }
         (data_dir / f"weird_scores_{season}_meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
@@ -370,6 +385,7 @@ let CURLANG = 'ru';
 let CURSEASON = SEASONS[SEASONS.length - 1];
 let MATCHES = [];
 let META = null;
+let CLUB_NAMES = {}; // club_id -> display name, set from META.clubs on each season load
 const STATE = { cats: new Set(), divs: new Set(), gts: new Set(), seeded: false };
 const ENRICH_CACHE = {};
 
@@ -517,7 +533,7 @@ function clubAgg(matches) {
   }
   matches.forEach(m => { bump(m.hc, m.hs, m.as, m.hid); bump(m.ac, m.as, m.hs, m.aid); });
   return [...map.values()].map(c => ({
-    club: c.club, played: c.played, gf: c.gf, ga: c.ga, wins: c.wins,
+    club: CLUB_NAMES[c.club] ?? String(c.club), played: c.played, gf: c.gf, ga: c.ga, wins: c.wins,
     teams: c.teams.size, diff: c.gf - c.ga, win_pct: Math.round(c.wins / c.played * 100),
   }));
 }
@@ -638,7 +654,7 @@ function renderSec06(t, matches, teams) {
   });
   if (bestSpread) {
     const { club, best, worst, n } = bestSpread;
-    curios.push([t.c1h, t.c1p(club, n, teamLink(worst.tid, worst.name), `${worst.gf}:${worst.ga}`, worst.played,
+    curios.push([t.c1h, t.c1p(CLUB_NAMES[club] ?? String(club), n, teamLink(worst.tid, worst.name), `${worst.gf}:${worst.ga}`, worst.played,
       teamLink(best.tid, best.name), `${best.gf}:${best.ga}`, (best.diff > 0 ? '+' : '') + best.diff)]);
   }
   // b) intra-club derby blowout
@@ -652,7 +668,7 @@ function renderSec06(t, matches, teams) {
       legs.forEach(l => { if (l.hid === derby.hid) { gf += l.hs; ga += l.as; } else { gf += l.as; ga += l.hs; } });
       agg = t.c2agg(gf, ga);
     }
-    curios.push([t.c2h, t.c2p(derby.hc, teamLink(derby.hid, derby.h), teamLink(derby.aid, derby.a), derby.d, matchLink(derby.id, scoreTxt(derby)), agg)]);
+    curios.push([t.c2h, t.c2p(CLUB_NAMES[derby.hc] ?? String(derby.hc), teamLink(derby.hid, derby.h), teamLink(derby.aid, derby.a), derby.d, matchLink(derby.id, scoreTxt(derby)), agg)]);
   }
   // c) intra-club match count
   curios.push([t.c3h(intra.length), t.c3p(intra.length)]);
@@ -905,6 +921,7 @@ async function loadSeason(season) {
   document.getElementById('content').innerHTML = `<div class="loading-state">${T[CURLANG].loading}</div>`;
   const metaRes = await fetch(`data/weird_scores_${season}_meta.json`);
   META = await metaRes.json();
+  CLUB_NAMES = META.clubs || {};
 
   const activeCats = [...STATE.cats].filter(c => META.categories.includes(c));
   if (!STATE.seeded || !activeCats.length) {
