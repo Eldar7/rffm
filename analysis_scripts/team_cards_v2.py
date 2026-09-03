@@ -59,10 +59,11 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 import rffm_data as data
 from club_division_map import CAT_LABEL_ES, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER, TIER_OF
 from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS,
-                         THEME_SWITCH_JS, club_slug_map, switch_row_html)
+                         THEME_SWITCH_JS, switch_row_html)
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -91,8 +92,8 @@ def clean(v) -> str | None:
     return v or None
 
 
-def build_club_team_cards(season: str) -> dict[str, dict]:
-    """club_name_raw -> {team_id: {name, matches: [...], competitions: {...}}},
+def build_club_team_cards(season: str) -> dict[int, dict]:
+    """club_id -> {team_id: {name, matches: [...], competitions: {...}}},
     one entry per team the club fielded, sorted chronologically within each
     team. `competitions` is keyed by f"{comp_id}_{group_id}" — a team can be
     registered in more than one competition/group the same season (regular
@@ -100,13 +101,20 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     each entry carries the static per-competition facts matches.csv repeats
     on every row (division, phase, game type) plus a standings.csv snapshot
     (position/played/W-D-L/goals/points), for the Team Card's per-competition
-    summary panel."""
+    summary panel.
+
+    Keyed by club_id (club_identity.py - team_club_map.csv's authoritative
+    team_id -> club_id, not club_name_raw) so a team whose club renamed
+    mid-history (sponsor change) still lands in the SAME club's entry - see
+    club_identity.py's module docstring. A team_id with no known club_id
+    (team_club_gap_reasons.csv - a genuine gap, not a matching failure) is
+    dropped, same as every other club_identity.py-based report."""
     teams = data.read_table("teams", season=season)
     matches = data.read_table("matches", season=season)
     comps = data.read_table("competitions", season=season)
     standings = data.read_table("standings", season=season)
 
-    tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
+    tid_to_club_id = {tid: ci.resolve(tid) for tid in teams["team_id"].map(norm_id).dropna().unique()}
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
     comp_id_to_division = dict(zip(comps["competition_id"], comps["division_level"]))
 
@@ -128,7 +136,7 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
     matches["hid"] = matches["home_team_id"].map(norm_id)
     matches["aid"] = matches["away_team_id"].map(norm_id)
 
-    club_teams: dict[str, dict[str, dict]] = {}
+    club_teams: dict[int, dict[str, dict]] = {}
     sides = (("hid", "aid", "home_team", "away_team", "home_score", "away_score", True),
              ("aid", "hid", "away_team", "home_team", "away_score", "home_score", False))
     for _, r in matches.iterrows():
@@ -136,8 +144,8 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
             tid = r[tid_col]
             if not tid:
                 continue
-            club = tid_to_club.get(tid)
-            if not club:
+            club_id = tid_to_club_id.get(tid)
+            if club_id is None:
                 continue
             opp_tid = r[opp_col]
             opp_name = clean(tid_to_name.get(opp_tid)) or clean(r[opp_name_col])
@@ -160,7 +168,7 @@ def build_club_team_cards(season: str) -> dict[str, dict]:
                 "phase": clean(r["phase_label"]), "matchday": clean(r["matchday_label"]),
                 "season_id": clean(r["season_id"]),
             }
-            team_rec = club_teams.setdefault(club, {}).setdefault(tid, {
+            team_rec = club_teams.setdefault(club_id, {}).setdefault(tid, {
                 "name": clean(tid_to_name.get(tid)) or tid, "matches": [], "competitions": {},
             })
             team_rec["matches"].append(entry)
@@ -1475,7 +1483,7 @@ async function main() {
   }
   const team = (payload.teams || {})[teamId];
   document.getElementById('clubName').innerHTML = payload.club
-    ? `${esc(payload.club)} &middot; <a href="club_profile.html?clubname=${encodeURIComponent(payload.club)}">${CURLANG === 'ru' ? 'профиль клуба' : 'perfil de club'} &rarr;</a>`
+    ? `${esc(payload.club)} &middot; <a href="club_profile.html?club=${encodeURIComponent(CUR_CLUB_SLUG)}">${CURLANG === 'ru' ? 'профиль клуба' : 'perfil de club'} &rarr;</a>`
     : '';
   if (!team) {
     document.getElementById('teamName').textContent = payload.club || '—';
@@ -1553,15 +1561,20 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "team_card.html").write_text(build_html(), encoding="utf-8")
 
+    names = ci.club_display_names()
+    slugs = ci.club_slugs()
     for season in seasons:
         print(f"Building team cards for season {season}")
         club_teams = build_club_team_cards(season)
-        slugs = club_slug_map(sorted(club_teams.keys()))
         data_dir = out_dir / "data" / f"team_cards_{season}"
         data_dir.mkdir(parents=True, exist_ok=True)
-        for club, teams_of_club in club_teams.items():
-            payload = {"club": club, "season": season, "teams": teams_of_club}
-            (data_dir / f"{slugs[club]}.json").write_text(
+        for club_id, teams_of_club in club_teams.items():
+            slug = slugs.get(club_id) or f"club-{club_id}"
+            payload = {
+                "club": names.get(club_id) or f"club {club_id}", "club_id": club_id,
+                "season": season, "teams": teams_of_club,
+            }
+            (data_dir / f"{slug}.json").write_text(
                 json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False),
                 encoding="utf-8")
         print(f"  {len(club_teams)} clubs written to {data_dir}")

@@ -352,13 +352,14 @@ function quickSelect(kind, containerId, allItems, action, onToggle) {
 function aggregateClubs(rows, clubMeta) {
   const byClub = new Map();
   rows.forEach(r => {
-    let c = byClub.get(r.club);
+    let c = byClub.get(r.club_id);
     if (!c) {
       c = {
-        club: r.club, teams: new Set(), cats: new Set(), divs: new Set(), leaders: new Set(),
+        club: r.club, club_id: r.club_id, slug: r.slug,
+        teams: new Set(), cats: new Set(), divs: new Set(), leaders: new Set(),
         pl: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0, teamAgg: new Map(),
       };
-      byClub.set(r.club, c);
+      byClub.set(r.club_id, c);
     }
     c.teams.add(r.tid);
     c.cats.add(r.cat);
@@ -374,9 +375,9 @@ function aggregateClubs(rows, clubMeta) {
     const stVals = teamStats.map(t => t.st).filter(v => v !== null && v !== undefined);
     const divsSorted = [...c.divs].sort((a, b) => divTier(a) - divTier(b));
     const bestDiv = divsSorted.length ? divsSorted[0] : null;
-    const meta = clubMeta[c.club] || {};
+    const meta = clubMeta[c.club_id] || {};
     return {
-      club: c.club, cats: c.cats.size, teams: c.teams.size, bestDiv,
+      club: c.club, club_id: c.club_id, slug: c.slug, cats: c.cats.size, teams: c.teams.size, bestDiv,
       pl: c.pl, w: c.w, d: c.d, l: c.l, gf: c.gf, ga: c.ga, gd: c.gf - c.ga, pts: c.pts,
       leaders: c.leaders.size,
       sq: sqVals.length ? sqVals.reduce((a, b) => a + b, 0) / sqVals.length : null,
@@ -392,7 +393,7 @@ function allTeamsUrl(c) {
   return `all_teams.html?season=${encodeURIComponent(CUR_SEASON)}&q=${encodeURIComponent(c.club)}`;
 }
 function clubProfileUrl(c) {
-  return `club_profile.html?clubname=${encodeURIComponent(c.club)}`;
+  return `club_profile.html?club=${encodeURIComponent(c.slug)}`;
 }
 
 function rowHtml(c) {

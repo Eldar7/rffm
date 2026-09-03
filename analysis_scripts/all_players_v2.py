@@ -57,11 +57,11 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 import player_career_v2 as player_career
 import rffm_data as data
 from club_division_map import CAT_LABEL_ES, CAT_LABEL_RU, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER
-from site_theme import (DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS,
-                         club_slug_map, switch_row_html)
+from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 from team_cards_v2 import build_club_team_cards, norm_id
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
@@ -116,12 +116,12 @@ def build_career_profiles(seasons: list[str]) -> dict[str, dict]:
                 by = pid_to_birth.get(pid)
                 if by and str(by).strip():
                     p["birth_year"] = str(by).strip()
-            club = clean(row.club_name_raw)
-            if club:
-                p["clubs"].add(club)
             tid = norm_id(row.team_id)
             if tid:
                 p["teams"].add(tid)
+                club_id = ci.resolve(tid)
+                if club_id is not None:
+                    p["clubs"].add(club_id)
     return profiles
 
 
@@ -230,22 +230,13 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
     pid_to_name = dict(zip(players["player_id"], players["player_name"]))
     pid_to_birth = dict(zip(players["player_id"], players["birth_year"]))
 
-    # Same club_name_raw -> slug map + team_id -> (club, slug) lookup as
-    # player_cards.py, and for the same reason: club_slug_map() must see
-    # team_cards.py's own club universe (not this CSV's raw names) or a
-    # "Команда" link can resolve to the wrong club on a slug collision, and
-    # joining by team_id (not by this row's free-text club_name_raw, which
-    # disagrees with teams.csv often enough to matter) is what actually
-    # gets a slug for ~20% of rows that would otherwise silently get none.
+    # club_teams (club_id -> {team_id: {..., "matches": [...]}}) still needed
+    # below for the result-influence match list; club_id/name/slug now come
+    # from club_identity.py, not from this row's free-text club_name_raw
+    # (which disagrees with teams.csv's spelling often enough to matter).
     club_teams = build_club_team_cards(season)
-    slug_by_club = club_slug_map(sorted(club_teams.keys()))
-    tid_to_club: dict[str, str] = {}
-    tid_to_slug: dict[str, str] = {}
-    for club_name, teams_of_club in club_teams.items():
-        slug = slug_by_club.get(club_name)
-        for tid in teams_of_club:
-            tid_to_club[tid] = club_name
-            tid_to_slug[tid] = slug
+    names = ci.club_display_names()
+    slugs = ci.club_slugs()
 
     perf = build_season_performance(season)
 
@@ -260,10 +251,11 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
         if not pid or pid in current:
             continue
         tid = norm_id(row.team_id)
-        club = tid_to_club.get(tid) or clean(row.club_name_raw)
+        club_id = ci.resolve(tid)
+        club = names.get(club_id) if club_id is not None else None
         current[pid] = {
             "team": clean(row.team), "team_id": clean(row.team_id),
-            "club": club, "club_slug": tid_to_slug.get(tid),
+            "club": club, "club_slug": slugs.get(club_id) if club_id is not None else None,
             "cat": clean(getattr(row, "category_base", None)) or "OTHER",
             "div": clean(getattr(row, "division_level", None)) or "OTHER",
         }
@@ -282,7 +274,7 @@ def build_season_all_players(season: str, profiles: dict[str, dict], all_seasons
         # docstring for why this, not goals, is the metric that also works
         # for a defender/midfielder who never scores.
         cur_tid = norm_id(cur["team_id"])
-        team_matches = club_teams.get(tid_to_club.get(cur_tid, ""), {}).get(cur_tid, {}).get("matches", [])
+        team_matches = club_teams.get(ci.resolve(cur_tid), {}).get(cur_tid, {}).get("matches", [])
         infl = compute_result_influence(team_matches, stats.get("mids", set()))
 
         rec = {

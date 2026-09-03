@@ -43,6 +43,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check club identity heuristic ratchet
+        # Fails fast (no data needed) if the club_name_raw-based "club
+        # identity" heuristic club_identity.py replaced (see its module
+        # docstring) got reintroduced somewhere not already on the known
+        # list - see analysis_scripts/check_club_identity_heuristic.py.
+        run: python analysis_scripts/check_club_identity_heuristic.py
+
       - name: Rebuild players.parquet
         # output/processed/rffm_parquet/players.parquet is deliberately
         # gitignored (see .gitignore / build_parquet.py docstring) - every

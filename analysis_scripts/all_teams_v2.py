@@ -50,9 +50,10 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 from club_division_map import (CAT_LABEL_ES, CAT_LABEL_RU, CATEGORIES, DIV_LABEL_ES, DIV_LABEL_RU, DIV_ORDER,
                                 GT_SHORT, TIER_OF, abs_crest_url)
-from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
+from site_theme import DATATABLE_CSS, DATATABLE_JS, FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 import rffm_data as data
 from team_cards_v2 import build_club_team_cards, list_seasons, norm_id
 
@@ -138,24 +139,18 @@ def build_team_lineup_stats(season: str) -> dict[str, dict]:
     return out
 
 
-def build_club_meta(season: str) -> dict[str, dict]:
-    """club_name_raw -> {web, loc, prov, crest}, from the opt-in clubs.csv
-    enrichment (correspondence address, not a stadium — see
-    DATA_DICTIONARY.md). Missing entirely for a season that hasn't had
-    enrich_clubs.py run, or for a club that crawl never resolved — both
-    just mean the caller gets {} for that name and shows a blank."""
-    df = data.read_table("clubs", season=season)
-    if df.empty:
-        return {}
-    df = df[["club_name_raw", "portal_web", "locality", "province", "crest_url"]]
-    out: dict[str, dict] = {}
-    for row in df.itertuples(index=False):
-        name = clean(row.club_name_raw)
-        if not name:
-            continue
-        out[name] = {
-            "web": clean(row.portal_web), "loc": clean(row.locality), "prov": clean(row.province),
-            "crest": abs_crest_url(clean(row.crest_url)),
+def build_club_meta() -> dict[int, dict]:
+    """club_id -> {web, loc, prov, crest}, from club_identity.py's
+    cross-season club_meta() (opt-in clubs.csv enrichment - correspondence
+    address, not a stadium - see DATA_DICTIONARY.md). A club_id with no
+    clubs.csv coverage just means the caller gets {} for that id and shows
+    a blank. Cross-season (not season-scoped like the rest of this file's
+    tables) since club identity/profile fields aren't season-specific."""
+    out: dict[int, dict] = {}
+    for club_id, m in ci.club_meta().items():
+        out[club_id] = {
+            "web": m["web"], "loc": m["loc"], "prov": m["prov"],
+            "crest": abs_crest_url(m["crest_url"]),
         }
     return out
 
@@ -175,12 +170,14 @@ def build_team_rows(season: str) -> list[dict]:
     comp_id_to_cat = dict(zip(comps["competition_id"], comps["category_base"]))
 
     club_teams = build_club_team_cards(season)
-    slugs = club_slug_map(sorted(club_teams.keys()))
+    names = ci.club_display_names()
+    slugs = ci.club_slugs()
     lineup_stats = build_team_lineup_stats(season)
 
     rows: list[dict] = []
-    for club, teams_of_club in club_teams.items():
-        slug = slugs[club]
+    for club_id, teams_of_club in club_teams.items():
+        club = names.get(club_id) or f"club {club_id}"
+        slug = slugs.get(club_id) or f"club-{club_id}"
         for tid, team_rec in teams_of_club.items():
             ls = lineup_stats.get(tid, {})
             for comp_id, comp in team_rec["competitions"].items():
@@ -190,7 +187,7 @@ def build_team_rows(season: str) -> list[dict]:
                     continue  # nothing finished in this competition yet — nothing to rank
                 standing = comp.get("standing") or {}
                 rows.append({
-                    "club": club, "slug": slug,
+                    "club": club, "club_id": club_id, "slug": slug,
                     "tid": tid, "team": team_rec["name"],
                     "cat": clean(comp_id_to_cat.get(comp_id)) or "OTHER",
                     "div": clean(comp.get("division_level")) or "OTHER",
@@ -466,7 +463,7 @@ let CUR_SEASON = null;
 const SEASON_CACHE = {}; // season -> Promise<{rows, clubs}>
 let ALL_DIVS = new Set();
 let RESTORING = false;
-let CUR_CLUB_META = {}; // club name -> {web, loc, prov, crest}, set each render() from payload.clubs
+let CUR_CLUB_META = {}; // club_id -> {web, loc, prov, crest}, set each render() from payload.clubs
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -524,7 +521,7 @@ function rowHtml(r) {
   const posDisplay = r.pos ? (r.size ? `${r.pos}/${r.size}` : r.pos) : '—';
   const posSort = (r.pos && r.size) ? (Number(r.size) - Number(r.pos) + 1) / Number(r.size) : '';
   const stDisplay = (r.st === null || r.st === undefined) ? '—' : `${Math.round(r.st * 100)}%`;
-  const crest = (CUR_CLUB_META[r.club] || {}).crest;
+  const crest = (CUR_CLUB_META[r.club_id] || {}).crest;
   const crestHtml = crest ? `<img class="club-crest-ic" src="${crest}" alt="" onerror="this.remove()">` : '';
   return `<tr>
     <td class="name-cell" data-col="club" data-v="${esc(r.club)}">${crestHtml}<a href="${allClubsUrl(r)}">${esc(r.club)}</a></td>
@@ -688,7 +685,7 @@ def build_all(out_dir: Path, seasons: list[str] | None = None) -> None:
     for season in build_seasons:
         print(f"Building all-teams data for season {season}")
         rows = build_team_rows(season)
-        clubs = build_club_meta(season)
+        clubs = build_club_meta()
         text = json.dumps({"rows": rows, "clubs": clubs}, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         (data_dir / f"all_teams_{season}.json").write_text(text, encoding="utf-8")
         print(f"  {len(rows)} team-competition rows, {len(clubs)} clubs with metadata ({len(text) / 1024:.0f} KB)")

@@ -38,8 +38,9 @@ from pathlib import Path
 
 import pandas as pd
 
+import club_identity as ci
 import rffm_data as data
-from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, club_slug_map, switch_row_html
+from site_theme import FONT_LINKS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
 BASE = Path(__file__).parent.parent / "output" / "processed" / "rffm"
 MANIFEST = BASE / "coverage_manifest.csv"
@@ -200,9 +201,17 @@ def load_data(season: str) -> dict:
     standings["position"] = pd.to_numeric(standings["position"], errors="coerce")
     standings["tid"] = standings["team_id"].map(norm_id)
 
-    tid_to_club = dict(zip(teams["team_id"].map(norm_id), teams["club_name_raw"]))
+    # "club" columns/dict keys below hold club_id (int) throughout, not
+    # club_name_raw - club_identity.py's team_id -> club_id join (ground
+    # truth from RFFM's own site, no name matching - see that module's
+    # docstring) replaces the per-season name heuristic an earlier version
+    # of this file used, which split a club's history across a sponsor
+    # rename (a real case in this data - club_id 1011, "ARAVACA C.F." vs
+    # "ARAVACA C.F. - CEIBA"). Display names/slugs are looked up once, by
+    # club_id, when clubs_out is assembled below.
+    tid_to_club_id = {tid: ci.resolve(tid) for tid in teams["team_id"].map(norm_id).dropna().unique()}
     tid_to_name = dict(zip(teams["team_id"].map(norm_id), teams["team"]))
-    standings["club"] = standings["tid"].map(tid_to_club)
+    standings["club"] = standings["tid"].map(tid_to_club_id)
     standings = standings.dropna(subset=["club", "position"])
     standings["gt_code"] = standings["game_type"].map(gt_code)
 
@@ -253,7 +262,7 @@ def load_data(season: str) -> dict:
         matches[["aid"] + app_cols].rename(columns={"aid": "tid"}),
     ], ignore_index=True)
     appearances = appearances.dropna(subset=["tid", "competition_id"])
-    appearances["club"] = appearances["tid"].map(tid_to_club)
+    appearances["club"] = appearances["tid"].map(tid_to_club_id)
     appearances = appearances.dropna(subset=["club"])
     comp_meta = comps.set_index("competition_id")[["category_base", "division_level"]]
     appearances = appearances.join(comp_meta, on="competition_id")
@@ -302,7 +311,7 @@ def load_data(season: str) -> dict:
     matches["hid"] = matches["home_team_id"].map(norm_id)
     matches["vid"] = matches["venue_id"].map(norm_id)
     home = matches[matches["hid"].isin(relevant_tids)].copy()
-    home["club"] = home["hid"].map(tid_to_club)
+    home["club"] = home["hid"].map(tid_to_club_id)
     venues["vid"] = venues["venue_id"].map(norm_id)
     venue_info = venues.set_index("vid")[["venue_name", "address", "locality", "google_maps_url"]].to_dict("index")
 
@@ -321,20 +330,17 @@ def load_data(season: str) -> dict:
         venues_by_club[club] = out
 
     # ── club identity (crest, website, correspondence address) — opt-in, may be absent ──
-    # Keyed by the *representative team's* club_name_raw from teams.csv, not
-    # clubs.csv's own club_name_raw column: enrich_clubs.py's crawl of the
-    # fichaequipo page frequently captures a differently-formatted name for
-    # the same club (e.g. clubs.csv "ARAVACA C.F." vs. teams.csv "ARAVACA
-    # C.F. - CEIBA" for club_id 1011) — keying by clubs.csv's own string
-    # silently dropped crest/website/address/fichaclub-link for 161 of 674
-    # clubs in 2025-2026 alone. representative_team_id always resolves in
-    # teams.csv with no collisions (checked across every crawled season).
-    club_info_by_name = {}
+    # Keyed by clubs.csv's own club_id column directly - it's the same real
+    # RFFM club_id team_club_map.csv resolves teams to (club_identity.py),
+    # so no join through representative_team_id is needed at all here.
+    club_info_by_id = {}
     if clubs_df is not None:
         for _, r in clubs_df.iterrows():
-            key = tid_to_club.get(norm_id(r.get("representative_team_id"))) or r["club_name_raw"]
-            club_info_by_name[key] = {
-                "club_id": clean(r.get("club_id")),
+            cid = clean(r.get("club_id"))
+            if cid is None:
+                continue
+            club_info_by_id[int(float(cid))] = {
+                "club_id": cid,
                 "crest": abs_crest_url(clean(r.get("crest_url"))),
                 "web": clean(r.get("portal_web")),
                 "address": clean(r.get("correspondence_address")),
@@ -347,26 +353,32 @@ def load_data(season: str) -> dict:
     # teams sit entirely outside the tiered matrix (cup-only, Superliga/Liga
     # Nacional, femenino "OTHER" leagues, ...) still gets a row instead of
     # vanishing from the page. ──
-    all_club_names = set(teams_by_club) | set(venues_by_club) | set(club_all_comps)
+    all_club_ids = set(teams_by_club) | set(venues_by_club) | set(club_all_comps)
     if not cells.empty:
-        all_club_names |= set(cells["club"])
+        all_club_ids |= set(cells["club"])
     cells_by_club = {club: grp for club, grp in cells.groupby("club")} if not cells.empty else {}
-    # Every team-card link (this page and team_cards.py, independently) needs
-    # to agree on the same file name for the same club — see club_slug_map()'s
-    # docstring for why this can't just be computed ad hoc in JS.
-    slug_by_club = club_slug_map(sorted(all_club_names))
+    # club_identity.py's global, cross-season slug/name map (not computed
+    # fresh from this season's own club set) - every team-card link (this
+    # page and team_cards_v2.py) resolves against the SAME club_id -> slug
+    # map now, so they always agree without needing to coordinate on what's
+    # "this season's" club universe.
+    names = ci.club_display_names()
+    slugs = ci.club_slugs()
     clubs_out = []
-    for club in all_club_names:
-        rec = {"club": club, "slug": slug_by_club[club]}
+    for club_id in all_club_ids:
+        rec = {
+            "club": names.get(club_id) or f"club {club_id}", "club_id": club_id,
+            "slug": slugs.get(club_id) or f"club-{club_id}",
+        }
         cells_dict = {}
-        for _, r in cells_by_club.get(club, pd.DataFrame()).iterrows():
+        for _, r in cells_by_club.get(club_id, pd.DataFrame()).iterrows():
             key = f"{r['cat']}_{DIV_CODE[r['div']]}_{r['gtc']}"
             cells_dict[key] = {"n": int(r["n"]), "pos": int(r["pos"]), "size": int(r["size"]), "grp": r["grp"]}
         rec["cells"] = cells_dict
-        rec["teams"] = sorted(teams_by_club.get(club, []), key=lambda t: (t["cat"], t["div"], t["pos"]))
-        rec["venues"] = sorted(venues_by_club.get(club, []), key=lambda v: -v["n"])
-        rec["all_comps"] = club_all_comps.get(club, [])
-        rec["info"] = club_info_by_name.get(club)
+        rec["teams"] = sorted(teams_by_club.get(club_id, []), key=lambda t: (t["cat"], t["div"], t["pos"]))
+        rec["venues"] = sorted(venues_by_club.get(club_id, []), key=lambda v: -v["n"])
+        rec["all_comps"] = club_all_comps.get(club_id, [])
+        rec["info"] = club_info_by_id.get(club_id)
         clubs_out.append(rec)
     clubs_out.sort(key=lambda r: r["club"])
 
@@ -1156,7 +1168,7 @@ function openClubModal(club, opts) {
   const allCompsBody = allCompsHtml(club) ||
     `<div class="modal-note">${L === 'ru' ? 'Нет данных о матчах.' : 'Sin datos de partidos.'}</div>`;
   const profileLabel = L === 'ru' ? 'Профиль клуба (доноры, состав, путь игроков)' : 'Perfil de club (procedencia, plantilla, trayectorias)';
-  const profileHtml = `<div class="modal-note"><a href="club_profile.html?clubname=${encodeURIComponent(club.club)}">${profileLabel} &rarr;</a></div>`;
+  const profileHtml = `<div class="modal-note"><a href="club_profile.html?club=${encodeURIComponent(club.slug)}">${profileLabel} &rarr;</a></div>`;
   document.getElementById('modalContent').innerHTML = `
     <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}${profileHtml}</div></div>
     ${addrHtml}

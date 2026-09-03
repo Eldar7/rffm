@@ -163,6 +163,44 @@ def club_name_variants() -> dict[int, list[str]]:
     return {cid: sorted(names) for cid, names in variants.items()}
 
 
+@lru_cache(maxsize=1)
+def club_meta() -> dict[int, dict]:
+    """club_id -> {web, loc, prov, crest_url}, latest clubs.csv snapshot per
+    club_id (same "current state" recipe as club_display_names()). Several
+    report generators (all_teams_v2.py's build_club_meta(), ...) re-derive
+    this per season, keyed by club_name_raw instead of club_id - same class
+    of bug as everywhere else in this module's docstring: a club profiled
+    under an older sponsor-era name stops matching once the name moves on."""
+    frames = [
+        pd.read_parquet(p, columns=["club_id", "season", "scraped_at", "portal_web", "locality", "province", "crest_url"])
+        for p in sorted((PARQUET_DIR / "clubs").glob("*.parquet"))
+    ]
+    df = pd.concat(frames, ignore_index=True)
+    df = df.sort_values(["season", "scraped_at"]).drop_duplicates("club_id", keep="last")
+    out = {}
+    for r in df.itertuples(index=False):
+        out[int(r.club_id)] = {
+            "web": r.portal_web if isinstance(r.portal_web, str) else None,
+            "loc": r.locality if isinstance(r.locality, str) else None,
+            "prov": r.province if isinstance(r.province, str) else None,
+            "crest_url": r.crest_url if isinstance(r.crest_url, str) else None,
+        }
+    return out
+
+
+def attach_club_id(df: pd.DataFrame, team_col: str = "team_id", out_col: str = "club_id") -> pd.DataFrame:
+    """Copy of `df` with `out_col` added: `df[team_col]` resolved to club_id
+    via team_to_club(). The one-line replacement for every report's own
+    `tid_to_club = dict(zip(teams["team_id"], teams["club_name_raw"]))` -
+    same call shape (one line, no redesign needed at the call site), but
+    resolving the real identifier instead of a name heuristic. Unresolved
+    rows get NaN (pandas' native missing-int marker once you .astype it) -
+    do not fall back to club_name_raw for those (see module docstring)."""
+    out = df.copy()
+    out[out_col] = out[team_col].astype(str).map(team_to_club())
+    return out
+
+
 def clear_caches() -> None:
     """For tests / re-running build steps in-process against fresh Parquet
     without restarting the interpreter."""
@@ -170,3 +208,4 @@ def clear_caches() -> None:
     club_display_names.cache_clear()
     club_slugs.cache_clear()
     club_name_variants.cache_clear()
+    club_meta.cache_clear()
