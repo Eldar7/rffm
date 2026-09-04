@@ -313,9 +313,10 @@ function divTier(d) { const t = TIER_OF[d]; return (t === null || t === undefine
 
 function loadSeason(season) {
   if (!SEASON_CACHE[season]) {
-    // v2/data/... - all_teams.py (v1) no longer builds its own copy of
-    // this (see build_site.py); all_teams_v2's copy is the only one.
-    SEASON_CACHE[season] = fetch(`v2/data/all_teams_${season}.json`)
+    // data/... - all_teams.py (v1) no longer builds its own copy of
+    // this (see build_site.py); all_teams_v2's copy (built at the same
+    // top-level out_dir as all_clubs.html now) is the only one.
+    SEASON_CACHE[season] = fetch(`data/all_teams_${season}.json`)
       .then(res => res.ok ? res.json() : { rows: [], clubs: {} })
       .catch(() => ({ rows: [], clubs: {} }));
   }

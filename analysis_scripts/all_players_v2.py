@@ -473,7 +473,7 @@ footer.note{font-size:0.78rem; color:var(--ink-soft); max-width:90ch;}
     %SWITCH_ROW%
     <a class="back" href="club_division_map.html" data-i18n="back">&larr; Карта клубов</a>
     <nav class="nav-row">
-      <a href="../all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
+      <a href="all_clubs.html" data-i18n="nav_clubs">Все клубы</a>
       <a href="all_teams.html" data-i18n="nav_teams">Все команды</a>
       <a class="is-here" data-i18n="nav_players">Все игроки</a>
     </nav>
