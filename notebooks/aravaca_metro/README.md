@@ -111,6 +111,42 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Column headers redesigned + made sticky.** Season titles are now centered
+  over the *whole* season (all its lanes combined, via `text-anchor: middle`
+  at `x0 + totalW/2`) rather than left-aligned at the season's edge — so
+  "2022-2023" sits centered over both its Prebenjamín and Benjamín
+  sub-columns. Each lane gets its own centered category name + a
+  birth-year/age line (`ageAtSeason()`: season's first year minus birth
+  year, e.g. 2022-2023 → 2015 is "7 y.o.") — combined onto one line
+  ("2015, 6 y.o.; 2014, 7 y.o.") when the season's two birth years still
+  share a lane, split into two lines/lanes once they've diverged into
+  different categories. Season columns alternate a subtle background tint
+  (`--season-stripe`, one new CSS var per theme) painted *behind* the
+  existing division-tier bands so the two subtle overlays compose instead
+  of clashing.
+
+  These header labels, and the division-tier row labels (`#canalLabels`,
+  already existed), moved from SVG text / a scroll-along HTML overlay to
+  two dedicated sticky HTML overlays (`#seasonHeaders` sticky-top,
+  `#canalLabels` now sticky-left) so both stay on screen through any
+  scroll — the classic spreadsheet frozen-row/frozen-column pattern. Both
+  are zero-size (`width/height: 0`) normal-flow siblings of `#zoomWrap` so
+  `position: sticky` has a real scrollport to stick against (it doesn't
+  work reliably on elements inside a `transform`-scaled ancestor, which is
+  exactly what `#zoomWrap` is — this is *why* they're siblings of it, not
+  children); their labels are absolutely positioned within via
+  `data-base-left`/`data-base-top`, rescaled by `applyZoom()` exactly like
+  the pre-existing canal-label trick, just on the horizontal axis this
+  time. **The bug that first shipped:** both overlays got a `top: 0` *and*
+  `left: 0` sticky inset — that pins an element to a corner immediately,
+  ignoring scroll on **both** axes, which silently no-ops the entire
+  feature (nothing ever visibly moved, in either direction, at any scroll
+  position — caught by comparing element position before/after a
+  synthetic scroll in Playwright, since it looked fine by eye at rest).
+  Fixed to exactly one inset per overlay (`left: 0` only for the row
+  labels, `top: 0` only for the headers) so the other axis tracks scroll
+  normally. Both are `opacity: 0.82` — translucent since, once scrolled,
+  they float over live diagram content rather than blank margin.
 - **Side panel is hideable.** `#panelToggleBtn` in the header toggles
   `body.panel-hidden`, which just `display: none`s `.panel` — `canvas-wrap`
   is `flex: 1 1 auto` so it reclaims the ~300px on its own, no layout math

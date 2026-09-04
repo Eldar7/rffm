@@ -7,6 +7,7 @@
     --surface:        #eef1f4;
     --surface-card:   #ffffff;
     --surface-canal:  rgba(20,40,70,0.045);
+    --season-stripe:  rgba(20,20,25,0.025);
     --ink:            #10151c;
     --ink-dim:        #5b6572;
     --ink-faint:      #99a2ac;
@@ -29,6 +30,7 @@
       --surface:        #0e1116;
       --surface-card:   #171b21;
       --surface-canal:  rgba(220,230,245,0.035);
+      --season-stripe:  rgba(210,220,235,0.03);
       --ink:            #eef1f4;
       --ink-dim:        #a7afb9;
       --ink-faint:      #5b6572;
@@ -51,6 +53,7 @@
     --surface:        #0e1116;
     --surface-card:   #171b21;
     --surface-canal:  rgba(220,230,245,0.035);
+    --season-stripe:  rgba(210,220,235,0.03);
     --ink:            #eef1f4;
     --ink-dim:        #a7afb9;
     --ink-faint:      #5b6572;
@@ -234,7 +237,28 @@
   .main { flex: 1 1 auto; display: flex; min-height: 0; }
   .canvas-wrap { flex: 1 1 auto; overflow: auto; position: relative; padding: 18px 40px 40px 100px; }
   .zoom-wrap { display: inline-block; position: relative; transform-origin: 0 0; }
-  .canal-labels { position: absolute; left: 0; top: 18px; width: 96px; pointer-events: none; }
+
+  /* row names (division-tier labels) and column names (season/lane headers)
+     are both HTML overlays, siblings of zoom-wrap rather than SVG content,
+     sticky so they stay on screen through any scroll — canal-labels sticks
+     to the left edge (tracks vertical scroll normally), season-headers
+     sticks to the top edge (tracks horizontal scroll normally). Both are
+     zero-size normal-flow boxes; their labels are the ones actually
+     positioned/sized, via left/top offsets rescaled in applyZoom() from the
+     unscaled data-base-left/data-base-top render() stores, same trick for
+     both axes. Kept translucent (opacity) since once scrolled they float
+     over live diagram content, not blank margin. */
+  .canal-labels, .season-headers {
+    position: sticky;
+    width: 0; height: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 4;
+  }
+  /* exactly one sticky axis each — a top AND left inset together would stick
+     the element to the corner immediately, ignoring scroll on either axis */
+  .canal-labels { left: 0; }
+  .season-headers { top: 0; }
   .canal-label {
     position: absolute;
     left: 8px;
@@ -246,18 +270,38 @@
     color: var(--ink-faint);
     writing-mode: vertical-rl;
     transform: rotate(180deg);
+    opacity: 0.82;
   }
 
-  svg text { font-family: "IBM Plex Sans Condensed", sans-serif; }
-  .season-title { font-weight: 700; font-size: 15px; fill: var(--ink); }
-  .season-cat { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-dim); }
-  .lane-label {
+  .season-header-title, .season-header-cat, .season-header-lbl {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0.82;
+  }
+  .season-header-title {
+    top: 6px;
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .season-header-cat {
+    top: 23px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+  }
+  .season-header-lbl {
+    top: 35px;
     font-family: "IBM Plex Mono", monospace;
     font-size: 9px;
     letter-spacing: 0.02em;
-    fill: var(--ink-faint);
+    color: var(--ink-faint);
     font-style: italic;
   }
+
+  svg text { font-family: "IBM Plex Sans Condensed", sans-serif; }
   .lane-divider { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 3; }
 
   .station-rect {
@@ -450,6 +494,7 @@
 <div class="main">
   <div class="canvas-wrap" id="canvasWrap">
     <div class="canal-labels" id="canalLabels"></div>
+    <div class="season-headers" id="seasonHeaders"></div>
     <div class="zoom-wrap" id="zoomWrap">
       <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
@@ -660,6 +705,12 @@ function bezierPath(x1, y1, x2, y2) {
   return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
 }
 
+// age at the start of a "YYYY-YYYY" season = the season's first year minus
+// the birth year (Spanish football's own age-category convention)
+function ageAtSeason(seasonName, birthYear) {
+  return parseInt(seasonName.slice(0, 4), 10) - birthYear;
+}
+
 function render() {
   pinned = null;
   const view = buildView(activePivot);
@@ -676,6 +727,20 @@ function render() {
 
   // birth-year cohort stripe: senior year = the earlier of the pivot's active years
   const seniorYear = view.years.size > 1 ? Math.min(...view.years) : null;
+
+  // alternating season-column tint (every other season), painted behind the
+  // division-tier bands so the two subtle overlays compose rather than clash
+  const stripeLayer = el('g', {});
+  svg.appendChild(stripeLayer);
+  RAW.season_names.forEach((_, si) => {
+    if (si % 2 !== 1) return;
+    const n = layout.lanesBySeason[si].length;
+    const w = n * STATION_W + (n - 1) * LANE_GAP;
+    stripeLayer.appendChild(el('rect', {
+      x: layout.seasonX[si], y: 0, width: w, height: layout.totalHeight,
+      fill: 'var(--season-stripe)',
+    }));
+  });
 
   // division-tier "canal" background bands, shared across every season/lane
   const bandsLayer = el('g', {});
@@ -695,48 +760,59 @@ function render() {
     d.textContent = TIER_NAMES[b];
     canalLabels.appendChild(d);
   }
-  applyZoom();
 
-  // season headers (span the season's full lane width) + lane dividers/labels
+  // lane dividers only — the season/lane *names* live in the sticky HTML
+  // #seasonHeaders overlay below (rescaled by applyZoom() once built),
+  // not as SVG text, so they can stay pinned to the top on scroll.
   const headerLayer = el('g', {});
   svg.appendChild(headerLayer);
+  RAW.season_names.forEach((_, si) => {
+    const lanes = layout.lanesBySeason[si];
+    const x0 = layout.seasonX[si];
+    lanes.forEach((lane, laneIdx) => {
+      if (laneIdx === 0) return;
+      const laneX = x0 + laneIdx * (STATION_W + LANE_GAP);
+      const dx = laneX - LANE_GAP / 2;
+      headerLayer.appendChild(el('line', {x1: dx, y1: 44, x2: dx, y2: layout.totalHeight - 20, class: 'lane-divider'}));
+    });
+  });
+
+  // season headers: the title spans the whole season (all its lanes); each
+  // lane gets its own centered category name + birth-year/age line, split
+  // apart only once that season's birth years have diverged into different
+  // categories (a still-shared lane lists every year on one combined line).
+  const seasonHeaders = document.getElementById('seasonHeaders');
+  seasonHeaders.innerHTML = '';
+  function headerDiv(className, baseLeft, text) {
+    const d = document.createElement('div');
+    d.className = className;
+    d.dataset.baseLeft = baseLeft;
+    d.textContent = text;
+    seasonHeaders.appendChild(d);
+    return d;
+  }
   RAW.season_names.forEach((season, si) => {
     const lanes = layout.lanesBySeason[si];
     const x0 = layout.seasonX[si];
     const totalW = lanes.length * STATION_W + (lanes.length - 1) * LANE_GAP;
-    const title = el('text', {x: x0, y: 24, class: 'season-title'});
-    title.textContent = season;
-    headerLayer.appendChild(title);
-    const set = view.anchorSetBySeason[si];
-    const catNames = [...set].sort((a,b)=>a-b).map(o => CAT_FULL[CATEGORY_ORDER[o]] || CATEGORY_ORDER[o]);
-    const cat = el('text', {x: x0, y: 38, class: 'season-cat'});
-    cat.textContent = catNames.join(' + ');
-    headerLayer.appendChild(cat);
+    headerDiv('season-header-title', x0 + totalW / 2, season);
 
+    const set = view.anchorSetBySeason[si];
     const yearsByOrdinal = view.anchorYearsBySeason[si];
     lanes.forEach((lane, laneIdx) => {
       const laneX = x0 + laneIdx * (STATION_W + LANE_GAP);
-      const lbl = el('text', {x: laneX, y: 50, class: 'lane-label'});
+      const cx = laneX + STATION_W / 2;
       if (set.has(lane)) {
-        // a main/anchor column - tag which birth year(s) it is, but only
-        // when the season actually has more than one (otherwise it's
-        // already obvious from the season subtitle above).
-        if (set.size > 1) {
-          const ys = (yearsByOrdinal.get(lane) || []).slice().sort((a,b)=>a-b);
-          lbl.textContent = ys.join('/');
-          headerLayer.appendChild(lbl);
-        }
+        headerDiv('season-header-cat', cx, CAT_FULL[CATEGORY_ORDER[lane]] || CATEGORY_ORDER[lane]);
+        const ys = (yearsByOrdinal.get(lane) || []).slice().sort((a, b) => b - a);
+        headerDiv('season-header-lbl', cx, ys.map(y => `${y}, ${ageAtSeason(season, y)} y.o.`).join('; '));
       } else {
         const mn = Math.min(...set), mx = Math.max(...set);
-        lbl.textContent = lane < mn ? '← un año atrás' : 'un año adelante →';
-        headerLayer.appendChild(lbl);
-      }
-      if (laneIdx > 0) {
-        const dx = laneX - LANE_GAP / 2;
-        headerLayer.appendChild(el('line', {x1: dx, y1: 44, x2: dx, y2: layout.totalHeight - 20, class: 'lane-divider'}));
+        headerDiv('season-header-lbl', cx, lane < mn ? '← un año atrás' : 'un año adelante →');
       }
     });
   });
+  applyZoom();
 
   // links layer (under stations)
   const linksLayer = el('g', {});
@@ -1051,6 +1127,9 @@ function applyZoom() {
   zoomPct.textContent = Math.round(zoomLevel * 100) + '%';
   document.querySelectorAll('.canal-label').forEach(d => {
     d.style.top = (parseFloat(d.dataset.baseTop) * zoomLevel) + 'px';
+  });
+  document.querySelectorAll('#seasonHeaders > *').forEach(d => {
+    d.style.left = (parseFloat(d.dataset.baseLeft) * zoomLevel) + 'px';
   });
 }
 // Zoom anchored on a viewport point (clientX/clientY) — compensates
