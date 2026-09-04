@@ -183,7 +183,14 @@ A real, narrow exception, not a data error.
 
 ---
 
-## `university_team` — the weakest signal in this table, read carefully
+## `university_team` — was the weakest signal in this table, now resolved to 0
+
+**Update:** all 29 rows below were resolved via `manual_review`/
+`manual_synthetic` `team_club_map.csv` entries, as a follow-up once the
+`unexplained` bucket above was closed - see `DATA_FINDINGS.md`'s
+"resolving the 29 `reason=university_team` rows" section for the
+per-university evidence. Left here, unmodified, as the historical record
+of why this reason was originally the lowest-confidence one in this file.
 
 **Rule:** `club_name_raw` contains "UNIVERSIDAD" or "UNIV.".
 

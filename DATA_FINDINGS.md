@@ -183,6 +183,36 @@ behind all 23 `reason=unexplained` rows. One resolves via ordinary
   technically-separate `club_id` for what's really an existing branch -
   a minor split, not the wrong-merge risk a name guess would have carried.
 
+## team_club_map.csv — resolving the 29 `reason=university_team` rows
+
+Same treatment, done as a follow-up once the `unexplained` bucket above
+hit 0 - `university_team` was `TEAM_CLUB_GAP_REASONS.md`'s own
+lowest-precision, explicitly-not-fully-investigated reason (only 37% of
+matching rows stayed unresolved). Investigated all 29 by normalizing
+`club_name_raw` (strip accents, `UNIV.`/`UNIVERSIDAD` prefix, `FEMENINO`/
+`F.S.M.`/`F.S.F.` suffixes) and grouping by real-world institution -
+unlike BREOGÁN/GREDOS SAN DIEGO (multi-branch networks with genuine
+who-is-this-team-actually ambiguity), a university name is essentially
+unambiguous, so the only question was resolved-elsewhere-or-not per
+institution:
+
+- **25 team_ids across 11 real Madrid universities** (Alfonso X, Autónoma,
+  Camilo José Cela, Carlos III, CEU San Pablo, Complutense, ESIC,
+  Francisco de Vitoria, Politécnica, Pontificia Comillas, Rey Juan Carlos)
+  → **`manual_review`**, attached to that university's own already-resolved
+  `club_id` (found under a different accent/abbreviation/gender-suffix
+  spelling - e.g. `UNIVERSIDAD AUTONOMA FEMENINO`'s `22097254` onto the
+  same `club_id=16797423` as the men's-named `UNIVERSIDAD AUTONOMA`
+  registrations). Confirmed this is standard practice in the dataset, not
+  an assumption: 4 already-resolved real clubs elsewhere already mix
+  `FEMENINO`/non-`FEMENINO` team registrations under one `club_id`.
+- **4 team_ids across 3 universities with ZERO resolved variant anywhere**
+  (`UNIVERSIDAD ANTONIO DE NEBRIJA` `2609758`; `UNIVERSIDAD CUNEF`/`UNIV.
+  CUNEF F.S.M.` `14420560`+`21125332`; `UNIVERSIDAD EUROPEA DE MADRID`
+  `2609763`) → **`manual_synthetic`**, same `-min(team_id)` convention.
+
+This closes `university_team` to 0 rows, same as `unexplained` above.
+
 ---
 
 ## team_club_map.csv / team_club_gap_reasons.csv — two different "% done" numbers, don't conflate them

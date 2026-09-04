@@ -75,6 +75,18 @@ additions, not because of an ordering requirement:
    freshly minted `-min(team_id)`) and document the result the same way. No
    evidence found -> leave it `unexplained`, same as any of the current
    residual cases - never guess a `club_id` from name text alone.
+
+   `unexplained` is the main one to watch, but not the only one that can
+   hide a real, resolvable club: `university_team`'s 29 rows were the
+   *lowest*-precision reason in the classifier (only 37% genuinely
+   unresolved) and still turned out to hide 29 real, resolvable team_ids
+   (25 via `manual_review` onto an already-resolved sibling spelling, 4
+   via `manual_synthetic`) - see DATA_FINDINGS.md's "resolving the 29
+   `reason=university_team` rows". After a season or two of `unexplained`
+   staying clean, it's worth the same spot-check on `university_team` (and
+   any other reason whose own precision write-up in
+   TEAM_CLUB_GAP_REASONS.md isn't near 100%) rather than assuming only
+   `unexplained` ever needs this.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups/<category>.csv`
    (needs step 2 done first for the categories it targets). Same order of
