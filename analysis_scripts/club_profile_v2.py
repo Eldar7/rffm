@@ -162,6 +162,9 @@ I18N_ES = {
     "th_us": "Nosotros", "th_them": "Ellos", "div_never": "nunca", "h_by_division": "Por división",
     "rivals_none_filtered": "No hay partidos con los filtros seleccionados.",
     "scope_divs": "Divisiones",
+    "tab_careers": "Carreras de jugadores", "tab_rivals": "Rivalidades",
+    "back_to_opponents": "&larr; Todos los rivales", "rivals_reset": "Restablecer filtros",
+    "show_all_n": "Mostrar los {n} partidos", "h_matches": "Partidos",
     "l_matches": "Partidos", "l_opponents": "Rivales", "l_wdl": "G-E-P", "l_goals": "Goles",
     "count_matches": "partidos",
     "h_squads": "Equipos", "th_team_pair": "Pareja de equipos",
@@ -211,6 +214,13 @@ HTML = r"""<!DOCTYPE html>
 
     <div class="club-head" id="clubHead"></div>
 
+    <div class="seg" id="pageTabToggle">
+      <button type="button" class="seg-opt is-active" data-tab="careers"><span data-i18n="tab_careers">Карьеры игроков</span></button>
+      <button type="button" class="seg-opt" data-tab="rivals"><span data-i18n="tab_rivals">Соперничества</span></button>
+    </div>
+
+    <div id="tabCareers">
+
     <div class="filter-panel">
       <div id="filterbar"></div>
       <div class="chiprow" id="chiprow"></div>
@@ -252,30 +262,18 @@ HTML = r"""<!DOCTYPE html>
       <div class="chart-wrap"><div id="pathsDiv" style="width:100%;min-height:520px"></div></div>
     </section>
 
+    </div>
+
+    <div id="tabRivals" style="display:none">
     <section id="rivalrySection">
       <div class="section-head"><h2><span data-i18n="h_rivals">Соперничества</span></h2></div>
       <p class="scope-note"><span class="mark">i</span> <span data-i18n="rivals_note">Из полного краула матчей (все сезоны 2016/17&ndash;2025/26 &mdash; шире, чем сезоны заявок выше) &mdash; составы клуба сведены по единому club_id, а не по имени, поэтому смена спонсора/названия клуба здесь не создаёт второй клуб.</span></p>
-      <div id="rivFilterbar"></div>
-      <div class="chiprow" id="rivChiprow"></div>
-      <div class="stats" id="rivalStats"></div>
-      <div class="section-head" style="border:none;padding:0;margin:0.9rem 0 0.5rem;">
-        <input type="text" id="rivalSearch" class="path-search" data-i18n-ph="rivals_search" placeholder="Найти соперника&hellip;" autocomplete="off" style="margin-left:0">
+      <div class="rival-layout">
+        <div class="rival-facets" id="rivFacets"></div>
+        <div class="rival-content" id="rivContent"></div>
       </div>
-      <div class="table-shell">
-        <div class="table-scroll">
-          <table>
-            <thead><tr>
-              <th><span data-i18n="th_opp">Соперник</span></th>
-              <th class="num"><span data-i18n="th_m">И</span></th>
-              <th class="num"><span data-i18n="th_wdl">В-Н-П</span></th>
-              <th class="num"><span data-i18n="th_goals">Мячи</span></th>
-            </tr></thead>
-            <tbody id="rivalTbody"></tbody>
-          </table>
-        </div>
-      </div>
-      <p class="foot" id="rivalEmptyNote" style="display:none"></p>
     </section>
+    </div>
 
   </div>
 
@@ -443,6 +441,31 @@ section{ display:flex; flex-direction:column; gap:0.8rem; }
 .stats.is-filtered .stat{ border-color:var(--accent); border-left-width:3px; }
 .stats.is-filtered .stat .n{ color:var(--accent); }
 
+.rival-layout{ display:grid; grid-template-columns:20rem 1fr; gap:1.2rem; align-items:start; }
+.rival-facets{ display:flex; flex-direction:column; gap:1rem; position:sticky; top:1rem; }
+.facet-reset{ align-self:flex-start; font-size:0.76rem; padding:0.24rem 0.6rem; border:1px solid var(--line-strong);
+  border-radius:999px; background:var(--surface); color:var(--ink-soft); cursor:pointer; font-family:inherit; }
+.facet-reset:hover{ color:var(--pos-red); border-color:var(--pos-red); }
+.facet-title{ font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin-bottom:0.3rem; }
+.facet-scroll{ max-height:12rem; }
+.facet-row{ cursor:pointer; }
+.facet-row td{ transition:opacity 0.1s; }
+.facet-row:hover td{ background:var(--row-hover); }
+.facet-row.is-active td{ background:var(--accent-soft); }
+.facet-row.is-dim{ opacity:0.4; }
+.facet-label{ display:flex; align-items:center; gap:0.4rem; cursor:pointer; margin:0; }
+.facet-label input{ margin:0; flex:none; }
+.rival-content{ min-width:0; }
+.crumb-back{ display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--accent); cursor:pointer; background:none; border:none; font-family:inherit; padding:0; }
+.crumb-back:hover{ text-decoration:underline; }
+.show-more-btn{ margin-top:0.6rem; font-size:0.8rem; padding:0.3rem 0.7rem; border:1px solid var(--line-strong); border-radius:6px;
+  background:var(--surface); color:var(--ink); cursor:pointer; font-family:inherit; }
+.show-more-btn:hover{ border-color:var(--accent); color:var(--accent); }
+@media (max-width:900px){
+  .rival-layout{ grid-template-columns:1fr; }
+  .rival-facets{ position:static; }
+}
+
 .flow-stats{ display:flex; flex-wrap:wrap; gap:0.6rem; font-size:0.82rem; color:var(--ink-soft); }
 .flow-stats .fs-item{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:0.4rem 0.8rem; display:flex; gap:0.4rem; align-items:baseline; }
 .flow-stats .fs-item b{ font-family:ui-monospace,monospace; color:var(--accent); font-size:1rem; }
@@ -515,6 +538,7 @@ let filters = { seasons: null, cats: null, teams: null };  // null = "all"
 let direction = 'in';     // 'in' = donors, 'out' = destinations
 let flowView = 'sankey';
 let pathHighlight = '';
+let activeTab = 'careers';  // 'careers' | 'rivals' - which of the page's two tabs is showing
 
 const YEARS = ALL_SEASONS.map(s => parseInt(s.slice(0, 4), 10));
 const MIN_YEAR = Math.min.apply(null, YEARS);
@@ -564,12 +588,13 @@ async function init() {
   }
   // ?opp=<slug> - a cross-link straight into one rivalry (e.g. from
   // weird_scores.html's "see the full history" link on a highlighted
-  // match) - opens the club-vs-club modal once RIVALS has loaded, scrolled
-  // to the Соперничества section. Only honored on this initial deep-link,
-  // never re-applied on a later manual club pick (wireSearch()/wireStaticControls()
-  // call selectClub() with no second argument, which skips this).
+  // match) - opens that opponent's detail on the Соперничества tab once
+  // RIVALS has loaded. Only honored on this initial deep-link, never
+  // re-applied on a later manual club pick (wireSearch()/wireStaticControls()
+  // call selectClub() with no second/third argument, which skips this).
   const opp = params.get('opp');
-  if (entry) selectClub(entry, opp, true);
+  const tab = params.get('tab') === 'rivals' ? 'rivals' : 'careers';
+  if (entry) selectClub(entry, opp, true, tab);
 }
 
 function wireSearch() {
@@ -614,7 +639,7 @@ function wireSearch() {
   });
 }
 
-async function selectClub(entry, openOppSlug, isInitial) {
+async function selectClub(entry, openOppSlug, isInitial, initialTab) {
   document.getElementById('pickHint').style.display = 'none';
   document.getElementById('app').style.display = '';
   document.getElementById('clubHead').innerHTML = '<div class="sub">' + (isEs() ? 'Cargando…' : 'Загрузка…') + '</div>';
@@ -629,7 +654,7 @@ async function selectClub(entry, openOppSlug, isInitial) {
     // universe/season range is wider than this page's fichajugador-scoped
     // one (see club_rivalries_data_v2.py's module docstring), and a club
     // with no match history at all (rare, but possible) 404s here rather
-    // than existing as an empty file - see renderRivals()'s RIVALS===null case.
+    // than existing as an empty file - see renderRivContent()'s RIVALS===null case.
     fetch('data/rivalries/' + entry.slug + '.json').catch(() => null),
   ];
   // _presence.json is shared across every club on the page (club_id ->
@@ -644,11 +669,11 @@ async function selectClub(entry, openOppSlug, isInitial) {
   filters = { seasons: null, cats: null, teams: null };
   direction = 'in'; flowView = 'sankey'; pathHighlight = '';
   document.getElementById('pathSearch').value = '';
-  document.getElementById('rivalSearch').value = '';
   document.querySelectorAll('#dirToggle .seg-opt').forEach(b => b.classList.toggle('is-active', b.dataset.dir === 'in'));
   document.querySelectorAll('#flowViewToggle .seg-opt').forEach(b => b.classList.toggle('is-active', b.dataset.view === 'sankey'));
 
   rivOpenOppId = null;
+  rivLogExpanded = false;
   // rf_* filter params only apply on the very first page load (a shared
   // link) - a manual club switch via search always starts unfiltered,
   // since a leftover filter from a DIFFERENT club's URL (season list,
@@ -660,23 +685,18 @@ async function selectClub(entry, openOppSlug, isInitial) {
   renderFilterBar();
   renderChips();
   renderAll();
-
-  if (RIVALS) {
-    renderRivFilterBarTop();
-    rivRenderChips('rivChiprow', RIV_TOP_KEYS, onRivFilterChanged);
-  } else {
-    document.getElementById('rivFilterbar').innerHTML = '';
-    document.getElementById('rivChiprow').innerHTML = '';
-  }
-  renderRivals();
+  renderRivalsTab();
+  setActiveTab(initialTab || 'careers');
 
   if (openOppSlug && RIVALS) {
     const oppId = Object.keys(RIVALS.opponents_meta).find(k => RIVALS.opponents_meta[k].slug === openOppSlug);
     if (oppId != null) {
-      document.getElementById('rivalrySection').scrollIntoView({ block: 'start' });
-      openRivalMatchup(+oppId);
+      rivOpenOppId = +oppId;
+      setActiveTab('rivals');
+      renderRivalsTab();
     }
   }
+  syncRivUrl();
 }
 
 /* ============================= club header ============================= */
@@ -1143,6 +1163,7 @@ function applyPathHighlight() {
   Plotly.restyle(el, { opacity: opacities });
 }
 
+
 /* ============================= rivalries ============================= */
 
 function wdlBar(w, d, l) {
@@ -1151,67 +1172,49 @@ function wdlBar(w, d, l) {
     '<span class="d" style="width:' + (d / total * 100) + '%"></span>' +
     '<span class="l" style="width:' + (l / total * 100) + '%"></span></div>';
 }
-
 function wdlText(w, d, l) {
   return '<span class="wdl"><span class="w">' + w + '</span>-<span class="d">' + d + '</span>-<span class="l">' + l + '</span></span>';
 }
 
-function breakdownTable(rows, keyField, keyLabel) {
-  if (!rows.length) return '';
-  return '<div class="table-shell" style="margin-top:0.6rem"><div class="table-scroll" style="max-height:12rem"><table><thead><tr>' +
-    '<th>' + esc(keyLabel) + '</th><th class="num">' + T('th_m', 'И') + '</th><th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
-    rows.map(r => '<tr><td>' + esc(r[keyField]) + '</td><td class="num">' + r.matches + '</td>' +
-      '<td class="num">' + wdlText(r.wins, r.draws, r.losses) + '</td>' +
-      '<td class="num">' + r.goals_for + ':' + r.goals_against + '</td></tr>').join('') +
-    '</tbody></table></div></div>';
-}
-
-function divisionTable(rows, usName, themName) {
-  if (!rows.length) return '';
-  function dot(seasons) {
-    const active = seasons.length > 0;
-    const title = active ? seasons.join(', ') : T('div_never', 'никогда');
-    return '<span class="div-dot' + (active ? ' active' : '') + '" title="' + esc(title) + '">' + (active ? '●' : '○') + '</span>';
-  }
-  return '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_by_division', 'По дивизионам') + '</h3>' +
-    '<div class="table-shell"><div class="table-scroll" style="max-height:14rem"><table><thead><tr>' +
-    '<th>' + T('th_div_row', 'Дивизион') + '</th>' +
-    '<th class="num" title="' + esc(usName) + '">' + T('th_us', 'Мы') + '</th>' +
-    '<th class="num" title="' + esc(themName) + '">' + T('th_them', 'Они') + '</th>' +
-    '<th class="num">' + T('th_m', 'И') + '</th><th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
-    rows.map(r => '<tr><td>' + esc(r.division) + '</td>' +
-      '<td class="num">' + dot(r.us_seasons) + '</td>' +
-      '<td class="num">' + dot(r.them_seasons) + '</td>' +
-      '<td class="num">' + r.matches + '</td>' +
-      '<td class="num">' + wdlText(r.wins, r.draws, r.losses) + '</td>' +
-      '<td class="num">' + r.goals_for + ':' + r.goals_against + '</td></tr>').join('') +
-    '</tbody></table></div></div>';
-}
-
-/* ---- cross-filter state: RIVALS.matches is a flat, unaggregated array of
-   [date, season, category, division, venue, opp_club_id, team_us_id,
-   opp_team_id, home, for, against] rows (club_rivalries_data_v2.MATCH_COLS)
-   - everything below filters/aggregates it client-side on demand, PowerBI-
-   slicer style, instead of reading precomputed server-side breakdowns. */
+/* ---- RIVALS.matches is a flat, unaggregated array of [date, season,
+   category, division, venue, opp_club_id, team_us_id, opp_team_id, home,
+   for, against] rows (club_rivalries_data_v2.MATCH_COLS) - everything
+   below filters/aggregates it client-side on demand. The left-hand facet
+   tables (season/category/division/our-team[/their-team once an opponent
+   is open]) double as the filter controls: checking a row highlights it
+   and dims the rest of that facet's other rows; a facet's own counts are
+   computed with every OTHER active filter applied but never its own (so
+   unchecking never zeroes out what you'd see by re-checking it, standard
+   faceted-search behavior), while the right-hand content (opponent list,
+   or one opponent's breakdown + match log) uses every active filter. */
 const M_DATE = 0, M_SEASON = 1, M_CAT = 2, M_DIV = 3, M_VENUE = 4,
   M_OPP = 5, M_TUS = 6, M_TTHEM = 7, M_HOME = 8, M_FOR = 9, M_AGAINST = 10;
-const RIV_TOP_KEYS = ['seasons', 'cats', 'divs', 'teamUs'];
+const M_IDX = { seasons: M_SEASON, cats: M_CAT, divs: M_DIV, teamUs: M_TUS, teamThem: M_TTHEM };
+const RIV_BASE_KEYS = ['seasons', 'cats', 'divs', 'teamUs'];
+const RIV_LOG_SHOW_LIMIT = 30;
 
 let PRESENCE = null;      // shared data/rivalries/_presence.json - {club_id (string): {divCode: [season,...]}}
 let rivFilters = { seasons: null, cats: null, divs: null, teamUs: null, teamThem: null };  // null = "all"
-let rivOpenOppId = null;  // club_id of the currently open matchup modal, or null
+let rivOpenOppId = null;  // club_id of the opponent currently shown on the right, or null (opponent list)
+let rivLogExpanded = false;
 
-function filteredMatches(oppId) {
-  return (RIVALS ? RIVALS.matches : []).filter(m => {
-    if (oppId != null && m[M_OPP] !== oppId) return false;
-    if (rivFilters.seasons && !rivFilters.seasons.has(m[M_SEASON])) return false;
-    if (rivFilters.cats && !rivFilters.cats.has(m[M_CAT])) return false;
-    if (rivFilters.divs && !rivFilters.divs.has(m[M_DIV])) return false;
-    if (rivFilters.teamUs && !rivFilters.teamUs.has(m[M_TUS])) return false;
-    if (oppId != null && rivFilters.teamThem && !rivFilters.teamThem.has(m[M_TTHEM])) return false;
+function rivActiveKeys() { return rivOpenOppId != null ? RIV_BASE_KEYS.concat(['teamThem']) : RIV_BASE_KEYS; }
+function rivBaseRows() {
+  return (RIVALS ? RIVALS.matches : []).filter(m => rivOpenOppId == null || m[M_OPP] === rivOpenOppId);
+}
+function rivApplyFilters(rows, excludeKey) {
+  return rows.filter(m => {
+    if (excludeKey !== 'seasons' && rivFilters.seasons && !rivFilters.seasons.has(m[M_SEASON])) return false;
+    if (excludeKey !== 'cats' && rivFilters.cats && !rivFilters.cats.has(m[M_CAT])) return false;
+    if (excludeKey !== 'divs' && rivFilters.divs && !rivFilters.divs.has(m[M_DIV])) return false;
+    if (excludeKey !== 'teamUs' && rivFilters.teamUs && !rivFilters.teamUs.has(m[M_TUS])) return false;
+    if (excludeKey !== 'teamThem' && rivOpenOppId != null && rivFilters.teamThem && !rivFilters.teamThem.has(m[M_TTHEM])) return false;
     return true;
   });
 }
+function filteredMatches() { return rivApplyFilters(rivBaseRows(), null); }
+function matchesExcluding(key) { return rivApplyFilters(rivBaseRows(), key); }
+
 function aggregate(rows) {
   let w = 0, d = 0, l = 0, gf = 0, ga = 0;
   rows.forEach(m => {
@@ -1230,28 +1233,8 @@ function isRivFiltered() {
   return !!(rivFilters.seasons || rivFilters.cats || rivFilters.divs || rivFilters.teamUs ||
     (rivOpenOppId != null && rivFilters.teamThem));
 }
-function buildDivisionRows(rows, clubId, oppId) {
-  const byDiv = new Map();
-  rows.forEach(m => {
-    const code = m[M_DIV];
-    if (code == null) return;
-    if (!byDiv.has(code)) byDiv.set(code, []);
-    byDiv.get(code).push(m);
-  });
-  const us = (PRESENCE && PRESENCE[String(clubId)]) || {};
-  const them = (PRESENCE && PRESENCE[String(oppId)]) || {};
-  const codes = new Set([...byDiv.keys(), ...Object.keys(us), ...Object.keys(them)]);
-  return [...codes]
-    .sort((a, b) => (CODE_TIER[a] ?? 999) - (CODE_TIER[b] ?? 999))
-    .map(code => ({
-      division: CODE_LABEL[code] || code,
-      ...aggregate(byDiv.get(code) || []),
-      us_seasons: us[code] || [], them_seasons: them[code] || [],
-    }));
-}
 
-/* ---- generic multi-select filter bar (id-prefixed, so the top-level bar
-   and the one embedded in the matchup modal never collide in the DOM) ---- */
+/* ---- facet tables (left column) ---- */
 
 function rivGroupLabel(key) {
   if (key === 'seasons') return T('scope_seasons', 'Сезоны');
@@ -1259,102 +1242,229 @@ function rivGroupLabel(key) {
   if (key === 'divs') return T('scope_divs', 'Дивизионы');
   return key === 'teamUs' ? T('th_us', 'Мы') : T('th_them', 'Они');
 }
-function rivOptionsFor(key, scopeOppId) {
-  const base = scopeOppId != null ? RIVALS.matches.filter(m => m[M_OPP] === scopeOppId) : RIVALS.matches;
-  const idx = { seasons: M_SEASON, cats: M_CAT, divs: M_DIV, teamUs: M_TUS, teamThem: M_TTHEM }[key];
-  const seen = new Set();
-  base.forEach(m => { if (m[idx] != null) seen.add(m[idx]); });
-  const values = [...seen];
-  if (key === 'seasons') return values.sort().map(v => ({ value: v, label: v }));
-  if (key === 'cats') return values.sort((a, b) => catIndex(a) - catIndex(b)).map(v => ({ value: v, label: CAT_LABEL[v] || v }));
-  if (key === 'divs') return values.sort((a, b) => (CODE_TIER[a] ?? 999) - (CODE_TIER[b] ?? 999)).map(v => ({ value: v, label: CODE_LABEL[v] || v }));
-  return values.map(v => ({ value: v, label: RIVALS.team_names[v] || String(v) })).sort((a, b) => a.label.localeCompare(b.label, 'ru'));
+function rivFacetValueLabel(key, v) {
+  if (key === 'cats') return CAT_LABEL[v] || v;
+  if (key === 'divs') return CODE_LABEL[v] || v;
+  if (key === 'teamUs' || key === 'teamThem') return RIVALS.team_names[v] || String(v);
+  return v;
 }
-function rivFilterBarHtml(idPrefix, keys) {
-  return keys.map(key => (
-    '<div class="msel" id="' + idPrefix + 'Msel-' + key + '"><span class="filter-label">' + esc(rivGroupLabel(key)) + '</span>' +
-    '<button type="button" class="msel-btn" id="' + idPrefix + 'MselBtn-' + key + '"></button>' +
-    '<div class="msel-pop" id="' + idPrefix + 'MselPop-' + key + '"></div></div>'
-  )).join('');
+function rivFacetRows(key) {
+  const idx = M_IDX[key];
+  const universe = new Set();
+  rivBaseRows().forEach(m => { if (m[idx] != null) universe.add(m[idx]); });
+  const byVal = new Map(groupByAgg(matchesExcluding(key), m => m[idx]).map(g => [g.key, g]));
+  const zero = { matches: 0, wins: 0, draws: 0, losses: 0, goals_for: 0, goals_against: 0 };
+  const rows = [...universe].map(v => ({ value: v, ...(byVal.get(v) || zero) }));
+  if (key === 'seasons') rows.sort((a, b) => String(a.value).localeCompare(String(b.value)));
+  else if (key === 'cats') rows.sort((a, b) => catIndex(a.value) - catIndex(b.value));
+  else if (key === 'divs') rows.sort((a, b) => (CODE_TIER[a.value] ?? 999) - (CODE_TIER[b.value] ?? 999));
+  else rows.sort((a, b) => b.matches - a.matches);
+  return rows;
 }
-function rivRenderMselButton(idPrefix, key, scopeOppId) {
-  const btn = document.getElementById(idPrefix + 'MselBtn-' + key);
-  if (!btn) return;
-  const all = rivOptionsFor(key, scopeOppId);
+function divPresenceDot(clubId, divCode) {
+  const seasons = (PRESENCE && PRESENCE[String(clubId)] && PRESENCE[String(clubId)][divCode]) || [];
+  const active = seasons.length > 0;
+  const title = active ? seasons.join(', ') : T('div_never', 'никогда');
+  return '<span class="div-dot' + (active ? ' active' : '') + '" title="' + esc(title) + '">' + (active ? '●' : '○') + '</span>';
+}
+function divPresenceCell(divCode) {
+  const us = divPresenceDot(RIVALS.club_id, divCode);
+  return rivOpenOppId == null ? us : us + divPresenceDot(rivOpenOppId, divCode);
+}
+function facetRowHtml(key, row) {
   const sel = rivFilters[key];
-  btn.textContent = !sel ? (T('preset_all', 'Все') + ' (' + all.length + ')') : (all.filter(o => sel.has(o.value)).length + ' / ' + all.length);
+  const active = !!(sel && sel.has(row.value));
+  const dim = !!(sel && !active);
+  const presence = key === 'divs' ? '<td class="num facet-presence">' + divPresenceCell(row.value) + '</td>' : '';
+  return '<tr class="facet-row' + (active ? ' is-active' : '') + (dim ? ' is-dim' : '') + '" data-v="' + esc(String(row.value)) + '">' +
+    '<td><label class="facet-label"><input type="checkbox"' + (active ? ' checked' : '') + '><span>' + esc(String(rivFacetValueLabel(key, row.value))) + '</span></label></td>' +
+    presence +
+    '<td class="num">' + row.matches + '</td>' +
+    '<td class="num">' + wdlText(row.wins, row.draws, row.losses) + '</td>' +
+    '<td class="num">' + row.goals_for + ':' + row.goals_against + '</td></tr>';
 }
-function rivWireFilterBar(idPrefix, keys, scopeOppId, onChange) {
+function facetBlockHtml(key) {
+  const rows = rivFacetRows(key);
+  if (!rows.length) return '';
+  const presenceHead = key === 'divs'
+    ? '<th class="num">' + (rivOpenOppId != null ? T('th_us', 'Мы') + '/' + T('th_them', 'Они') : T('th_us', 'Мы')) + '</th>' : '';
+  return '<div class="facet-block" data-key="' + key + '">' +
+    '<div class="facet-title">' + esc(rivGroupLabel(key)) + '</div>' +
+    '<div class="table-shell"><div class="table-scroll facet-scroll"><table><thead><tr><th></th>' + presenceHead +
+    '<th class="num">' + T('th_m', 'И') + '</th><th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
+    rows.map(r => facetRowHtml(key, r)).join('') +
+    '</tbody></table></div></div></div>';
+}
+function toggleRivFacetValue(key, vStr) {
+  const found = rivFacetRows(key).find(r => String(r.value) === vStr);
+  if (!found) return;
+  const current = new Set(rivFilters[key] || []);
+  if (current.has(found.value)) current.delete(found.value); else current.add(found.value);
+  rivFilters[key] = current.size ? current : null;
+  onRivFilterChanged();
+}
+function renderRivFacets() {
+  const wrap = document.getElementById('rivFacets');
+  if (!RIVALS) { wrap.innerHTML = ''; return; }
+  const keys = rivActiveKeys();
+  wrap.innerHTML =
+    (isRivFiltered() ? '<button type="button" class="facet-reset" id="rivResetBtn">' + T('rivals_reset', 'Сбросить фильтры') + '</button>' : '') +
+    keys.map(facetBlockHtml).join('');
+  const resetBtn = document.getElementById('rivResetBtn');
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    rivFilters = { seasons: null, cats: null, divs: null, teamUs: null, teamThem: null };
+    onRivFilterChanged();
+  });
   keys.forEach(key => {
-    const btn = document.getElementById(idPrefix + 'MselBtn-' + key);
-    const pop = document.getElementById(idPrefix + 'MselPop-' + key);
-    if (!btn || !pop) return;
-    rivRenderMselButton(idPrefix, key, scopeOppId);
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const wasOpen = pop.classList.contains('open');
-      closeAllMsel();
-      if (!wasOpen) rivOpenMselPopover(idPrefix, key, pop, scopeOppId, onChange);
-    });
-    pop.addEventListener('click', (e) => e.stopPropagation());
-  });
-}
-function rivOpenMselPopover(idPrefix, key, pop, scopeOppId, onChange) {
-  const all = rivOptionsFor(key, scopeOppId);
-  const sel = rivFilters[key];
-  const isChecked = (v) => !sel || sel.has(v);
-  const presets = key === 'seasons'
-    ? [['all', T('preset_all', 'Все')], ['last3', T('preset_last3', 'Последние 3')], ['current', T('preset_current', 'Текущий сезон')]]
-    : [['all', T('preset_all', 'Все')], ['none', T('preset_none', 'Ни одной')]];
-
-  pop.innerHTML =
-    '<div class="msel-presets">' + presets.map(([p, l]) => '<button type="button" data-preset="' + p + '">' + esc(l) + '</button>').join('') + '</div>' +
-    '<div class="msel-list">' + all.map(o => (
-      '<label class="msel-item"><input type="checkbox" data-v="' + esc(String(o.value)) + '" ' + (isChecked(o.value) ? 'checked' : '') + '><span>' + esc(String(o.label)) + '</span></label>'
-    )).join('') + '</div>';
-  pop.classList.add('open');
-
-  pop.querySelectorAll('input[type=checkbox]').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const current = new Set(rivFilters[key] ? [...rivFilters[key]] : all.map(o => o.value));
-      const typed = all.find(o => String(o.value) === cb.dataset.v).value;
-      if (cb.checked) current.add(typed); else current.delete(typed);
-      rivFilters[key] = (current.size === all.length) ? null : current;
-      onChange();
-    });
-  });
-  pop.querySelectorAll('button[data-preset]').forEach(b => {
-    b.addEventListener('click', () => {
-      const p = b.dataset.preset;
-      if (p === 'all') rivFilters[key] = null;
-      else if (p === 'none') rivFilters[key] = new Set();
-      else if (p === 'last3') rivFilters.seasons = new Set(all.map(o => o.value).slice(-3));
-      else if (p === 'current') rivFilters.seasons = new Set(all.length ? [all[all.length - 1].value] : []);
-      onChange();
-      rivOpenMselPopover(idPrefix, key, pop, scopeOppId, onChange);
+    wrap.querySelectorAll('.facet-block[data-key="' + key + '"] tr.facet-row').forEach(tr => {
+      const cb = tr.querySelector('input[type=checkbox]');
+      tr.addEventListener('click', (e) => {
+        if (e.target === cb) return;
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+      });
+      cb.addEventListener('change', (e) => { e.stopPropagation(); toggleRivFacetValue(key, tr.dataset.v); });
     });
   });
 }
-function rivRenderChips(containerId, keys, onChange) {
-  const row = document.getElementById(containerId);
-  if (!row) return;
-  const chips = [];
-  keys.forEach(key => {
-    const sel = rivFilters[key];
-    if (!sel) return;
-    const all = rivOptionsFor(key, key === 'teamThem' ? rivOpenOppId : null);
-    const labels = all.filter(o => sel.has(o.value)).map(o => o.label);
-    chips.push('<span class="chip accent">' + esc(rivGroupLabel(key)) + ': ' +
-      (labels.length ? esc(labels.join(', ')) : (isEs() ? 'ninguno' : 'ничего')) +
-      ' <button type="button" data-remove-key="' + key + '">&times;</button></span>');
-  });
-  if (!chips.length) { row.innerHTML = ''; return; }
-  row.innerHTML = chips.join('') + '<button type="button" class="chip-reset" id="' + containerId + 'Reset">' + T('chips_reset', 'Сбросить фильтры') + '</button>';
-  row.querySelectorAll('button[data-remove-key]').forEach(b => b.addEventListener('click', () => { rivFilters[b.dataset.removeKey] = null; onChange(); }));
-  document.getElementById(containerId + 'Reset').addEventListener('click', () => { keys.forEach(k => { rivFilters[k] = null; }); onChange(); });
+
+/* ---- right-hand content: opponent list, or one opponent's detail ---- */
+
+function renderRivContent() {
+  const wrap = document.getElementById('rivContent');
+  if (!RIVALS) {
+    wrap.innerHTML = '<p class="foot">' + T('rivals_none', 'Нет данных о матчах для этого клуба.') + '</p>';
+    return;
+  }
+  if (rivOpenOppId == null) renderRivOpponentList(wrap);
+  else renderRivOpponentDetail(wrap);
 }
 
-/* ---- shareable URL: ?rf_season=&rf_cat=&rf_div=&rf_teamus=&rf_teamthem=&opp= ---- */
+function renderRivalTbody(opps) {
+  const tbody = document.getElementById('rivalTbody');
+  const searchEl = document.getElementById('rivalSearch');
+  if (!tbody || !searchEl) return;
+  const q = (searchEl.value || '').trim().toLowerCase();
+  const shown = q ? opps.filter(o => o.display.toLowerCase().includes(q)) : opps;
+  const maxM = opps.length ? opps[0].matches : 1;
+  tbody.innerHTML = shown.map(o => {
+    const pct = Math.max(4, Math.round(o.matches / maxM * 100));
+    return '<tr class="rival-row" data-opp="' + o.club_id + '">' +
+      '<td class="opp-name">' + esc(o.display) + '<span class="opp-bar"><i style="width:' + pct + '%"></i></span></td>' +
+      '<td class="num">' + o.matches + '</td>' +
+      '<td class="num">' + wdlText(o.wins, o.draws, o.losses) + '</td>' +
+      '<td class="num">' + o.goals_for + ':' + o.goals_against + '</td></tr>';
+  }).join('');
+  tbody.querySelectorAll('tr[data-opp]').forEach(tr => tr.addEventListener('click', () => {
+    rivFilters.teamThem = null;  // fresh pick, not carrying over a filter from a different opponent
+    rivOpenOppId = +tr.dataset.opp;
+    rivLogExpanded = false;
+    onRivFilterChanged();
+  }));
+}
+
+function renderRivOpponentList(wrap) {
+  const rows = filteredMatches();
+  const agg = aggregate(rows);
+  const opps = groupByAgg(rows, m => m[M_OPP]).map(g => {
+    const meta = RIVALS.opponents_meta[String(g.key)] || {};
+    return { club_id: g.key, display: meta.display || ('club ' + g.key), ...g };
+  }).sort((a, b) => b.matches - a.matches);
+
+  wrap.innerHTML =
+    '<div class="stats' + (isRivFiltered() ? ' is-filtered' : '') + '" id="rivalStats">' +
+    [
+      [agg.matches, T('l_matches', 'Матчей')],
+      [opps.length, T('l_opponents', 'Соперников')],
+      [agg.wins + '-' + agg.draws + '-' + agg.losses, T('l_wdl', 'В-Н-П')],
+      [agg.goals_for + ':' + agg.goals_against, T('l_goals', 'Мячи')],
+    ].map(([val, label]) => '<div class="stat"><div class="n">' + val + '</div><div class="l">' + esc(label) + '</div></div>').join('') +
+    '</div>' +
+    '<div class="section-head" style="border:none;padding:0;margin:0.9rem 0 0.5rem;">' +
+    '<input type="text" id="rivalSearch" class="path-search" placeholder="' + esc(T('rivals_search', 'Найти соперника…')) + '" autocomplete="off" style="margin-left:0"></div>' +
+    (opps.length
+      ? '<div class="table-shell"><div class="table-scroll"><table><thead><tr>' +
+        '<th>' + T('th_opp', 'Соперник') + '</th><th class="num">' + T('th_m', 'И') + '</th>' +
+        '<th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead>' +
+        '<tbody id="rivalTbody"></tbody></table></div></div>'
+      : '<p class="foot">' + T('rivals_none_filtered', 'Нет матчей под выбранные фильтры.') + '</p>');
+
+  if (opps.length) {
+    renderRivalTbody(opps);
+    document.getElementById('rivalSearch').addEventListener('input', () => renderRivalTbody(opps));
+  }
+}
+
+function renderRivOpponentDetail(wrap) {
+  const meta = RIVALS.opponents_meta[String(rivOpenOppId)];
+  if (!meta) { rivOpenOppId = null; renderRivOpponentList(wrap); return; }
+  const rows = filteredMatches();
+  const agg = aggregate(rows);
+  const teamPairs = groupByAgg(rows, m => m[M_TUS] + '|' + m[M_TTHEM]).map(g => {
+    const [tus, tthem] = g.key.split('|').map(Number);
+    return {
+      team_us_id: tus, team_us_name: RIVALS.team_names[tus] || String(tus),
+      team_them_id: tthem, team_them_name: RIVALS.team_names[tthem] || String(tthem), ...g,
+    };
+  }).sort((a, b) => b.matches - a.matches);
+
+  const log = [...rows].sort((a, b) => (b[M_DATE] || '').localeCompare(a[M_DATE] || ''));
+  const showAll = rivLogExpanded || log.length <= RIV_LOG_SHOW_LIMIT;
+  const shownLog = showAll ? log : log.slice(0, RIV_LOG_SHOW_LIMIT);
+
+  wrap.innerHTML =
+    '<button type="button" class="crumb-back" id="backToOpponents">' + T('back_to_opponents', '← Все соперники') + '</button>' +
+    '<h3>' + esc(RIVALS.display) + ' &mdash; ' + esc(meta.display) + '</h3>' +
+    '<div class="modal-sub">' + agg.matches + ' ' + T('count_matches', 'матчей') + '</div>' +
+    '<div class="score-band"><div class="side us">' + esc(RIVALS.display) + '</div>' +
+    '<div class="num">' + agg.goals_for + '<span class="colon">:</span>' + agg.goals_against + '</div>' +
+    '<div class="side">' + esc(meta.display) + '</div></div>' +
+    wdlBar(agg.wins, agg.draws, agg.losses) +
+    (teamPairs.length > 1
+      ? '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_squads', 'Составы') + '</h3>' +
+        '<div class="table-shell"><div class="table-scroll" style="max-height:12rem"><table><thead><tr>' +
+        '<th>' + T('th_team_pair', 'Пара команд') + '</th><th class="num">' + T('th_m', 'И') + '</th>' +
+        '<th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
+        teamPairs.map((tp, i) => '<tr class="rival-clickable" data-i="' + i + '"><td>' + esc(tp.team_us_name) + ' &ndash; ' + esc(tp.team_them_name) + '</td>' +
+          '<td class="num">' + tp.matches + '</td><td class="num">' + wdlText(tp.wins, tp.draws, tp.losses) + '</td>' +
+          '<td class="num">' + tp.goals_for + ':' + tp.goals_against + '</td></tr>').join('') +
+        '</tbody></table></div></div>'
+      : '') +
+    '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_matches', 'Матчи') + '</h3>' +
+    (log.length
+      ? '<div class="table-shell"><div class="table-scroll log-table" style="max-height:24rem"><table><thead><tr>' +
+        '<th>' + T('th_date', 'Дата') + '</th><th>' + T('th_season', 'Сезон') + '</th><th>' + T('th_cat_row', 'Категория') + '</th>' +
+        '<th>' + T('th_div_row', 'Дивизион') + '</th>' +
+        '<th class="num">' + T('th_score', 'Счёт') + '</th><th>' + T('th_where', 'Где') + '</th><th>' + T('th_venue', 'Поле') + '</th>' +
+        '</tr></thead><tbody>' +
+        shownLog.map(m => '<tr><td>' + esc(m[M_DATE] || '—') + '</td><td>' + esc(m[M_SEASON]) + '</td><td>' + esc(m[M_CAT]) + '</td>' +
+          '<td>' + esc(CODE_LABEL[m[M_DIV]] || m[M_DIV] || '—') + '</td>' +
+          '<td class="num">' + m[M_FOR] + ':' + m[M_AGAINST] + '</td>' +
+          '<td>' + (m[M_HOME] ? T('l_home', 'Дома') : T('l_away', 'Выезд')) + '</td>' +
+          '<td class="venue">' + esc(m[M_VENUE] || '—') + '</td></tr>').join('') +
+        '</tbody></table></div></div>' +
+        (!showAll ? '<button type="button" class="show-more-btn" id="rivShowAllBtn">' +
+          T('show_all_n', 'Показать все {n} матчей').replace('{n}', String(log.length)) + '</button>' : '')
+      : '<p class="foot">' + T('rivals_none_filtered', 'Нет матчей под выбранные фильтры.') + '</p>');
+
+  document.getElementById('backToOpponents').addEventListener('click', () => {
+    rivOpenOppId = null;
+    rivFilters.teamThem = null;
+    onRivFilterChanged();
+  });
+  wrap.querySelectorAll('tr[data-i]').forEach(tr => {
+    const tp = teamPairs[+tr.dataset.i];
+    tr.addEventListener('click', () => {
+      rivFilters.teamUs = new Set([tp.team_us_id]);
+      rivFilters.teamThem = new Set([tp.team_them_id]);
+      onRivFilterChanged();
+    });
+  });
+  const showBtn = document.getElementById('rivShowAllBtn');
+  if (showBtn) showBtn.addEventListener('click', () => { rivLogExpanded = true; renderRivContent(); });
+}
+
+/* ---- shareable URL: ?tab=rivals&opp=&rf_season=&rf_cat=&rf_div=&rf_teamus=&rf_teamthem= ---- */
 
 const RIV_URL_PARAM = { seasons: 'rf_season', cats: 'rf_cat', divs: 'rf_div', teamUs: 'rf_teamus', teamThem: 'rf_teamthem' };
 function syncRivUrl() {
@@ -1365,6 +1475,7 @@ function syncRivUrl() {
   });
   const meta = rivOpenOppId != null && RIVALS ? RIVALS.opponents_meta[String(rivOpenOppId)] : null;
   if (meta && meta.slug) url.searchParams.set('opp', meta.slug); else url.searchParams.delete('opp');
+  if (activeTab === 'rivals') url.searchParams.set('tab', 'rivals'); else url.searchParams.delete('tab');
   history.replaceState(null, '', url);
 }
 function readRivFiltersFromUrl() {
@@ -1380,189 +1491,17 @@ function readRivFiltersFromUrl() {
   };
 }
 
-function renderRivFilterBarTop() {
-  const bar = document.getElementById('rivFilterbar');
-  bar.className = 'filter-row';
-  bar.innerHTML = rivFilterBarHtml('riv', RIV_TOP_KEYS);
-  rivWireFilterBar('riv', RIV_TOP_KEYS, null, onRivFilterChanged);
-}
 function onRivFilterChanged() {
-  RIV_TOP_KEYS.forEach(key => rivRenderMselButton('riv', key, null));
-  rivRenderChips('rivChiprow', RIV_TOP_KEYS, onRivFilterChanged);
   syncRivUrl();
-  renderRivals();
+  renderRivFacets();
+  renderRivContent();
 }
 
-function renderRivals() {
-  const wrap = document.getElementById('rivalStats');
-  const tbody = document.getElementById('rivalTbody');
-  const note = document.getElementById('rivalEmptyNote');
-  if (!RIVALS) {
-    wrap.innerHTML = ''; tbody.innerHTML = '';
-    note.style.display = 'block';
-    note.textContent = T('rivals_none', 'Нет данных о матчах для этого клуба.');
-    return;
-  }
-  note.style.display = 'none';
-  const rows = filteredMatches(null);
-  const agg = aggregate(rows);
-  const oppGroups = groupByAgg(rows, m => m[M_OPP]);
-
-  wrap.className = 'stats' + (isRivFiltered() ? ' is-filtered' : '');
-  wrap.innerHTML = [
-    [agg.matches, T('l_matches', 'Матчей')],
-    [oppGroups.length, T('l_opponents', 'Соперников')],
-    [agg.wins + '-' + agg.draws + '-' + agg.losses, T('l_wdl', 'В-Н-П')],
-    [agg.goals_for + ':' + agg.goals_against, T('l_goals', 'Мячи')],
-  ].map(([val, label]) => '<div class="stat"><div class="n">' + val + '</div><div class="l">' + esc(label) + '</div></div>').join('');
-
-  const opps = oppGroups.map(g => {
-    const meta = RIVALS.opponents_meta[String(g.key)] || {};
-    return { club_id: g.key, display: meta.display || ('club ' + g.key), ...g };
-  }).sort((a, b) => b.matches - a.matches);
-
-  const q = (document.getElementById('rivalSearch').value || '').trim().toLowerCase();
-  const shown = q ? opps.filter(o => o.display.toLowerCase().includes(q)) : opps;
-  const maxM = opps.length ? opps[0].matches : 1;
-  tbody.innerHTML = shown.map(o => {
-    const pct = Math.max(4, Math.round(o.matches / maxM * 100));
-    return '<tr class="rival-row" data-opp="' + o.club_id + '">' +
-      '<td class="opp-name">' + esc(o.display) + '<span class="opp-bar"><i style="width:' + pct + '%"></i></span></td>' +
-      '<td class="num">' + o.matches + '</td>' +
-      '<td class="num">' + wdlText(o.wins, o.draws, o.losses) + '</td>' +
-      '<td class="num">' + o.goals_for + ':' + o.goals_against + '</td>' +
-      '</tr>';
-  }).join('');
-  tbody.querySelectorAll('tr[data-opp]').forEach(tr => tr.addEventListener('click', () => {
-    rivFilters.teamThem = null;  // fresh pick - not carrying over a stale filter from a different opponent
-    openRivalMatchup(+tr.dataset.opp);
-  }));
+function renderRivalsTab() {
+  renderRivFacets();
+  renderRivContent();
 }
-
-function openRivalMatchup(oppId) {
-  // Callers decide whether rivFilters.teamThem should carry over: a deep
-  // link (selectClub()'s isInitial path) or "back to matchup" from
-  // openTeamPairView() want to KEEP it (same opponent, same team filter);
-  // a fresh row click from renderRivals() clears it first (see there) -
-  // it's meaningless for whichever opponent was open before.
-  const meta = RIVALS.opponents_meta[String(oppId)];
-  if (!meta) return;
-  rivOpenOppId = oppId;
-
-  const card = document.getElementById('playerModalCard');
-  card.innerHTML = '<button type="button" class="modal-close" id="modalCloseBtn">&times;</button>' +
-    '<h3>' + esc(RIVALS.display) + ' &mdash; ' + esc(meta.display) + '</h3>' +
-    '<div id="rivModalTeamThem"></div>' +
-    '<div class="chiprow" id="rivModalChiprow"></div>' +
-    '<div id="rivModalResults"></div>';
-  document.getElementById('rivModalTeamThem').innerHTML = rivFilterBarHtml('rivModal', ['teamThem']);
-  rivWireFilterBar('rivModal', ['teamThem'], oppId, onRivModalFilterChanged);
-  rivRenderChips('rivModalChiprow', RIV_TOP_KEYS.concat(['teamThem']), onRivModalFilterChanged);
-  document.getElementById('modalCloseBtn').addEventListener('click', hideModal);
-  renderRivModalResults(oppId);
-  syncRivUrl();
-  showModal();
-}
-
-function onRivModalFilterChanged() {
-  rivRenderMselButton('rivModal', 'teamThem', rivOpenOppId);
-  rivRenderChips('rivModalChiprow', RIV_TOP_KEYS.concat(['teamThem']), onRivModalFilterChanged);
-  syncRivUrl();
-  renderRivModalResults(rivOpenOppId);
-}
-
-function renderRivModalResults(oppId) {
-  const meta = RIVALS.opponents_meta[String(oppId)];
-  const rows = filteredMatches(oppId);
-  const agg = aggregate(rows);
-
-  const bySeason = groupByAgg(rows, m => m[M_SEASON]).map(g => ({ season: g.key, ...g })).sort((a, b) => a.season.localeCompare(b.season));
-  const byCategory = groupByAgg(rows, m => m[M_CAT]).map(g => ({ category: g.key, ...g })).sort((a, b) => catIndex(a.category) - catIndex(b.category));
-  const byDivision = buildDivisionRows(rows, RIVALS.club_id, oppId);
-  const teamPairs = groupByAgg(rows, m => m[M_TUS] + '|' + m[M_TTHEM]).map(g => {
-    const [tus, tthem] = g.key.split('|').map(Number);
-    return {
-      team_us_id: tus, team_us_name: RIVALS.team_names[tus] || String(tus),
-      team_them_id: tthem, team_them_name: RIVALS.team_names[tthem] || String(tthem), ...g,
-    };
-  }).sort((a, b) => b.matches - a.matches);
-
-  const wrap = document.getElementById('rivModalResults');
-  wrap.innerHTML =
-    '<div class="modal-sub">' + agg.matches + ' ' + T('count_matches', 'матчей') + '</div>' +
-    '<div class="score-band"><div class="side us">' + esc(RIVALS.display) + '</div>' +
-    '<div class="num">' + agg.goals_for + '<span class="colon">:</span>' + agg.goals_against + '</div>' +
-    '<div class="side">' + esc(meta.display) + '</div></div>' +
-    wdlBar(agg.wins, agg.draws, agg.losses) +
-    breakdownTable(bySeason, 'season', T('th_season', 'Сезон')) +
-    breakdownTable(byCategory, 'category', T('th_cat_row', 'Категория')) +
-    divisionTable(byDivision, RIVALS.display, meta.display) +
-    '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_squads', 'Составы') + '</h3>' +
-    (teamPairs.length
-      ? '<div class="table-shell"><div class="table-scroll" style="max-height:16rem"><table><thead><tr>' +
-        '<th>' + T('th_team_pair', 'Пара команд') + '</th><th class="num">' + T('th_m', 'И') + '</th>' +
-        '<th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
-        teamPairs.map((tp, i) => '<tr class="rival-clickable" data-i="' + i + '"><td>' + esc(tp.team_us_name) + ' &ndash; ' + esc(tp.team_them_name) + '</td>' +
-          '<td class="num">' + tp.matches + '</td><td class="num">' + wdlText(tp.wins, tp.draws, tp.losses) + '</td>' +
-          '<td class="num">' + tp.goals_for + ':' + tp.goals_against + '</td></tr>').join('') +
-        '</tbody></table></div></div>'
-      : '<p class="foot">' + T('rivals_none_filtered', 'Нет матчей под выбранные фильтры.') + '</p>');
-
-  wrap.querySelectorAll('tr[data-i]').forEach(tr => {
-    const tp = teamPairs[+tr.dataset.i];
-    tr.addEventListener('click', () => openTeamPairView(oppId, tp.team_us_id, tp.team_them_id));
-  });
-}
-
-function openTeamPairView(oppId, teamUsId, teamThemId) {
-  const meta = RIVALS.opponents_meta[String(oppId)];
-  const rows = filteredMatches(oppId).filter(m => m[M_TUS] === teamUsId && m[M_TTHEM] === teamThemId);
-  if (!rows.length) return;
-  const agg = aggregate(rows);
-  const teamUsName = RIVALS.team_names[teamUsId] || String(teamUsId);
-  const teamThemName = RIVALS.team_names[teamThemId] || String(teamThemId);
-  const log = [...rows].sort((a, b) => (b[M_DATE] || '').localeCompare(a[M_DATE] || ''));
-  const card = document.getElementById('playerModalCard');
-  card.innerHTML = '<button type="button" class="modal-close" id="modalCloseBtn">&times;</button>' +
-    '<div class="crumb"><a id="backToMatchup">' + esc(RIVALS.display) + ' &mdash; ' + esc(meta.display) + '</a> / ' +
-    esc(teamUsName) + ' &ndash; ' + esc(teamThemName) + '</div>' +
-    '<h3>' + esc(teamUsName) + ' &mdash; ' + esc(teamThemName) + '</h3>' +
-    '<div class="modal-sub">' + agg.matches + ' ' + T('count_matches', 'матчей') + '</div>' +
-    '<div class="score-band"><div class="side us">' + esc(teamUsName) + '</div>' +
-    '<div class="num">' + agg.goals_for + '<span class="colon">:</span>' + agg.goals_against + '</div>' +
-    '<div class="side">' + esc(teamThemName) + '</div></div>' +
-    wdlBar(agg.wins, agg.draws, agg.losses) +
-    '<div class="table-shell"><div class="table-scroll log-table" style="max-height:18rem"><table><thead><tr>' +
-    '<th>' + T('th_date', 'Дата') + '</th><th>' + T('th_season', 'Сезон') + '</th><th>' + T('th_cat_row', 'Категория') + '</th>' +
-    '<th>' + T('th_div_row', 'Дивизион') + '</th>' +
-    '<th class="num">' + T('th_score', 'Счёт') + '</th><th>' + T('th_where', 'Где') + '</th><th>' + T('th_venue', 'Поле') + '</th>' +
-    '</tr></thead><tbody>' +
-    log.map(m => '<tr><td>' + esc(m[M_DATE] || '—') + '</td><td>' + esc(m[M_SEASON]) + '</td><td>' + esc(m[M_CAT]) + '</td>' +
-      '<td>' + esc(CODE_LABEL[m[M_DIV]] || m[M_DIV] || '—') + '</td>' +
-      '<td class="num">' + m[M_FOR] + ':' + m[M_AGAINST] + '</td>' +
-      '<td>' + (m[M_HOME] ? T('l_home', 'Дома') : T('l_away', 'Выезд')) + '</td>' +
-      '<td class="venue">' + esc(m[M_VENUE] || '—') + '</td></tr>').join('') +
-    '</tbody></table></div></div>';
-  document.getElementById('backToMatchup').addEventListener('click', () => openRivalMatchup(oppId));
-  document.getElementById('modalCloseBtn').addEventListener('click', hideModal);
-  showModal();
-}
-
-/* ============================= player modal ============================= */
-
-function showModal() { document.getElementById('playerModalBackdrop').classList.remove('hidden'); }
-function hideModal() {
-  document.getElementById('playerModalBackdrop').classList.add('hidden');
-  // Closing any modal while a rivalry matchup was open drops it from the
-  // URL (an "?opp=" without a modal open would be misleading) - harmless
-  // no-op for every other modal (player card, etc.), since rivOpenOppId is
-  // null then.
-  if (rivOpenOppId != null) {
-    rivOpenOppId = null;
-    rivFilters.teamThem = null;
-    syncRivUrl();
-  }
-}
+function hideModal() { document.getElementById('playerModalBackdrop').classList.add('hidden'); }
 
 function openPlayersListModal(title, players) {
   const card = document.getElementById('playerModalCard');
@@ -1618,7 +1557,13 @@ function renderAll() {
   renderFlow(roster);
   renderRoster(roster);
   renderPaths(roster);
-  renderRivals();
+}
+
+function setActiveTab(tab) {
+  activeTab = tab;
+  document.getElementById('tabCareers').style.display = tab === 'careers' ? '' : 'none';
+  document.getElementById('tabRivals').style.display = tab === 'rivals' ? '' : 'none';
+  document.querySelectorAll('#pageTabToggle .seg-opt').forEach(b => b.classList.toggle('is-active', b.dataset.tab === tab));
 }
 
 function wireStaticControls() {
@@ -1637,7 +1582,11 @@ function wireStaticControls() {
   document.getElementById('pathSearch').addEventListener('input', (e) => {
     pathHighlight = e.target.value; applyPathHighlight();
   });
-  document.getElementById('rivalSearch').addEventListener('input', renderRivals);
+  document.getElementById('pageTabToggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('.seg-opt'); if (!btn || !CLUB) return;
+    setActiveTab(btn.dataset.tab);
+    syncRivUrl();
+  });
   document.getElementById('playerModalBackdrop').addEventListener('click', (e) => {
     if (e.target.id === 'playerModalBackdrop') hideModal();
   });
@@ -1645,7 +1594,7 @@ function wireStaticControls() {
   document.querySelectorAll('.theme-opt').forEach(btn => btn.addEventListener('click', () => { if (CLUB) renderAll(); }));
   document.querySelectorAll('.lang-opt').forEach(btn => btn.addEventListener('click', () => {
     if (!CLUB) return;
-    renderClubHead(); renderFilterBar(); renderChips(); renderAll();
+    renderClubHead(); renderFilterBar(); renderChips(); renderAll(); renderRivalsTab();
   }));
 }
 
