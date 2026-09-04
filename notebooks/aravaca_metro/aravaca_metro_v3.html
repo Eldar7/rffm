@@ -159,6 +159,10 @@
   body.is-fullscreen .legend-toggle-btn { display: inline-block; }
   body.is-fullscreen.legend-collapsed .legend { display: none; }
 
+  /* side panel is hideable at any time (not just fullscreen) — canvas-wrap
+     is flex:1 1 auto so it reclaims the freed width automatically */
+  body.panel-hidden .panel { display: none; }
+
   /* ---------------- pivot selector ---------------- */
   .pivot-bar {
     flex: 0 0 auto;
@@ -393,6 +397,7 @@
       <span class="zoom-pct" id="zoomPct" title="Restablecer al 100%" role="button">100%</span>
       <button class="zoom-btn" id="zoomIn" title="Acercar" aria-label="Acercar">+</button>
     </div>
+    <button class="fs-btn" id="panelToggleBtn" aria-pressed="false">◀ Ocultar panel</button>
     <button class="fs-btn" id="fsBtn" aria-pressed="false">⛶ Pantalla completa</button>
   </div>
 </header>
@@ -1144,4 +1149,15 @@ legendToggleBtn.addEventListener('click', () => {
   legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
 });
 document.addEventListener('fullscreenchange', syncFullscreenState);
+
+// ---------------- side panel toggle ----------------
+// Independent of fullscreen — the panel can be hidden any time to give the
+// canvas the extra ~300px, and stays hidden across re-renders (pivot
+// switches) since it's just a body class render() never touches.
+const panelToggleBtn = document.getElementById('panelToggleBtn');
+panelToggleBtn.addEventListener('click', () => {
+  const hidden = document.body.classList.toggle('panel-hidden');
+  panelToggleBtn.textContent = hidden ? '▶ Mostrar panel' : '◀ Ocultar panel';
+  panelToggleBtn.setAttribute('aria-pressed', String(hidden));
+});
 </script>

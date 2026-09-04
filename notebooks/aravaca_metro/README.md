@@ -111,6 +111,12 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Side panel is hideable.** `#panelToggleBtn` in the header toggles
+  `body.panel-hidden`, which just `display: none`s `.panel` — `canvas-wrap`
+  is `flex: 1 1 auto` so it reclaims the ~300px on its own, no layout math
+  needed. Independent of fullscreen (unlike the legend, it doesn't
+  auto-hide on entering fullscreen) and, like the other toggles, untouched
+  by `render()` so it survives a pivot switch.
 - **Team-card deep link fixed.** The "Abrir carta de participación del
   equipo" link in the side panel pointed at the root `team_card.html`
   (`analysis_scripts/team_cards.py`, v1 — only a Matches/Roster tab pair),
