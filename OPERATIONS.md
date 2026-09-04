@@ -56,6 +56,25 @@ additions, not because of an ordering requirement:
    non-federated local cup, ...), not tied to this run's own targets - see
    `DATA_DICTIONARY.md`. Queued automatically per season in
    `crawl-all.yml`'s plan, unlike step 5 below.
+
+   **Manual follow-up, NOT automatic - do this after adding a new season:**
+   the classification above is fully automatic, but `reason=unexplained`
+   rows (genuinely no rule matched - see `TeamClubGapReason`'s docstring in
+   `models.py`) are NOT resolved by any pipeline run, by design (`source`
+   values `manual_review`/`manual_synthetic` are explicitly "not
+   reproducible by re-running the pipeline" - see `TeamClubMapping`'s
+   docstring). After a new season's `team_clubs` stage completes, check
+   `team_club_gap_reasons.csv` for new `unexplained` rows
+   (`reason == "unexplained"`) - a season boundary is exactly when a new
+   one is likely to show up (a club fielding a team for the first time,
+   RFFM's site not yet exposing its `codigo_club`). If any appear, repeat
+   the investigation TEAM_CLUB_GAP_REASONS.md and DATA_FINDINGS.md's
+   "resolving the 23 `unexplained` rows" section demonstrate (same-season/
+   same-name sibling evidence -> `manual_review` onto a real `club_id`;
+   confirmed-single-entity-no-real-codigo_club -> `manual_synthetic` with a
+   freshly minted `-min(team_id)`) and document the result the same way. No
+   evidence found -> leave it `unexplained`, same as any of the current
+   residual cases - never guess a `club_id` from name text alone.
 4. `enrich_players.py` → `rffm_scraper/player_pipeline.py` — player
    profiles/season stats/participation. Reads `match_lineups/<category>.csv`
    (needs step 2 done first for the categories it targets). Same order of
