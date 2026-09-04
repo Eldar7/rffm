@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+# Blocks a commit that stages an open-season or never-closing-stage
+# Parquet file - see analysis_scripts/check_parquet_commit.py and
+# PARQUET_CLOSURE.md's "Enforcement" section for why this exists. Not
+# itself git-tracked as .git/hooks/pre-commit (git doesn't read hooks
+# from anywhere else) - installed there by .claude/hooks/session-start.sh
+# on every session; run `bash scripts/git-hooks/install.sh` to install it
+# manually outside a Claude Code session.
+
+cd "$(git rev-parse --show-toplevel)"
+
+changed=$(git diff --cached --name-only --diff-filter=ACMR -- output/processed/rffm_parquet || true)
+[ -z "$changed" ] && exit 0
+
+echo "$changed" | xargs python3 analysis_scripts/check_parquet_commit.py

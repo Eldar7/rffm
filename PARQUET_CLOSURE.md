@@ -179,6 +179,42 @@ only ever done once `coverage_manifest.csv` is genuinely `"complete"` (the
 whole point of the strict rule above), a closed file needing correction at
 all should be the exception, not something this policy routinely triggers.
 
+## Enforcement — nothing used to stop a manual commit
+
+`parquet_closure.py`'s closure logic was, until now, only ever consulted
+by `parquet-build.yml`'s own git-add step (`--list-committable`). Nothing
+stopped an ordinary `git add`/`git commit` from committing an open-season
+or never-closing-stage Parquet snapshot anyway - e.g. after
+`.claude/hooks/session-start-open.sh` regenerates one locally for
+querying (which it's supposed to do, on disk only). Not hypothetical:
+commits `d7bf2da`/`83ac65f` (`clubs/`, `clubs_extended.parquet`,
+`club_teams.parquet`, `2017-2018` `acta_partido` - caught and reverted
+within the same PR before it reached `main`) and `42fec3f`
+(`crawl_log`/`data_quality_report` for every season - never reverted,
+still committed on `main` as of this writing, ~39.5MB, even though
+`log_family_closed_seasons()` is currently empty) both happened this way.
+
+Two guards now close that gap, both driven by the same script,
+`analysis_scripts/check_parquet_commit.py` (which just calls
+`parquet_closure.py`'s existing functions - no separate policy to drift):
+
+- **`scripts/git-hooks/pre-commit`** - a real git pre-commit hook that
+  blocks staging a Parquet file for a `(table, season)` that isn't
+  closed. `.git/hooks/` isn't itself git-tracked, so
+  `.claude/hooks/session-start.sh` re-links it on every Claude Code
+  session start (unconditional - cheap, no network); a contributor not
+  using Claude Code installs it once with `bash scripts/git-hooks/install.sh`.
+  Bypassable with `git commit --no-verify` for a deliberate, reviewed
+  exception (project owner's call, same as everywhere else in this file).
+- **`.github/workflows/check-parquet-closure.yml`** - the same check
+  against a PR's full diff vs its base branch, independent of whether the
+  hook was installed or was skipped. Read-only, doesn't commit anything.
+
+The `42fec3f` cleanup (removing the currently-committed
+`crawl_log`/`data_quality_report` files) hasn't been done - like closing
+itself, deleting committed data is a separate, deliberate, project-owner
+step, not something either guard above does on its own.
+
 ## Closing a `(season, stage)`
 
 Committing its final Parquet **and** deleting its now-redundant source CSV

@@ -1,0 +1,49 @@
+name: Check Parquet closure policy
+
+# Defense-in-depth for the open/closed Parquet git policy (PARQUET_CLOSURE.md):
+# scripts/git-hooks/pre-commit (installed automatically by .claude/hooks/
+# session-start.sh, or manually via scripts/git-hooks/install.sh) is meant to
+# catch this before it's even committed, but a hook can be skipped
+# (--no-verify), never installed (a contributor not running Claude Code who
+# hasn't run install.sh), or simply not have been active for an older commit
+# already on the branch. This workflow re-checks the same rule against
+# whatever actually lands in a PR, regardless of how it got there - see
+# analysis_scripts/check_parquet_commit.py's docstring for the two real
+# incidents (commits d7bf2da/83ac65f, 42fec3f) that motivated both guards.
+#
+# Read-only: never writes, commits, or modifies anything - just fails the
+# check if a PR's diff touches a Parquet file parquet_closure.py doesn't
+# currently consider closed.
+
+on:
+  pull_request:
+    paths:
+      - "output/processed/rffm_parquet/**"
+      - "output/processed/rffm/coverage_manifest.csv"
+      - "analysis_scripts/parquet_closure.py"
+      - "analysis_scripts/check_parquet_commit.py"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check changed Parquet files against the open/closed policy
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          changed=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- output/processed/rffm_parquet)
+          if [ -z "$changed" ]; then
+            echo "No Parquet files changed in this PR."
+            exit 0
+          fi
+          echo "$changed" | xargs python analysis_scripts/check_parquet_commit.py
