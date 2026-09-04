@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-Cross-season club-vs-club and team-vs-team match history ("Соперничества" -
-club_profile.py's rivalries section): for a chosen club, every opponent
-it has ever played, with W/D/L and goals, drillable down to which specific
-squads (team_id vs team_id) actually met and the full match log between
-them.
+Cross-season club-vs-club match history ("Соперничества" - club_profile.py's
+rivalries section): for a chosen club, every opponent it has ever played,
+drillable down to which specific squads (team_id vs team_id) actually met.
 
 Built from matches.csv (core crawl - every season, not gated behind any
 enrichment stage), both sides resolved to club_id via club_identity.py
@@ -15,14 +13,41 @@ club_profile_data_v2.py - team_club_gap_reasons.csv documents why), and a
 match between two teams of the SAME club_id (a club's 'A' squad playing its
 own 'B' squad) is dropped too - that is not a rivalry between two clubs.
 
-The by-division breakdown additionally reads standings.csv and
-competitions.csv (division_level, via load_division_presence()) - not just
-"which tier did THESE matches happen in" but "which tiers has EACH club
-ever reached at all," independent of whether they met there. Without that,
-a division with 0 matches between a pair is ambiguous (never both there vs.
-both there, different years/groups, just never scheduled together) - see
-DIV_ORDER (imported from club_division_map_v2.py, the existing
-project-wide tier ladder - not reinvented here) and _division_rows() below.
+DESIGN: ships raw match rows, not precomputed aggregates. An earlier version
+of this module computed by_season/by_category/by_division/team_pairs W/D/L
+breakdowns in Python and shipped only those - fine when the UI only ever
+showed one fixed set of breakdowns, but club_profile_v2.py's rivalries tab
+now has free-form multi-select cross-filtering (season x category x division
+x our-team x their-team, PowerBI-slicer style) - precomputing every possible
+filter *combination* server-side isn't tractable (combinatorial), so instead
+each club's file carries every one of its own matches as a plain row, and
+club_profile_v2.py's JS filters/aggregates client-side on demand. This is
+also less data than the old precomputed shape (no more repeating the same
+match under every team-pair's own nested log) and less code (no groupby-per-
+breakdown-level machinery below).
+
+Each match row is a positional array, not a keyed object - see MATCH_COLS
+for column order - to avoid repeating 10 field names per row across
+hundreds of thousands of rows; club_profile_v2.py's JS mirrors this order
+via its own M_* index constants.
+
+division_level (standings.csv/competitions.csv, restricted to DIV_ORDER -
+imported from club_division_map_v2.py, the existing project-wide tier
+ladder, not reinvented here) is attached to each match row - as DIV_CODE's
+short code (e.g. "PREF"), not the full division_level string, matching the
+exact convention club_profile_data.club_payload() already uses, since
+club_profile_v2.py's JS already has CODE_TIER/CODE_LABEL injected for
+sorting/labeling those codes - no new client-side constant needed. Also
+shipped separately and more completely via load_division_presence(): every
+tier a club_id has EVER fielded a team in, independent of whether a given
+opponent met them there. The client needs both - a division filter needs to
+know which matches match it (per-row division_level), and the "did this
+club ever reach this tier at all" presence indicator needs data no match
+row alone carries (a club can be in PRIMERA some season without that
+season's matches touching the opponent currently open). Written once as a
+single shared data/rivalries/_presence.json (not duplicated into every
+club's own file) since many different clubs' pages need the same
+opponent's presence data as they get opened.
 
 Deliberately spans every core-crawled season (2016-2017 on) - wider than
 club_profile_data_v2.py's fichajugador-scoped season list (2017-2018 on),
@@ -37,18 +62,6 @@ page (plays real matches but was never covered by fichajugador enrichment,
 e.g. an adult-only category) still appears in the opponent list, just
 without a `slug` - the client shows it as plain text, not a broken link.
 
-Performance note: every W/D/L/goals aggregate (club totals, by-season,
-by-category, per-opponent, per-opponent-by-season/category, per-team-pair)
-is computed via ONE pandas .groupby() call each over the whole (doubled,
-one row per side) match table - not a chain of per-club/per-opponent
-.groupby() calls. An earlier version called .groupby() fresh for every one
-of ~990 clubs' own opponent/team-pair breakdown (thousands of small calls)
-and measured 8+ minutes without finishing - pandas' per-call overhead
-dominates when there are many small groups; a handful of groupby calls
-each covering the full 1.4M-row frame is >50x faster. Only the raw
-per-match log (JSON needs individual match records, not just counts) is
-built by hand, in one linear pass over the frame pre-sorted by date.
-
 Usage:
     import club_rivalries_data_v2 as crd
     build_all(out_dir, profiled_club_ids=set(club_profile_clubs))
@@ -62,7 +75,7 @@ import duckdb
 import pandas as pd
 
 import club_identity as ci
-from club_division_map_v2 import DIV_ORDER
+from club_division_map_v2 import DIV_CODE, DIV_ORDER
 
 PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
 
@@ -152,12 +165,10 @@ def load_team_names() -> dict[int, str]:
 
 def perspective_rows(matches: pd.DataFrame) -> pd.DataFrame:
     """Doubles every match into two rows - one from each side's own point of
-    view (club_id/team_id = 'us', the other side = 'them') - so every
-    aggregate downstream is a plain groupby("club_id"/"opp_club_id"/...)
-    instead of two asymmetric cases. Also precomputes the W/D/L indicator
-    columns every breakdown below sums - vectorized once, here, rather than
-    per breakdown."""
-    cols = ["season", "category", "competition", "match_id", "match_date", "venue", "venue_id", "division_level"]
+    view (club_id/team_id = 'us', the other side = 'them') - so building
+    each club's own file below is a plain filter on club_id, not two
+    asymmetric cases."""
+    cols = ["season", "category", "match_date", "venue", "division_level"]
     home = matches[cols].copy()
     home["club_id"] = matches["home_club_id"]
     home["team_id"] = matches["home_team_id"]
@@ -176,31 +187,17 @@ def perspective_rows(matches: pd.DataFrame) -> pd.DataFrame:
     away["against"] = matches["home_score"]
     away["is_home"] = False
 
-    out = pd.concat([home, away], ignore_index=True)
-    out["is_w"] = (out["for_"] > out["against"]).astype("int64")
-    out["is_d"] = (out["for_"] == out["against"]).astype("int64")
-    out["is_l"] = (out["for_"] < out["against"]).astype("int64")
-    return out
+    return pd.concat([home, away], ignore_index=True)
 
 
-_AGG = {"matches": ("for_", "size"), "wins": ("is_w", "sum"), "draws": ("is_d", "sum"),
-        "losses": ("is_l", "sum"), "goals_for": ("for_", "sum"), "goals_against": ("against", "sum")}
-
-
-def _wdl_groupby(persp: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
-    """One vectorized aggregate over the whole frame - see module docstring
-    for why this replaces per-club/per-opponent .groupby() calls."""
-    g = persp.groupby(keys, sort=False).agg(**_AGG).reset_index()
-    for c in ("matches", "wins", "draws", "losses", "goals_for", "goals_against"):
-        g[c] = g[c].astype(int)
-    return g
-
-
-def _counter_dict(row) -> dict:
-    return {
-        "matches": int(row.matches), "wins": int(row.wins), "draws": int(row.draws), "losses": int(row.losses),
-        "goals_for": int(row.goals_for), "goals_against": int(row.goals_against),
-    }
+# Column order for each row in a club's "matches" array - positional, not
+# keyed, to avoid repeating field names per row across hundreds of
+# thousands of rows (see module docstring). club_profile_v2.py's JS mirrors
+# this exact order via its own M_* index constants - keep both in sync.
+MATCH_COLS = [
+    "date", "season", "category", "division", "venue",
+    "opp_club_id", "team_us_id", "opp_team_id", "home", "for", "against",
+]
 
 
 def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
@@ -209,123 +206,68 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
     print(f"  {len(matches)} inter-club finished matches")
     persp = perspective_rows(matches)
     persp = persp[persp["club_id"].isin(profiled_club_ids)]
-
-    print("Aggregating (vectorized groupby, one pass per breakdown level)...")
-    club_totals = _wdl_groupby(persp, ["club_id"])
-    club_by_season = _wdl_groupby(persp, ["club_id", "season"])
-    club_by_category = _wdl_groupby(persp, ["club_id", "category"])
-    opp_totals = _wdl_groupby(persp, ["club_id", "opp_club_id"])
-    opp_by_season = _wdl_groupby(persp, ["club_id", "opp_club_id", "season"])
-    opp_by_category = _wdl_groupby(persp, ["club_id", "opp_club_id", "category"])
-    opp_by_division = _wdl_groupby(persp[persp["division_level"].notna()], ["club_id", "opp_club_id", "division_level"])
-    tp_totals = _wdl_groupby(persp, ["club_id", "opp_club_id", "team_id", "opp_team_id"])
+    # 3 of 720,648 finished matches carry no match_date at all (a genuine,
+    # tiny data quirk) - na_position="first" keeps sort_values from choking
+    # on comparing float NaN against the other rows' str dates. groupby()
+    # below preserves this order within each club's own rows (sort=False),
+    # so each club's "matches" array comes out already date-sorted for free.
+    persp = persp.sort_values("match_date", na_position="first")
 
     print("Loading division presence (standings x competitions, every season)...")
     presence = load_division_presence()
-
-    print("Building per-match log (single sorted pass)...")
-    log_rows: dict[tuple, list] = defaultdict(list)
-    # 3 of 720,648 finished matches carry no match_date at all (a genuine,
-    # tiny data quirk, not a bug here) - na_position="first" keeps sort_values
-    # from choking on comparing float NaN against the other rows' str dates,
-    # and to_payload()'s per-team-pair sort below re-sorts with None-safe
-    # `r["date"] or ""` so those 3 just land first within their pair's log.
-    persp_sorted = persp.sort_values("match_date", na_position="first")
-    for r in persp_sorted.itertuples(index=False):
-        log_rows[(r.club_id, r.opp_club_id, r.team_id, r.opp_team_id)].append({
-            "date": r.match_date if isinstance(r.match_date, str) else None,
-            "season": r.season, "category": r.category,
-            "division": r.division_level if isinstance(r.division_level, str) else None,
-            "for": int(r.for_), "against": int(r.against), "home": bool(r.is_home),
-            "venue": r.venue if isinstance(r.venue, str) else None,
-            "venue_id": int(r.venue_id) if pd.notna(r.venue_id) else None,
-        })
 
     names = ci.club_display_names()
     slugs = ci.club_slugs()
     team_names = load_team_names()
 
-    # index everything by club_id (and, for the per-opponent tables, also by
-    # opp_club_id) so assembling one club's payload below is dict lookups,
-    # not filtering a dataframe per club.
-    def _index(df, key_cols):
-        idx = defaultdict(list)
-        for row in df.itertuples(index=False):
-            idx[tuple(getattr(row, k) for k in key_cols)].append(row)
-        return idx
-
-    club_by_season_ix = _index(club_by_season, ["club_id"])
-    club_by_category_ix = _index(club_by_category, ["club_id"])
-    opp_totals_ix = _index(opp_totals, ["club_id"])
-    opp_by_season_ix = _index(opp_by_season, ["club_id", "opp_club_id"])
-    opp_by_category_ix = _index(opp_by_category, ["club_id", "opp_club_id"])
-    opp_by_division_ix = _index(opp_by_division, ["club_id", "opp_club_id"])
-    tp_totals_ix = _index(tp_totals, ["club_id", "opp_club_id"])
-
-    def _division_rows(club_id: int, opp_id: int) -> list[dict]:
-        """DIV_ORDER-sorted rows for the by-division breakdown: every tier
-        EITHER club has ever been in, W/D/L for this pair (0 if they never
-        met there), plus each side's own season list so the client can show
-        e.g. "never reached this tier" vs "both did, just not each other"
-        instead of a bare unexplained zero (see club_rivalries_data_v2.py's
-        module-level design discussion)."""
-        wdl_by_div = {r.division_level: _counter_dict(r) for r in opp_by_division_ix[(club_id, opp_id)]}
-        us = presence.get(club_id, {})
-        them = presence.get(opp_id, {})
-        divs = set(wdl_by_div) | set(us) | set(them)
-        zero = {"matches": 0, "wins": 0, "draws": 0, "losses": 0, "goals_for": 0, "goals_against": 0}
-        return [
-            {"division": d, **wdl_by_div.get(d, zero), "us_seasons": us.get(d, []), "them_seasons": them.get(d, [])}
-            for d in DIV_ORDER if d in divs
-        ]
-
     data_dir = out_dir / "data" / "rivalries"
     data_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Writing {len(club_totals)} club rivalry files...")
+    # _presence.json: shared across every club's page, not duplicated into
+    # each one - covers every club_id that appears as either side of any
+    # profiled club's match (an opponent's own presence is shown too, once
+    # its matchup is opened - see module docstring).
+    relevant_club_ids = set(persp["club_id"].unique()) | set(persp["opp_club_id"].unique())
+    presence_out = {
+        str(cid): {DIV_CODE.get(div, div): seasons for div, seasons in presence[cid].items()}
+        for cid in relevant_club_ids if cid in presence
+    }
+    presence_text = json.dumps(presence_out, ensure_ascii=False, separators=(",", ":"))
+    (data_dir / "_presence.json").write_text(presence_text, encoding="utf-8")
+    print(f"  _presence.json: {len(presence_out)} clubs, {len(presence_text) / 1e6:.1f} MB")
+
+    n_clubs = persp["club_id"].nunique()
+    print(f"Writing per-club match files ({n_clubs} clubs)...")
     total_bytes = 0
-    for i, row in enumerate(club_totals.itertuples(index=False), start=1):
-        club_id = int(row.club_id)
+    for i, (club_id, g) in enumerate(persp.groupby("club_id", sort=False), start=1):
+        club_id = int(club_id)
+        opponents_meta = {
+            str(oid): {"display": names.get(oid) or f"club {oid}",
+                       "slug": slugs.get(oid) if oid in profiled_club_ids else None}
+            for oid in {int(x) for x in g["opp_club_id"].unique()}
+        }
+        tids = {int(x) for x in g["team_id"].unique()} | {int(x) for x in g["opp_team_id"].unique()}
+        team_names_out = {str(t): team_names.get(t) or str(t) for t in tids}
 
-        opponents = []
-        for opp_row in opp_totals_ix[(club_id,)]:
-            opp_id = int(opp_row.opp_club_id)
-            team_pairs = []
-            for tp_row in tp_totals_ix[(club_id, opp_id)]:
-                tid, opp_tid = int(tp_row.team_id), int(tp_row.opp_team_id)
-                log = sorted(log_rows[(club_id, opp_id, tid, opp_tid)], key=lambda r: r["date"] or "")
-                team_pairs.append({
-                    "team_us_id": tid, "team_us_name": team_names.get(tid) or str(tid),
-                    "team_them_id": opp_tid, "team_them_name": team_names.get(opp_tid) or str(opp_tid),
-                    **_counter_dict(tp_row), "log": log,
-                })
-            team_pairs.sort(key=lambda p: -p["matches"])
+        match_rows = [
+            [
+                r.match_date if isinstance(r.match_date, str) else None,
+                r.season, r.category,
+                DIV_CODE.get(r.division_level, r.division_level) if isinstance(r.division_level, str) else None,
+                r.venue if isinstance(r.venue, str) else None,
+                int(r.opp_club_id), int(r.team_id), int(r.opp_team_id),
+                bool(r.is_home), int(r.for_), int(r.against),
+            ]
+            for r in g.itertuples(index=False)
+        ]
 
-            by_season = sorted(({"season": r.season, **_counter_dict(r)} for r in opp_by_season_ix[(club_id, opp_id)]),
-                                key=lambda r: r["season"])
-            by_category = sorted(({"category": r.category, **_counter_dict(r)} for r in opp_by_category_ix[(club_id, opp_id)]),
-                                  key=lambda r: r["category"])
-            opponents.append({
-                "club_id": opp_id,
-                "display": names.get(opp_id) or f"club {opp_id}",
-                "slug": slugs.get(opp_id) if opp_id in profiled_club_ids else None,
-                **_counter_dict(opp_row),
-                "by_season": by_season, "by_category": by_category,
-                "by_division": _division_rows(club_id, opp_id),
-                "team_pairs": team_pairs,
-            })
-        opponents.sort(key=lambda o: -o["matches"])
-
-        by_season = sorted(({"season": r.season, **_counter_dict(r)} for r in club_by_season_ix[(club_id,)]),
-                            key=lambda r: r["season"])
-        by_category = sorted(({"category": r.category, **_counter_dict(r)} for r in club_by_category_ix[(club_id,)]),
-                              key=lambda r: r["category"])
         payload = {
             "club_id": club_id,
             "display": names.get(club_id) or f"club {club_id}",
-            **_counter_dict(row),
-            "by_season": by_season, "by_category": by_category,
-            "opponents": opponents,
+            "cols": MATCH_COLS,
+            "opponents_meta": opponents_meta,
+            "team_names": team_names_out,
+            "matches": match_rows,
         }
 
         slug = slugs.get(club_id) or f"club-{club_id}"
@@ -333,5 +275,5 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
         total_bytes += len(text)
         (data_dir / f"{slug}.json").write_text(text, encoding="utf-8")
         if i % 200 == 0:
-            print(f"  {i}/{len(club_totals)}...")
-    print(f"  done, {total_bytes / 1e6:.0f} MB across {len(club_totals)} files")
+            print(f"  {i}/{n_clubs}...")
+    print(f"  done, {total_bytes / 1e6:.0f} MB across {n_clubs} per-club files")
