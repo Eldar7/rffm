@@ -194,7 +194,7 @@ HTML = r"""<!DOCTYPE html>
 <div class="page full">
   <header class="masthead">
     %SWITCH_ROW%
-    <a class="back" href="../index.html">&larr; RFFM data</a>
+    <a class="back" href="index.html">&larr; RFFM data</a>
     <span class="eyebrow"><span data-i18n="eyebrow">RFFM (Мадрид) &middot; профиль клуба</span></span>
     <h1><span data-i18n="h1">Профиль клуба</span></h1>
     <p><span data-i18n="lede">Выберите клуб, чтобы увидеть, из каких клубов пришли его игроки, как устроен состав

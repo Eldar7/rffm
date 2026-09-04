@@ -219,7 +219,7 @@ a.back{ font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--acc
 </header>
 
 <main>
-  <a class="back" href="index.html" data-i18n="back">&larr; на главную</a>
+  <a class="back" href="../index.html" data-i18n="back">&larr; на главную</a>
 
   <div class="intro">
     <h1 class="page-title" data-i18n="h_title">Какие клубы правда растят своих?</h1>

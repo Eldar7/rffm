@@ -631,7 +631,7 @@ td.cell .chip2.pos-gold{box-shadow: inset 0 0 0 1.5px var(--gold);}
 <div class="page">
   <header class="masthead">
     %SWITCH_ROW%
-    <a class="back" href="../index.html">&larr; RFFM data</a>
+    <a class="back" href="index.html">&larr; RFFM data</a>
     <span class="eyebrow"><span data-i18n="eyebrow">RFFM (Мадрид) &middot; клубы по дивизионам</span></span>
     <h1><span data-i18n="h1">Карта клубов по дивизионам</span></h1>
     <p><span data-i18n="lede">Каждая строка &mdash; клуб, каждый столбец &mdash; дивизион/тип игры. В ячейке &mdash; сколько команд клуба там выступает и лучшая позиция (любой из его команд) в своей группе. Кликните по названию клуба, чтобы увидеть настоящие площадки, герб и полный список команд.</span></p>

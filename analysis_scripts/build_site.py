@@ -1,44 +1,38 @@
 #!/usr/bin/env python3
 """
 Builds the whole GitHub Pages site into a single output directory: the
-three interactive reports plus a landing page (index.html) that links to
-them and summarizes season/category coverage from coverage_manifest.csv.
+interactive reports plus a landing page (index.html) that links to them
+and summarizes season/category coverage from coverage_manifest.csv.
 
-Every report is regenerated from the CSVs already committed under
-output/processed/rffm/ — nothing here re-scrapes the RFFM site.
+weird_scores.html, club_division_map.html, team_card.html, player_card.html,
+club_profile.html, all_players.html, all_teams.html and season_comparison.html
+are built exclusively from their _v2 generators now (Parquet-sourced, via
+rffm_data.py, reading output/processed/rffm_parquet/) — each strictly
+supersedes the CSV-driven v1 report it replaced (see DATA_FINDINGS.md /
+OPERATIONS.md for the club_id migration this depended on) and several fix
+real v1 bugs on top: v1's birth_year read carried the CSVs' ".0" float-
+serialization artifact, which silently dropped team_card.html's roster
+"seasons eligible" (Y) stat to None for ~18.6k players; v1's all_players.html
+inflated a player's "number of clubs" count on a club that only ever
+renamed/changed sponsor; club_profile.html/v2 additionally ships a whole
+"Соперничества" (rivalries) section v1 never had. The v1 generators
+(club_division_map.py, team_cards.py, player_cards.py, club_profile.py +
+club_profile_data.py, all_players.py, all_teams.py, weird_scores_report.py,
+season_comparison.py) are kept in the repo — club_division_map.py and
+team_cards.py in particular are still imported everywhere as shared
+constant/helper modules (CATEGORIES, DIV_CODE, TIER_OF, build_club_team_cards,
+norm_id, ...) — but this script no longer calls their build_all()/
+build_html(), so they no longer render into the site.
 
-Also builds <output-dir>/v2/* from the _v2 report generators (Parquet-
-sourced, via rffm_data.py, reading output/processed/rffm_parquet/ instead
-of the CSVs) when that Parquet copy exists, sitting next to the untouched
-CSV-driven originals rather than replacing them: weird_scores.html (a
-live, deployed proof the migration reproduces the CSV-driven site exactly),
-team_card.html + its team-participation-map data (team_participation_map_v2
-— the "Карта участия" tab: how one squad moved through divisions within a
-season and across seasons, core-data-only so it needs no acta_partido
-enrichment), club_division_map.html (adds the squads-over-seasons grid
-that reads the same team-participation data), club_profile.html (donor-
-club/alumni-career view, linked from both of the above), player_card.html
-(donor-club-style per-player registration/career view, linked from
-team_card.html's roster), player_card.html's own "Карта участия" tab
-(participation_map_v2 — per-match acta_partido facts, the player-level
-analog of team_participation_map_v2), all_players.html, all_teams.html,
-and season_comparison.html — the full set of _v2 report generators this
-project has written now all build into v2/. Skipped with a message if
-output/processed/rffm_parquet/ hasn't been built yet
-(analysis_scripts/build_parquet.py, or .github/workflows/parquet-build.yml).
+output/processed/rffm_parquet/ is therefore required for a full site build,
+not optional: pages-deploy.yml always rebuilds it before calling this
+script, so this only bites a local/dev build run without first running
+analysis_scripts/build_parquet.py. main() fails fast with a clear message
+in that case rather than silently emitting an index.html whose cards link
+to pages that were never built.
 
-One exception to "sitting next to, not replacing": team_card.html's
-"Состав" roster x matches tab is v2-only (team_rosters_v2) even on the v1
-page - v1's team_rosters.py isn't called here any more. Confirmed on real
-data that the two weren't actually identical (only reordering, like every
-other v1/v2 pair) - v1's birth_year read carries the CSVs' ".0" float-
-serialization artifact, which silently drops the roster's "seasons
-eligible" (Y) stat to None for ~18.6k players; team_rosters_v2's Parquet
-read cleans that via real int typing. Building only the v2 copy is a
-correctness fix for those players on top of halving this step's cost/site
-size. v1's team_card.html and player_card.html fetch the shared JSON via a
-v2/data/... relative path (patched into their JS); v2/team_card.html's own
-fetch is unchanged, since it already lived at that same physical location.
+<output-dir>/v2/club_scorecard.html ("Кантера") is the one page that stays
+under v2/ — a v2-exclusive report with no v1 equivalent ever built.
 
 Usage:
     python analysis_scripts/build_site.py --output-dir site
@@ -52,9 +46,6 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-import season_comparison
-import club_division_map
-import weird_scores_report
 import weird_scores_report_v2
 import team_cards_v2
 import club_division_map_v2
@@ -68,11 +59,6 @@ import all_teams_v2
 import season_comparison_v2
 import club_scorecard_site
 import competition_structure
-import team_cards
-import player_cards
-import club_profile
-import all_players
-import all_teams
 import all_clubs
 from site_theme import CSS, FONT_LINKS, LANG_SWITCH_JS, THEME_INIT_JS, THEME_SWITCH_JS, switch_row_html
 
@@ -316,27 +302,16 @@ def main():
     out_dir = Path(__file__).parent.parent / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Building season_comparison.html ({len(season_comparison.SEASONS)} seasons)...")
-    sc_data = season_comparison.load_all_data()
-    (out_dir / "season_comparison.html").write_text(season_comparison.build_html(sc_data), encoding="utf-8")
-
-    print("Building club_division_map.html...")
-    club_division_map.build_all(out_dir)
-
-    print("Building team_card.html...")
-    team_cards.build_all(out_dir)
-
-    print("Building player_card.html...")
-    player_cards.build_all(out_dir)
-
-    print("Building club_profile.html...")
-    club_profile.build_all(out_dir)
-
-    print("Building all_players.html...")
-    all_players.build_all(out_dir)
-
-    print("Building all_teams.html...")
-    all_teams.build_all(out_dir)
+    parquet_dir = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
+    if not any((parquet_dir / "matches").glob("*.parquet")):
+        sys.exit(
+            "output/processed/rffm_parquet/ is not built yet — weird_scores.html, "
+            "club_division_map.html, team_card.html, player_card.html, club_profile.html, "
+            "all_players.html, all_teams.html, season_comparison.html and club_scorecard.html "
+            "are all Parquet-sourced now and have no CSV-driven fallback. Run "
+            "analysis_scripts/build_parquet.py first (pages-deploy.yml always does this "
+            "before calling build_site.py)."
+        )
 
     print("Building all_clubs.html...")
     all_clubs.build_all(out_dir)
@@ -345,67 +320,53 @@ def main():
     competition_structure.build_all(out_dir)
 
     print("Building weird_scores.html...")
-    weird_scores_report.build_all(out_dir)
+    weird_scores_report_v2.build_all(out_dir)
 
-    parquet_dir = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
-    if any((parquet_dir / "matches").glob("*.parquet")):
-        print("Building v2/weird_scores.html (Parquet-sourced proof of concept)...")
-        v2_dir = out_dir / "v2"
-        v2_dir.mkdir(parents=True, exist_ok=True)
-        weird_scores_report_v2.build_all(v2_dir)
+    print("Building team_card.html + team-participation-map data...")
+    team_cards_v2.build_all(out_dir)
+    team_participation_map_v2.build_all(out_dir)
 
-        print("Building v2/team_card.html + team-participation-map data...")
-        team_cards_v2.build_all(v2_dir)
-        team_participation_map_v2.build_all(v2_dir)
+    print("Building club_division_map.html (squads-over-seasons grid)...")
+    club_division_map_v2.build_all(out_dir)
 
-        print("Building v2/club_division_map.html (squads-over-seasons grid)...")
-        club_division_map_v2.build_all(v2_dir)
+    print("Building club_profile.html (linked from team_card.html / club_division_map.html)...")
+    club_profile_v2.build_all(out_dir)
 
-        print("Building v2/club_profile.html (linked from team_card.html / club_division_map.html)...")
-        club_profile_v2.build_all(v2_dir)
+    # team_rosters.py's (v1) build is no longer called - confirmed on real
+    # data that its output wasn't actually identical to team_rosters_v2's
+    # (not just reordering): v1's birth_year read carries the CSVs' ".0"
+    # float-serialization artifact, which silently drops the roster's
+    # "seasons eligible" (Y) stat to None for ~18.6k players; team_rosters_v2's
+    # Parquet read cleans that via real int typing.
+    print("Building team_card.html's Состав tab data (team_rosters_v2)...")
+    team_rosters_v2.build_all(out_dir)
 
-        # The v1 team_card.html/player_card.html also fetch this data (via
-        # a v2/data/... relative path, patched into their JS below) - v1's
-        # own team_rosters.py used to build a byte-different second copy
-        # here (site/data/team_rosters_<season>/) for them, but confirmed
-        # non-identical on real data (not just reordering): its birth_year
-        # read carries the ".0" float-serialization artifact documented in
-        # rffm_data.py's module docstring, which silently drops the "seasons
-        # eligible" (Y) denominator to None for ~18.6k players whose Y this
-        # path computes correctly via real int typing. Building only this
-        # copy is a real correctness fix for those players, not just
-        # deduplication - and halves this step's site-build cost/site size,
-        # since the two copies were otherwise identical.
-        print("Building team_card.html/v2/team_card.html's Состав tab data (team_rosters_v2)...")
-        team_rosters_v2.build_all(v2_dir)
+    print("Building player_card.html (linked from team_card.html's roster)...")
+    player_cards_v2.build_all(out_dir)
 
-        print("Building v2/player_card.html (linked from team_card.html's roster)...")
-        player_cards_v2.build_all(v2_dir)
+    print("Building player_card.html's Карта участия tab data (participation_map_v2)...")
+    participation_map_v2.build_all(out_dir)
 
-        print("Building v2/player_card.html's Карта участия tab data (participation_map_v2)...")
-        participation_map_v2.build_all(v2_dir)
+    print("Building all_players.html...")
+    all_players_v2.build_all(out_dir)
 
-        print("Building v2/all_players.html...")
-        all_players_v2.build_all(v2_dir)
+    print("Building all_teams.html...")
+    all_teams_v2.build_all(out_dir)
 
-        print("Building v2/all_teams.html...")
-        all_teams_v2.build_all(v2_dir)
+    print(f"Building season_comparison.html ({len(season_comparison_v2.SEASONS)} seasons)...")
+    sc_data_v2 = season_comparison_v2.load_all_data()
+    (out_dir / "season_comparison.html").write_text(season_comparison_v2.build_html(sc_data_v2), encoding="utf-8")
 
-        print(f"Building v2/season_comparison.html ({len(season_comparison_v2.SEASONS)} seasons)...")
-        sc_data_v2 = season_comparison_v2.load_all_data()
-        (v2_dir / "season_comparison.html").write_text(season_comparison_v2.build_html(sc_data_v2), encoding="utf-8")
-
-        print("Building v2/club_scorecard.html (\"Кантера\" - youth-development scorecard, all clubs)...")
-        cs_data = club_scorecard_site.load_all_data()
-        (v2_dir / "club_scorecard.html").write_text(club_scorecard_site.build_html(cs_data), encoding="utf-8")
-    else:
-        print("Skipping v2/* pages: output/processed/rffm_parquet/ not built yet "
-              "(run analysis_scripts/build_parquet.py first)")
+    print("Building v2/club_scorecard.html (\"Кантера\" - youth-development scorecard, all clubs)...")
+    v2_dir = out_dir / "v2"
+    v2_dir.mkdir(parents=True, exist_ok=True)
+    cs_data = club_scorecard_site.load_all_data()
+    (v2_dir / "club_scorecard.html").write_text(club_scorecard_site.build_html(cs_data), encoding="utf-8")
 
     print("Building index.html...")
     coverage = coverage_rows()
     (out_dir / "index.html").write_text(
-        build_index(season_comparison.SEASONS, coverage), encoding="utf-8")
+        build_index(season_comparison_v2.SEASONS, coverage), encoding="utf-8")
 
     total_bytes = sum(f.stat().st_size for f in out_dir.glob("*.html"))
     print(f"\nSite written to {out_dir} ({total_bytes / 1024:.0f} KB total)")
