@@ -111,6 +111,42 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Mobile fixes: label font didn't zoom, sticky labels sat in the wrong
+  place, gutters too wide.** All three turned out to share one root cause,
+  found by testing (headless Chromium can't be trusted to report the real
+  device viewport unless the artifact's own `<meta viewport>` tag is
+  present — the raw repo file has none, since the publish wrapper adds it;
+  had to test against a manually re-wrapped copy to see what a phone
+  actually sees): several header-area flex rows (`.view-controls`,
+  `.legend .grp`, `.pivot-bar`) had no `flex-wrap`, so on a narrow screen
+  their un-wrappable content forced the *entire page* — `window.innerWidth`
+  itself, not just those rows — wider than the real device width (measured
+  646px on a 390px-wide phone before the fix). Every sticky/rescale
+  computation was then correct *relative to that inflated width*, which is
+  exactly why the row labels looked shifted right of where they belonged
+  on a real phone: the whole page was laid out for a phantom ~650px screen
+  and rendered zoomed out to fit. Fixed by adding `flex-wrap: wrap` to all
+  three; `.panel` also changed from `flex: 0 0 300px` (a hard floor that
+  alone needed 300px + canvas-wrap's own minimum gutter width to coexist)
+  to `flex: 0 1 300px; min-width: 160px` so it can shrink instead of
+  forcing overflow.
+  Once that was fixed, the other two were direct: canvas-wrap's padding
+  dropped from `18px 40px 40px 100px` to `12px 16px 16px 44px` (the row
+  label gutter alone was 100px for ~11px-wide vertical text) — verified
+  the tier names still fit without new wrapping at the smaller size, on a
+  simulated 390px-wide viewport with the canvas around 230px. And the
+  header/row-label font sizes, which `applyZoom()` was deliberately *not*
+  scaling (a design call at the time, to match the pre-existing
+  canal-label precedent) — reverted that: `BASE_FONT_SIZE` now holds each
+  overlay class's 100%-zoom size, and `applyZoom()` multiplies it by
+  `zoomLevel` alongside the existing position rescale.
+  **Not fixed, found along the way:** the legend (5 groups) previously
+  overflowed the page width silently on narrow screens instead of
+  wrapping; now that `.grp` wraps, it instead grows very tall (each
+  swatch group stacks to multiple lines), pushing the canvas far down a
+  phone-height viewport. The existing fullscreen legend-collapse toggle
+  doesn't apply outside fullscreen — worth extending to narrow viewports
+  too, but that's a separate change from what was asked here.
 - **Column headers redesigned + made sticky.** Season titles are now centered
   over the *whole* season (all its lanes combined, via `text-anchor: middle`
   at `x0 + totalW/2`) rather than left-aligned at the season's edge — so
