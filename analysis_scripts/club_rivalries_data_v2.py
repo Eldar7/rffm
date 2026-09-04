@@ -6,14 +6,23 @@ it has ever played, with W/D/L and goals, drillable down to which specific
 squads (team_id vs team_id) actually met and the full match log between
 them.
 
-Built from matches.csv alone (core crawl - every season, not gated behind
-any enrichment stage), both sides resolved to club_id via club_identity.py
+Built from matches.csv (core crawl - every season, not gated behind any
+enrichment stage), both sides resolved to club_id via club_identity.py
 (team_club_map.csv - the authoritative team_id -> club_id join, no name
 heuristics; see that module's docstring). A match where either side's
 team_id has no known club_id is dropped (same ~1% honest gap as
 club_profile_data_v2.py - team_club_gap_reasons.csv documents why), and a
 match between two teams of the SAME club_id (a club's 'A' squad playing its
 own 'B' squad) is dropped too - that is not a rivalry between two clubs.
+
+The by-division breakdown additionally reads standings.csv and
+competitions.csv (division_level, via load_division_presence()) - not just
+"which tier did THESE matches happen in" but "which tiers has EACH club
+ever reached at all," independent of whether they met there. Without that,
+a division with 0 matches between a pair is ambiguous (never both there vs.
+both there, different years/groups, just never scheduled together) - see
+DIV_ORDER (imported from club_division_map_v2.py, the existing
+project-wide tier ladder - not reinvented here) and _division_rows() below.
 
 Deliberately spans every core-crawled season (2016-2017 on) - wider than
 club_profile_data_v2.py's fichajugador-scoped season list (2017-2018 on),
@@ -53,8 +62,25 @@ import duckdb
 import pandas as pd
 
 import club_identity as ci
+from club_division_map_v2 import DIV_ORDER
 
 PARQUET_DIR = Path(__file__).parent.parent / "output" / "processed" / "rffm_parquet"
+
+
+def load_competition_divisions() -> dict[str, str]:
+    """competition_id -> division_level, every season. competition_id is
+    globally unique (confirmed: never reused across seasons - see
+    build_parquet.py's PER_SEASON_TABLES), so a flat dict needs no season
+    key. Only DIV_ORDER's tiered ladder is meaningful for the rivalry
+    section's by-division breakdown - a cup/zonal/"OTHER" competition_id
+    simply won't be in this dict, and load_match_rows() below drops those
+    match rows' division_level to null rather than inventing a bucket for
+    them (same convention as club_division_map_v2.py's matrix)."""
+    frames = [pd.read_parquet(p, columns=["competition_id", "division_level"])
+              for p in sorted((PARQUET_DIR / "competitions").glob("*.parquet"))]
+    df = pd.concat(frames, ignore_index=True).drop_duplicates("competition_id")
+    df = df[df["division_level"].isin(DIV_ORDER)]
+    return dict(zip(df["competition_id"], df["division_level"]))
 
 
 def load_match_rows() -> pd.DataFrame:
@@ -64,7 +90,7 @@ def load_match_rows() -> pd.DataFrame:
     docstring)."""
     con = duckdb.connect()
     df = con.execute(f"""
-        SELECT season, category, competition, match_id, match_date,
+        SELECT season, category, competition, competition_id, match_id, match_date,
                venue, venue_id, home_team_id, away_team_id, home_score, away_score
         FROM read_parquet('{PARQUET_DIR}/matches/*.parquet')
         WHERE is_finished = true AND home_team_id IS NOT NULL AND away_team_id IS NOT NULL
@@ -80,7 +106,38 @@ def load_match_rows() -> pd.DataFrame:
     df = df[df["home_club_id"] != df["away_club_id"]]
     df["home_score"] = df["home_score"].astype(int)
     df["away_score"] = df["away_score"].astype(int)
+    df["division_level"] = df["competition_id"].map(load_competition_divisions())
     return df
+
+
+def load_division_presence() -> dict[int, dict[str, list[str]]]:
+    """club_id -> {division_level: sorted [season, ...]} - every DIV_ORDER
+    tier a club_id has EVER fielded a team in, across every season,
+    independent of any particular opponent. Same source/convention as
+    club_division_map_v2.py's matrix (standings.csv joined to
+    competitions.csv's division_level, restricted to DIV_ORDER's tiered
+    ladder - a cup/zonal/"OTHER" appearance doesn't count as tier
+    presence). Used by build_all() below so the by-division rivalry
+    breakdown can show e.g. "0 matches in PRIMERA" as either "neither club
+    ever reached it" or "both did, just never met there" instead of a bare,
+    unexplained zero."""
+    divs = load_competition_divisions()
+    frames = [pd.read_parquet(p, columns=["season", "competition_id", "team_id"])
+              for p in sorted((PARQUET_DIR / "standings").glob("*.parquet"))]
+    df = pd.concat(frames, ignore_index=True)
+    df["division_level"] = df["competition_id"].map(divs)
+    df = df.dropna(subset=["division_level"])
+
+    t2c = ci.team_to_club()
+    df["club_id"] = df["team_id"].astype(str).map(t2c)
+    df = df.dropna(subset=["club_id"])
+    df["club_id"] = df["club_id"].astype(int)
+
+    presence: dict[int, dict[str, set]] = defaultdict(lambda: defaultdict(set))
+    for r in df[["club_id", "division_level", "season"]].drop_duplicates().itertuples(index=False):
+        presence[r.club_id][r.division_level].add(r.season)
+    return {cid: {div: sorted(seasons) for div, seasons in by_div.items()}
+            for cid, by_div in presence.items()}
 
 
 def load_team_names() -> dict[int, str]:
@@ -100,7 +157,7 @@ def perspective_rows(matches: pd.DataFrame) -> pd.DataFrame:
     instead of two asymmetric cases. Also precomputes the W/D/L indicator
     columns every breakdown below sums - vectorized once, here, rather than
     per breakdown."""
-    cols = ["season", "category", "competition", "match_id", "match_date", "venue", "venue_id"]
+    cols = ["season", "category", "competition", "match_id", "match_date", "venue", "venue_id", "division_level"]
     home = matches[cols].copy()
     home["club_id"] = matches["home_club_id"]
     home["team_id"] = matches["home_team_id"]
@@ -160,7 +217,11 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
     opp_totals = _wdl_groupby(persp, ["club_id", "opp_club_id"])
     opp_by_season = _wdl_groupby(persp, ["club_id", "opp_club_id", "season"])
     opp_by_category = _wdl_groupby(persp, ["club_id", "opp_club_id", "category"])
+    opp_by_division = _wdl_groupby(persp[persp["division_level"].notna()], ["club_id", "opp_club_id", "division_level"])
     tp_totals = _wdl_groupby(persp, ["club_id", "opp_club_id", "team_id", "opp_team_id"])
+
+    print("Loading division presence (standings x competitions, every season)...")
+    presence = load_division_presence()
 
     print("Building per-match log (single sorted pass)...")
     log_rows: dict[tuple, list] = defaultdict(list)
@@ -174,6 +235,7 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
         log_rows[(r.club_id, r.opp_club_id, r.team_id, r.opp_team_id)].append({
             "date": r.match_date if isinstance(r.match_date, str) else None,
             "season": r.season, "category": r.category,
+            "division": r.division_level if isinstance(r.division_level, str) else None,
             "for": int(r.for_), "against": int(r.against), "home": bool(r.is_home),
             "venue": r.venue if isinstance(r.venue, str) else None,
             "venue_id": int(r.venue_id) if pd.notna(r.venue_id) else None,
@@ -197,7 +259,25 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
     opp_totals_ix = _index(opp_totals, ["club_id"])
     opp_by_season_ix = _index(opp_by_season, ["club_id", "opp_club_id"])
     opp_by_category_ix = _index(opp_by_category, ["club_id", "opp_club_id"])
+    opp_by_division_ix = _index(opp_by_division, ["club_id", "opp_club_id"])
     tp_totals_ix = _index(tp_totals, ["club_id", "opp_club_id"])
+
+    def _division_rows(club_id: int, opp_id: int) -> list[dict]:
+        """DIV_ORDER-sorted rows for the by-division breakdown: every tier
+        EITHER club has ever been in, W/D/L for this pair (0 if they never
+        met there), plus each side's own season list so the client can show
+        e.g. "never reached this tier" vs "both did, just not each other"
+        instead of a bare unexplained zero (see club_rivalries_data_v2.py's
+        module-level design discussion)."""
+        wdl_by_div = {r.division_level: _counter_dict(r) for r in opp_by_division_ix[(club_id, opp_id)]}
+        us = presence.get(club_id, {})
+        them = presence.get(opp_id, {})
+        divs = set(wdl_by_div) | set(us) | set(them)
+        zero = {"matches": 0, "wins": 0, "draws": 0, "losses": 0, "goals_for": 0, "goals_against": 0}
+        return [
+            {"division": d, **wdl_by_div.get(d, zero), "us_seasons": us.get(d, []), "them_seasons": them.get(d, [])}
+            for d in DIV_ORDER if d in divs
+        ]
 
     data_dir = out_dir / "data" / "rivalries"
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -231,6 +311,7 @@ def build_all(out_dir: Path, profiled_club_ids: set[int]) -> None:
                 "slug": slugs.get(opp_id) if opp_id in profiled_club_ids else None,
                 **_counter_dict(opp_row),
                 "by_season": by_season, "by_category": by_category,
+                "by_division": _division_rows(club_id, opp_id),
                 "team_pairs": team_pairs,
             })
         opponents.sort(key=lambda o: -o["matches"])

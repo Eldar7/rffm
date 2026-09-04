@@ -159,6 +159,7 @@ I18N_ES = {
     "rivals_search": "Buscar rival…",
     "rivals_none": "No hay datos de partidos para este club.",
     "th_opp": "Rival", "th_m": "PJ", "th_wdl": "G-E-P", "th_goals": "Goles",
+    "th_us": "Nosotros", "th_them": "Ellos", "div_never": "nunca", "h_by_division": "Por división",
     "l_matches": "Partidos", "l_opponents": "Rivales", "l_wdl": "G-E-P", "l_goals": "Goles",
     "count_matches": "partidos",
     "h_squads": "Equipos", "th_team_pair": "Pareja de equipos",
@@ -484,6 +485,8 @@ tr.rival-row .opp-bar i{ display:block; height:100%; background:var(--accent); }
 .wdl-bar span{ height:100%; }
 .wdl-bar .w{ background:var(--accent); } .wdl-bar .d{ background:var(--teal); } .wdl-bar .l{ background:var(--pos-red); }
 .rival-clickable{ cursor:pointer; }
+.div-dot{ color:var(--ink-soft); opacity:0.4; cursor:default; }
+.div-dot.active{ color:var(--accent); opacity:1; }
 .rival-clickable:hover td{ background:var(--row-hover); }
 .log-table td.venue{ color:var(--ink-soft); font-size:0.78rem; }
 
@@ -1134,6 +1137,28 @@ function breakdownTable(rows, keyField, keyLabel) {
     '</tbody></table></div></div>';
 }
 
+function divisionTable(rows, usName, themName) {
+  if (!rows.length) return '';
+  function dot(seasons) {
+    const active = seasons.length > 0;
+    const title = active ? seasons.join(', ') : T('div_never', 'никогда');
+    return '<span class="div-dot' + (active ? ' active' : '') + '" title="' + esc(title) + '">' + (active ? '●' : '○') + '</span>';
+  }
+  return '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_by_division', 'По дивизионам') + '</h3>' +
+    '<div class="table-shell"><div class="table-scroll" style="max-height:14rem"><table><thead><tr>' +
+    '<th>' + T('th_div_row', 'Дивизион') + '</th>' +
+    '<th class="num" title="' + esc(usName) + '">' + T('th_us', 'Мы') + '</th>' +
+    '<th class="num" title="' + esc(themName) + '">' + T('th_them', 'Они') + '</th>' +
+    '<th class="num">' + T('th_m', 'И') + '</th><th class="num">' + T('th_wdl', 'В-Н-П') + '</th><th class="num">' + T('th_goals', 'Мячи') + '</th></tr></thead><tbody>' +
+    rows.map(r => '<tr><td>' + esc(r.division) + '</td>' +
+      '<td class="num">' + dot(r.us_seasons) + '</td>' +
+      '<td class="num">' + dot(r.them_seasons) + '</td>' +
+      '<td class="num">' + r.matches + '</td>' +
+      '<td class="num">' + wdlText(r.wins, r.draws, r.losses) + '</td>' +
+      '<td class="num">' + r.goals_for + ':' + r.goals_against + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+}
+
 function renderRivals() {
   const wrap = document.getElementById('rivalStats');
   const tbody = document.getElementById('rivalTbody');
@@ -1181,6 +1206,7 @@ function openRivalMatchup(oppId) {
     wdlBar(opp.wins, opp.draws, opp.losses) +
     breakdownTable(opp.by_season, 'season', T('th_season', 'Сезон')) +
     breakdownTable(opp.by_category, 'category', T('th_cat_row', 'Категория')) +
+    divisionTable(opp.by_division, RIVALS.display, opp.display) +
     '<h3 style="margin-top:1rem;font-size:0.95rem">' + T('h_squads', 'Составы') + '</h3>' +
     '<div class="table-shell"><div class="table-scroll" style="max-height:16rem"><table><thead><tr>' +
     '<th>' + T('th_team_pair', 'Пара команд') + '</th><th class="num">' + T('th_m', 'И') + '</th>' +
@@ -1211,9 +1237,11 @@ function openTeamPairView(oppId, tpIndex) {
     wdlBar(tp.wins, tp.draws, tp.losses) +
     '<div class="table-shell"><div class="table-scroll log-table" style="max-height:18rem"><table><thead><tr>' +
     '<th>' + T('th_date', 'Дата') + '</th><th>' + T('th_season', 'Сезон') + '</th><th>' + T('th_cat_row', 'Категория') + '</th>' +
+    '<th>' + T('th_div_row', 'Дивизион') + '</th>' +
     '<th class="num">' + T('th_score', 'Счёт') + '</th><th>' + T('th_where', 'Где') + '</th><th>' + T('th_venue', 'Поле') + '</th>' +
     '</tr></thead><tbody>' +
     log.map(m => '<tr><td>' + esc(m.date) + '</td><td>' + esc(m.season) + '</td><td>' + esc(m.category) + '</td>' +
+      '<td>' + esc(m.division || '—') + '</td>' +
       '<td class="num">' + m.for + ':' + m.against + '</td>' +
       '<td>' + (m.home ? T('l_home', 'Дома') : T('l_away', 'Выезд')) + '</td>' +
       '<td class="venue">' + esc(m.venue || '—') + '</td></tr>').join('') +
