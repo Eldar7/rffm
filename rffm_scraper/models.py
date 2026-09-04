@@ -150,6 +150,25 @@ class TeamClubMapping(Row):
         (shared venue_id across every season, consecutive team_id issued in
         the same registration batch, or an unambiguous crest/name match),
         documented per-row in DATA_FINDINGS.md - never added speculatively.
+        `club_id` here is always a real, already-resolved codigo_club (some
+        other team_id's own live fetch), just attached to one more team_id
+        by evidence instead of an exact-string match.
+      - "manual_synthetic": like "manual_review", a one-time, deliberately
+        reviewed exception, not a recurring seeding layer - but for a real
+        club confirmed (by evidence, in TEAM_CLUB_GAP_REASONS.md /
+        DATA_FINDINGS.md) to be ONE single, unambiguous entity that RFFM's
+        own site simply never assigned a codigo_club to at all - there is
+        no real club_id to attach to. `club_id` is instead a MINTED
+        placeholder: `-min(team_id)` across every team_id confirmed to
+        belong to this same club, always negative (a real codigo_club is
+        always positive) so it can never collide with one. Only ever used
+        when every team_id in the group is independently confirmed to be
+        the same real club - never a substitute for club_name_raw grouping
+        under ambiguity (see club_identity.py's module docstring - e.g.
+        C.D.E. ESCUELA BREOGÁN's ~50-branch academy was deliberately left
+        OUT of this treatment, since which branch one more team_id belongs
+        to couldn't be pinned down; it got its own standalone synthetic id
+        instead of being guessed into an existing one).
         Not reproducible by re-running the pipeline; a one-time,
         deliberately reviewed exception, not a recurring seeding layer.
     """

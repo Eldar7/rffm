@@ -134,6 +134,55 @@ unresolved rather than guess. `18345500` ("SPORTING ALTO DE EXTREMADURA")
 genuinely real, single-season, three-match cup run with a distinct crest,
 just no connection to anything else in this dataset).
 
+## team_club_map.csv — resolving the 23 `unexplained` rows (6 real clubs)
+
+Follow-up to the section above, done after `TEAM_CLUB_GAP_REASONS.md`'s
+"unexplained" writeup identified exactly 6 distinct `club_name_raw` groups
+behind all 23 `reason=unexplained` rows. One resolves via ordinary
+`manual_review` evidence (an existing real `club_id`); the other 5 (really
+4 real clubs - the 3 ELECTROCOR name variants are one club) get
+`source=manual_synthetic` (see `TeamClubMapping`'s docstring in
+`models.py` for the mechanism/id convention). This closes the
+`unexplained` bucket to 0 rows.
+
+- **`18405762`** ("GREDOS SAN DIEGO LAS SUERTES", 2017-2018, squad "B")
+  → **`manual_review`, `club_id=16669730`**. Its own `/fichaequipo/`
+  never resolved, but its exact-same-season, exact-same-`club_name_raw`
+  sibling squads `17155665`/`18311375` (both "A", both 2017-2018) already
+  resolve to `16669730` via `fichaequipo_direct` - same club_name_raw
+  group only failed `exact_name_match` because *other* team_ids under this
+  name (from 2025-2026 rosters) resolve to a *different* club_id (`4112`)
+  - GREDOS SAN DIEGO LAS SUERTES itself apparently changed which of the
+    two GREDOS SAN DIEGO org-level `club_id`s its squads register under,
+  at some point between 2017-2018 and 2025-2026. The season-matched
+  sibling evidence pins `18405762` to the 2017-2018-era id specifically.
+
+- **C.D. ELECTROCOR (LAS ROZAS)** - 20 `team_id`s across 3 `club_name_raw`
+  spellings (`"C.D. ELECTROCOR C.F."` 2016-2020, `"C.D. ELECTROCOR LAS
+  ROZAS C.F."` 2020-2024, `"C.D. ELECTROCOR LAS ROZAS"` 2021-2025) → one
+  new **`manual_synthetic`, `club_id=-2729917`** (`-min(team_id)` of the
+  group). Confirmed one real, continuously-active club by
+  `TEAM_CLUB_GAP_REASONS.md`'s own investigation (its `fase_zonal`
+  satellite team_id proves it's still fielding real squads); RFFM's site
+  never independently exposed a `codigo_club` for any of its 20
+  registrations. Does not include the separate `fase_zonal` satellite
+  team_id `21368885` ("ELECTROCOR LAS ROZAS ALEV F7 CERCEDA") -
+  intentionally out of scope for this fix, a different, already-explained
+  `reason`.
+
+- **`18345500`** ("SPORTING ALTO DE EXTREMADURA") → **`manual_synthetic`,
+  `club_id=-18345500`**. Single `team_id`, no merge ambiguity (nothing to
+  attach it to, per the investigation above) - minted its own id rather
+  than left invisible.
+
+- **`18408082`** ("C.D.E. ESCUELA BREOGÁN") → **`manual_synthetic`,
+  `club_id=-18408082`**. Deliberately given its OWN standalone id rather
+  than guessed into any of the ~50 sibling BREOGÁN branches (per the
+  "deliberately excluded" note above - which branch it belongs to is
+  still genuinely unknown). Accepted tradeoff: this may end up a 51st,
+  technically-separate `club_id` for what's really an existing branch -
+  a minor split, not the wrong-merge risk a name guess would have carried.
+
 ---
 
 ## team_club_map.csv / team_club_gap_reasons.csv — two different "% done" numbers, don't conflate them

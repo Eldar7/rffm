@@ -213,9 +213,17 @@ total in `team_club_gap_reasons.csv`, ~0.2% of all `team_id`s).
 
 ---
 
-## `unexplained` — the 23 genuine residual gaps
+## `unexplained` — was 23 genuine residual gaps, now resolved to 0
 
-No rule matched. Two sub-populations, both real:
+**Update:** all 23 rows below were resolved via `manual_review`/
+`manual_synthetic` `team_club_map.csv` entries - see `DATA_FINDINGS.md`'s
+"resolving the 23 `unexplained` rows" section for the per-club evidence
+and `TeamClubMapping`'s docstring in `models.py` for the mechanism. Left
+here, unmodified, as the historical record of how each was found and why
+it didn't match any automated rule - re-run the classifier query at the
+top of this file against a fresh `team_club_map.csv` to confirm 0 remain.
+
+No rule matched originally. Two sub-populations, both real:
 
 **A real, ongoing club RFFM never gave a resolvable `fichaequipo`/
 `fichaclub` profile to** - the clearest case is the **C.D. ELECTROCOR LAS

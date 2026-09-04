@@ -34,6 +34,14 @@ club", not a name-matched substitute. `resolve()` returns None for them;
 callers must show that plainly (e.g. "неизвестный клуб (team <id>)") and
 must never merge two such rows just because their raw names match.
 
+A small number of club_id values are negative - not a real RFFM
+codigo_club (always positive), but a deliberately minted stand-in for a
+confirmed single real club RFFM's own site never assigned one to (source
+"manual_synthetic" in team_club_map.csv - see TeamClubMapping's docstring
+in rffm_scraper/models.py and DATA_FINDINGS.md for which clubs and why).
+Callers don't need to special-case this - every function here treats it
+like any other club_id - but don't assume club_id > 0 anywhere new.
+
 Usage:
     import club_identity as ci
     club_id = ci.resolve(team_id)                  # None if genuinely unresolved
