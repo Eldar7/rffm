@@ -17,11 +17,15 @@ update it and republish to this same URL via the `Artifact` tool: `action:
 Started from a deep link the user pasted:
 `https://eldar7.github.io/rffm/team_card.html?season=2025-2026&club=club-atletico-de-madrid-s-a-d&team=39`
 — team_id 39 is "CLUB ATLETICO DE MADRID S.A.D. A", Benjamín, División de
-Honor, 2025-26, and its entire roster that season is birth year 2016 (one
-year, not a 2014/2015-style pair like Aravaca). Added the adjacent 2015
-cohort (already one category ahead, in Alevín) to get the same "two
-neighboring birth years, category/by-year pivot" shape as Aravaca, per
-explicit ask — `PIVOT_BIRTH_YEARS = (2015, 2016)`.
+Honor, 2025-26. Its own roster that season is entirely birth year 2016 —
+first read as "one year, not a pair like Aravaca's 2014/2015" and paired it
+with the adjacent 2015 cohort (already a category ahead, in Alevín) instead.
+**Wrong**: team 39 is only the "A" team, i.e. the stronger/older half of a
+much bigger Benjamín intake spread across many parallel team_ids (see
+below) — a full-category query across *all* of the club's Benjamín teams in
+2025-26 (not just team 39) shows the real pair is 2016 (42 players) and
+2017 (41 players). 2015 is already a category ahead (Alevín), not part of
+this Benjamín cohort at all. `PIVOT_BIRTH_YEARS = (2016, 2017)`.
 
 ## Why this pipeline is scoped by team_id, not club_name_raw
 
@@ -48,7 +52,7 @@ count as this club" mechanism.
 
 One thing name-matching would have silently pulled in: `CLUB ATLETICO DE
 MADRID - FEM.` (women's/girls' section) shares club_id 40024 in
-`team_club_map`, and a handful of 2015/2016-born players' matches genuinely
+`team_club_map`, and a handful of 2016/2017-born players' matches genuinely
 show up under FEM team_ids in the raw lineup data. Excluded via
 `t.club_name_raw NOT LIKE '%FEM%'` — a different program, not this cohort's
 pathway, and not something Aravaca's README had to consider since Aravaca
@@ -56,13 +60,15 @@ has no separate women's section in this data.
 
 ## Scale vs. Aravaca
 
-39 stations across 5 seasons (Aravaca: 32), but the shape is different, not
-just bigger: a single season can have up to 16 stations here (2024-25) vs.
-Aravaca's max of ~7-8, since this cohort's players spread across many
-parallel same-category teams (letters up to K/L seen), not just adjacent
-categories. Exit-rate composition also differs a lot: 112 of 126 exits are
-`left_to_club` (found at a specific other club) vs. only 14 `vanished` —
-Aravaca's split was closer to even (18 left_to_club / 50 vanished out of 68).
+33 stations across 5 seasons (Aravaca: 32) — close in total count, but the
+shape is different: a single season can have well over a dozen stations
+here (13 in 2024-25) vs. Aravaca's max of ~7-8, since this cohort's players
+spread across many parallel same-category teams (letters up to K/L seen
+under the original, wrong 2015/2016 cohort; still several parallel teams
+under the corrected 2016/2017 one), not just adjacent categories. Exit-rate
+composition also differs a lot: 93 of 104 exits are `left_to_club` (found
+at a specific other club) vs. only 11 `vanished` — Aravaca's split was
+closer to even (18 left_to_club / 50 vanished out of 68).
 Both are real, expected differences from being a first-tier academy with
 heavy scouting turnover, not a pipeline bug.
 
