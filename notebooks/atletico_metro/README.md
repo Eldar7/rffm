@@ -72,6 +72,44 @@ closer to even (18 left_to_club / 50 vanished out of 68).
 Both are real, expected differences from being a first-tier academy with
 heavy scouting turnover, not a pipeline bug.
 
+## Why team 39's 2025-26 roster shows so few 2024-25 continuity links
+
+Asked about this directly: team_id=39 ("A") 2025-26 has 14 players but only
+2 links back to a 2024-25 station. Traced it through several levels before
+finding the real cause (see `DATA_FINDINGS.md`'s "matches.csv — 25 groups in
+2024-2025 have standings/scorers but zero matches" entry for the full
+writeup):
+
+1. The pipeline's own linking data confirms only 2/14 are "linked" - not a
+   rendering bug in the artifact itself.
+2. Ruled out a club-level coverage illusion: the previous clubs these
+   players' `entry.origin_club` names point to have complete 2024-25
+   coverage in our data generally.
+3. 8 of the remaining 10 unlinked players DO have confirmed appearances in
+   *earlier* seasons (2021-22 through 2023-24) - so it's not that they never
+   played, specifically a 2024-25 gap.
+4. Ruled out `player_id` reuse/reissue (no matching names found under a
+   different `player_id` anywhere in 2024-25).
+5. **Root cause, confirmed via live `/fichajugador/` requests (user-
+   authorized, one-off, bypassing robots.txt for this specific bounded
+   check):** most of these players' actual 2024-25 team was Atlético's own
+   "B" team (team_id=40), not "A" - and team_id=40's group (group_id
+   21434208, "PRIMERA DIVISION AUTONOMICA BENJAMIN F7 - Grupo 3") is one of
+   25 groups across the whole 2024-2025 season where `matches.csv` came back
+   completely empty despite the calendario page fetch reporting success and
+   `standings.csv`/`scorers.csv` for the same group being complete. Live
+   checks on 3 players (Vega Fernandez Montes, Garcia Cordero, Perez Perez)
+   confirmed full 24-match 2024-25 seasons with goal totals matching
+   `scorers.csv` exactly - they very much played, our `matches.csv` just has
+   no fixtures for their group that season, so the transfer-linker (which
+   walks `match_lineups` keyed off `matches.csv`) has nothing to link from.
+
+**Not a bug in this artifact's pipeline** - a genuine, narrow upstream gap
+in 2024-2025's core crawl, isolated to that one season, affecting ~2% of
+that season's groups scattered across categories. Re-crawling those 25
+group_ids' calendario pages for 2024-2025 (not attempted here) should
+restore the missing links next time this artifact is rebuilt.
+
 ## Team-card deep links
 
 `team_slug_map_v3.json` was rebuilt for this club the same way

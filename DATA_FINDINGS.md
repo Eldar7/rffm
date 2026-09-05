@@ -9,6 +9,72 @@ This is separate from `DATA_DICTIONARY.md` (which describes the schema) and
 
 ---
 
+## matches.csv — 25 groups in 2024-2025 have standings/scorers but zero matches (genuine gap, confirmed live)
+
+**Symptom:** A player who is confirmed (`standings.csv`, `scorers.csv`,
+`team_group_membership.csv`) to have played a full season for a given
+`group_id` in 2024-2025 has **no rows at all** in `matches.csv` for that
+group — so no `match_lineups`/`match_goals` either, and the cross-season
+transfer-linking logic (which requires a confirmed row in two
+calendar-adjacent seasons, see the "team_id/player_id linking" entry below)
+reports them as a fresh "new" entry with no prior-club history instead of a
+continuation. This surfaced investigating Club Atlético de Madrid's Benjamín
+team_id=40 ("...'B'") roster: `PIVOT_BIRTH_YEARS=(2016,2017)` players who
+scored 20-34 goals across 24 matches in `scorers.csv`/`season_stats` for
+group_id 21434208 had zero matches in our data for that season.
+
+**Confirmed genuinely a crawl/parse gap, not "these players didn't play":**
+live `/fichajugador/<id>?temporada=<2024-2025 cod_temporada=20>` requests
+(one-off, user-authorized, robots.txt-disallowed page — see
+`rffm_scraper/fetchers.py`'s `fetch_fichajugador` docstring for why this is
+off by default) for 3 of group 21434208's players
+(14662155 Vega Fernandez Montes, 13238881 Garcia Cordero, 19364743 Perez
+Perez) each showed a full `season_stats` row for 2024-2025 —
+`matches_played=24`, `starter_appearances=24`, exact goal totals matching
+`scorers.csv` (17/12/31) — and a `competitions` entry naming team_id=40,
+competition_id=21434205, group_id=21434208. So the players definitely
+played; `matches.csv` is simply missing that group's fixtures.
+
+**Root cause is in `matches.csv` specifically, not the fetch:** `crawl_log`
+shows the `group_calendario` fetch for all 25 affected groups returned
+HTTP 200 with `parser_type=html_next_data` (i.e. `__NEXT_DATA__` was found
+and parsed) — `manifest_groups.has_calendario=True` for group 21434208 too.
+Yet `parse_matches()` (`rffm_scraper/parsers.py`) produced zero rows from
+that same successful fetch. `clasificaciones`/`goleadores` pages for the
+same groups parsed fine (their `standings.csv`/`scorers.csv` rows are
+complete and consistent with each other). So the calendario page's JSON for
+these 25 groups specifically had a `rounds` list that came back empty (or
+shaped in a way `parse_matches` doesn't recognize) despite the season being
+fully played out — not investigated further; the fetch didn't cache raw
+HTML (`raw_saved_path=None`), so the actual page JSON from that crawl can't
+be re-inspected after the fact.
+
+**Scope:** all 25 affected groups are in season **2024-2025 only** (checked
+every other season — zero such groups elsewhere), all from the same single
+crawl `run_id` (`ca517b493fb9`), spanning categories BENJAMIN (8),
+ALEVIN (11), PREBENJAMIN (3), INFANTIL (1), JUVENIL (1), DEBUTANTE (1) — not
+tied to one category or game type. 25 of 1201 groups that season (~2.1%).
+Query to reproduce/re-check after a future 2024-2025 re-crawl:
+```python
+import duckdb
+con = duckdb.connect()
+groups_with_standings = con.execute("SELECT DISTINCT season, group_id FROM read_parquet('output/processed/rffm_parquet/standings/**/*.parquet') WHERE season='2024-2025'").df()
+groups_with_matches = con.execute("SELECT DISTINCT season, group_id FROM read_parquet('output/processed/rffm_parquet/matches/**/*.parquet') WHERE season='2024-2025'").df()
+missing = groups_with_standings.merge(groups_with_matches, on=['season','group_id'], how='left', indicator=True)
+print(missing[missing['_merge']=='left_only'])
+```
+
+**Consequence:** any player whose only 2024-2025 team belonged to one of
+these 25 `group_id`s will incorrectly show up as having no 2024-2025
+record anywhere downstream (transfer-linking, "did this player have a gap
+year" analyses, the Metro de la Cantera artifacts' continuity links) even
+though they have complete `standings`/`scorers` presence that season. Not a
+players-didn't-play story — re-crawling 2024-2025's calendario stage for
+these 25 group_ids (list above) should fix it; not attempted here since
+that's a pipeline change, out of scope for this investigation.
+
+---
+
 ## clubs.csv — 326 missing entries (2025-2026)
 
 **Symptom:** `coverage_manifest.csv` shows `complete_with_failures` with
