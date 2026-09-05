@@ -111,6 +111,16 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **`#panelToggleBtn` moved from the header into the pivot-bar,** next to
+  `#headerToggleBtn` — they were on opposite ends of two different bars,
+  which is why the header toggle looked like it was wrapping onto its own
+  odd row. Couldn't just move `#headerToggleBtn` into the header next to
+  the old `#panelToggleBtn` location instead (the more literal reading of
+  the ask): that would hide the panel toggle's own home *and* the header
+  toggle along with the header it controls, with nothing left on-screen to
+  bring either back. Moving `#panelToggleBtn` the other way keeps both in
+  the pivot-bar, which never hides — panel toggle stays reachable even
+  with the header collapsed.
 - **Header hideable, side panel wider + resizable.** `#headerToggleBtn` (in
   the pivot-bar, so it's still reachable once the header itself is hidden)
   toggles `body.header-hidden`, same `display:none` pattern as the legend/
