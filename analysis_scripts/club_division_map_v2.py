@@ -1169,8 +1169,12 @@ function openClubModal(club, opts) {
     `<div class="modal-note">${L === 'ru' ? 'Нет данных о матчах.' : 'Sin datos de partidos.'}</div>`;
   const profileLabel = L === 'ru' ? 'Профиль клуба (доноры, состав, путь игроков)' : 'Perfil de club (procedencia, plantilla, trayectorias)';
   const profileHtml = `<div class="modal-note"><a href="club_profile.html?club=${encodeURIComponent(club.slug)}">${profileLabel} &rarr;</a></div>`;
+  // Always shown - club_metro_v2.py skips clubs with too little cross-season
+  // signal for a readable diagram, and metro.html itself shows a friendly
+  // message rather than a broken page if this club's data/metro/<slug>.json 404s.
+  const metroHtml = `<div class="modal-note"><a href="metro.html?club=${encodeURIComponent(club.slug)}" target="_blank" rel="noopener">Metro de la Cantera &rarr;</a></div>`;
   document.getElementById('modalContent').innerHTML = `
-    <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}${profileHtml}</div></div>
+    <div class="modal-head">${crestHtml}<div><h2>${clubNameHtml}</h2>${webHtml}${profileHtml}${metroHtml}</div></div>
     ${addrHtml}
     <div class="modal-section"><h3>${venuesTitle}</h3>${venuesHtml}</div>
     <div class="modal-section"><h3>${teamsTitle}</h3>${teamsHtml}</div>

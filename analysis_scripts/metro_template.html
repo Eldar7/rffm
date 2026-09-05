@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metro de la Cantera</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    color-scheme: light;
+    --surface:        #eef1f4;
+    --surface-card:   #ffffff;
+    --surface-canal:  rgba(20,40,70,0.045);
+    --season-stripe:  rgba(20,20,25,0.025);
+    --ink:            #10151c;
+    --ink-dim:        #5b6572;
+    --ink-faint:      #99a2ac;
+    --rule:           #d5dae0;
+    --line-rest:      #c7cdd4;
+    --brand:          #c8342b;
+    --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #6da7ec; --seq-4: #3987e5; --seq-5: #256abf; --seq-6: #184f95; --seq-7: #0d366b;
+    --rise:  #eb6834;
+    --fall:  #2a78d6;
+    --exit-club: #d03b3b;
+    --entry-club: #1baf7a;
+    --captain: #eda100;
+    --cohort-senior: #4a3aa7;
+    --cohort-junior: #e87ba4;
+    --shadow: rgba(16,21,28,0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface:        #0e1116;
+      --surface-card:   #171b21;
+      --surface-canal:  rgba(220,230,245,0.035);
+      --season-stripe:  rgba(210,220,235,0.03);
+      --ink:            #eef1f4;
+      --ink-dim:        #a7afb9;
+      --ink-faint:      #5b6572;
+      --rule:           #2a2f37;
+      --line-rest:      #3a4048;
+      --brand:          #e8635a;
+      --seq-1: #123258; --seq-2: #184f95; --seq-3: #1c5cab; --seq-4: #3987e5; --seq-5: #5598e7; --seq-6: #86b6ef; --seq-7: #cde2fb;
+      --rise:  #e0805c;
+      --fall:  #3987e5;
+      --exit-club: #e66767;
+      --entry-club: #199e70;
+      --captain: #d9a441;
+      --cohort-senior: #9085e9;
+      --cohort-junior: #d55181;
+      --shadow: rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface:        #0e1116;
+    --surface-card:   #171b21;
+    --surface-canal:  rgba(220,230,245,0.035);
+    --season-stripe:  rgba(210,220,235,0.03);
+    --ink:            #eef1f4;
+    --ink-dim:        #a7afb9;
+    --ink-faint:      #5b6572;
+    --rule:           #2a2f37;
+    --line-rest:      #3a4048;
+    --brand:          #e8635a;
+    --seq-1: #123258; --seq-2: #184f95; --seq-3: #1c5cab; --seq-4: #3987e5; --seq-5: #5598e7; --seq-6: #86b6ef; --seq-7: #cde2fb;
+    --rise:  #e0805c;
+    --fall:  #3987e5;
+    --exit-club: #e66767;
+    --entry-club: #199e70;
+    --captain: #d9a441;
+    --cohort-senior: #9085e9;
+    --cohort-junior: #d55181;
+    --shadow: rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------------- header ---------------- */
+  header {
+    flex: 0 0 auto;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--surface-card);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand .mark {
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    color: #fff;
+    background: var(--brand);
+    padding: 3px 8px 4px;
+    border-radius: 3px;
+  }
+  h1 {
+    margin: 0;
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.01em;
+  }
+  .brand .sub { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-dim); }
+  .stats-row { display: flex; gap: 22px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-dim); }
+  .stats-row b { color: var(--ink); font-weight: 500; }
+
+  /* ---------------- view controls (zoom + fullscreen) ---------------- */
+  .view-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; row-gap: 6px; }
+  .zoom-group { display: flex; align-items: center; gap: 2px; font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  .zoom-btn, .fs-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    padding: 5px 9px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .zoom-btn:hover, .fs-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .zoom-pct {
+    min-width: 42px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-dim);
+  }
+  .zoom-pct:hover { color: var(--ink); }
+  .fs-btn { display: flex; align-items: center; gap: 5px; }
+
+  body.fauxfs { position: fixed; inset: 0; z-index: 2147483647; }
+
+  /* legend collapses in fullscreen by default (frees vertical space for the
+     canvas) behind a toggle that only appears while fullscreen is active */
+  .legend-toggle-btn {
+    display: none;
+    margin-left: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+  }
+  .legend-toggle-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  body.is-fullscreen .legend-toggle-btn { display: inline-block; }
+  body.is-fullscreen.legend-collapsed .legend { display: none; }
+
+  /* "hide header" collapses the decorative logo/title/stats *and* the
+     legend — .view-controls and the pivot-bar (zoom, panel/header/legend
+     toggles, fullscreen, pivot buttons) stay visible, since hiding the
+     whole <header> (or the pivot-bar) would take their own toggle buttons
+     down with them, with nothing left on-screen to bring them back */
+  body.header-hidden .brand,
+  body.header-hidden .stats-row,
+  body.header-hidden .legend { display: none; }
+
+  /* side panel is hideable at any time (not just fullscreen) — canvas-wrap
+     is flex:1 1 auto so it reclaims the freed width automatically */
+  body.panel-hidden .panel { display: none; }
+
+  /* ---------------- pivot selector ---------------- */
+  .pivot-bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    gap: 12px;
+    padding: 10px 22px;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--rule);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+  }
+  .pivot-bar .lbl { color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; font-size: 10.5px; }
+  .pivot-btns { display: flex; gap: 6px; }
+  .pivot-btn {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .pivot-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .pivot-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+  .pivot-hint { color: var(--ink-faint); font-style: italic; font-size: 11px; }
+
+  /* ---------------- legend ---------------- */
+  .legend {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 8px 22px;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--rule);
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    font-family: "IBM Plex Mono", monospace;
+    flex-wrap: wrap;
+  }
+  .legend .grp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; row-gap: 4px; }
+  .legend .sw { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .chip { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .legend .ln { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+  .legend .dash { border-top-style: dashed; }
+  .legend .divider { width: 1px; height: 14px; background: var(--rule); }
+  .legend .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--captain); display: inline-block; }
+  .legend .gk-chip {
+    width: 11px; height: 11px; border-radius: 2px; display: inline-block;
+    background: var(--seq-3); border: 1.3px dashed var(--ink-dim);
+  }
+  .legend .up-chip, .legend .down-chip {
+    width: 11px; height: 11px; border-radius: 2px; display: inline-block;
+    background: var(--seq-3); border: 1.3px solid var(--ink);
+  }
+  .legend .up-chip { border-style: dashed; border-width: 1.6px; }
+  .legend .down-chip { border-style: dotted; border-width: 2px; }
+  .legend .seq-grad {
+    width: 72px; height: 10px; border-radius: 2px; display: inline-block;
+    background: linear-gradient(to right, var(--seq-1), var(--seq-2), var(--seq-3), var(--seq-4), var(--seq-5), var(--seq-6), var(--seq-7));
+    border: 1px solid var(--rule);
+  }
+  .legend .seq-sw { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; }
+
+  /* ---------------- main area ---------------- */
+  .main { flex: 1 1 auto; display: flex; min-height: 0; }
+  /* flex-basis: 0 (not auto) so canvas-wrap's hypothetical flex size is 0,
+     not its own SVG content's huge natural width — with auto, that huge
+     preferred size skewed the proportional flex-shrink split, squeezing
+     .panel down well below its own requested width even with plenty of
+     total space to go around */
+  .canvas-wrap { flex: 1 1 0; overflow: auto; position: relative; padding: 12px 16px 16px 42px; }
+  .zoom-wrap { display: inline-block; position: relative; transform-origin: 0 0; }
+
+  /* row names (division-tier labels) and column names (season/lane headers)
+     are both HTML overlays, siblings of zoom-wrap rather than SVG content,
+     sticky so they stay on screen through any scroll — canal-labels sticks
+     to the left edge (tracks vertical scroll normally), season-headers
+     sticks to the top edge (tracks horizontal scroll normally). Both are
+     zero-size normal-flow boxes; their labels are the ones actually
+     positioned/sized, via left/top offsets rescaled in applyZoom() from the
+     unscaled data-base-left/data-base-top render() stores, same trick for
+     both axes. Kept translucent (opacity) since once scrolled they float
+     over live diagram content, not blank margin. */
+  .canal-labels, .season-headers {
+    position: sticky;
+    width: 0; height: 0;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 4;
+  }
+  /* exactly one sticky axis each — a top AND left inset together would stick
+     the element to the corner immediately, ignoring scroll on either axis */
+  .canal-labels { left: 0; }
+  .season-headers { top: 0; }
+  .canal-label {
+    position: absolute;
+    left: 3px;
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    opacity: 0.82;
+  }
+
+  .season-header-title, .season-header-cat, .season-header-lbl {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0.82;
+  }
+  .season-header-title {
+    top: 6px;
+    font-family: "IBM Plex Sans Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .season-header-cat {
+    top: 27px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+  }
+  .season-header-lbl {
+    top: 48px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.02em;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  svg text { font-family: "IBM Plex Sans Condensed", sans-serif; }
+  .lane-divider { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 3; }
+
+  .station-rect {
+    fill: var(--surface-card);
+    stroke: var(--rule);
+    stroke-width: 1;
+    transition: stroke 0.15s, filter 0.15s;
+  }
+  .station-rect.hot { stroke: var(--brand); stroke-width: 1.6; filter: drop-shadow(0 2px 10px var(--shadow)); }
+  .station-label-group { cursor: pointer; }
+  .station-label-group.hot .station-letter { fill: var(--brand); }
+  .station-letter { font-weight: 700; font-size: 13px; fill: var(--ink); transition: fill 0.15s; }
+  .station-div {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8.5px;
+    fill: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .station-count { font-family: "IBM Plex Mono", monospace; font-size: 8.5px; fill: var(--ink-faint); }
+
+  .row-rect { transition: opacity 0.15s; cursor: pointer; }
+  .row-rect.play-up { stroke: var(--ink); stroke-width: 1.1; stroke-dasharray: 3.2 1; }
+  .row-rect.play-down { stroke: var(--ink); stroke-width: 1.1; stroke-dasharray: 0.4 1.3; }
+  .cap-dot { fill: var(--captain); }
+  .cohort-mark { transition: opacity 0.15s; }
+  .cohort-mark.dim { opacity: 0.15; }
+
+  .path-link {
+    fill: none;
+    stroke: var(--line-rest);
+    stroke-width: 1.1;
+    transition: stroke 0.12s, stroke-width 0.12s, opacity 0.15s;
+  }
+  .path-link.hot { stroke-width: 2.2; }
+  .path-link.lateral.hot { stroke: var(--ink); }
+  .path-link.hot path { stroke-width: 2.4px; }
+  .intra-link path { transition: stroke-width 0.12s; }
+  .path-link.dim { opacity: 0.06; }
+  .row-rect.dim { opacity: 0.15; }
+  .station-rect.dim { opacity: 0.35; }
+  .station-label-group.dim { opacity: 0.35; }
+
+  .stub { fill: none; stroke-width: 1.1; stroke-dasharray: 2 2.4; }
+  .stub.exit-known { stroke: var(--exit-club); }
+  .stub.exit-vanish { stroke: var(--ink-faint); }
+  .stub.entry-known { stroke: var(--entry-club); }
+
+  /* ---------------- side panel ---------------- */
+  .panel {
+    /* flex-basis: auto (not a fixed length) so `width` — not flex-basis —
+       drives the main size; that's what lets the native resize handle
+       (which sets an inline `width`) actually take effect on a flex item */
+    flex: 0 1 auto;
+    width: 405px;
+    min-width: 160px;
+    max-width: 70vw;
+    resize: horizontal;
+    border-left: 1px solid var(--rule);
+    background: var(--surface-card);
+    padding: 20px 20px 20px;
+    overflow: auto;
+    font-size: 13px;
+  }
+  .panel-empty { color: var(--ink-faint); font-size: 13px; line-height: 1.6; padding-top: 40px; text-align: center; }
+  .panel-empty .big { font-size: 28px; display: block; margin-bottom: 10px; opacity: 0.5; }
+  .panel h2 { font-family: "IBM Plex Sans Condensed", sans-serif; font-size: 19px; font-weight: 700; margin: 0 0 2px; }
+  .panel h2 a, .panel h2 a:visited {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1.5px dotted var(--ink-faint);
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .panel h2 a:hover { color: var(--brand); border-bottom-color: var(--brand); }
+  .panel h2 a::after {
+    content: '↗';
+    display: inline-block;
+    font-size: 12px;
+    margin-left: 4px;
+    vertical-align: super;
+    color: var(--ink-faint);
+  }
+  .panel h2 a:hover::after { color: var(--brand); }
+  .panel .meta { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-dim); margin-bottom: 16px; }
+  .panel .close-btn {
+    float: right;
+    cursor: pointer;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 2px 7px;
+    background: none;
+  }
+  .panel .close-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .timeline-row { display: flex; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--rule); font-size: 12.5px; }
+  .timeline-row:first-of-type { border-top: none; }
+  .timeline-row .season-tag { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-dim); flex: 0 0 62px; }
+  .timeline-row .detail b { font-weight: 600; }
+  .timeline-row .detail .sub { color: var(--ink-dim); font-size: 11.5px; }
+  .arrow-note { font-size: 11.5px; color: var(--ink-dim); padding: 6px 0 2px 72px; font-style: italic; }
+  .arrow-note.rise { color: var(--rise); }
+  .arrow-note.fall { color: var(--fall); }
+  .arrow-note.lateral { color: var(--ink-dim); font-style: normal; }
+  .arrow-note.exit { color: var(--exit-club); }
+  .arrow-note.entry { color: var(--entry-club); }
+  .arrow-note.intra { color: var(--brand); font-style: normal; font-weight: 500; }
+  .arrow-note.playup, .arrow-note.playdown { color: var(--ink); font-style: normal; font-weight: 500; }
+
+  .team-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin: 14px 0 18px; }
+  .team-stat dt { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 2px; }
+  .team-stat dd { margin: 0; font-family: "IBM Plex Mono", monospace; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .team-roster-item { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px dashed var(--rule); font-size: 12px; }
+  .team-roster-item:first-of-type { border-top: none; }
+  .team-roster-item .g { font-family: "IBM Plex Mono", monospace; color: var(--ink-dim); }
+
+  footer {
+    flex: 0 0 auto;
+    padding: 8px 22px;
+    background: var(--surface-card);
+    border-top: 1px solid var(--rule);
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="mark">RFFM</span>
+    <div>
+      <h1 id="pageTitle">Metro de la Cantera</h1>
+      <div class="sub" id="subTitle"></div>
+    </div>
+  </div>
+  <div class="view-controls">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="zoom-group">
+      <button class="zoom-btn" id="zoomOut" title="Alejar" aria-label="Alejar">−</button>
+      <span class="zoom-pct" id="zoomPct" title="Restablecer al 100%" role="button">100%</span>
+      <button class="zoom-btn" id="zoomIn" title="Acercar" aria-label="Acercar">+</button>
+    </div>
+    <button class="fs-btn" id="panelToggleBtn" aria-pressed="false">◀ Ocultar panel</button>
+    <button class="fs-btn" id="headerToggleBtn">▲ Ocultar cabecera</button>
+    <button class="fs-btn" id="fsBtn" aria-pressed="false">⛶ Pantalla completa</button>
+  </div>
+</header>
+
+<div class="pivot-bar">
+  <span class="lbl">Punto de partida</span>
+  <div class="pivot-btns" id="seasonBtns"></div>
+  <span class="pivot-hint" id="seasonHint"></span>
+  <button class="legend-toggle-btn" id="legendToggleBtn">Mostrar leyenda</button>
+</div>
+
+<div class="pivot-bar" id="cohortBar" hidden>
+  <span class="lbl">Cohorte</span>
+  <div class="pivot-btns" id="pivotBtns"></div>
+  <span class="pivot-hint" id="pivotHint"></span>
+</div>
+
+<div class="legend">
+  <div class="grp"><span style="font-weight:600;color:var(--ink)">relleno</span>
+    <span class="sw seq-sw">
+      <span>0</span><i class="seq-grad"></i><span id="legendMaxGoals">máx.</span>
+      <span style="color:var(--ink-faint)">— goles marcados con ese equipo esa temporada</span>
+    </span>
+    <span class="sw"><i class="gk-chip"></i>borde discontinuo fino = portero</span>
+    <span class="sw"><i class="dot"></i> capitán</span>
+  </div>
+  <div class="divider"></div>
+  <div class="grp"><span style="font-weight:600;color:var(--ink)">cohorte de edad</span>
+    <span class="sw"><i class="chip" style="background:var(--cohort-senior);width:3px;border-radius:1px"></i>2º año en la categoría</span>
+    <span class="sw"><i class="chip" style="background:var(--cohort-junior);width:3px;border-radius:1px"></i>1er año en la categoría</span>
+    <span style="color:var(--ink-faint);font-style:italic">— franja izquierda de cada jugador</span>
+  </div>
+  <div class="divider"></div>
+  <div class="grp"><span style="font-weight:600;color:var(--ink)">fuera de su edad</span>
+    <span class="sw"><i class="up-chip"></i>juega por encima de su edad</span>
+    <span class="sw"><i class="down-chip"></i>juega por debajo de su edad</span>
+    <span style="color:var(--ink-faint);font-style:italic">— columna lateral del año; patrón de borde, no color</span>
+  </div>
+  <div class="divider"></div>
+  <div class="grp"><span style="font-weight:600;color:var(--ink)">trayecto</span>
+    <span class="sw"><i class="ln" style="border-color:var(--rise)"></i>sube de nivel</span>
+    <span class="sw"><i class="ln" style="border-color:var(--fall)"></i>baja de nivel</span>
+    <span class="sw"><i class="ln" style="border-color:var(--line-rest)"></i>mismo nivel</span>
+    <span class="sw"><i class="ln dash" style="border-color:var(--exit-club)"></i>sale a otro club</span>
+    <span class="sw"><i class="ln dash" style="border-color:var(--ink-faint)"></i>desaparece</span>
+    <span class="sw"><i class="ln dash" style="border-color:var(--entry-club)"></i>llega de otro club</span>
+    <span class="sw"><i class="dot" style="background:var(--brand)"></i>traspaso en la misma temporada</span>
+  </div>
+  <div class="divider"></div>
+  <div class="grp"><span style="font-weight:600;color:var(--ink)">formato</span>
+    <span class="sw"><i class="chip" style="background:var(--brand);border-radius:50%;width:14px"></i>Fútbol-11</span>
+    <span class="sw"><i class="chip" style="background:none;border:1px solid var(--ink-faint);border-radius:50%;width:9px"></i>Fútbol-7</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="canvas-wrap" id="canvasWrap">
+    <div class="canal-labels" id="canalLabels"></div>
+    <div class="season-headers" id="seasonHeaders"></div>
+    <div class="zoom-wrap" id="zoomWrap">
+      <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+  <div class="panel" id="panel">
+    <div class="panel-empty"><span class="big">⚑</span>Pasa el cursor sobre un jugador o un equipo — o haz clic para fijarlo.</div>
+  </div>
+</div>
+
+<footer id="footerNote"></footer>
+
+<script>
+
+async function boot(RAW) {
+
+function seasonRangeLabel() {
+  const short = s => s.slice(2, 4) + '-' + s.slice(7, 9);
+  const names = RAW.season_names;
+  return names.length > 1 ? `${short(names[0])} → ${short(names[names.length - 1])}` : short(names[0]);
+}
+
+const CATEGORY_ORDER = RAW.category_order;
+const CAT_ORDINAL = {}; CATEGORY_ORDER.forEach((c,i) => CAT_ORDINAL[c] = i);
+const CAT_ABBR = {PREBENJAMIN:'Pre', BENJAMIN:'Benj', ALEVIN:'Alev', INFANTIL:'Inf', CADETE:'Cad', JUVENIL:'Juv', AFICIONADO:'Afic'};
+const CAT_FULL = {PREBENJAMIN:'Prebenjamín', BENJAMIN:'Benjamín', ALEVIN:'Alevín', INFANTIL:'Infantil', CADETE:'Cadete', JUVENIL:'Juvenil', AFICIONADO:'Aficionado'};
+
+const birthYearOf = {};
+RAW.stations.forEach(s => s.roster.forEach(r => { if (r.birth_year != null) birthYearOf[r.player_id] = r.birth_year; }));
+
+const ALL_BIRTH_YEARS = RAW.pivot_birth_years.slice().sort((a,b)=>a-b);
+const PIVOTS = {};
+if (ALL_BIRTH_YEARS.length > 1) {
+  PIVOTS.all = { label: ALL_BIRTH_YEARS.join('/'), years: ALL_BIRTH_YEARS.slice(),
+                 hint: ALL_BIRTH_YEARS.join(' y ') + ' · ' + ALL_BIRTH_YEARS.length + ' columnas principales' };
+}
+ALL_BIRTH_YEARS.forEach(y => {
+  PIVOTS['by' + y] = { label: 'Nacidos en ' + y, years: [y], hint: '1 columna principal' };
+});
+
+let activePivot = ALL_BIRTH_YEARS.length > 1 ? 'all' : ('by' + ALL_BIRTH_YEARS[0]);
+
+// ---------------- view: filter RAW to the active pivot's birth year(s) ----------------
+function buildView(pivotKey) {
+  const years = new Set(PIVOTS[pivotKey].years);
+  const stations = [];
+  RAW.stations.forEach(s => {
+    const roster = s.roster.filter(r => years.has(r.birth_year));
+    if (roster.length) stations.push(Object.assign({}, s, {roster}));
+  });
+  const stationById = {};
+  const shownAt = new Set();
+  stations.forEach(s => { stationById[s.id] = s; s.roster.forEach(r => shownAt.add(r.player_id + ':' + s.id)); });
+
+  const links = RAW.links.filter(l => years.has(birthYearOf[l.player_id]) && shownAt.has(l.player_id + ':' + l.from) && shownAt.has(l.player_id + ':' + l.to));
+  const exits = RAW.exits.filter(e => years.has(birthYearOf[e.player_id]) && shownAt.has(e.player_id + ':' + e.team));
+  const intra = (RAW.intra_transfers || []).filter(t => years.has(birthYearOf[t.player_id]));
+
+  // anchor category (the modal / most common one) per (birth year, season)
+  const anchorByYearSeason = {};
+  years.forEach(year => {
+    RAW.season_names.forEach((_, si) => {
+      const counts = {};
+      stations.filter(s => s.season_idx === si).forEach(s => {
+        const n = s.roster.filter(r => r.birth_year === year).length;
+        if (n > 0) counts[s.category_ordinal] = (counts[s.category_ordinal] || 0) + n;
+      });
+      let best = null, bestN = -1;
+      for (const k in counts) if (counts[k] > bestN) { bestN = counts[k]; best = +k; }
+      if (best !== null) anchorByYearSeason[year + ':' + si] = best;
+    });
+  });
+  // per season, the anchor SET (1 category if both years agree, one PER
+  // year - up to 2 - if they've diverged) and which birth year(s) map to
+  // each anchor ordinal, for the lane's own header label.
+  const anchorSetBySeason = [];
+  const anchorYearsBySeason = []; // si -> Map(ordinal -> [years])
+  RAW.season_names.forEach((_, si) => {
+    const set = new Set();
+    const yearsByOrdinal = new Map();
+    years.forEach(year => {
+      const a = anchorByYearSeason[year + ':' + si];
+      if (a != null) {
+        set.add(a);
+        (yearsByOrdinal.get(a) || yearsByOrdinal.set(a, []).get(a)).push(year);
+      }
+    });
+    anchorSetBySeason.push(set);
+    anchorYearsBySeason.push(yearsByOrdinal);
+  });
+
+  // lane per station: every DISTINCT anchor category gets its own column
+  // (this is what makes a diverged season - e.g. one birth year already in
+  // Benjamín while the other is still in Prebenjamín - render as separate
+  // side-by-side sub-columns instead of stacking both in one shared lane).
+  // A true outlier (nobody's birth-year anchor that season) still only gets
+  // one extra column per side, clamped to 1 category away either direction.
+  stations.forEach(s => {
+    const set = anchorSetBySeason[s.season_idx];
+    if (!set || !set.size) { s._lane = s.category_ordinal; s._offTrack = 0; return; }
+    const mn = Math.min(...set), mx = Math.max(...set);
+    if (set.has(s.category_ordinal)) { s._lane = s.category_ordinal; s._offTrack = 0; }
+    else if (s.category_ordinal < mn) { s._lane = mn - 1; s._offTrack = -1; }
+    else { s._lane = mx + 1; s._offTrack = 1; }
+  });
+
+  return { years, stations, stationById, links, exits, intra, anchorSetBySeason, anchorYearsBySeason };
+}
+
+// ---------------- layout ----------------
+const STATION_W = 190;
+const LANE_GAP = 16;
+const SEASON_GAP = 56;
+const HEADER_H = 32;
+const ROW_H = 6.6;
+const ROW_GAP = 0.6;
+const STATION_PAD_BOTTOM = 6;
+const CELL_GAP = 8;      // gap between stations stacked within one (season,lane,tier) cell
+const BAND_GAP_TOP = 10; // gap between division-tier bands
+const LEFT_MARGIN = 20;
+const TOP_MARGIN = 58;
+const NUM_BANDS = 6;
+const TIER_NAMES = ['Superliga / Liga Nacional', 'División de Honor', '1ª Div. Autonómica', 'Preferente', 'Primera', 'Segunda'];
+
+function stationHeight(s) {
+  return HEADER_H + s.roster.length * (ROW_H + ROW_GAP) + STATION_PAD_BOTTOM;
+}
+
+function computeLayout(view) {
+  const seasonCount = RAW.season_names.length;
+  const lanesBySeason = [];
+  for (let si = 0; si < seasonCount; si++) {
+    const lanes = [...new Set(view.stations.filter(s => s.season_idx === si).map(s => s._lane))].sort((a, b) => a - b);
+    lanesBySeason.push(lanes.length ? lanes : [0]);
+  }
+
+  const seasonX = [];
+  let x = LEFT_MARGIN;
+  for (let si = 0; si < seasonCount; si++) {
+    seasonX.push(x);
+    const n = lanesBySeason[si].length;
+    x += n * STATION_W + (n - 1) * LANE_GAP + SEASON_GAP;
+  }
+  const totalWidth = x - SEASON_GAP + 40;
+
+  // division tier is a horizontal "canal" shared across every season/lane
+  // (same visual grammar as before lanes existed) - group stations into
+  // (season, lane, tier_band) cells, stack same-tier stations within a cell
+  // (rare: a genuine same-letter F-7/F-11 pair), and size each tier's band
+  // to fit the tallest cell anywhere in the current view.
+  const cellStations = {};
+  view.stations.forEach(s => {
+    const key = s.season_idx + ':' + s._lane + ':' + s.tier_band;
+    (cellStations[key] = cellStations[key] || []).push(s);
+  });
+  Object.values(cellStations).forEach(list => list.sort((a, b) => a.letter.localeCompare(b.letter)));
+
+  const bandMaxHeight = new Array(NUM_BANDS).fill(0);
+  Object.values(cellStations).forEach(list => {
+    const h = list.reduce((sum, s) => sum + stationHeight(s), 0) + CELL_GAP * (list.length - 1);
+    const tb = list[0].tier_band;
+    if (h > bandMaxHeight[tb]) bandMaxHeight[tb] = h;
+  });
+  for (let b = 0; b < NUM_BANDS; b++) if (bandMaxHeight[b] === 0) bandMaxHeight[b] = 40;
+  const bandY = [];
+  { let y = TOP_MARGIN; for (let b = 0; b < NUM_BANDS; b++) { bandY.push(y); y += bandMaxHeight[b] + BAND_GAP_TOP; } }
+  const totalHeight = bandY[NUM_BANDS - 1] + bandMaxHeight[NUM_BANDS - 1] + 30;
+
+  const rowPos = {};
+  const laneBoxes = []; // for lane header labels + dividers: {x, y0, y1, lane, si}
+  for (let si = 0; si < seasonCount; si++) {
+    lanesBySeason[si].forEach((lane, laneIdx) => {
+      const laneX = seasonX[si] + laneIdx * (STATION_W + LANE_GAP);
+      laneBoxes.push({x: laneX, y0: TOP_MARGIN, y1: totalHeight - 30, lane, si});
+    });
+  }
+  Object.entries(cellStations).forEach(([key, list]) => {
+    const [siStr, laneStr, tbStr] = key.split(':');
+    const si = +siStr, lane = +laneStr, tb = +tbStr;
+    const laneIdx = lanesBySeason[si].indexOf(lane);
+    const laneX = seasonX[si] + laneIdx * (STATION_W + LANE_GAP);
+    let y = bandY[tb];
+    list.forEach(s => {
+      s._x = laneX; s._y = y; s._w = STATION_W; s._h = stationHeight(s);
+      s.roster.forEach((r, ri) => {
+        const ry = s._y + HEADER_H + ri * (ROW_H + ROW_GAP);
+        rowPos[r.player_id + ':' + s.id] = {x: s._x, y: ry, w: s._w, h: ROW_H};
+      });
+      y += s._h + CELL_GAP;
+    });
+  });
+
+  return {lanesBySeason, seasonX, rowPos, laneBoxes, bandY, bandMaxHeight, totalWidth, totalHeight};
+}
+
+// ---------------- render ----------------
+const svg = document.getElementById('svg');
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+let CUR = null; // {view, layout, stationById, rowPos}
+let pinned = null;
+
+function seqColor(goals, maxGoals) {
+  const steps = ['--seq-1','--seq-2','--seq-3','--seq-4','--seq-5','--seq-6','--seq-7'];
+  if (goals <= 0) return 'var(' + steps[0] + ')';
+  const t = Math.min(1, goals / Math.max(1, maxGoals));
+  const idx = Math.min(steps.length - 1, Math.round(t * (steps.length - 1)));
+  return 'var(' + steps[idx] + ')';
+}
+
+function bezierPath(x1, y1, x2, y2) {
+  const mx = (x1 + x2) / 2;
+  return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+}
+
+// age at the start of a "YYYY-YYYY" season = the season's first year minus
+// the birth year (Spanish football's own age-category convention)
+function ageAtSeason(seasonName, birthYear) {
+  return parseInt(seasonName.slice(0, 4), 10) - birthYear;
+}
+
+function render() {
+  pinned = null;
+  const view = buildView(activePivot);
+  const layout = computeLayout(view);
+  CUR = {view, layout};
+
+  svg.innerHTML = '';
+  svg.setAttribute('width', layout.totalWidth);
+  svg.setAttribute('height', layout.totalHeight);
+  svg.setAttribute('viewBox', `0 0 ${layout.totalWidth} ${layout.totalHeight}`);
+
+  const globalMaxGoals = Math.max(1, ...view.stations.flatMap(s => s.roster.map(r => r.goals)));
+  document.getElementById('legendMaxGoals').textContent = globalMaxGoals + ' (máx.)';
+
+  // birth-year cohort stripe: senior year = the earlier of the pivot's active years
+  const seniorYear = view.years.size > 1 ? Math.min(...view.years) : null;
+
+  // alternating season-column tint (every other season), painted behind the
+  // division-tier bands so the two subtle overlays compose rather than clash
+  const stripeLayer = el('g', {});
+  svg.appendChild(stripeLayer);
+  RAW.season_names.forEach((_, si) => {
+    if (si % 2 !== 1) return;
+    const n = layout.lanesBySeason[si].length;
+    const w = n * STATION_W + (n - 1) * LANE_GAP;
+    stripeLayer.appendChild(el('rect', {
+      x: layout.seasonX[si], y: 0, width: w, height: layout.totalHeight,
+      fill: 'var(--season-stripe)',
+    }));
+  });
+
+  // division-tier "canal" background bands, shared across every season/lane
+  const bandsLayer = el('g', {});
+  svg.appendChild(bandsLayer);
+  for (let b = 0; b < NUM_BANDS; b++) {
+    bandsLayer.appendChild(el('rect', {
+      x: 0, y: layout.bandY[b] - BAND_GAP_TOP / 2, width: layout.totalWidth, height: layout.bandMaxHeight[b] + BAND_GAP_TOP,
+      fill: 'var(--surface-canal)',
+    }));
+  }
+  const canalLabels = document.getElementById('canalLabels');
+  canalLabels.innerHTML = '';
+  for (let b = 0; b < NUM_BANDS; b++) {
+    const d = document.createElement('div');
+    d.className = 'canal-label';
+    d.dataset.baseTop = layout.bandY[b] + layout.bandMaxHeight[b] / 2 - 40;
+    d.textContent = TIER_NAMES[b];
+    canalLabels.appendChild(d);
+  }
+
+  // lane dividers only — the season/lane *names* live in the sticky HTML
+  // #seasonHeaders overlay below (rescaled by applyZoom() once built),
+  // not as SVG text, so they can stay pinned to the top on scroll.
+  const headerLayer = el('g', {});
+  svg.appendChild(headerLayer);
+  RAW.season_names.forEach((_, si) => {
+    const lanes = layout.lanesBySeason[si];
+    const x0 = layout.seasonX[si];
+    lanes.forEach((lane, laneIdx) => {
+      if (laneIdx === 0) return;
+      const laneX = x0 + laneIdx * (STATION_W + LANE_GAP);
+      const dx = laneX - LANE_GAP / 2;
+      headerLayer.appendChild(el('line', {x1: dx, y1: 44, x2: dx, y2: layout.totalHeight - 20, class: 'lane-divider'}));
+    });
+  });
+
+  // season headers: the title spans the whole season (all its lanes); each
+  // lane gets its own centered category name + birth-year/age line, split
+  // apart only once that season's birth years have diverged into different
+  // categories (a still-shared lane lists every year on one combined line).
+  const seasonHeaders = document.getElementById('seasonHeaders');
+  seasonHeaders.innerHTML = '';
+  function headerDiv(className, baseLeft, text) {
+    const d = document.createElement('div');
+    d.className = className;
+    d.dataset.baseLeft = baseLeft;
+    d.textContent = text;
+    seasonHeaders.appendChild(d);
+    return d;
+  }
+  RAW.season_names.forEach((season, si) => {
+    const lanes = layout.lanesBySeason[si];
+    const x0 = layout.seasonX[si];
+    const totalW = lanes.length * STATION_W + (lanes.length - 1) * LANE_GAP;
+    headerDiv('season-header-title', x0 + totalW / 2, season);
+
+    const set = view.anchorSetBySeason[si];
+    const yearsByOrdinal = view.anchorYearsBySeason[si];
+    lanes.forEach((lane, laneIdx) => {
+      const laneX = x0 + laneIdx * (STATION_W + LANE_GAP);
+      const cx = laneX + STATION_W / 2;
+      if (set.has(lane)) {
+        headerDiv('season-header-cat', cx, CAT_FULL[CATEGORY_ORDER[lane]] || CATEGORY_ORDER[lane]);
+        const ys = (yearsByOrdinal.get(lane) || []).slice().sort((a, b) => b - a);
+        headerDiv('season-header-lbl', cx, ys.map(y => `${y}, ${ageAtSeason(season, y)} y.o.`).join('; '));
+      } else {
+        const mn = Math.min(...set), mx = Math.max(...set);
+        headerDiv('season-header-lbl', cx, lane < mn ? '← un año atrás' : 'un año adelante →');
+      }
+    });
+  });
+  applyZoom();
+
+  // links layer (under stations)
+  const linksLayer = el('g', {});
+  svg.appendChild(linksLayer);
+  const stubsLayer = el('g', {});
+  svg.appendChild(stubsLayer);
+  const linkEls = [];
+
+  view.links.forEach(l => {
+    const from = layout.rowPos[l.player_id + ':' + l.from];
+    const to = layout.rowPos[l.player_id + ':' + l.to];
+    if (!from || !to) return;
+    const fromStation = view.stationById[l.from], toStation = view.stationById[l.to];
+    let kind = 'lateral';
+    if (toStation.tier_band < fromStation.tier_band) kind = 'rise';
+    else if (toStation.tier_band > fromStation.tier_band) kind = 'fall';
+    const x1 = from.x + from.w, y1 = from.y + from.h / 2;
+    const x2 = to.x, y2 = to.y + to.h / 2;
+    const p = el('path', {d: bezierPath(x1, y1, x2, y2), class: 'path-link ' + kind, 'data-player': l.player_id});
+    if (kind === 'rise') p.style.stroke = 'var(--rise)';
+    if (kind === 'fall') p.style.stroke = 'var(--fall)';
+    linksLayer.appendChild(p);
+    linkEls.push(p);
+  });
+
+  view.exits.forEach(e => {
+    const from = layout.rowPos[e.player_id + ':' + e.team];
+    if (!from) return;
+    const x1 = from.x + from.w, y1 = from.y + from.h / 2;
+    const x2 = x1 + 34, y2 = y1 + (e.kind === 'vanished' ? 10 : -6);
+    const kindClass = e.kind === 'vanished' ? 'exit-vanish' : 'exit-known';
+    const p = el('path', {d: `M ${x1} ${y1} L ${x2} ${y2}`, class: 'stub ' + kindClass, 'data-player': e.player_id, 'data-exit': '1'});
+    stubsLayer.appendChild(p);
+  });
+
+  view.stations.forEach(s => {
+    s.roster.forEach(r => {
+      if (r.entry_kind === 'arrived_from_club') {
+        const pos = layout.rowPos[r.player_id + ':' + s.id];
+        const x2 = pos.x, y2 = pos.y + ROW_H / 2;
+        const x1 = x2 - 34, y1 = y2 - 6;
+        stubsLayer.appendChild(el('path', {d: `M ${x1} ${y1} L ${x2} ${y2}`, class: 'stub entry-known', 'data-player': r.player_id}));
+      }
+    });
+  });
+
+  (view.intra || []).forEach(t => {
+    const pos1 = layout.rowPos[t.player_id + ':' + t.from];
+    const pos2 = layout.rowPos[t.player_id + ':' + t.to];
+    if (!pos1 || !pos2) return;
+    const fromStation = view.stationById[t.from], toStation = view.stationById[t.to];
+    let kind = 'lateral';
+    if (toStation.tier_band < fromStation.tier_band) kind = 'rise';
+    else if (toStation.tier_band > fromStation.tier_band) kind = 'fall';
+    const x1 = pos1.x + pos1.w, y1 = pos1.y + pos1.h / 2;
+    const x2 = pos2.x + pos2.w, y2 = pos2.y + pos2.h / 2;
+    const bulge = Math.max(26, Math.abs(y2 - y1) * 0.35);
+    const d = `M ${x1} ${y1} C ${x1+bulge} ${y1}, ${x2+bulge} ${y2}, ${x2} ${y2}`;
+    const grp = el('g', {class: 'path-link intra-link ' + kind, 'data-player': t.player_id, 'data-intra': '1'});
+    const p = el('path', {d, fill: 'none', 'stroke-width': 1.4});
+    if (kind === 'rise') p.style.stroke = 'var(--rise)';
+    else if (kind === 'fall') p.style.stroke = 'var(--fall)';
+    else p.style.stroke = 'var(--brand)';
+    grp.appendChild(p);
+    const midY = (y1 + y2) / 2;
+    grp.appendChild(el('circle', {cx: Math.max(x1, x2) + bulge * 0.75, cy: midY, r: 2.2,
+      fill: kind === 'rise' ? 'var(--rise)' : kind === 'fall' ? 'var(--fall)' : 'var(--brand)'}));
+    linksLayer.appendChild(grp);
+    linkEls.push(grp);
+  });
+
+  // stations + rosters
+  const stationsLayer = el('g', {});
+  svg.appendChild(stationsLayer);
+  view.stations.forEach(s => {
+    const g = el('g', {class: 'station-label-group', 'data-station': s.id});
+    g.appendChild(el('rect', {x: s._x, y: s._y, width: s._w, height: s._h, rx: 5, class: 'station-rect', 'data-station': s.id}));
+
+    const letter = el('text', {x: s._x + 8, y: s._y + 16, class: 'station-letter'});
+    letter.textContent = s.letter;
+    g.appendChild(letter);
+
+    const isF11 = /11/.test(s.game_type || '');
+    const badgeW = isF11 ? 15 : 10;
+    const badgeX = s._x + 8 + 11;
+    g.appendChild(el('rect', {x: badgeX, y: s._y + 5, width: badgeW, height: 11, rx: 5.5,
+      fill: isF11 ? 'var(--brand)' : 'none', stroke: isF11 ? 'none' : 'var(--ink-faint)', 'stroke-width': 0.8}));
+    const badgeLbl = el('text', {x: badgeX + badgeW / 2, y: s._y + 13.2, 'text-anchor': 'middle',
+      class: 'station-count', fill: isF11 ? '#fff' : 'var(--ink-dim)', style: 'font-weight:600'});
+    badgeLbl.textContent = isF11 ? '11' : '7';
+    g.appendChild(badgeLbl);
+
+    const catTag = CAT_ABBR[s.category_base] || s.category_base || '';
+    const divLabel = (catTag ? catTag + ' · ' : '') + s.division_level;
+    const div = el('text', {x: s._x + s._w - 6, y: s._y + 13, class: 'station-div', 'text-anchor': 'end'});
+    div.textContent = divLabel.length > 22 ? divLabel.slice(0, 20) + '…' : divLabel;
+    g.appendChild(div);
+    const count = el('text', {x: s._x + s._w - 6, y: s._y + 25, class: 'station-count', 'text-anchor': 'end'});
+    count.textContent = s.roster.length + ' jug.';
+    g.appendChild(count);
+
+    s.roster.forEach(r => {
+      const pos = layout.rowPos[r.player_id + ':' + s.id];
+      const laneClass = s._offTrack > 0 ? ' play-up' : (s._offTrack < 0 ? ' play-down' : '');
+      const rowRect = el('rect', {
+        x: pos.x + 4, y: pos.y, width: pos.w - 8, height: ROW_H, rx: 1.3,
+        fill: seqColor(r.goals, globalMaxGoals),
+        class: 'row-rect' + laneClass,
+        'data-player': r.player_id, 'data-station': s.id,
+      });
+      if (s._offTrack === 0 && r.is_gk) rowRect.setAttribute('stroke', 'var(--ink-dim)'), rowRect.setAttribute('stroke-width', '0.8'), rowRect.setAttribute('stroke-dasharray', '1.4 1');
+      g.appendChild(rowRect);
+      if (seniorYear !== null && r.birth_year != null) {
+        const cohortColor = r.birth_year === seniorYear ? 'var(--cohort-senior)' : 'var(--cohort-junior)';
+        g.appendChild(el('rect', {x: pos.x + 4, y: pos.y, width: 2.2, height: ROW_H, rx: 1.1,
+          fill: cohortColor, class: 'cohort-mark', 'data-player': r.player_id}));
+      }
+      if (r.is_cap) {
+        g.appendChild(el('circle', {cx: pos.x + pos.w - 3, cy: pos.y + ROW_H / 2, r: 1.6, class: 'cap-dot', 'data-player': r.player_id}));
+      }
+    });
+    stationsLayer.appendChild(g);
+  });
+
+  // ---------------- interactions ----------------
+  function clearHighlight() {
+    document.querySelectorAll('.path-link').forEach(p => p.classList.remove('hot', 'dim'));
+    document.querySelectorAll('.row-rect').forEach(r => r.classList.remove('dim'));
+    document.querySelectorAll('.cohort-mark').forEach(r => r.classList.remove('dim'));
+    document.querySelectorAll('.station-rect').forEach(r => r.classList.remove('hot', 'dim'));
+    document.querySelectorAll('.station-label-group').forEach(r => r.classList.remove('hot', 'dim'));
+    document.querySelectorAll('.stub').forEach(r => r.style.opacity = '');
+  }
+  function highlightPlayer(pid) {
+    clearHighlight();
+    linkEls.forEach(p => { if (p.getAttribute('data-player') == pid) p.classList.add('hot'); else p.classList.add('dim'); });
+    document.querySelectorAll('.stub').forEach(p => { p.style.opacity = (p.getAttribute('data-player') == pid) ? '1' : '0.05'; });
+    document.querySelectorAll('.row-rect').forEach(r => { if (r.getAttribute('data-player') != pid) r.classList.add('dim'); });
+    document.querySelectorAll('.cohort-mark').forEach(r => { if (r.getAttribute('data-player') != pid) r.classList.add('dim'); });
+  }
+  function highlightStation(sid) {
+    clearHighlight();
+    const relatedPids = new Set();
+    view.links.forEach(l => { if (l.from === sid || l.to === sid) relatedPids.add(String(l.player_id)); });
+    view.exits.forEach(e => { if (e.team === sid) relatedPids.add(String(e.player_id)); });
+    (view.intra || []).forEach(t => { if (t.from === sid || t.to === sid) relatedPids.add(String(t.player_id)); });
+    linkEls.forEach(p => { const pid = p.getAttribute('data-player'); if (relatedPids.has(pid)) p.classList.add('hot'); else p.classList.add('dim'); });
+    document.querySelectorAll('.stub').forEach(p => { const pid = p.getAttribute('data-player'); p.style.opacity = relatedPids.has(pid) ? '1' : '0.05'; });
+    document.querySelectorAll('.station-rect').forEach(r => { if (r.getAttribute('data-station') === sid) r.classList.add('hot'); else if (r.getAttribute('data-station')) r.classList.add('dim'); });
+    document.querySelectorAll('.station-label-group').forEach(r => { if (r.getAttribute('data-station') === sid) r.classList.add('hot'); else r.classList.add('dim'); });
+  }
+
+  function playerTimelinePanel(pid) {
+    pid = String(pid);
+    const appearances = [];
+    view.stations.forEach(s => {
+      const r = s.roster.find(x => String(x.player_id) === pid);
+      if (r) appearances.push({station: s, roster: r});
+    });
+    appearances.sort((a, b) => a.station.season_idx - b.station.season_idx ||
+      (a.roster.transfer_role === 'before' ? -1 : a.roster.transfer_role === 'after' ? 1 : 0));
+    if (!appearances.length) return;
+    const name = appearances[0].roster.name || '(sin nombre)';
+    const by = appearances[0].roster.birth_year;
+    const lastSeason = appearances[appearances.length - 1].station.season;
+    const playerCardUrl = `https://eldar7.github.io/rffm/player_card.html?season=${encodeURIComponent(lastSeason)}&player=${encodeURIComponent(pid)}`;
+    let html = `<button class="close-btn" onclick="unpin()">cerrar ✕</button>`;
+    html += `<h2><a href="${playerCardUrl}" target="_blank" rel="noopener" title="Abrir carta de participación">${name}</a></h2><div class="meta">${by ? 'n. ' + by + ' · ' : ''}player_id ${pid}</div>`;
+    appearances.forEach((a, i) => {
+      const s = a.station, r = a.roster;
+      const fmt = /11/.test(s.game_type || '') ? 'F-11' : 'F-7';
+      const ageTag = s._offTrack > 0 ? ' <span style="color:var(--ink)">▲ juega arriba</span>' : (s._offTrack < 0 ? ' <span style="color:var(--ink)">▼ juega abajo</span>' : '');
+      html += `<div class="timeline-row"><div class="season-tag">${s.season}</div><div class="detail">
+        <b>${s.letter}</b> <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-faint)">[${fmt}]</span> · ${CAT_ABBR[s.category_base]||s.category_base} · ${s.division_level}${ageTag}<br>
+        <span class="sub">${r.apps} partidos${r.goals ? ' · ' + r.goals + ' goles' : ''}${r.is_cap ? ' · capitán' : ''}${r.is_gk ? ' · portero' : ''}</span>
+      </div></div>`;
+      if (i < appearances.length - 1) {
+        const next = appearances[i + 1];
+        if (next.station.season_idx === s.season_idx && r.transfer_role === 'before') {
+          const dt = (r.intra_transfer && r.intra_transfer.date) || '';
+          html += `<div class="arrow-note intra">⇄ traspaso interno el ${dt}${next.station.tier_band < s.tier_band ? ' — sube' : next.station.tier_band > s.tier_band ? ' — baja' : ''}</div>`;
+        } else if (next.station.season_idx === s.season_idx + 1) {
+          // category_ordinal normally changes every couple of seasons just
+          // from aging (Prebenjamín -> Benjamín etc) - that's not notable on
+          // its own. Only call out ▲▲/▼▼ when the DESTINATION station is
+          // off-track for its season (_lane != 0, i.e. away from where this
+          // birth year's peers mostly are that year); otherwise compare
+          // division tier as before, same as any other season-to-season step.
+          if (next.station._offTrack > 0) html += `<div class="arrow-note playup">▲▲ juega por encima de su edad (${CAT_ABBR[next.station.category_base]||next.station.category_base})</div>`;
+          else if (next.station._offTrack < 0) html += `<div class="arrow-note playdown">▼▼ juega por debajo de su edad (${CAT_ABBR[next.station.category_base]||next.station.category_base})</div>`;
+          else if (next.station.tier_band < s.tier_band) html += `<div class="arrow-note rise">↑ asciende de nivel</div>`;
+          else if (next.station.tier_band > s.tier_band) html += `<div class="arrow-note fall">↓ desciende de nivel</div>`;
+          else html += `<div class="arrow-note lateral">→ mismo nivel</div>`;
+        } else {
+          html += `<div class="arrow-note">— pausa de una temporada —</div>`;
+        }
+      }
+    });
+    const last = appearances[appearances.length - 1];
+    const exit = view.exits.find(e => String(e.player_id) === pid && e.team === last.station.id);
+    if (exit) {
+      if (exit.kind === 'left_to_club') html += `<div class="arrow-note exit">→ ficha por ${exit.dest_club}</div>`;
+      else html += `<div class="arrow-note exit">→ desaparece de los datos de RFFM</div>`;
+    }
+    const first = appearances[0];
+    if (first.roster.entry_kind === 'arrived_from_club') {
+      html = html.replace('<h2>', `<div class="arrow-note entry" style="padding-left:0;margin-bottom:8px">← llega de ${first.roster.origin_club}</div><h2>`);
+    }
+    document.getElementById('panel').innerHTML = html;
+  }
+
+  function stationPanel(sid) {
+    const s = view.stationById[sid];
+    const outgoing = view.links.filter(l => l.from === sid).length;
+    const exits = view.exits.filter(e => e.team === sid).length;
+    const totalGoals = s.roster.reduce((a, r) => a + r.goals, 0);
+    let html = `<button class="close-btn" onclick="unpin()">cerrar ✕</button>`;
+    const fmt = /11/.test(s.game_type || '') ? 'Fútbol-11' : 'Fútbol-7';
+    const teamTitle = `${RAW.club} "${s.letter}"`;
+    const teamHeading = (s.club_slug && s.team_id)
+      ? `<a href="v2/team_card.html?season=${encodeURIComponent(s.season)}&club=${encodeURIComponent(s.club_slug)}&team=${encodeURIComponent(s.team_id)}" target="_blank" rel="noopener" title="Abrir carta de participación del equipo (incluye la pestaña Mapa de participación)">${teamTitle}</a>`
+      : teamTitle;
+    html += `<h2>${teamHeading}</h2><div class="meta">${s.season} · ${CAT_FULL[s.category_base]||s.category_base} · ${s.division_level} · ${fmt}</div>`;
+    if (s._offTrack !== 0) {
+      html += `<div class="arrow-note ${s._offTrack>0?'playup':'playdown'}" style="padding-left:0;margin-bottom:10px">${s._offTrack>0?'▲ una categoría por encima':'▼ una categoría por debajo'} de donde está el grueso de esta cohorte esa temporada</div>`;
+    }
+    html += `<dl class="team-stat-grid">
+      <div class="team-stat"><dt>Plantilla</dt><dd>${s.roster.length}</dd></div>
+      <div class="team-stat"><dt>Goles totales</dt><dd>${totalGoals}</dd></div>
+      <div class="team-stat"><dt>Siguen en el club</dt><dd>${outgoing}</dd></div>
+      <div class="team-stat"><dt>Se van</dt><dd>${exits}</dd></div>
+    </dl>`;
+    html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:6px">Plantilla (por goles)</div>`;
+    s.roster.forEach(r => {
+      html += `<div class="team-roster-item"><span>${r.is_cap ? '⦿ ' : ''}${r.is_gk ? '◆ ' : ''}${r.name || '—'}</span><span class="g">${r.goals || ''}</span></div>`;
+    });
+    document.getElementById('panel').innerHTML = html;
+  }
+
+  function resetPanel() {
+    document.getElementById('panel').innerHTML = '<div class="panel-empty"><span class="big">⚑</span>Pasa el cursor sobre un jugador o un equipo — o haz clic para fijarlo.</div>';
+  }
+  window.unpin = function() { pinned = null; clearHighlight(); resetPanel(); };
+
+  function resolveHit(t) {
+    if (t.hasAttribute && t.hasAttribute('data-player')) return {type: 'player', id: t.getAttribute('data-player')};
+    const grp = t.closest && t.closest('.station-label-group');
+    if (grp) return {type: 'station', id: grp.getAttribute('data-station')};
+    return null;
+  }
+  svg.addEventListener('mousemove', (ev) => {
+    if (pinned) return;
+    const hit = resolveHit(ev.target);
+    if (!hit) return;
+    if (hit.type === 'player') { highlightPlayer(hit.id); playerTimelinePanel(hit.id); }
+    else { highlightStation(hit.id); stationPanel(hit.id); }
+  });
+  svg.addEventListener('mouseleave', () => { if (!pinned) { clearHighlight(); resetPanel(); } });
+  svg.addEventListener('click', (ev) => {
+    const hit = resolveHit(ev.target);
+    if (!hit) return;
+    pinned = hit;
+    if (hit.type === 'player') { highlightPlayer(pinned.id); playerTimelinePanel(pinned.id); }
+    else { highlightStation(pinned.id); stationPanel(pinned.id); }
+  });
+
+  // stats row
+  const totalPlayers = new Set();
+  view.stations.forEach(s => s.roster.forEach(r => totalPlayers.add(r.player_id)));
+  document.getElementById('statsRow').innerHTML = `
+    <span><b>${view.stations.length}</b> equipos-temporada</span>
+    <span><b>${totalPlayers.size}</b> jugadores distintos</span>
+    <span><b>${view.links.length}</b> continuidades</span>
+    <span><b>${view.exits.filter(e=>e.kind==='left_to_club').length}</b> fichan por otro club</span>
+  `;
+  document.getElementById('subTitle').textContent = `${PIVOTS[activePivot].label} · ${seasonRangeLabel()}`;
+  document.getElementById('footerNote').textContent =
+    `${RAW.club} (club_id ${RAW.club_id}) · datos oficiales del pipeline RFFM, sin scraping en vivo · solo plantilla principal (≥4 partidos por tramo) · ` +
+    `punto de partida: ${PIVOTS[activePivot].label} (${[...view.years].sort((a,b)=>a-b).join('/')}) · columnas laterales acotadas a 1 categoría de distancia`;
+}
+
+// ---------------- pivot selector UI ----------------
+const pivotBtns = document.getElementById('pivotBtns');
+Object.keys(PIVOTS).forEach(key => {
+  const btn = document.createElement('button');
+  btn.className = 'pivot-btn' + (key === activePivot ? ' active' : '');
+  btn.textContent = PIVOTS[key].label;
+  btn.addEventListener('click', () => {
+    activePivot = key;
+    pivotBtns.querySelectorAll('.pivot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pivotHint').textContent = PIVOTS[key].hint;
+    render();
+  });
+  pivotBtns.appendChild(btn);
+});
+document.getElementById('pivotHint').textContent = PIVOTS[activePivot].hint;
+document.getElementById('cohortBar').hidden = Object.keys(PIVOTS).length <= 1;
+
+// ---------------- zoom control ----------------
+// Only the zoom-wrap (the SVG) is scaled via transform; canal-labels stay in
+// their fixed, unscaled left gutter (canvas-wrap's padding-left doesn't
+// scale) and instead have their per-band `top` rescaled here from the
+// unscaled value render() stores in data-base-top, so they track each
+// band's vertical position at any zoom level without clipping sideways.
+const ZOOM_MIN = 0.25, ZOOM_MAX = 3, ZOOM_STEP = 0.1;
+let zoomLevel = 1;
+const zoomWrap = document.getElementById('zoomWrap');
+const zoomPct = document.getElementById('zoomPct');
+const canvasWrapEl = document.getElementById('canvasWrap');
+// base (100%-zoom) font sizes and vertical offsets for the sticky-overlay
+// header labels — kept here rather than read via getComputedStyle so
+// applyZoom() has a fixed reference point to scale from regardless of any
+// previous zoom's size. BASE_TOP matters as much as BASE_FONT_SIZE: without
+// it, the title/cat/lbl lines' fixed CSS `top` stayed put while their font
+// grew with zoom, so at high zoom the (now much taller) lines overlapped
+// each other — scaling both by the same zoomLevel keeps their spacing
+// proportional to their size at any zoom.
+const BASE_FONT_SIZE = {
+  'canal-label': 10.5,
+  'season-header-title': 15,
+  'season-header-cat': 10,
+  'season-header-lbl': 9,
+};
+const BASE_TOP = {
+  'season-header-title': 6,
+  'season-header-cat': 27,
+  'season-header-lbl': 48,
+};
+// canvas-wrap's own padding-left reserves room for the row-label text
+// (its wrapped width scales with its own font-size, so the reserved gutter
+// has to keep pace too, same class of bug BASE_TOP fixes for the header
+// lines) — but position:sticky's `left: 0` resolves at canvas-wrap's
+// CONTENT edge (after padding), not its padding edge like the old
+// position:absolute did, so a small *positive* left on `.canal-label` (as
+// it was pre-sticky) actually sits INSIDE that reserved gutter, overlapping
+// the diagram, which starts at that same content edge. CANAL_LABEL_LEFT_BASE
+// is negative to pull it back before the content edge, into the gutter,
+// landing it a constant CANAL_LABEL_EDGE_GAP from the true left edge at
+// any zoom (both scale together, so the gap stays proportionally minimal).
+const ROW_GUTTER_BASE = 42;
+const CANAL_LABEL_EDGE_GAP = 3;
+const CANAL_LABEL_LEFT_BASE = CANAL_LABEL_EDGE_GAP - ROW_GUTTER_BASE;
+function applyZoom() {
+  zoomWrap.style.transform = `scale(${zoomLevel})`;
+  zoomPct.textContent = Math.round(zoomLevel * 100) + '%';
+  canvasWrapEl.style.paddingLeft = (ROW_GUTTER_BASE * zoomLevel) + 'px';
+  document.querySelectorAll('.canal-label').forEach(d => {
+    d.style.top = (parseFloat(d.dataset.baseTop) * zoomLevel) + 'px';
+    d.style.left = (CANAL_LABEL_LEFT_BASE * zoomLevel) + 'px';
+    d.style.fontSize = (BASE_FONT_SIZE['canal-label'] * zoomLevel) + 'px';
+  });
+  document.querySelectorAll('#seasonHeaders > *').forEach(d => {
+    d.style.left = (parseFloat(d.dataset.baseLeft) * zoomLevel) + 'px';
+    d.style.fontSize = (BASE_FONT_SIZE[d.className] * zoomLevel) + 'px';
+    d.style.top = (BASE_TOP[d.className] * zoomLevel) + 'px';
+  });
+}
+// Zoom anchored on a viewport point (clientX/clientY) — compensates
+// canvas-wrap's scroll so that point stays visually still, instead of
+// always scaling away from the top-left corner (transform-origin: 0 0)
+// regardless of where the pinch/click happened.
+function setZoomAt(z, clientX, clientY) {
+  const newZ = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  if (newZ === zoomLevel) return;
+  const wrapRect = canvasWrapEl.getBoundingClientRect();
+  const localX = clientX - wrapRect.left, localY = clientY - wrapRect.top;
+  const ratio = newZ / zoomLevel;
+  const newScrollLeft = (canvasWrapEl.scrollLeft + localX) * ratio - localX;
+  const newScrollTop = (canvasWrapEl.scrollTop + localY) * ratio - localY;
+  zoomLevel = newZ;
+  applyZoom();
+  canvasWrapEl.scrollLeft = newScrollLeft;
+  canvasWrapEl.scrollTop = newScrollTop;
+}
+function setZoom(z) {
+  // no specific input point (button click) — anchor on the middle of
+  // whatever's currently visible, not the top-left corner.
+  const wrapRect = canvasWrapEl.getBoundingClientRect();
+  setZoomAt(z, wrapRect.left + wrapRect.width / 2, wrapRect.top + wrapRect.height / 2);
+}
+document.getElementById('zoomIn').addEventListener('click', () => setZoom(zoomLevel + ZOOM_STEP));
+document.getElementById('zoomOut').addEventListener('click', () => setZoom(zoomLevel - ZOOM_STEP));
+zoomPct.addEventListener('click', () => setZoom(1));
+
+// two-finger pinch zoom (touch devices), anchored on the pinch midpoint —
+// one-finger touch keeps doing the browser's native pan/scroll on
+// canvas-wrap untouched; only a 2-touch gesture is intercepted and
+// preventDefault'd, so it never fights the pan.
+let pinchStartDist = null, pinchStartZoom = 1;
+function touchDist(touches) {
+  return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+}
+function touchMid(touches) {
+  return {x: (touches[0].clientX + touches[1].clientX) / 2, y: (touches[0].clientY + touches[1].clientY) / 2};
+}
+canvasWrapEl.addEventListener('touchstart', (ev) => {
+  if (ev.touches.length === 2) {
+    pinchStartDist = touchDist(ev.touches);
+    pinchStartZoom = zoomLevel;
+  }
+}, {passive: true});
+canvasWrapEl.addEventListener('touchmove', (ev) => {
+  if (ev.touches.length === 2 && pinchStartDist) {
+    ev.preventDefault();
+    const mid = touchMid(ev.touches);
+    setZoomAt(pinchStartZoom * (touchDist(ev.touches) / pinchStartDist), mid.x, mid.y);
+  }
+}, {passive: false});
+canvasWrapEl.addEventListener('touchend', (ev) => {
+  if (ev.touches.length < 2) pinchStartDist = null;
+});
+
+render();
+
+// ---------------- fullscreen toggle ----------------
+// Fullscreen keeps the header/pivot-bar/side-panel visible, but the legend
+// (5 groups, wraps to multiple rows) collapses by default to give the
+// canvas more room, behind a toggle that only shows up while fullscreen is
+// active. `is-fullscreen` tracks the mode itself; `legend-collapsed` is the
+// independent, user-toggleable state within it — reset (collapsed) on every
+// fresh entry, left alone on entry/exit-fullscreen no-ops.
+const fsBtn = document.getElementById('fsBtn');
+const legendToggleBtn = document.getElementById('legendToggleBtn');
+function isFullscreenActive() { return !!document.fullscreenElement || document.body.classList.contains('fauxfs'); }
+function syncFullscreenState() {
+  const on = isFullscreenActive();
+  const wasOn = document.body.classList.contains('is-fullscreen');
+  if (on && !wasOn) document.body.classList.add('is-fullscreen', 'legend-collapsed');
+  else if (!on) document.body.classList.remove('is-fullscreen', 'legend-collapsed');
+  fsBtn.textContent = on ? '⤦ Salir de pantalla completa' : '⛶ Pantalla completa';
+  fsBtn.setAttribute('aria-pressed', String(on));
+  legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
+}
+fsBtn.addEventListener('click', async () => {
+  if (isFullscreenActive()) {
+    if (document.fullscreenElement) {
+      try { await document.exitFullscreen(); } catch {}
+    }
+    document.body.classList.remove('fauxfs');
+  } else {
+    let ok = false;
+    if (document.documentElement.requestFullscreen) {
+      try { await document.documentElement.requestFullscreen(); ok = true; } catch {}
+    }
+    if (!ok) document.body.classList.add('fauxfs');
+  }
+  syncFullscreenState();
+});
+legendToggleBtn.addEventListener('click', () => {
+  document.body.classList.toggle('legend-collapsed');
+  legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
+});
+document.addEventListener('fullscreenchange', syncFullscreenState);
+
+// ---------------- header toggle ----------------
+// Independent of fullscreen — same pattern as the legend/side-panel toggles.
+const headerToggleBtn = document.getElementById('headerToggleBtn');
+headerToggleBtn.addEventListener('click', () => {
+  const hidden = document.body.classList.toggle('header-hidden');
+  headerToggleBtn.textContent = hidden ? '▼ Mostrar cabecera' : '▲ Ocultar cabecera';
+});
+
+// ---------------- side panel toggle ----------------
+// Independent of fullscreen — the panel can be hidden any time to give the
+// canvas the extra ~300px, and stays hidden across re-renders (pivot
+// switches) since it's just a body class render() never touches.
+const panelToggleBtn = document.getElementById('panelToggleBtn');
+panelToggleBtn.addEventListener('click', () => {
+  const hidden = document.body.classList.toggle('panel-hidden');
+  panelToggleBtn.textContent = hidden ? '▶ Mostrar panel' : '◀ Ocultar panel';
+  panelToggleBtn.setAttribute('aria-pressed', String(hidden));
+});
+
+} // end boot()
+
+// ---------------- bootstrap: ?club=<slug>[&season=<start>] ----------------
+// One club file holds one entry point per plausible starting season
+// (club_metro_v2.py's compute_entry_points - a club's whole history can't
+// be one diagram, see its docstring). ?season= picks which; switching
+// entry points reloads the page (new URL) rather than re-invoking boot()
+// in place - boot() wires a fixed set of addEventListener calls once per
+// call (zoom/fullscreen/panel buttons etc.), so calling it a second time
+// on the same page would double-register all of them. Switching the
+// COHORT (birth-year pivot) *within* one already-loaded entry point is a
+// different, already-existing mechanism (the PIVOTS buttons re-render in
+// place) and is untouched by this.
+const clubSlug = new URLSearchParams(location.search).get('club');
+const canvasWrap = document.getElementById('canvasWrap');
+
+function seasonButtonLabel(startSeason, entryPoint) {
+  const years = entryPoint.pivot_birth_years.slice().sort((a, b) => a - b);
+  return `${startSeason.slice(2, 4)}-${startSeason.slice(7, 9)} (${years.join('/')})`;
+}
+
+if (!clubSlug) {
+  canvasWrap.innerHTML = '<p style="padding:40px">Falta el parámetro <code>?club=&lt;slug&gt;</code> en la URL.</p>';
+} else {
+  fetch(`data/metro/${encodeURIComponent(clubSlug)}.json`)
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(payload => {
+      if (!payload.start_seasons || !payload.start_seasons.length) {
+        throw new Error('sin datos suficientes para este club');
+      }
+      document.title = `Metro de la Cantera — ${payload.club}`;
+      document.getElementById('pageTitle').textContent = `Metro de la Cantera — ${payload.club}`;
+
+      const requested = new URLSearchParams(location.search).get('season');
+      const startSeason = payload.start_seasons.includes(requested)
+        ? requested : payload.start_seasons[payload.start_seasons.length - 1];
+
+      const seasonBtns = document.getElementById('seasonBtns');
+      payload.start_seasons.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'pivot-btn' + (s === startSeason ? ' active' : '');
+        btn.textContent = seasonButtonLabel(s, payload.entry_points[s]);
+        btn.addEventListener('click', () => {
+          const url = new URL(location.href);
+          url.searchParams.set('season', s);
+          location.href = url.toString();
+        });
+        seasonBtns.appendChild(btn);
+      });
+      document.getElementById('seasonHint').textContent =
+        `${payload.start_seasons.length} puntos de partida disponibles para este club`;
+
+      return boot(payload.entry_points[startSeason]);
+    })
+    .catch(err => {
+      canvasWrap.innerHTML = `<p style="padding:40px">No se pudo cargar el mapa de este club (${err.message}).</p>`;
+    });
+}
+</script>
+</body>
+</html>

@@ -50,6 +50,7 @@ import weird_scores_report_v2
 import team_cards_v2
 import club_division_map_v2
 import team_participation_map_v2
+import club_metro_v2
 import club_profile_v2
 import team_rosters_v2
 import participation_map_v2
@@ -325,6 +326,11 @@ def main():
     print("Building team_card.html + team-participation-map data...")
     team_cards_v2.build_all(out_dir)
     team_participation_map_v2.build_all(out_dir)
+
+    print("Building metro.html + per-club metro-diagram data (club_metro_v2)...")
+    (out_dir / "metro.html").write_text(
+        (Path(__file__).parent / "metro_template.html").read_text(encoding="utf-8"), encoding="utf-8")
+    club_metro_v2.build_all(out_dir)
 
     print("Building club_division_map.html (squads-over-seasons grid)...")
     club_division_map_v2.build_all(out_dir)

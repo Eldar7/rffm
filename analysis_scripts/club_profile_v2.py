@@ -542,6 +542,9 @@ PAGE_JS = r"""
 
 let CLUB_INDEX = [];
 let CLUB = null;          // current club payload (see club_profile_data.club_payload())
+let CLUB_SLUG = null;     // CLUB has no slug field of its own (club_payload() doesn't carry
+                          // one - see its docstring) - kept from CLUB_INDEX at selection time
+                          // for cross-links (e.g. metro.html?club=) that need it
 let RIVALS = null;        // current club's rivalries payload (club_rivalries_data_v2.build_club_payload()) - null if none
 let SELF = null;          // CLUB.self — which "clubs" entry IS the target club
 let filters = { seasons: null, cats: null, teams: null };  // null = "all"
@@ -673,6 +676,7 @@ async function selectClub(entry, openOppSlug, isInitial, initialTab) {
   if (!PRESENCE) fetches.push(fetch('data/rivalries/_presence.json').then(r => r.ok ? r.json() : {}).catch(() => ({})));
   const results = await Promise.all(fetches);
   CLUB = await results[0].json();
+  CLUB_SLUG = entry.slug;
   RIVALS = (results[1] && results[1].ok) ? await results[1].json() : null;
   if (results.length > 2) PRESENCE = results[2];
   SELF = CLUB.self;
@@ -713,10 +717,18 @@ async function selectClub(entry, openOppSlug, isInitial, initialTab) {
 
 function renderClubHead() {
   const el = document.getElementById('clubHead');
+  // metro.html covers every club (club_metro_v2.py), but skips ones with too
+  // little cross-season signal for a readable diagram - the link is always
+  // shown (no per-club index fetched just to decide), and metro.html itself
+  // shows a friendly message if this club's data/metro/<slug>.json 404s.
+  const metroLink = CLUB_SLUG
+    ? ' · <a href="metro.html?club=' + encodeURIComponent(CLUB_SLUG) + '" target="_blank" rel="noopener">' +
+      T('metro_link', 'Metro de la Cantera') + '</a>'
+    : '';
   el.innerHTML =
     '<div><div class="nm">' + esc(CLUB.display) + '</div>' +
     '<div class="sub">' + CLUB.seasons_active[0] + '–' + CLUB.seasons_active[CLUB.seasons_active.length - 1] +
-    ' · ' + Object.keys(CLUB.players).length + ' ' + T('count_players', 'игроков за всё время') + '</div></div>' +
+    ' · ' + Object.keys(CLUB.players).length + ' ' + T('count_players', 'игроков за всё время') + metroLink + '</div></div>' +
     '<div class="count" id="clubHeadCount"></div>';
 }
 
