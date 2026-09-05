@@ -104,9 +104,14 @@ writeup):
    no fixtures for their group that season, so the transfer-linker (which
    walks `match_lineups` keyed off `matches.csv`) has nothing to link from.
 
-**Not a bug in this artifact's pipeline** - a genuine, narrow upstream gap
-in 2024-2025's core crawl, isolated to that one season, affecting ~2% of
-that season's groups scattered across categories. Re-crawling those 25
+**Not a bug in this artifact's pipeline, and not a parser bug either** -
+confirmed by re-running the project's own unmodified `fetch_calendario()` +
+`parse_matches()` live against group 21434208 a month after the original
+crawl: it now returns 182 match rows (156 finished), not zero. Same code,
+same params, different result over time - so the gap is RFFM's own results
+entry lagging behind at crawl time (2026-08-02), since backfilled on their
+side, not a code defect. Isolated to 2024-2025, affecting ~2% of that
+season's groups scattered across categories. Simply re-crawling those 25
 group_ids' calendario pages for 2024-2025 (not attempted here) should
 restore the missing links next time this artifact is rebuilt.
 

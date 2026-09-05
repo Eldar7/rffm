@@ -9,7 +9,7 @@ This is separate from `DATA_DICTIONARY.md` (which describes the schema) and
 
 ---
 
-## matches.csv — 25 groups in 2024-2025 have standings/scorers but zero matches (genuine gap, confirmed live)
+## matches.csv — 25 groups in 2024-2025 have standings/scorers but zero matches (site-side data lag at crawl time, NOT a parser bug — confirmed by re-fetch)
 
 **Symptom:** A player who is confirmed (`standings.csv`, `scorers.csv`,
 `team_group_membership.csv`) to have played a full season for a given
@@ -35,19 +35,33 @@ Perez) each showed a full `season_stats` row for 2024-2025 —
 competition_id=21434205, group_id=21434208. So the players definitely
 played; `matches.csv` is simply missing that group's fixtures.
 
-**Root cause is in `matches.csv` specifically, not the fetch:** `crawl_log`
-shows the `group_calendario` fetch for all 25 affected groups returned
-HTTP 200 with `parser_type=html_next_data` (i.e. `__NEXT_DATA__` was found
-and parsed) — `manifest_groups.has_calendario=True` for group 21434208 too.
-Yet `parse_matches()` (`rffm_scraper/parsers.py`) produced zero rows from
-that same successful fetch. `clasificaciones`/`goleadores` pages for the
-same groups parsed fine (their `standings.csv`/`scorers.csv` rows are
-complete and consistent with each other). So the calendario page's JSON for
-these 25 groups specifically had a `rounds` list that came back empty (or
-shaped in a way `parse_matches` doesn't recognize) despite the season being
-fully played out — not investigated further; the fetch didn't cache raw
-HTML (`raw_saved_path=None`), so the actual page JSON from that crawl can't
-be re-inspected after the fact.
+**Root cause — decisively NOT a bug in `parse_matches()`, confirmed by
+re-running the exact same code live:** `crawl_log` shows the
+`group_calendario` fetch for all 25 affected groups returned HTTP 200 with
+`parser_type=html_next_data` (i.e. `__NEXT_DATA__` was found and parsed) —
+`manifest_groups.has_calendario=True` for group 21434208 too. At first this
+looked like `parse_matches()` (`rffm_scraper/parsers.py`) silently producing
+zero rows from a successful fetch. But re-running `fetch_calendario()` +
+`parse_matches()` — the project's own, unmodified functions, same params
+(`season_id="20"`, `competicion="21434205"`, `grupo="21434208"`,
+`game_type_id="2"`) — live, over a month after the original crawl (crawled
+2026-08-02, re-checked 2026-09-05), produced **182 match rows (156
+finished)**, not zero. The user independently confirmed this by opening
+`https://www.rffm.es/competicion/calendario?temporada=20&competicion=21434205&grupo=21434208&jornada=1&tipojuego=2`
+and `https://www.rffm.es/acta-partido/5193061?temporada=20&competicion=21434205&grupo=21434208`
+directly in a browser — both load real match/acta data.
+
+So the parser is fine; the site itself is what changed. Most likely
+explanation: RFFM's own results entry for these 25 groups' calendars was
+still incomplete/pending at crawl time (a grassroots-league admin-entry
+lag, not unusual for retroactively-entered fixture data) and has since been
+filled in — `clasificaciones`/`goleadores` for the same groups parsed fine
+at crawl time (their `standings.csv`/`scorers.csv` rows are complete),
+meaning those aggregate endpoints were already backfilled by RFFM before
+the calendar/fixture-level endpoint was. The original fetch didn't cache
+raw HTML (`raw_saved_path=None`), so the exact empty/malformed shape the
+JSON had on 2026-08-02 can't be recovered — but given the successful re-fetch,
+that's no longer needed to explain the gap.
 
 **Scope:** all 25 affected groups are in season **2024-2025 only** (checked
 every other season — zero such groups elsewhere), all from the same single
@@ -69,9 +83,11 @@ these 25 `group_id`s will incorrectly show up as having no 2024-2025
 record anywhere downstream (transfer-linking, "did this player have a gap
 year" analyses, the Metro de la Cantera artifacts' continuity links) even
 though they have complete `standings`/`scorers` presence that season. Not a
-players-didn't-play story — re-crawling 2024-2025's calendario stage for
-these 25 group_ids (list above) should fix it; not attempted here since
-that's a pipeline change, out of scope for this investigation.
+players-didn't-play story, and not a code fix needed — **simply re-crawling
+2024-2025's calendario stage for these 25 group_ids (list above) should
+fully fix it**, since the live page already has the data now. Re-crawl not
+attempted here (pipeline change, out of scope for this investigation) but
+the query above will confirm zero remain missing once it's run.
 
 ---
 
