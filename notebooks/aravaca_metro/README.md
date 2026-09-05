@@ -111,37 +111,38 @@ has nothing to show right now.
 
 ## Known state / open items
 
-- **Label backing bands + header line-overlap at zoom (follow-up to the
-  mobile fixes below).** Two more bugs surfaced after those: (1) the row
-  labels, once the gutter got narrowed for mobile, visually sat flush
-  against — effectively inside — the diagram's own tinted content, with no
-  breathing room, unlike the column headers which had always had blank
-  (unfilled) space above the diagram to sit in. (2) at high zoom, the
-  season-header's title/category/years lines started overlapping each
-  other — `applyZoom()` scaled their font size (per the earlier "text
-  doesn't zoom" fix) but not the fixed CSS `top` gaps between the three
-  lines, so a much taller (zoomed) line collided with the next one still
-  only ~12-17px below it.
-  Fixed (2) by adding `BASE_TOP` (a `top` value per header class, alongside
-  the existing `BASE_FONT_SIZE`) that `applyZoom()` also multiplies by
-  `zoomLevel` — same fix shape as the font-size one, just the other axis.
-  Fixed (1) by giving both label overlays an actual backing band —
-  `#canalLabelsBg`/`#seasonHeadersBg`, `--surface-card` (matching the
-  header/pivot-bar/legend's own chrome color) — so they read as a clearly
-  separate strip rather than blending into the diagram. **First attempt at
-  this broke sticky entirely**: giving the band elements a real
-  width/height directly made them occupy actual flow space (they're normal
-  block children of canvas-wrap), pushing `#canalLabels`/`#seasonHeaders`
-  down/right and off the sticky-pinned position instead of the diagram.
-  Fixed by keeping the band wrapper itself zero-size (exactly like
-  `#canalLabels`/`#seasonHeaders`) and rendering the actual visible rect on
-  an absolutely-positioned `.fill` child instead — absolute children never
-  contribute to a flow ancestor's size regardless of how big they render.
-  The `.fill`'s axis that needs to track zoom (canal's width, season's
-  height) is still set from `applyZoom()`; the other axis is just an
-  oversized fixed value (2000px / 5000px) relying on canvas-wrap's own
-  `overflow: auto` to clip it to the real visible size, no JS measurement
-  needed.
+- **Backing bands tried, then reverted; the real left-edge-gap bug found
+  underneath.** After narrowing the gutter for mobile, the row labels sat
+  flush against — effectively inside — the diagram's own tinted content.
+  First fix was a `--surface-card` backing band behind both label overlays
+  (`#canalLabelsBg`/`#seasonHeadersBg`) so they'd read as a clearly
+  separate strip. Explicitly asked to revert: wanted the pre-band look
+  back (translucent labels only, nothing solid blocking the diagram) —
+  those elements are gone again. (The `--season-stripe` per-season column
+  tint from the header redesign is a *different* thing and stayed;
+  "revert the labels" wasn't "revert the stripe.")
+  Removing the band exposed the actual bug the band had been *hiding*
+  rather than fixing: `.canal-label`'s `left: 8px` (from the pre-sticky
+  `position: absolute` design, where `left` resolves at the containing
+  block's *padding* edge) was carried over unchanged into the sticky
+  overlay, where `left` instead resolves at canvas-wrap's *content* edge
+  (after padding) — the same edge `#zoomWrap` (the diagram) starts from.
+  So the label was never sitting in the gutter at all; it started exactly
+  where the diagram does and read as "inside the table" independent of the
+  band. Fixed with `CANAL_LABEL_LEFT_BASE = CANAL_LABEL_EDGE_GAP -
+  ROW_GUTTER_BASE` (both constants, currently `3` and `42`) — a *negative*
+  base left that pulls the label back before the content edge, into the
+  gutter, landing it a constant `CANAL_LABEL_EDGE_GAP` from the true left
+  edge at any zoom (`applyZoom()` scales it by `zoomLevel` like everything
+  else here, so the gap stays proportionally minimal rather than growing
+  with zoom). `ROW_GUTTER_BASE` also dropped from 60 to 42 (just enough
+  for the label's own wrapped width, no longer padded out for a band that
+  doesn't exist anymore).
+  The header line-overlap-at-zoom bug found alongside this (title/category/
+  years colliding at high zoom, since only their font size scaled with
+  zoom, not the fixed gaps between them) is unrelated to the band and
+  stayed fixed: `BASE_TOP` per header class, multiplied by `zoomLevel` in
+  `applyZoom()` next to the existing `BASE_FONT_SIZE`.
 - **Mobile fixes: label font didn't zoom, sticky labels sat in the wrong
   place, gutters too wide.** All three turned out to share one root cause,
   found by testing (headless Chromium can't be trusted to report the real

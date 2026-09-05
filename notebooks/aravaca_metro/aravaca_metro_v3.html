@@ -237,7 +237,7 @@
 
   /* ---------------- main area ---------------- */
   .main { flex: 1 1 auto; display: flex; min-height: 0; }
-  .canvas-wrap { flex: 1 1 auto; overflow: auto; position: relative; padding: 12px 16px 16px 60px; }
+  .canvas-wrap { flex: 1 1 auto; overflow: auto; position: relative; padding: 12px 16px 16px 42px; }
   .zoom-wrap { display: inline-block; position: relative; transform-origin: 0 0; }
 
   /* row names (division-tier labels) and column names (season/lane headers)
@@ -261,42 +261,9 @@
      the element to the corner immediately, ignoring scroll on either axis */
   .canal-labels { left: 0; }
   .season-headers { top: 0; }
-
-  /* backing bands behind the two label overlays, so they read as a clearly
-     separate "chrome" strip (matching the header/pivot-bar/legend's own
-     --surface-card) rather than floating loose over the diagram's own
-     background — unlike the labels above, these stick on BOTH axes (always
-     anchored to their corner, not tracking the content-relevant scroll
-     axis) since they're a fixed backdrop, not content.
-     The wrapper itself must stay zero-size like .canal-labels/.season-headers
-     above (giving it a real width/height here — even just one axis — makes
-     it occupy flow space and push #canal-labels/#season-headers down/right,
-     breaking their sticky position entirely). The actual visible rect is a
-     `.fill` child instead: position:absolute doesn't contribute to the
-     zero-size parent's flow size no matter how big it renders, and an
-     oversized fixed dimension on the axis that doesn't need to track zoom
-     (2000px/5000px, comfortably bigger than any real viewport) gets clipped
-     to canvas-wrap's own visible box by its overflow:auto — no JS needed to
-     measure it. The OTHER axis — canal .fill's width, season .fill's height
-     — does need to track zoom (set in applyZoom()), to keep pace with the
-     labels' own scaled font size instead of clipping them short. */
-  .canal-labels-bg, .season-headers-bg {
-    position: sticky;
-    top: 0; left: 0;
-    width: 0; height: 0;
-    overflow: visible;
-    pointer-events: none;
-    z-index: 3;
-  }
-  .canal-labels-bg .fill, .season-headers-bg .fill {
-    position: absolute;
-    background: var(--surface-card);
-  }
-  .canal-labels-bg .fill { left: 0; top: 0; height: 2000px; }
-  .season-headers-bg .fill { top: 0; left: 0; width: 5000px; }
   .canal-label {
     position: absolute;
-    left: 8px;
+    left: 3px;
     font-family: "IBM Plex Sans Condensed", sans-serif;
     font-weight: 600;
     font-size: 10.5px;
@@ -529,8 +496,6 @@
 
 <div class="main">
   <div class="canvas-wrap" id="canvasWrap">
-    <div class="canal-labels-bg" id="canalLabelsBg"><div class="fill"></div></div>
-    <div class="season-headers-bg" id="seasonHeadersBg"><div class="fill"></div></div>
     <div class="canal-labels" id="canalLabels"></div>
     <div class="season-headers" id="seasonHeaders"></div>
     <div class="zoom-wrap" id="zoomWrap">
@@ -1179,22 +1144,27 @@ const BASE_TOP = {
   'season-header-cat': 27,
   'season-header-lbl': 48,
 };
-// canvas-wrap's own padding-left, and #canalLabels-bg/#seasonHeaders-bg's
-// size, scale with zoom too (base values at 100%) so the reserved gutter/
-// header band always keeps pace with the labels' own scaled font size —
-// otherwise it stays fixed while the labels grow and end up spilling past
-// it into the diagram, the same class of bug BASE_TOP fixes above.
-const ROW_GUTTER_BASE = 60;
-const canalLabelsBgFill = document.querySelector('#canalLabelsBg .fill');
-const seasonHeadersBgFill = document.querySelector('#seasonHeadersBg .fill');
+// canvas-wrap's own padding-left reserves room for the row-label text
+// (its wrapped width scales with its own font-size, so the reserved gutter
+// has to keep pace too, same class of bug BASE_TOP fixes for the header
+// lines) — but position:sticky's `left: 0` resolves at canvas-wrap's
+// CONTENT edge (after padding), not its padding edge like the old
+// position:absolute did, so a small *positive* left on `.canal-label` (as
+// it was pre-sticky) actually sits INSIDE that reserved gutter, overlapping
+// the diagram, which starts at that same content edge. CANAL_LABEL_LEFT_BASE
+// is negative to pull it back before the content edge, into the gutter,
+// landing it a constant CANAL_LABEL_EDGE_GAP from the true left edge at
+// any zoom (both scale together, so the gap stays proportionally minimal).
+const ROW_GUTTER_BASE = 42;
+const CANAL_LABEL_EDGE_GAP = 3;
+const CANAL_LABEL_LEFT_BASE = CANAL_LABEL_EDGE_GAP - ROW_GUTTER_BASE;
 function applyZoom() {
   zoomWrap.style.transform = `scale(${zoomLevel})`;
   zoomPct.textContent = Math.round(zoomLevel * 100) + '%';
   canvasWrapEl.style.paddingLeft = (ROW_GUTTER_BASE * zoomLevel) + 'px';
-  canalLabelsBgFill.style.width = (ROW_GUTTER_BASE * zoomLevel) + 'px';
-  seasonHeadersBgFill.style.height = (TOP_MARGIN * zoomLevel) + 'px';
   document.querySelectorAll('.canal-label').forEach(d => {
     d.style.top = (parseFloat(d.dataset.baseTop) * zoomLevel) + 'px';
+    d.style.left = (CANAL_LABEL_LEFT_BASE * zoomLevel) + 'px';
     d.style.fontSize = (BASE_FONT_SIZE['canal-label'] * zoomLevel) + 'px';
   });
   document.querySelectorAll('#seasonHeaders > *').forEach(d => {
