@@ -162,21 +162,12 @@
   body.is-fullscreen .legend-toggle-btn { display: inline-block; }
   body.is-fullscreen.legend-collapsed .legend { display: none; }
 
-  /* header (logo/title/stats/view-controls) is hideable any time, same
-     pattern as the side panel — frees vertical space for the canvas */
-  .header-toggle-btn {
-    margin-left: auto;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 5px;
-    border: 1px solid var(--rule);
-    background: var(--surface);
-    color: var(--ink-dim);
-    cursor: pointer;
-  }
-  .header-toggle-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
-  body.header-hidden header { display: none; }
+  /* "hide header" only collapses the decorative logo/title/stats part —
+     .view-controls (zoom, panel/header toggles, fullscreen) stays visible,
+     since it lives inside <header> too and hiding the whole element would
+     take its own toggle button down with it, with nothing left on-screen
+     to bring it back */
+  body.header-hidden .brand, body.header-hidden .stats-row { display: none; }
 
   /* side panel is hideable at any time (not just fullscreen) — canvas-wrap
      is flex:1 1 auto so it reclaims the freed width automatically */
@@ -471,6 +462,8 @@
       <span class="zoom-pct" id="zoomPct" title="Restablecer al 100%" role="button">100%</span>
       <button class="zoom-btn" id="zoomIn" title="Acercar" aria-label="Acercar">+</button>
     </div>
+    <button class="fs-btn" id="panelToggleBtn" aria-pressed="false">◀ Ocultar panel</button>
+    <button class="fs-btn" id="headerToggleBtn">▲ Ocultar cabecera</button>
     <button class="fs-btn" id="fsBtn" aria-pressed="false">⛶ Pantalla completa</button>
   </div>
 </header>
@@ -480,8 +473,6 @@
   <div class="pivot-btns" id="pivotBtns"></div>
   <span class="pivot-hint" id="pivotHint"></span>
   <button class="legend-toggle-btn" id="legendToggleBtn">Mostrar leyenda</button>
-  <button class="header-toggle-btn" id="headerToggleBtn">▲ Ocultar cabecera</button>
-  <button class="header-toggle-btn" id="panelToggleBtn" aria-pressed="false">◀ Ocultar panel</button>
 </div>
 
 <div class="legend">

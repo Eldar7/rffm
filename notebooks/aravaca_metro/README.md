@@ -111,16 +111,25 @@ has nothing to show right now.
 
 ## Known state / open items
 
-- **`#panelToggleBtn` moved from the header into the pivot-bar,** next to
-  `#headerToggleBtn` — they were on opposite ends of two different bars,
-  which is why the header toggle looked like it was wrapping onto its own
-  odd row. Couldn't just move `#headerToggleBtn` into the header next to
-  the old `#panelToggleBtn` location instead (the more literal reading of
-  the ask): that would hide the panel toggle's own home *and* the header
-  toggle along with the header it controls, with nothing left on-screen to
-  bring either back. Moving `#panelToggleBtn` the other way keeps both in
-  the pivot-bar, which never hides — panel toggle stays reachable even
-  with the header collapsed.
+- **Header/panel toggles: settled in `.view-controls`, "hide header" only
+  collapses `.brand`+`.stats-row`.** Went back and forth on where these two
+  buttons live. First cut put `#panelToggleBtn` in the header's
+  `.view-controls` and `#headerToggleBtn` in the pivot-bar — wrong pairing,
+  and the header toggle wrapped onto its own odd row since it was alone
+  with `margin-left: auto` in a bar with little else in it. Tried moving
+  `#panelToggleBtn` to join it in the pivot-bar instead — also wrong: the
+  ask was to restore `#panelToggleBtn` to its original, correct spot in
+  `.view-controls` and bring `#headerToggleBtn` to it instead, not the
+  reverse. Both buttons are back in `.view-controls` now, next to the zoom
+  controls and fullscreen toggle.
+  That still leaves the puzzle from the first design pass: `#headerToggleBtn`
+  lives inside `<header>`, so if "hide header" hid the *whole* `<header>`
+  element, it'd take its own toggle down with it — no way to bring it back.
+  Resolved by scoping what "hidden" means: `body.header-hidden` now hides
+  only `.brand` and `.stats-row` (the logo/title/stats — purely
+  informational), while `.view-controls` (all four buttons) stays visible
+  regardless, since it's a *sibling* of `.brand`/`.stats-row` inside
+  `<header>`, not hidden itself.
 - **Header hideable, side panel wider + resizable.** `#headerToggleBtn` (in
   the pivot-bar, so it's still reachable once the header itself is hidden)
   toggles `body.header-hidden`, same `display:none` pattern as the legend/
