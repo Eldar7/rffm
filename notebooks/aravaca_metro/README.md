@@ -111,6 +111,29 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Header hideable, side panel wider + resizable.** `#headerToggleBtn` (in
+  the pivot-bar, so it's still reachable once the header itself is hidden)
+  toggles `body.header-hidden`, same `display:none` pattern as the legend/
+  panel toggles. The side panel's default width went from 300px to 405px
+  (+35%) and gained a native `resize: horizontal` handle (`min-width:
+  160px`, `max-width: 70vw`).
+  Getting the wider default to actually render took a second fix:
+  `.panel`'s `flex: 0 1 300px` used a fixed-length flex-basis, which the
+  native resize handle's inline `width` can't override (a flex item's main
+  size comes from flex-basis when it's a definite length, not from
+  `width`) — changed to `flex: 0 1 auto` + a real `width: 405px`, so
+  flex-basis resolves *from* that width instead of overriding it, and
+  `resize` (which sets `width` inline) has something to actually act on.
+  That alone still rendered at 276px, not 405 — `#canvasWrap`'s own
+  `flex: 1 1 auto` gives it an "auto" flex-basis that resolves to its own
+  *content's* natural preferred width (the SVG, easily 1700px+), and
+  flexbox's shrink distribution is weighted by each item's flex-basis —
+  so canvas-wrap's huge preferred size was dragging `.panel` down
+  proportionally too, even with hundreds of spare pixels available
+  page-wide. Fixed by giving canvas-wrap an explicit `flex: 1 1 0` — basis
+  0 instead of content-derived, the standard idiom for "grow to fill
+  remaining space regardless of what's inside," which stops it from
+  skewing the shrink weighting.
 - **Backing bands tried, then reverted; the real left-edge-gap bug found
   underneath.** After narrowing the gutter for mobile, the row labels sat
   flush against — effectively inside — the diagram's own tinted content.

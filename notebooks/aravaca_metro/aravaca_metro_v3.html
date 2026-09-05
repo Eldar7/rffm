@@ -162,6 +162,22 @@
   body.is-fullscreen .legend-toggle-btn { display: inline-block; }
   body.is-fullscreen.legend-collapsed .legend { display: none; }
 
+  /* header (logo/title/stats/view-controls) is hideable any time, same
+     pattern as the side panel — frees vertical space for the canvas */
+  .header-toggle-btn {
+    margin-left: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+  }
+  .header-toggle-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  body.header-hidden header { display: none; }
+
   /* side panel is hideable at any time (not just fullscreen) — canvas-wrap
      is flex:1 1 auto so it reclaims the freed width automatically */
   body.panel-hidden .panel { display: none; }
@@ -237,7 +253,12 @@
 
   /* ---------------- main area ---------------- */
   .main { flex: 1 1 auto; display: flex; min-height: 0; }
-  .canvas-wrap { flex: 1 1 auto; overflow: auto; position: relative; padding: 12px 16px 16px 42px; }
+  /* flex-basis: 0 (not auto) so canvas-wrap's hypothetical flex size is 0,
+     not its own SVG content's huge natural width — with auto, that huge
+     preferred size skewed the proportional flex-shrink split, squeezing
+     .panel down well below its own requested width even with plenty of
+     total space to go around */
+  .canvas-wrap { flex: 1 1 0; overflow: auto; position: relative; padding: 12px 16px 16px 42px; }
   .zoom-wrap { display: inline-block; position: relative; transform-origin: 0 0; }
 
   /* row names (division-tier labels) and column names (season/lane headers)
@@ -353,12 +374,18 @@
 
   /* ---------------- side panel ---------------- */
   .panel {
-    flex: 0 1 300px;
+    /* flex-basis: auto (not a fixed length) so `width` — not flex-basis —
+       drives the main size; that's what lets the native resize handle
+       (which sets an inline `width`) actually take effect on a flex item */
+    flex: 0 1 auto;
+    width: 405px;
     min-width: 160px;
+    max-width: 70vw;
+    resize: horizontal;
     border-left: 1px solid var(--rule);
     background: var(--surface-card);
     padding: 20px 20px 20px;
-    overflow-y: auto;
+    overflow: auto;
     font-size: 13px;
   }
   .panel-empty { color: var(--ink-faint); font-size: 13px; line-height: 1.6; padding-top: 40px; text-align: center; }
@@ -454,6 +481,7 @@
   <div class="pivot-btns" id="pivotBtns"></div>
   <span class="pivot-hint" id="pivotHint"></span>
   <button class="legend-toggle-btn" id="legendToggleBtn">Mostrar leyenda</button>
+  <button class="header-toggle-btn" id="headerToggleBtn">▲ Ocultar cabecera</button>
 </div>
 
 <div class="legend">
@@ -1269,6 +1297,14 @@ legendToggleBtn.addEventListener('click', () => {
   legendToggleBtn.textContent = document.body.classList.contains('legend-collapsed') ? 'Mostrar leyenda' : 'Ocultar leyenda';
 });
 document.addEventListener('fullscreenchange', syncFullscreenState);
+
+// ---------------- header toggle ----------------
+// Independent of fullscreen — same pattern as the legend/side-panel toggles.
+const headerToggleBtn = document.getElementById('headerToggleBtn');
+headerToggleBtn.addEventListener('click', () => {
+  const hidden = document.body.classList.toggle('header-hidden');
+  headerToggleBtn.textContent = hidden ? '▼ Mostrar cabecera' : '▲ Ocultar cabecera';
+});
 
 // ---------------- side panel toggle ----------------
 // Independent of fullscreen — the panel can be hidden any time to give the
