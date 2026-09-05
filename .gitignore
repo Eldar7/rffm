@@ -21,6 +21,11 @@ tmp/
 # live directly under reports/).
 /reports/data/
 
+# Detail CSVs written by analysis_scripts/audit_aggregates_vs_matches.py —
+# regenerate by re-running the script, see DATA_FINDINGS.md's "Systematic
+# audit" entry.
+/analysis_scripts/audit_output/
+
 # players.parquet is deliberately NOT git-tracked, unlike every other table
 # under output/processed/rffm_parquet/ — it's a binary blob that gets fully
 # rewritten (no useful git delta) on every commit that touches it, measured

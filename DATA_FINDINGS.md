@@ -91,6 +91,157 @@ the query above will confirm zero remain missing once it's run.
 
 ---
 
+## Systematic audit: aggregate tables vs. match-level tables — `analysis_scripts/audit_aggregates_vs_matches.py`
+
+The entry above found one specific shape of mismatch ("group has
+standings/scorers, has zero `matches.csv` rows") for one season. This
+generalizes that anti-join into 7 checks across **every** season, comparing
+aggregate tables (`standings`, `scorers`, `player_season_stats`) against
+match-level tables (`matches`, `match_goals`, `match_cards`,
+`match_lineups`). Read-only DuckDB queries against
+`output/processed/rffm_parquet/`; re-run with
+`python analysis_scripts/audit_aggregates_vs_matches.py`, which also writes
+one detail CSV per check to `analysis_scripts/audit_output/` (gitignored —
+regenerate rather than expecting them to be committed). Headline result:
+**check 1's 25-group gap turns out to be the extreme case of a much larger,
+ongoing pattern** (next section) — not a one-off.
+
+### Same root cause as the 25-group gap, but 25x bigger and still happening: truncated (not just empty) `matches.csv` for ~13-19% of groups per season, 2022-2023 through 2025-2026
+
+**Symptom:** Check 2 compares `standings.played` to the actual count of
+finished matches in `matches.csv` for the same team/group; check 3 does the
+same for `goals_for`/`goals_against` vs. summed match scores. Excluding the
+25 already-known fully-empty groups, **759 (season, group_id) pairs**
+across 9 seasons still show a mismatch. Grouping those by `(season,
+group_id)`, **672 of them have every team in the group off by the same
+large amount** (`std == 0` across teams in the group) — i.e. this isn't
+noisy per-team data, it's a clean group-level truncation.
+
+**Root cause — same mechanism as the confirmed 25-group case, at partial
+instead of total severity:** picking a concrete example, group `23793583`
+(2024-2025, PREBENJAMIN, 8 teams): `matches.csv` has exactly 28 rows,
+matchdays **1 through 7 only**, all `is_finished=True` — but
+`standings.csv` credits every team with 15-23 `played` and goal totals in
+the 70s-170s range, and `crawl_log` shows the calendario/clasificaciones/
+goleadores fetches all succeeded (`http_status=200`,
+`parser_type=html_next_data`) in the same `2026-08-02` crawl run as the
+25-group case. Same signature: RFFM's results-entry backfill was still
+mid-way through the season at crawl time, so the calendario endpoint
+returned only the *first N* matchdays it had so far, while
+`clasificaciones`/`goleadores` (already reflecting the full season) parsed
+fine. **Not independently re-verified live** the way the 25-group case was
+(that re-fetch showed the site now has the full data) — recommend the same
+live spot-check before assuming a plain re-crawl fixes these too, but the
+shape of the evidence matches exactly.
+
+**Why the existing `jornada_coverage_gap` check doesn't catch this:**
+that check (`data_quality_report.csv`, core family, only 10 rows total)
+flags *missing matchday numbers inside an otherwise-contiguous sequence*
+(e.g. jornadas `1,2,4,5` → "missing: 3"). A truncated tail (`1..7` present,
+`8..N` simply never fetched) has no internal gap to flag, so it passes that
+check silently. None of these 672 groups have **any**
+`data_quality_report.csv` row of any `check_name` — this is a genuine blind
+spot in the crawler's own reconciliation checks, not a re-discovery of a
+known one.
+
+**Scope:** heavily concentrated in the four most recent seasons, and
+absent before 2020-2021 — not a fixed historical artifact, an ongoing one:
+
+| Season | Groups affected | Total groups | % |
+|---|---|---|---|
+| 2020-2021 | 4 | 517 | 0.8% |
+| 2021-2022 | 14 | 730 | 1.9% |
+| 2022-2023 | 166 | 879 | 18.9% |
+| 2023-2024 | 166 | 1187 | 14.0% |
+| 2024-2025 | 168 | 1201 | 14.0% |
+| 2025-2026 | 154 | 1210 | 12.7% |
+
+(2016-2017 through 2019-2020: zero groups match this pattern.) The
+remaining 87 of the 759 mismatched (season, group_id) pairs split into a
+small, uniform `-1` bucket (32 groups — `matches.csv` has exactly one more
+finished match per team than `standings.played` credits; plausible
+explanation is a forfeited/awarded match that gets a recorded score but
+isn't counted as "jugado" by the site's own PJ column, not independently
+confirmed) and 55 groups with a mixed, per-team-varying pattern that isn't
+explained by either mechanism above — flagged in the check 2/3 output CSVs
+for a future look, not resolved here.
+
+**Consequence:** identical to the 25-group case but at ~25x the row count
+— any player whose team is in one of these 672 groups will look like they
+stopped playing partway through the season in every downstream match-level
+view (`match_lineups`/`match_goals`/`match_cards` are only ever generated
+for `match_id`s that exist in `matches.csv`), while `standings`/`scorers`
+correctly show a full season. **Recommended fix is the same as the
+25-group case — re-crawl the calendario stage for these `(season,
+group_id)` pairs** (full list: `analysis_scripts/audit_output/
+check2_team_played_mismatch.csv`, grouped by `(season, group_id)` with
+`std(diff) < 0.6` and `mean(diff) >= 5`) — not a code change, and not
+attempted here.
+
+### Check 4 — `scorers.csv` group-level goal total vs. `match_goals` row count (new, not explained by the truncation above)
+
+5,027 `(season, group_id)` pairs show `sum(scorers.goals) !=
+count(match_goals rows)` for that group. Splitting by whether any
+`match_goals` rows exist at all: 498 have **zero** `match_goals` rows —
+these are almost certainly groups where `acta_partido` enrichment simply
+never ran for that category that season (expected, check
+`coverage_manifest.csv` before treating as a gap, not investigated
+per-group here). The other **4,529 have some `match_goals` rows but still
+don't reconcile** — and only 526 of those (12%) overlap with the truncated-
+calendario groups above, so this is a largely **separate, unresolved**
+phenomenon, spread across every season 2016-2017 through 2025-2026 (roughly
+250-830 groups/season, rising over time). Typical diffs are much smaller
+relative to the group's total goals than the "zero coverage" cases (tens of
+goals out of hundreds), e.g. group `9596698` (2018-2019): `scorers.csv`
+totals 1,202 goals, `match_goals` has 1,152 rows (diff 50). Root cause not
+determined — no matching `check_name` exists in `data_quality_report.csv`
+for this comparison. Detail: `analysis_scripts/audit_output/
+check4_scorers_vs_match_goals.csv`.
+
+### Check 5 — `player_season_stats.matches_played` vs. `match_lineups` appearance count: already a known, tracked check — not a new finding
+
+240,097 of 1,020,530 eligible player/season rows (23.5%, restricted to
+`(season, category_base)` combinations where `coverage_manifest.csv` shows
+`acta_partido` as `complete`/`complete_with_failures`) show
+`matches_played != count(match_lineups rows)`. **This is not new:**
+`data_quality_report.csv` already runs the identical comparison under
+`check_name = "jugados_reconciliation_mismatch"` (240,775 rows, `fichajugador`
+family, `severity=warning`) — within rounding of this check's own count,
+the small gap being this check's stricter category-coverage gate. Sample of
+the existing rows: `"site-reported matches_played=22 vs 23 rows collected
+in match_lineups/ - likely a gap in acta-partido coverage for this
+player"`. Diff sign is usually negative (`matches_played < lineup rows` —
+we've *collected more* lineup appearances than the site's own season-stats
+page credits, not fewer), which the existing message's phrasing doesn't
+quite capture, but that's a pre-existing characterization, not something
+this audit is introducing. No action needed here beyond what the project
+already tracks.
+
+### Check 6 — `player_season_stats` card counts vs. `match_cards` (new)
+
+57,687 of the same 1,020,530-row eligible population (5.7%) show a
+yellow/red/second-yellow card count mismatch against summed `match_cards`
+rows (mapped via `card_type_label`). Only 897 of these (1.6%) fall in the
+truncated-calendario groups above — genuinely separate. No corresponding
+`check_name` exists in `data_quality_report.csv`. Example: player
+`10065675` (2023-2024, AFICIONADO) — `player_season_stats` says 8 yellow
+cards, `match_cards` has 10. Root cause not investigated further here.
+Detail: `analysis_scripts/audit_output/check6_player_cards_mismatch.csv`.
+
+### Check 7 — `player_season_stats.goals_total` vs. `match_goals` count per player (new)
+
+74,277 of 1,020,530 (7.3%) show a goals mismatch. Only 5,233 (7%) overlap
+the truncated-calendario groups — mostly separate from that pattern too.
+Largest examples: player `9709668` (2018-2019, INFANTIL) — season stats say
+78 goals, `match_goals` has 1 row; player `2468893` (2018-2019) — 95 vs 21.
+These large-diff outliers look categorically different from the bulk
+(median diff is -1, i.e. usually off by one goal) and may be worth a
+follow-up look at whether they're specific players with a data quality
+issue vs. scattered small per-match undercounting. Not resolved here.
+Detail: `analysis_scripts/audit_output/check7_player_goals_mismatch.csv`.
+
+---
+
 ## clubs.csv — 326 missing entries (2025-2026)
 
 **Symptom:** `coverage_manifest.csv` shows `complete_with_failures` with
