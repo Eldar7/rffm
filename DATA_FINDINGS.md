@@ -89,6 +89,15 @@ fully fix it**, since the live page already has the data now. Re-crawl not
 attempted here (pipeline change, out of scope for this investigation) but
 the query above will confirm zero remain missing once it's run.
 
+**Update — all 25 verified live, not just the one sample above:** ran the
+project's own unmodified `fetch_calendario()` + `parse_matches()` against
+all 25 group_ids (2026-09-05). **25/25 now return real match data** — a
+total of **3,112 finished matches** recoverable across the 25 groups (per
+group: 306, 156, 156, 182, 182, 182, 182, 156, 132, 156, 132, 132, 56, 66,
+156, 156, 156, 156, 156, 45, 55, 30, 10, 6, 10 — group_ids in the same
+order as the query above). Re-crawling this set of 25 has a confirmed,
+exhaustively-checked benefit — every single one, not most.
+
 ---
 
 ## Systematic audit: aggregate tables vs. match-level tables — `analysis_scripts/audit_aggregates_vs_matches.py`
@@ -102,12 +111,14 @@ match-level tables (`matches`, `match_goals`, `match_cards`,
 `output/processed/rffm_parquet/`; re-run with
 `python analysis_scripts/audit_aggregates_vs_matches.py`, which also writes
 one detail CSV per check to `analysis_scripts/audit_output/` (gitignored —
-regenerate rather than expecting them to be committed). Headline result: a
-second, much larger group-level "played"/goals mismatch exists (672
-groups, next section) — but a **live spot-check disproved the initial
-guess that it shares check 1's root cause**; it's a different, unrelated
-phenomenon (multi-phase competitions), not a bigger version of the same
-crawl gap. Checks 4/6/7 below surface further mismatches with no
+regenerate rather than expecting them to be committed). Headline result,
+now settled by an exhaustive live check of all 784 candidate groups (not a
+sample): **only the original 25 groups are worth re-crawling** — every one
+of them now has real live data (3,112 recoverable finished matches total).
+The other 759 (a second, much larger group-level "played"/goals mismatch)
+turned out to be a different, unrelated phenomenon (multi-phase
+competitions) where the live site has nothing new to fetch — re-crawling
+them would add zero rows. Checks 4/6/7 below surface further mismatches with no
 established root cause yet.
 
 ### NOT the same root cause as the 25-group gap — 672 "truncated" groups are almost all multi-phase competitions, live re-fetch confirms re-crawling would add nothing
@@ -121,21 +132,21 @@ group_id)`, **672 of them have every team in the group off by the same
 large amount** (`std == 0` across teams in the group) — i.e. this isn't
 noisy per-team data, it's a clean group-level pattern.
 
-**Initial hypothesis (below, now corrected) was wrong — checked live, not
-assumed:** the first pass at this entry assumed the same site-side
-results-entry lag as the confirmed 25-group case, un-verified. Live
-spot-check of 6 groups (one per affected season, `2020-2021` through
-`2025-2026`, via the project's own unmodified `fetch_calendario()` +
-`parse_matches()`, same pattern as the 25-group case's re-fetch) found
-**0 of 6 had any new matches on the live site** — every one returned
-exactly the row count, matchday range, and finished-match count already in
-our `matches.csv` (e.g. group `13505583`: 25 rows live, 25 rows stored,
-both capped at matchday 5). **Re-crawling this bucket would not add
-anything** — this is not a backfill-lag case at all, unlike the 25-group
-one.
+**Initial hypothesis (below, now corrected) was wrong — checked live on
+every single group, not sampled or assumed:** the first pass at this entry
+assumed the same site-side results-entry lag as the confirmed 25-group
+case, un-verified. A 6-group spot-check first suggested otherwise, so this
+was then re-run exhaustively: `fetch_calendario()` + `parse_matches()`
+(unmodified) against **all 759** check-2 groups (2026-09-05, ~18 minutes at
+the project's own 0.75s rate limit, 0 fetch errors). **0 of 759 had any new
+data on the live site** — every single one returned exactly the row count,
+finished-match count, and max matchday already in our `matches.csv` (down
+to the exact number, not just "close"). **Re-crawling this entire 759-group
+set would add nothing** — confirmed exhaustively, not by inference from a
+sample, and not a backfill-lag case at all unlike the 25-group one.
 
 **Real cause, found by checking `competitions.csv.phase_label` for the
-same 6 groups: 6/6 are "segunda fase" (second-phase) competitions**, e.g.
+6-group sample that first flagged the contradiction: 6/6 are "segunda fase" (second-phase) competitions**, e.g.
 `"DIVISION DE HONOR DE JUVENILES - SEGUNDA FASE - V-D"`,
 `"SEGUNDA FASE PRIMERA PREBENJAMIN"`. Checked across all 672, not just the
 6 samples: `phase_label == "phase segunda fase"` for 509 of them (76%);
@@ -187,9 +198,12 @@ mixed, per-team-varying pattern that isn't explained by either mechanism
 above — flagged in the check 2/3 output CSVs for a future look, not
 resolved here.
 
-**Consequence / action:** **do not re-crawl these 672 groups expecting to
-fill in "missing" matches — confirmed live, the data isn't there to fetch.**
-`matches.csv` for a segunda-fase `group_id` is very likely already complete
+**Consequence / action:** **do not re-crawl any of these 759 groups
+expecting to fill in "missing" matches — confirmed live, group by group,
+the data isn't there to fetch.** (The exhaustive check covered all 759, not
+just the 672 "big gap" bucket — the 32 `-1` and 55 mixed groups showed the
+same zero-benefit result.) `matches.csv` for a segunda-fase `group_id` is
+very likely already complete
 for that group's own fixtures; the apparent gap is `standings`/`scorers`
 carrying a cumulative number that doesn't correspond 1:1 to that specific
 `group_id`'s own match count. Anyone joining `standings.played` against a
