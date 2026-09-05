@@ -102,11 +102,15 @@ match-level tables (`matches`, `match_goals`, `match_cards`,
 `output/processed/rffm_parquet/`; re-run with
 `python analysis_scripts/audit_aggregates_vs_matches.py`, which also writes
 one detail CSV per check to `analysis_scripts/audit_output/` (gitignored —
-regenerate rather than expecting them to be committed). Headline result:
-**check 1's 25-group gap turns out to be the extreme case of a much larger,
-ongoing pattern** (next section) — not a one-off.
+regenerate rather than expecting them to be committed). Headline result: a
+second, much larger group-level "played"/goals mismatch exists (672
+groups, next section) — but a **live spot-check disproved the initial
+guess that it shares check 1's root cause**; it's a different, unrelated
+phenomenon (multi-phase competitions), not a bigger version of the same
+crawl gap. Checks 4/6/7 below surface further mismatches with no
+established root cause yet.
 
-### Same root cause as the 25-group gap, but 25x bigger and still happening: truncated (not just empty) `matches.csv` for ~13-19% of groups per season, 2022-2023 through 2025-2026
+### NOT the same root cause as the 25-group gap — 672 "truncated" groups are almost all multi-phase competitions, live re-fetch confirms re-crawling would add nothing
 
 **Symptom:** Check 2 compares `standings.played` to the actual count of
 finished matches in `matches.csv` for the same team/group; check 3 does the
@@ -115,37 +119,52 @@ same for `goals_for`/`goals_against` vs. summed match scores. Excluding the
 across 9 seasons still show a mismatch. Grouping those by `(season,
 group_id)`, **672 of them have every team in the group off by the same
 large amount** (`std == 0` across teams in the group) — i.e. this isn't
-noisy per-team data, it's a clean group-level truncation.
+noisy per-team data, it's a clean group-level pattern.
 
-**Root cause — same mechanism as the confirmed 25-group case, at partial
-instead of total severity:** picking a concrete example, group `23793583`
-(2024-2025, PREBENJAMIN, 8 teams): `matches.csv` has exactly 28 rows,
-matchdays **1 through 7 only**, all `is_finished=True` — but
-`standings.csv` credits every team with 15-23 `played` and goal totals in
-the 70s-170s range, and `crawl_log` shows the calendario/clasificaciones/
-goleadores fetches all succeeded (`http_status=200`,
-`parser_type=html_next_data`) in the same `2026-08-02` crawl run as the
-25-group case. Same signature: RFFM's results-entry backfill was still
-mid-way through the season at crawl time, so the calendario endpoint
-returned only the *first N* matchdays it had so far, while
-`clasificaciones`/`goleadores` (already reflecting the full season) parsed
-fine. **Not independently re-verified live** the way the 25-group case was
-(that re-fetch showed the site now has the full data) — recommend the same
-live spot-check before assuming a plain re-crawl fixes these too, but the
-shape of the evidence matches exactly.
+**Initial hypothesis (below, now corrected) was wrong — checked live, not
+assumed:** the first pass at this entry assumed the same site-side
+results-entry lag as the confirmed 25-group case, un-verified. Live
+spot-check of 6 groups (one per affected season, `2020-2021` through
+`2025-2026`, via the project's own unmodified `fetch_calendario()` +
+`parse_matches()`, same pattern as the 25-group case's re-fetch) found
+**0 of 6 had any new matches on the live site** — every one returned
+exactly the row count, matchday range, and finished-match count already in
+our `matches.csv` (e.g. group `13505583`: 25 rows live, 25 rows stored,
+both capped at matchday 5). **Re-crawling this bucket would not add
+anything** — this is not a backfill-lag case at all, unlike the 25-group
+one.
 
-**Why the existing `jornada_coverage_gap` check doesn't catch this:**
-that check (`data_quality_report.csv`, core family, only 10 rows total)
-flags *missing matchday numbers inside an otherwise-contiguous sequence*
-(e.g. jornadas `1,2,4,5` → "missing: 3"). A truncated tail (`1..7` present,
-`8..N` simply never fetched) has no internal gap to flag, so it passes that
-check silently. None of these 672 groups have **any**
-`data_quality_report.csv` row of any `check_name` — this is a genuine blind
-spot in the crawler's own reconciliation checks, not a re-discovery of a
-known one.
+**Real cause, found by checking `competitions.csv.phase_label` for the
+same 6 groups: 6/6 are "segunda fase" (second-phase) competitions**, e.g.
+`"DIVISION DE HONOR DE JUVENILES - SEGUNDA FASE - V-D"`,
+`"SEGUNDA FASE PRIMERA PREBENJAMIN"`. Checked across all 672, not just the
+6 samples: `phase_label == "phase segunda fase"` for 509 of them (76%);
+most of the remaining 163 (nearly all in 2022-2023) carry a competition
+name that also says "2ª FASE" but got classified as `regular_season` by
+`classify_division_level` (a parser miss for the "2ª FASE" abbreviated
+form, not a separate phenomenon — see `DIVISIONS.md`/`normalize.py` if this
+gets revisited). Working theory, consistent with every group checked: for
+a segunda-fase group, `standings.played`/`goals_for`/`goals_against`
+reflect the competition's **cumulative season total (primera fase +
+segunda fase combined)**, while `matches.csv` for that `group_id` correctly
+holds only that group's own segunda-fase fixtures — RFFM's site itself
+carries the cumulative table forward onto the later phase's standings page,
+which is a real quirk of how multi-phase competitions are modeled, not a
+crawl gap on either the calendario or clasificaciones side. **Not fully
+proven** (would need a primera-fase group_id with the same team_ids to
+diff the numbers exactly and confirm arithmetically), but the phase-label
+correlation across all 672 groups plus the negative live re-fetch result
+together rule out the truncated-calendario explanation.
+
+**Why the existing `jornada_coverage_gap`/`team_count_mismatch` checks
+don't catch this:** neither check compares a team's played-count across
+phases — they only look for gaps in one group's own matchday sequence or
+mismatched team sets within one group. A cumulative-vs-single-phase
+count difference is invisible to both. None of these 672 groups have any
+`data_quality_report.csv` row of any `check_name`.
 
 **Scope:** heavily concentrated in the four most recent seasons, and
-absent before 2020-2021 — not a fixed historical artifact, an ongoing one:
+absent before 2020-2021:
 
 | Season | Groups affected | Total groups | % |
 |---|---|---|---|
@@ -156,27 +175,30 @@ absent before 2020-2021 — not a fixed historical artifact, an ongoing one:
 | 2024-2025 | 168 | 1201 | 14.0% |
 | 2025-2026 | 154 | 1210 | 12.7% |
 
-(2016-2017 through 2019-2020: zero groups match this pattern.) The
-remaining 87 of the 759 mismatched (season, group_id) pairs split into a
-small, uniform `-1` bucket (32 groups — `matches.csv` has exactly one more
-finished match per team than `standings.played` credits; plausible
-explanation is a forfeited/awarded match that gets a recorded score but
-isn't counted as "jugado" by the site's own PJ column, not independently
-confirmed) and 55 groups with a mixed, per-team-varying pattern that isn't
-explained by either mechanism above — flagged in the check 2/3 output CSVs
-for a future look, not resolved here.
+(2016-2017 through 2019-2020: zero groups match this pattern — plausibly
+because multi-phase competition structures became more common in later
+seasons, not investigated further.) The remaining 87 of the 759 mismatched
+(season, group_id) pairs split into a small, uniform `-1` bucket (32
+groups — `matches.csv` has exactly one more finished match per team than
+`standings.played` credits; plausible explanation is a forfeited/awarded
+match that gets a recorded score but isn't counted as "jugado" by the
+site's own PJ column, not independently confirmed) and 55 groups with a
+mixed, per-team-varying pattern that isn't explained by either mechanism
+above — flagged in the check 2/3 output CSVs for a future look, not
+resolved here.
 
-**Consequence:** identical to the 25-group case but at ~25x the row count
-— any player whose team is in one of these 672 groups will look like they
-stopped playing partway through the season in every downstream match-level
-view (`match_lineups`/`match_goals`/`match_cards` are only ever generated
-for `match_id`s that exist in `matches.csv`), while `standings`/`scorers`
-correctly show a full season. **Recommended fix is the same as the
-25-group case — re-crawl the calendario stage for these `(season,
-group_id)` pairs** (full list: `analysis_scripts/audit_output/
-check2_team_played_mismatch.csv`, grouped by `(season, group_id)` with
-`std(diff) < 0.6` and `mean(diff) >= 5`) — not a code change, and not
-attempted here.
+**Consequence / action:** **do not re-crawl these 672 groups expecting to
+fill in "missing" matches — confirmed live, the data isn't there to fetch.**
+`matches.csv` for a segunda-fase `group_id` is very likely already complete
+for that group's own fixtures; the apparent gap is `standings`/`scorers`
+carrying a cumulative number that doesn't correspond 1:1 to that specific
+`group_id`'s own match count. Anyone joining `standings.played` against a
+team's match count for a segunda-fase group should not expect them to
+match — that's the actionable takeaway, not a crawl backlog. If this
+matters for a specific downstream use (e.g. per-phase player stats), the
+primera-fase `group_id` for the same competition family would need to be
+found and its matches added in, not re-crawled from the segunda-fase
+`group_id` used here.
 
 ### Check 4 — `scorers.csv` group-level goal total vs. `match_goals` row count (new, not explained by the truncation above)
 
