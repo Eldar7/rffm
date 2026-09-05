@@ -111,6 +111,16 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **"Hide header" also hides the legend now.** `body.header-hidden` extended
+  to `.legend` alongside `.brand`/`.stats-row`. Independent of the
+  pre-existing fullscreen legend-collapse (`body.is-fullscreen.legend-collapsed
+  .legend { display: none }`) — both are separate `display: none` rules on
+  the same element, so the legend hides if *either* condition holds; toggling
+  one off while the other is still active correctly leaves it hidden
+  (verified: collapsed it via the fullscreen toggle, showed it back with
+  `#legendToggleBtn`, then hid it again via `#headerToggleBtn`, then
+  restored the header — legend came back since the fullscreen toggle
+  wasn't independently collapsing it anymore by that point).
 - **Header/panel toggles: settled in `.view-controls`, "hide header" only
   collapses `.brand`+`.stats-row`.** Went back and forth on where these two
   buttons live. First cut put `#panelToggleBtn` in the header's

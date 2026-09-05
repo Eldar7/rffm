@@ -162,12 +162,14 @@
   body.is-fullscreen .legend-toggle-btn { display: inline-block; }
   body.is-fullscreen.legend-collapsed .legend { display: none; }
 
-  /* "hide header" only collapses the decorative logo/title/stats part —
-     .view-controls (zoom, panel/header toggles, fullscreen) stays visible,
-     since it lives inside <header> too and hiding the whole element would
-     take its own toggle button down with it, with nothing left on-screen
-     to bring it back */
-  body.header-hidden .brand, body.header-hidden .stats-row { display: none; }
+  /* "hide header" collapses the decorative logo/title/stats *and* the
+     legend — .view-controls and the pivot-bar (zoom, panel/header/legend
+     toggles, fullscreen, pivot buttons) stay visible, since hiding the
+     whole <header> (or the pivot-bar) would take their own toggle buttons
+     down with them, with nothing left on-screen to bring them back */
+  body.header-hidden .brand,
+  body.header-hidden .stats-row,
+  body.header-hidden .legend { display: none; }
 
   /* side panel is hideable at any time (not just fullscreen) — canvas-wrap
      is flex:1 1 auto so it reclaims the freed width automatically */
