@@ -19,7 +19,11 @@ _team_ids_df = con.execute(f'''
 TEAM_IDS = tuple(int(x) for x in _team_ids_df['team_id'])
 
 SEASONS = ['2021-2022', '2022-2023', '2023-2024', '2024-2025', '2025-2026']
-PIVOT_BIRTH_YEARS = (2015, 2016)  # superset covering all 3 client-selectable pivots
+# The actual pair present in Benjamín in the 2025-26 season the pivot team
+# (team_id 39, "A" team) plays in - confirmed via a full-category query
+# (across all of the club's Benjamín teams, not just team 39, which happens
+# to roster only the older half): 42 players born 2016, 41 born 2017.
+PIVOT_BIRTH_YEARS = (2016, 2017)  # superset covering all 3 client-selectable pivots
 MIN_APPS = 4
 
 CATEGORY_ORDER = ['PREBENJAMIN', 'BENJAMIN', 'ALEVIN', 'INFANTIL', 'CADETE', 'JUVENIL', 'AFICIONADO']

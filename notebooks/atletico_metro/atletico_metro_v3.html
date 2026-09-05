@@ -546,8 +546,8 @@ RAW.stations.forEach(s => s.roster.forEach(r => { if (r.birth_year != null) birt
 const PIVOTS = {
   category: { label: 'PREBENJAMÍN 21-22', years: RAW.pivot_birth_years.slice(),
               hint: RAW.pivot_birth_years.slice().sort((a,b)=>a-b).join(' y ') + ' · 2 columnas principales' },
-  by2015:   { label: 'Nacidos en 2015', years: [2015], hint: '1 columna principal' },
   by2016:   { label: 'Nacidos en 2016', years: [2016], hint: '1 columna principal' },
+  by2017:   { label: 'Nacidos en 2017', years: [2017], hint: '1 columna principal' },
 };
 let activePivot = 'category';
 
