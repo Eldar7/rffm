@@ -111,6 +111,37 @@ has nothing to show right now.
 
 ## Known state / open items
 
+- **Label backing bands + header line-overlap at zoom (follow-up to the
+  mobile fixes below).** Two more bugs surfaced after those: (1) the row
+  labels, once the gutter got narrowed for mobile, visually sat flush
+  against — effectively inside — the diagram's own tinted content, with no
+  breathing room, unlike the column headers which had always had blank
+  (unfilled) space above the diagram to sit in. (2) at high zoom, the
+  season-header's title/category/years lines started overlapping each
+  other — `applyZoom()` scaled their font size (per the earlier "text
+  doesn't zoom" fix) but not the fixed CSS `top` gaps between the three
+  lines, so a much taller (zoomed) line collided with the next one still
+  only ~12-17px below it.
+  Fixed (2) by adding `BASE_TOP` (a `top` value per header class, alongside
+  the existing `BASE_FONT_SIZE`) that `applyZoom()` also multiplies by
+  `zoomLevel` — same fix shape as the font-size one, just the other axis.
+  Fixed (1) by giving both label overlays an actual backing band —
+  `#canalLabelsBg`/`#seasonHeadersBg`, `--surface-card` (matching the
+  header/pivot-bar/legend's own chrome color) — so they read as a clearly
+  separate strip rather than blending into the diagram. **First attempt at
+  this broke sticky entirely**: giving the band elements a real
+  width/height directly made them occupy actual flow space (they're normal
+  block children of canvas-wrap), pushing `#canalLabels`/`#seasonHeaders`
+  down/right and off the sticky-pinned position instead of the diagram.
+  Fixed by keeping the band wrapper itself zero-size (exactly like
+  `#canalLabels`/`#seasonHeaders`) and rendering the actual visible rect on
+  an absolutely-positioned `.fill` child instead — absolute children never
+  contribute to a flow ancestor's size regardless of how big they render.
+  The `.fill`'s axis that needs to track zoom (canal's width, season's
+  height) is still set from `applyZoom()`; the other axis is just an
+  oversized fixed value (2000px / 5000px) relying on canvas-wrap's own
+  `overflow: auto` to clip it to the real visible size, no JS measurement
+  needed.
 - **Mobile fixes: label font didn't zoom, sticky labels sat in the wrong
   place, gutters too wide.** All three turned out to share one root cause,
   found by testing (headless Chromium can't be trusted to report the real
