@@ -1482,8 +1482,14 @@ async function main() {
     return;
   }
   const team = (payload.teams || {})[teamId];
+  // metro.html?season= is this team's own season as the entry-point start -
+  // club_metro_v2.py only actually generated that entry point if the club's
+  // YOUNGEST category that season had a qualifying cohort (see its module
+  // docstring); metro.html itself falls back to the club's latest available
+  // entry point if the requested one isn't there, rather than 404-ing.
   document.getElementById('clubName').innerHTML = payload.club
-    ? `${esc(payload.club)} &middot; <a href="club_profile.html?club=${encodeURIComponent(CUR_CLUB_SLUG)}">${CURLANG === 'ru' ? 'профиль клуба' : 'perfil de club'} &rarr;</a>`
+    ? `${esc(payload.club)} &middot; <a href="club_profile.html?club=${encodeURIComponent(CUR_CLUB_SLUG)}">${CURLANG === 'ru' ? 'профиль клуба' : 'perfil de club'} &rarr;</a>` +
+      ` &middot; <a href="metro.html?club=${encodeURIComponent(CUR_CLUB_SLUG)}&season=${encodeURIComponent(CUR_SEASON)}" target="_blank" rel="noopener">Metro de la Cantera &rarr;</a>`
     : '';
   if (!team) {
     document.getElementById('teamName').textContent = payload.club || '—';
