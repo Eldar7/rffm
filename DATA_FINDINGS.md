@@ -151,10 +151,23 @@ sample, and not a backfill-lag case at all unlike the 25-group one.
 `"SEGUNDA FASE PRIMERA PREBENJAMIN"`. Checked across all 672, not just the
 6 samples: `phase_label == "phase segunda fase"` for 509 of them (76%);
 most of the remaining 163 (nearly all in 2022-2023) carry a competition
-name that also says "2ª FASE" but got classified as `regular_season` by
-`classify_division_level` (a parser miss for the "2ª FASE" abbreviated
-form, not a separate phenomenon — see `DIVISIONS.md`/`normalize.py` if this
-gets revisited). Working theory, consistent with every group checked: for
+name that also says "2ª FASE" but got classified as `regular_season` — a
+real, confirmed bug in `rffm_scraper/normalize.py`'s
+`phase_label_from_competition_name()` (called from `discovery.py` at crawl
+time — this is a crawler bug, not an artifact of this audit script, which
+only reads the already-stored `phase_label`). `_PLAYOFF_PHASE_RE`
+(`r"\b(\d+ª?\s*FASE|...)"`) does account for the digit+`ª` form, but the
+string it matches against has already been through `normalize_label()`,
+whose `strip_accents()` step NFKD-decomposes the ordinal indicator `ª` into
+a bare letter `A` (confirmed:
+`normalize_label("2ª FASE") == "2A FASE"`) — which the regex's `ª?`
+(matching the literal ordinal character, not a stray `A`) doesn't expect,
+so `\d+ª?\s*FASE` fails on exactly the strings it was written to catch.
+Not fixed here (this investigation is read-only per the task it was given),
+but the fix is narrow: either match `\d+A?\s*FASE` post-normalization, or
+run the phase regex on the pre-`strip_accents` raw name. Working theory,
+consistent with every group checked regardless of which path assigned
+`phase_label`: for
 a segunda-fase group, `standings.played`/`goals_for`/`goals_against`
 reflect the competition's **cumulative season total (primera fase +
 segunda fase combined)**, while `matches.csv` for that `group_id` correctly
