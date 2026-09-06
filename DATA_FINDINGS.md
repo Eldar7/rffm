@@ -163,11 +163,42 @@ a bare letter `A` (confirmed:
 `normalize_label("2ª FASE") == "2A FASE"`) — which the regex's `ª?`
 (matching the literal ordinal character, not a stray `A`) doesn't expect,
 so `\d+ª?\s*FASE` fails on exactly the strings it was written to catch.
-Not fixed here (this investigation is read-only per the task it was given),
-but the fix is narrow: either match `\d+A?\s*FASE` post-normalization, or
-run the phase regex on the pre-`strip_accents` raw name. Working theory,
-consistent with every group checked regardless of which path assigned
-`phase_label`: for
+**Fixed** in `_PLAYOFF_PHASE_RE` (now matches `\d+[AO]?\s*FASE`, i.e. the
+post-normalization form, since the pre-normalization `ª`/`º` never reaches
+this regex) and **backfilled offline, no re-crawl** — `phase_label` is a
+pure function of the `competition` column already sitting in every row of
+`competitions.csv`/`matches.csv`, so `analysis_scripts/
+backfill_phase_label.py` recomputed it in place across all 10 seasons'
+already-collected CSVs and rewrote only the changed field per affected row
+(verified byte-identical for every untouched row/byte). **Actual scope, now
+that every row was reprocessed rather than just the 672-group cohort that
+first surfaced it: 20,958 rows corrected** (30 in `competitions.csv` +
+20,928 in `matches.csv`, combined) across 7 of 10 seasons (2018-2019,
+2019-2020, 2020-2021, 2022-2023, 2023-2024, 2024-2025, 2025-2026 — 0 in
+2016-2017/2017-2018/2021-2022) — noticeably more than the 15-competition/
+163-group/5,018-row figure quoted earlier in this entry, which was only the
+fraction that happened to also intersect the played-count-mismatch check.
+Parquet copies rebuilt (`build_parquet.py`) after the CSV fix. Side effect
+worth knowing about: rebuilding touched **all 10** seasons' `competitions`/
+`matches` Parquet files, including the 3 seasons with zero real changes —
+confirmed (content-diffed, not just byte-diffed) that their row data is
+unchanged; the shared cross-season categorical dictionary for `phase_label`
+picking up a new value ("phase 2a fase") elsewhere is enough to rewrite
+every season's file's category metadata, so "an unchanged season produces
+a byte-identical file" (`PARQUET_CLOSURE.md`) doesn't hold in this specific
+case — not investigated further, not blocking, just worth knowing before
+assuming a big parquet diff means real data changed.
+
+**Checked whether the same bug class (an accent/ordinal character silently
+eaten by `normalize_label()`'s `strip_accents()` before a regex expecting
+it runs) affects `classify_division_level`/`classify_age_category` too** —
+no: neither `DIVISION_LEVEL_VOCABULARY` nor `AGE_CATEGORY_VOCABULARY` nor
+any other regex in `normalize.py` contains a literal `ª`/`º` (confirmed by
+grep), so this was isolated to `_PLAYOFF_PHASE_RE` and is now fully fixed,
+not just patched for this one symptom.
+
+Working theory, consistent with every group checked regardless of which
+path assigned `phase_label`: for
 a segunda-fase group, `standings.played`/`goals_for`/`goals_against`
 reflect the competition's **cumulative season total (primera fase +
 segunda fase combined)**, while `matches.csv` for that `group_id` correctly
@@ -226,6 +257,24 @@ matters for a specific downstream use (e.g. per-phase player stats), the
 primera-fase `group_id` for the same competition family would need to be
 found and its matches added in, not re-crawled from the segunda-fase
 `group_id` used here.
+
+**This had a real, concrete downstream consequence beyond mislabeling:**
+three files filter on `phase_label == "regular_season"` to exclude
+playoff/second-phase competitions from "regular season only" analysis —
+`notebooks/atletico_metro/build_metro_v3.py:48` (the very artifact whose
+investigation led to this whole audit), `analysis_scripts/
+competition_structure.py:554`, and `analysis_scripts/club_scorecard.py:144`.
+Before the fix above, the misclassified "Nª FASE" competitions leaked
+through that filter as if they were ordinary regular-season divisions —
+and since a segunda-fase group's `standings`/`scorers` carry the
+competition's cumulative season total rather than just that phase's own
+numbers, any of these three reports touching an affected team risked
+double-counting or inflated stats. Now fixed at the source (backfill
+above), so this no longer applies to a fresh read of the data, but any
+already-generated output from these three scripts (e.g. a previously-built
+`club_cohort.csv` or a previously-published Metro artifact) was built
+against the old, mislabeled `phase_label` and should be regenerated to
+pick up the correction.
 
 ### Check 4 — `scorers.csv` group-level goal total vs. `match_goals` row count (new, not explained by the truncation above)
 

@@ -232,7 +232,16 @@ def team_id_or_none(raw_id: str | None) -> str | None:
 
 
 _PLAYOFF_PHASE_RE = re.compile(
-    r"\b(\d+ª?\s*FASE|FASE\s*FINAL|SEGUNDA\s*FASE|TERCERA\s*FASE)\b"
+    # This regex runs on normalize_label()'s output, never on the raw name -
+    # so 'ª'/'º' (Spanish ordinal indicators, e.g. "2ª FASE") have already
+    # been NFKD-decomposed to bare "A"/"O" by strip_accents() before this
+    # ever sees the string ("2ª FASE" -> "2A FASE"). The literal 'ª?' below
+    # therefore never matched anything - it was written for pre-normalization
+    # text but only ever runs on post-normalization text. Match the
+    # normalized "A"/"O" form instead (see DATA_FINDINGS.md's phase_label
+    # entry for how this was found: ~163 "Nª FASE"-named groups were
+    # silently falling through to "regular_season").
+    r"\b(\d+[AO]?\s*FASE|FASE\s*FINAL|SEGUNDA\s*FASE|TERCERA\s*FASE)\b"
 )
 
 
