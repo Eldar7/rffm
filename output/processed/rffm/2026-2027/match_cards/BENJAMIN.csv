@@ -1,0 +1,11 @@
+match_id,team_id,player_id,player_name_raw,minute,minute_raw,card_type_raw,card_type_label,is_second_yellow,source_url,scraped_at
+5600836,846733,19409628,"ANTA MARTIN, HUGO",18,18,101,roja,False,https://www.rffm.es/acta-partido/5600836,2026-10-17T14:14:12.559899+00:00
+5604392,13571247,20762631,"DOLD ONGANIA, PEDRO",999,999,101,roja,False,https://www.rffm.es/acta-partido/5604392,2026-10-17T14:15:04.376318+00:00
+5604746,526034,28003074,"DIAZ ARTEAGA, JAVIER",17,17,100,amarilla,False,https://www.rffm.es/acta-partido/5604746,2026-10-17T14:15:50.500476+00:00
+5715968,2142,28124225,"LEON GALLU, ALBERTO",40,40,100,amarilla,False,https://www.rffm.es/acta-partido/5715968,2026-10-17T14:22:37.447348+00:00
+5681935,17132465,91236,"SANCHEZ REY DIAZ MECO, JOAQUIN",999,999,101,roja,False,https://www.rffm.es/acta-partido/5681935,2026-10-17T14:24:32.550251+00:00
+5682463,524074,16795501,"EL BAHMI, SUHAIL",50,50,100,amarilla,False,https://www.rffm.es/acta-partido/5682463,2026-10-17T14:24:48.660791+00:00
+5719183,18377870,27223865,"SANZ ABELLA, GABRIEL",24,24,100,amarilla,False,https://www.rffm.es/acta-partido/5719183,2026-10-17T14:25:14.717659+00:00
+5719181,24800380,27409681,"GONZÁLEZ QADADEH, OMAR CARLOS",24,24,100,amarilla,False,https://www.rffm.es/acta-partido/5719181,2026-10-17T14:25:15.119392+00:00
+5719184,17149558,28233002,"ARRIBAS PEREZ, ALEX",38,38,100,amarilla,False,https://www.rffm.es/acta-partido/5719184,2026-10-17T14:25:15.120671+00:00
+5719228,18973680,20774048,"ACICOLLA CUESTA, RUBEN",33,33,100,amarilla,False,https://www.rffm.es/acta-partido/5719228,2026-10-17T14:25:20.718498+00:00
