@@ -31,6 +31,14 @@ tmp/
 # locally with `build_parquet.py --players-only` after a fresh checkout.
 /output/processed/rffm_parquet/players.parquet
 
+# Every other Parquet file is ignored by default too: a (season, stage) only
+# gets its Parquet committed once it is CLOSED (PARQUET_CLOSURE.md), and the
+# current season never is - so open/in-progress Parquet files that the
+# SessionStart hook regenerates locally must not show up as untracked.
+# parquet-build.yml force-adds (`git add -f`) the closed ones. Files already
+# tracked are unaffected by this rule.
+/output/processed/rffm_parquet/
+
 # Python
 __pycache__/
 *.py[cod]
