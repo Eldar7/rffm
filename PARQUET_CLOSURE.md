@@ -56,6 +56,15 @@ source of truth if this table ever drifts from the code:
 
 ## How "closed" is actually decided
 
+- **The current season never closes.** `parquet_closure.current_season()` is the
+  newest season label in `coverage_manifest.csv`; it stays open even when its
+  `core` row reads `complete` (that only means one crawl run finished, while
+  fixtures and results keep changing all season). For it only the CSVs are
+  git-tracked. Once a newer season appears in the manifest it becomes
+  eligible to close like any other.
+- All of `output/processed/rffm_parquet/` is gitignored by default;
+  `parquet-build.yml` force-adds only the closed files.
+
 - A `(season, stage)` is closed when `coverage_manifest.csv` shows
   `status == "complete"` for **every** `category_base` row of that pair —
   strictly `"complete"`, not `complete_with_failures`. That distinction

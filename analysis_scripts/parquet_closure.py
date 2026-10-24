@@ -11,7 +11,8 @@ core is category_base="ALL" only (one row per season); acta_partido/
 fichajugador/clubs can have several category_base rows per season, and this
 module requires ALL of them to be "complete" before calling that (season,
 stage) closed - a season with 10 of 11 categories done for fichajugador
-still counts as open. This is the simpler of two options discussed with the
+still counts as open. The newest season in the manifest (the one
+currently being played) never closes either - see current_season(). This is the simpler of two options discussed with the
 project owner (the other: split match_lineups/etc. into one Parquet file per
 (season, category) instead of per season, so a category could close
 independently) - deliberately not done here since it would mean restructuring
@@ -50,6 +51,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -94,16 +96,34 @@ def load_manifest() -> pd.DataFrame:
     return pd.read_csv(MANIFEST, dtype=str)
 
 
+def current_season(manifest: pd.DataFrame | None = None) -> str | None:
+    """The newest real season label ("YYYY-YYYY") present in the manifest.
+    That season is still being played, so its fixtures/results/standings
+    (core) and everything enriched from them keep changing no matter what
+    `status` says - a `complete` core row only means "that crawl run
+    finished", not "this data is final". It is therefore never closed: only
+    its CSVs are git-tracked, its Parquet is regenerated on demand. Once a
+    newer season shows up in the manifest this one stops being current and
+    becomes eligible to close like any other."""
+    m = manifest if manifest is not None else load_manifest()
+    seasons = [s for s in m["season"].dropna().unique() if re.fullmatch(r"\d{4}-\d{4}", s)]
+    return max(seasons) if seasons else None
+
+
 def stage_closed_seasons(stage: str, manifest: pd.DataFrame | None = None) -> set[str]:
     """Every season where `stage` is fully closed - every category_base row
-    for (season, stage) has status == 'complete'. Always empty for a stage
-    in STAGES_THAT_NEVER_CLOSE, regardless of what the manifest says."""
+    for (season, stage) has status == 'complete', and the season is not the
+    current one (see current_season). Always empty for a stage in
+    STAGES_THAT_NEVER_CLOSE, regardless of what the manifest says."""
     if stage in STAGES_THAT_NEVER_CLOSE:
         return set()
     m = manifest if manifest is not None else load_manifest()
+    current = current_season(m)
     sub = m[m["stage"] == stage]
     closed = set()
     for season, g in sub.groupby("season"):
+        if season == current:
+            continue
         if len(g) > 0 and (g["status"] == "complete").all():
             closed.add(season)
     return closed

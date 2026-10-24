@@ -65,7 +65,7 @@ jobs:
           git config user.name "rffm-parquet-bot"
           git config user.email "actions@github.com"
 
-          python analysis_scripts/parquet_closure.py --list-committable | xargs -r git add
+          python analysis_scripts/parquet_closure.py --list-committable | xargs -r git add -f   # -f: rffm_parquet/ is gitignored by default
           if git diff --cached --quiet; then
             echo "No changes to commit (nothing newly closed since the last run)."
             exit 0
